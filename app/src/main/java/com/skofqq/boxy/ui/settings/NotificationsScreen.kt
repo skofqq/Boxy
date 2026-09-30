@@ -65,6 +65,10 @@ fun NotificationsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () 
     }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item {
             SectionCard(null) {
+                if (!permission) {
+                    NoticeCard(stringResource(R.string.update_tip_title), stringResource(R.string.notify_permission_off))
+                    Spacer(Modifier.height(6.dp))
+                }
                 SwitchRow(
                     BoxyIcons.Notifications,
                     stringResource(R.string.notify_status),
@@ -82,7 +86,7 @@ fun NotificationsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () 
                     }
                 }
                 SwitchRow(
-                    BoxyIcons.Subscriptions,
+                    BoxyIcons.SyncProblem,
                     stringResource(R.string.notify_subs),
                     stringResource(R.string.notify_subs_sub),
                     prefs.notifySubsFailed && permission,
@@ -100,10 +104,6 @@ fun NotificationsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () 
                             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     )
-                }
-                if (!permission) {
-                    Spacer(Modifier.height(6.dp))
-                    NoticeCard(stringResource(R.string.update_tip_title), stringResource(R.string.notify_permission_off))
                 }
             }
         }
