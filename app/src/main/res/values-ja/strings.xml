@@ -437,7 +437,7 @@
     <string name="settings_open_panel">起動時にパネルを開く</string>
     <string name="settings_open_panel_sub">パネル画面から開始</string>
     <string name="settings_notifications">通知</string>
-    <string name="settings_notifications_sub">操作ボタン付きの常駐サービス状態</string>
+    <string name="settings_notifications_sub">サービスの状態、サブスクリプション更新の失敗</string>
     <string name="settings_backup">バックアップと復元</string>
     <string name="settings_backup_sub">モジュールとアプリのルールをエクスポート / インポート</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">DNS ハイジャックと暗号化 DNS</string>
     <string name="tools_dns_row_sub">DNS ハイジャック、DNSCrypt、確認</string>
     <string name="dnscrypt_home_failed">停止中</string>
+    <string name="notify_page_sub">Boxy が表示する通知</string>
+    <string name="notify_status">サービスの状態</string>
+    <string name="notify_status_sub">ステータスバーに操作ボタン付きで表示</string>
+    <string name="notify_subs">サブスクリプション更新の失敗</string>
+    <string name="notify_subs_sub">予定された更新が失敗したとき</string>
+    <string name="notify_system">システムの通知設定</string>
+    <string name="notify_system_sub">サウンド、ロック画面、カテゴリ</string>
+    <string name="notify_permission_off">Boxy の通知は許可されていません。スイッチをオンにして許可するか、システム設定を開いてください。</string>
+    <string name="notify_channel_module">モジュールのイベント</string>
+    <string name="notify_subs_failed_title">サブスクリプションが更新されませんでした</string>
+    <string name="notify_subs_failed_download">サブスクリプションをダウンロードできませんでした。以前の設定を保持しています。</string>
+    <string name="notify_subs_failed_check">新しい設定がコアのチェックに通りませんでした。以前の設定を保持しています。</string>
+    <string name="notify_subs_failed_format">サブスクリプションの形式が不明です。以前の設定を保持しています。</string>
 </resources>

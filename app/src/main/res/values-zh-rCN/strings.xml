@@ -408,7 +408,7 @@
     <string name="settings_open_panel">启动时打开面板</string>
     <string name="settings_open_panel_sub">以面板页面启动</string>
     <string name="settings_notifications">通知</string>
-    <string name="settings_notifications_sub">带操作按钮的常驻服务状态</string>
+    <string name="settings_notifications_sub">服务状态、订阅更新失败</string>
     <string name="settings_backup">备份与恢复</string>
     <string name="settings_backup_sub">导出 / 导入模块和应用规则</string>
     <string name="settings_module_not_installed">未安装</string>
@@ -667,4 +667,17 @@
     <string name="tools_dns_sub">DNS 劫持与加密 DNS</string>
     <string name="tools_dns_row_sub">DNS 劫持、DNSCrypt、检查</string>
     <string name="dnscrypt_home_failed">故障</string>
+    <string name="notify_page_sub">Boxy 显示哪些通知</string>
+    <string name="notify_status">服务状态</string>
+    <string name="notify_status_sub">在状态栏，带控制按钮</string>
+    <string name="notify_subs">订阅更新失败</string>
+    <string name="notify_subs_sub">定时更新失败时</string>
+    <string name="notify_system">系统通知设置</string>
+    <string name="notify_system_sub">声音、锁屏、类别</string>
+    <string name="notify_permission_off">Boxy 的通知未被允许。打开任一开关以允许，或打开系统设置。</string>
+    <string name="notify_channel_module">模块事件</string>
+    <string name="notify_subs_failed_title">订阅未更新</string>
+    <string name="notify_subs_failed_download">无法下载订阅，已保留原配置。</string>
+    <string name="notify_subs_failed_check">新配置未通过内核检查，已保留原配置。</string>
+    <string name="notify_subs_failed_format">订阅格式未知，已保留原配置。</string>
 </resources>

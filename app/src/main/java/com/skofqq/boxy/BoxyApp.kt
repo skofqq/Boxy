@@ -16,6 +16,7 @@ class BoxyApp : Application() {
         com.skofqq.boxy.automation.Automation.reschedule(this)
         com.skofqq.boxy.net.Mirrors.current = prefs.githubMirror
         com.skofqq.boxy.service.BoxStatusService.createChannel(this)
+        com.skofqq.boxy.notify.ModuleEventReceiver.createChannel(this)
     }
 
     /** Re-reads preferences after a restore. */
@@ -26,6 +27,10 @@ class BoxyApp : Application() {
     companion object {
         lateinit var instance: BoxyApp
             private set
+
+        /** An activity of the app is on screen (set by MainActivity). */
+        @Volatile
+        var foreground = false
 
         init {
             Shell.enableVerboseLogging = BuildConfigCompat.DEBUG

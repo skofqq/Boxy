@@ -437,7 +437,7 @@
     <string name="settings_open_panel">Açılışta paneli aç</string>
     <string name="settings_open_panel_sub">Panel ekranıyla başla</string>
     <string name="settings_notifications">Bildirimler</string>
-    <string name="settings_notifications_sub">İşlemlerle kalıcı hizmet durumu</string>
+    <string name="settings_notifications_sub">Hizmet durumu, başarısız abonelik güncellemeleri</string>
     <string name="settings_backup">Yedekleme ve geri yükleme</string>
     <string name="settings_backup_sub">Modül ve uygulama kurallarını dışa / içe aktar</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">DNS yakalama ve şifreli DNS</string>
     <string name="tools_dns_row_sub">DNS yakalama, DNSCrypt, denetim</string>
     <string name="dnscrypt_home_failed">Hata</string>
+    <string name="notify_page_sub">Boxy’nin gösterdiği bildirimler</string>
+    <string name="notify_status">Hizmet durumu</string>
+    <string name="notify_status_sub">Durum çubuğunda, kontrol düğmeleriyle</string>
+    <string name="notify_subs">Abonelik güncellenemedi</string>
+    <string name="notify_subs_sub">Zamanlanmış güncelleme başarısız olursa</string>
+    <string name="notify_system">Sistem bildirim ayarları</string>
+    <string name="notify_system_sub">Ses, kilit ekranı, kanallar</string>
+    <string name="notify_permission_off">Boxy için bildirimlere izin verilmiyor. İzin vermek için bir anahtarı açın veya sistem ayarlarını açın.</string>
+    <string name="notify_channel_module">Modül olayları</string>
+    <string name="notify_subs_failed_title">Abonelik güncellenmedi</string>
+    <string name="notify_subs_failed_download">Abonelik indirilemedi. Önceki yapılandırma korundu.</string>
+    <string name="notify_subs_failed_check">Yeni yapılandırma çekirdek denetiminden geçmedi. Önceki korundu.</string>
+    <string name="notify_subs_failed_format">Aboneliğin biçimi bilinmiyor. Önceki yapılandırma korundu.</string>
 </resources>

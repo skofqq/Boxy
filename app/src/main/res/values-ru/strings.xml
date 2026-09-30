@@ -445,7 +445,7 @@
     <string name="settings_open_panel">Открывать панель при запуске</string>
     <string name="settings_open_panel_sub">Начинать с экрана панели</string>
     <string name="settings_notifications">Уведомления</string>
-    <string name="settings_notifications_sub">Постоянный статус сервиса с кнопками</string>
+    <string name="settings_notifications_sub">Статус сервиса, сбои обновления подписки</string>
     <string name="settings_backup">Резервное копирование</string>
     <string name="settings_backup_sub">Экспорт и импорт модуля и правил приложений</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -709,4 +709,17 @@
     <string name="tools_dns_sub">Перехват DNS и шифрованный DNS</string>
     <string name="tools_dns_row_sub">Перехват DNS, DNSCrypt, проверка</string>
     <string name="dnscrypt_home_failed">Сбой</string>
+    <string name="notify_page_sub">Какие уведомления показывает Boxy</string>
+    <string name="notify_status">Статус сервиса</string>
+    <string name="notify_status_sub">В строке состояния, с кнопками управления</string>
+    <string name="notify_subs">Сбой обновления подписки</string>
+    <string name="notify_subs_sub">Если обновление по расписанию не удалось</string>
+    <string name="notify_system">Системные настройки уведомлений</string>
+    <string name="notify_system_sub">Звук, экран блокировки, категории</string>
+    <string name="notify_permission_off">Уведомления для Boxy не разрешены. Включите переключатель, чтобы разрешить их, или откройте системные настройки.</string>
+    <string name="notify_channel_module">События модуля</string>
+    <string name="notify_subs_failed_title">Подписка не обновилась</string>
+    <string name="notify_subs_failed_download">Не удалось скачать подписку. Оставлена прежняя конфигурация.</string>
+    <string name="notify_subs_failed_check">Новая конфигурация не прошла проверку ядром. Оставлена прежняя.</string>
+    <string name="notify_subs_failed_format">У подписки неизвестный формат. Оставлена прежняя конфигурация.</string>
 </resources>

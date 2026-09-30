@@ -457,7 +457,7 @@
     <string name="settings_open_panel">Open Panel on launch</string>
     <string name="settings_open_panel_sub">Start on Panel screen</string>
     <string name="settings_notifications">Notifications</string>
-    <string name="settings_notifications_sub">Persistent service status with actions</string>
+    <string name="settings_notifications_sub">Service status, failed subscription updates</string>
     <string name="settings_backup">Backup &amp; restore</string>
     <string name="settings_backup_sub">Export / import module and app rules</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -721,4 +721,17 @@
     <string name="tools_dns_sub">DNS hijack and encrypted DNS</string>
     <string name="tools_dns_row_sub">DNS hijack, DNSCrypt, check</string>
     <string name="dnscrypt_home_failed">Down</string>
+    <string name="notify_page_sub">Choose which notifications Boxy shows</string>
+    <string name="notify_status">Service status</string>
+    <string name="notify_status_sub">In the status bar, with control buttons</string>
+    <string name="notify_subs">Failed subscription update</string>
+    <string name="notify_subs_sub">When a scheduled update fails</string>
+    <string name="notify_system">System notification settings</string>
+    <string name="notify_system_sub">Sound, lock screen, channels</string>
+    <string name="notify_permission_off">Notifications are not allowed for Boxy. Turn a switch on to allow them, or open the system settings.</string>
+    <string name="notify_channel_module">Module events</string>
+    <string name="notify_subs_failed_title">Subscription not updated</string>
+    <string name="notify_subs_failed_download">Could not download the subscription. The previous config is kept.</string>
+    <string name="notify_subs_failed_check">The new config did not pass the core check. The previous config is kept.</string>
+    <string name="notify_subs_failed_format">The subscription has an unknown format. The previous config is kept.</string>
 </resources>

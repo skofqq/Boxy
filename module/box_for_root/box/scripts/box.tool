@@ -378,6 +378,15 @@ upgeox() {
   fi
 }
 
+# Tells Boxy that a subscription update failed, so it can show a notification (it can be turned off in the app).
+# reason: download | check | format. Nothing happens when Boxy is not installed.
+notify_subs_failed() {
+  local reason="$1" detail="$2"
+  am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.SUBS_FAILED \
+    -n com.skofqq.boxy/.notify.ModuleEventReceiver \
+    --es reason "${reason}" --es core "${bin_name}" --es detail "${detail}" >/dev/null 2>&1 &
+}
+
 # Tests a config with the current core like box.service does before start.
 # Returns 0 when the core accepts it or when there is no core binary to test with yet.
 check_config() {
@@ -397,6 +406,7 @@ check_config() {
 rollback_config() {
   local file="$1"
   log Error "$(tail -n 5 "${box_run}/check.log" 2>/dev/null)"
+  notify_subs_failed check "$(grep -m1 -iE 'error|fatal|failed' "${box_run}/check.log" 2>/dev/null | cut -c1-300)"
   if [ -f "${file}.bak" ]; then
     mv -f "${file}.bak" "${file}"
     log Warning "New config failed the check, the previous ${file##*/} is kept"
@@ -489,10 +499,12 @@ upsubs() {
                     mv "${update_file_name}" "${clash_provide_config}"
                   else
                     log Error "File is not valid Base64"
+                    notify_subs_failed format ""
                     return 1
                   fi
                 else
                   log Error "${update_file_name} Unknown file format: cannot detect proxies, subscription URLs, or valid Base64"
+                  notify_subs_failed format ""
                   return 1
                 fi
 
@@ -510,6 +522,7 @@ upsubs() {
               fi
             else
               log Error "update $bin_name subscription failed → ${token_url}"
+              notify_subs_failed download ""
               return 1
             fi
           done
@@ -545,6 +558,7 @@ upsubs() {
             exit 0
           else
             log Error "update subscription failed"
+            notify_subs_failed download ""
             return 1
           fi
         else

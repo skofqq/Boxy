@@ -437,7 +437,7 @@
     <string name="settings_open_panel">Beim Start Panel öffnen</string>
     <string name="settings_open_panel_sub">Mit dem Panel-Bildschirm starten</string>
     <string name="settings_notifications">Benachrichtigungen</string>
-    <string name="settings_notifications_sub">Dauerhafter Dienststatus mit Aktionen</string>
+    <string name="settings_notifications_sub">Dienststatus, fehlgeschlagene Abo-Updates</string>
     <string name="settings_backup">Sichern &amp; wiederherstellen</string>
     <string name="settings_backup_sub">Modul- und App-Regeln exportieren / importieren</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">DNS-Übernahme und verschlüsseltes DNS</string>
     <string name="tools_dns_row_sub">DNS-Übernahme, DNSCrypt, Prüfung</string>
     <string name="dnscrypt_home_failed">Ausfall</string>
+    <string name="notify_page_sub">Welche Benachrichtigungen Boxy zeigt</string>
+    <string name="notify_status">Dienststatus</string>
+    <string name="notify_status_sub">In der Statusleiste, mit Steuertasten</string>
+    <string name="notify_subs">Abo-Update fehlgeschlagen</string>
+    <string name="notify_subs_sub">Wenn ein geplantes Update scheitert</string>
+    <string name="notify_system">System-Benachrichtigungseinstellungen</string>
+    <string name="notify_system_sub">Ton, Sperrbildschirm, Kanäle</string>
+    <string name="notify_permission_off">Benachrichtigungen sind für Boxy nicht erlaubt. Schalter einschalten, um sie zu erlauben, oder die Systemeinstellungen öffnen.</string>
+    <string name="notify_channel_module">Modulereignisse</string>
+    <string name="notify_subs_failed_title">Abo nicht aktualisiert</string>
+    <string name="notify_subs_failed_download">Abo konnte nicht geladen werden. Die bisherige Konfiguration bleibt.</string>
+    <string name="notify_subs_failed_check">Die neue Konfiguration hat die Kernprüfung nicht bestanden. Die bisherige bleibt.</string>
+    <string name="notify_subs_failed_format">Das Abo hat ein unbekanntes Format. Die bisherige Konfiguration bleibt.</string>
 </resources>

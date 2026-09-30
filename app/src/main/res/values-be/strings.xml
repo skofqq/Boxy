@@ -437,7 +437,7 @@
     <string name="settings_open_panel">Адкрываць панэль пры запуску</string>
     <string name="settings_open_panel_sub">Пачынаць з экрана панэлі</string>
     <string name="settings_notifications">Апавяшчэнні</string>
-    <string name="settings_notifications_sub">Пастаянны стан сэрвісу з кнопкамі</string>
+    <string name="settings_notifications_sub">Статус сэрвісу, збоі абнаўлення падпіскі</string>
     <string name="settings_backup">Рэзервовая копія і аднаўленне</string>
     <string name="settings_backup_sub">Экспарт / імпарт модуля і правіл праграм</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">Перахоп DNS і шыфраваны DNS</string>
     <string name="tools_dns_row_sub">Перахоп DNS, DNSCrypt, праверка</string>
     <string name="dnscrypt_home_failed">Збой</string>
+    <string name="notify_page_sub">Якія апавяшчэнні паказвае Boxy</string>
+    <string name="notify_status">Статус сэрвісу</string>
+    <string name="notify_status_sub">У радку стану, з кнопкамі кіравання</string>
+    <string name="notify_subs">Збой абнаўлення падпіскі</string>
+    <string name="notify_subs_sub">Калі абнаўленне па раскладзе не ўдалося</string>
+    <string name="notify_system">Сістэмныя налады апавяшчэнняў</string>
+    <string name="notify_system_sub">Гук, экран блакіроўкі, катэгорыі</string>
+    <string name="notify_permission_off">Апавяшчэнні для Boxy не дазволены. Уключыце пераключальнік, каб дазволіць іх, або адкрыйце сістэмныя налады.</string>
+    <string name="notify_channel_module">Падзеі модуля</string>
+    <string name="notify_subs_failed_title">Падпіска не абнавілася</string>
+    <string name="notify_subs_failed_download">Не ўдалося спампаваць падпіску. Пакінута папярэдняя канфігурацыя.</string>
+    <string name="notify_subs_failed_check">Новая канфігурацыя не прайшла праверку ядром. Пакінута папярэдняя.</string>
+    <string name="notify_subs_failed_format">У падпіскі невядомы фармат. Пакінута папярэдняя канфігурацыя.</string>
 </resources>

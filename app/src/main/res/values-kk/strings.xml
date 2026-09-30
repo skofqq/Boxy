@@ -437,7 +437,7 @@
     <string name="settings_open_panel">Іске қосқанда панельді ашу</string>
     <string name="settings_open_panel_sub">Панель экранынан бастау</string>
     <string name="settings_notifications">Хабарландырулар</string>
-    <string name="settings_notifications_sub">Түймелері бар тұрақты қызмет күйі</string>
+    <string name="settings_notifications_sub">Қызмет күйі, жазылымды жаңарту ақаулары</string>
     <string name="settings_backup">Сақтық көшірме және қалпына келтіру</string>
     <string name="settings_backup_sub">Модуль мен қолданба ережелерін экспорттау / импорттау</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">DNS ұстау және шифрланған DNS</string>
     <string name="tools_dns_row_sub">DNS ұстау, DNSCrypt, тексеру</string>
     <string name="dnscrypt_home_failed">Ақау</string>
+    <string name="notify_page_sub">Boxy қандай хабарландыруларды көрсетеді</string>
+    <string name="notify_status">Қызмет күйі</string>
+    <string name="notify_status_sub">Күй жолында, басқару түймелерімен</string>
+    <string name="notify_subs">Жазылымды жаңарту ақауы</string>
+    <string name="notify_subs_sub">Кесте бойынша жаңарту сәтсіз болса</string>
+    <string name="notify_system">Жүйелік хабарландыру параметрлері</string>
+    <string name="notify_system_sub">Дыбыс, құлып экраны, санаттар</string>
+    <string name="notify_permission_off">Boxy үшін хабарландыруларға рұқсат жоқ. Рұқсат беру үшін қосқышты қосыңыз немесе жүйелік параметрлерді ашыңыз.</string>
+    <string name="notify_channel_module">Модуль оқиғалары</string>
+    <string name="notify_subs_failed_title">Жазылым жаңартылмады</string>
+    <string name="notify_subs_failed_download">Жазылымды жүктеу мүмкін болмады. Алдыңғы конфигурация қалдырылды.</string>
+    <string name="notify_subs_failed_check">Жаңа конфигурация ядро тексеруінен өтпеді. Алдыңғысы қалдырылды.</string>
+    <string name="notify_subs_failed_format">Жазылым пішімі белгісіз. Алдыңғы конфигурация қалдырылды.</string>
 </resources>

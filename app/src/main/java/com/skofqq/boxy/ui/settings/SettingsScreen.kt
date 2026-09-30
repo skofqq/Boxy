@@ -66,6 +66,7 @@ private const val ROUTE_APPEARANCE = "appearance"
 private const val ROUTE_LATENCY = "latency"
 private const val ROUTE_BACKUP = "backup"
 private const val ROUTE_LICENSES = "licenses"
+private const val ROUTE_NOTIFICATIONS = "notifications"
 
 /** Settings tab with its own page stack (appearance extras, latency targets, backup, licenses). */
 @Composable
@@ -90,6 +91,7 @@ fun SettingsScreen(contentPadding: PaddingValues, prefs: Prefs, active: Boolean)
                 ROUTE_LATENCY -> LatencyTargetsScreen(contentPadding, prefs, pop)
                 ROUTE_BACKUP -> BackupScreen(contentPadding, prefs, pop)
                 ROUTE_LICENSES -> LicensesScreen(contentPadding, pop)
+                ROUTE_NOTIFICATIONS -> NotificationsScreen(contentPadding, prefs, pop)
                 else -> SettingsMain(contentPadding, prefs, push)
             }
         }
@@ -125,11 +127,6 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
         appUpdate = runCatching {
             Updates.appReleases()?.firstOrNull { !it.prerelease }?.version?.takeIf { Updates.isNewer(it, versionName) }
         }.getOrNull()
-    }
-
-    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        prefs.updateNotifications(granted)
-        BoxStatusService.sync(context, granted)
     }
 
     val themeChoices = buildList {
@@ -213,15 +210,8 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SwitchRow(BoxyIcons.Dashboard, stringResource(R.string.settings_open_panel), stringResource(R.string.settings_open_panel_sub), prefs.openPanelOnLaunch) {
                     prefs.updateOpenPanelOnLaunch(it)
                 }
-                SwitchRow(BoxyIcons.Notifications, stringResource(R.string.settings_notifications), stringResource(R.string.settings_notifications_sub), prefs.notifications) { on ->
-                    if (on && Build.VERSION.SDK_INT >= 33 &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        prefs.updateNotifications(on)
-                        BoxStatusService.sync(context, on)
-                    }
+                SettingsRow(BoxyIcons.Notifications, stringResource(R.string.settings_notifications), stringResource(R.string.settings_notifications_sub)) {
+                    push(ROUTE_NOTIFICATIONS)
                 }
                 SettingsRow(
                     BoxyIcons.Link,

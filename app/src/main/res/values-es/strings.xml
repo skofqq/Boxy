@@ -437,7 +437,7 @@
     <string name="settings_open_panel">Abrir el panel al iniciar</string>
     <string name="settings_open_panel_sub">Empezar en la pantalla del panel</string>
     <string name="settings_notifications">Notificaciones</string>
-    <string name="settings_notifications_sub">Estado persistente del servicio con acciones</string>
+    <string name="settings_notifications_sub">Estado del servicio, fallos al actualizar la suscripción</string>
     <string name="settings_backup">Copia y restauración</string>
     <string name="settings_backup_sub">Exportar / importar módulo y reglas de apps</string>
     <string name="settings_update_available_value">%1$s → %2$s</string>
@@ -697,4 +697,17 @@
     <string name="tools_dns_sub">Captura de DNS y DNS cifrado</string>
     <string name="tools_dns_row_sub">Captura de DNS, DNSCrypt, comprobación</string>
     <string name="dnscrypt_home_failed">Fallo</string>
+    <string name="notify_page_sub">Qué notificaciones muestra Boxy</string>
+    <string name="notify_status">Estado del servicio</string>
+    <string name="notify_status_sub">En la barra de estado, con botones de control</string>
+    <string name="notify_subs">Fallo al actualizar la suscripción</string>
+    <string name="notify_subs_sub">Si falla una actualización programada</string>
+    <string name="notify_system">Ajustes de notificaciones del sistema</string>
+    <string name="notify_system_sub">Sonido, pantalla de bloqueo, canales</string>
+    <string name="notify_permission_off">Las notificaciones de Boxy no están permitidas. Activa un interruptor para permitirlas o abre los ajustes del sistema.</string>
+    <string name="notify_channel_module">Eventos del módulo</string>
+    <string name="notify_subs_failed_title">La suscripción no se actualizó</string>
+    <string name="notify_subs_failed_download">No se pudo descargar la suscripción. Se mantiene la configuración anterior.</string>
+    <string name="notify_subs_failed_check">La nueva configuración no pasó la comprobación del núcleo. Se mantiene la anterior.</string>
+    <string name="notify_subs_failed_format">La suscripción tiene un formato desconocido. Se mantiene la configuración anterior.</string>
 </resources>

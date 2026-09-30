@@ -46,7 +46,7 @@ Languages: English, Русский, Українська, Беларуская, 
 - Liquid glass navigation bar with backdrop blur and lens, sheet blur, UI scale, system bars
 - Navigation: Apps or Logs as a fourth tab
 - GitHub mirror for all downloads (module scripts included)
-- Status notification with actions, Quick Settings tile, home screen widgets, start at boot switch, open panel on launch
+- Notifications: service status with actions and failed subscription updates (each can be turned off), Quick Settings tile, home screen widgets, start at boot switch, open panel on launch
 - Backup and restore of module files and app preferences
 - App updates (GitHub releases) and module updates (`updateJson`)
 

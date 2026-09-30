@@ -1,5 +1,13 @@
 # Box for Root (Boxy edition)
 
+## v1.10.2-ru.7
+
+- A failed subscription update (download, core check, unknown format) is reported to Boxy with `am broadcast`,
+  so the app can show a notification; nothing happens when Boxy is not installed
+
+- Сбой обновления подписки (скачивание, проверка ядром, неизвестный формат) передаётся в Boxy через `am broadcast`,
+  приложение показывает уведомление; если Boxy не установлен, ничего не происходит
+
 ## v1.10.2-ru.6
 
 - `quic="disable"` (now a settings.ini key) blocks QUIC only for apps; the core and dnscrypt-proxy keep UDP 443,

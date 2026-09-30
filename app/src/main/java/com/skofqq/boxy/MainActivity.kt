@@ -84,6 +84,16 @@ private enum class Overlay { APPS, LOGS, PANEL, SUBSTORE }
 
 class MainActivity : ComponentActivity() {
 
+    override fun onStart() {
+        super.onStart()
+        BoxyApp.foreground = true
+    }
+
+    override fun onStop() {
+        BoxyApp.foreground = false
+        super.onStop()
+    }
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         ImportLinks.fromIntent(intent)?.let { ImportBus.request = it }

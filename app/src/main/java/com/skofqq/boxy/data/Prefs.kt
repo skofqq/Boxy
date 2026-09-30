@@ -99,6 +99,9 @@ class Prefs(context: Context) {
         private set
     var notifications by mutableStateOf(sp.getBoolean("notifications", false))
         private set
+    /** Notification when the module could not update a subscription (download, core check, format). */
+    var notifySubsFailed by mutableStateOf(sp.getBoolean("notify_subs_failed", true))
+        private set
     var onboardingDone by mutableStateOf(sp.getBoolean("onboarding_done", false))
         private set
     var filterChains by mutableStateOf(sp.getString("filter_chains", "") ?: "")
@@ -123,6 +126,7 @@ class Prefs(context: Context) {
     fun updateUiScale(v: Int) { uiScale = v.coerceIn(80, 120); sp.edit().putInt("ui_scale", uiScale).apply() }
     fun updateOpenPanelOnLaunch(v: Boolean) { openPanelOnLaunch = v; sp.edit().putBoolean("open_panel_on_launch", v).apply() }
     fun updateNotifications(v: Boolean) { notifications = v; sp.edit().putBoolean("notifications", v).apply() }
+    fun updateNotifySubsFailed(v: Boolean) { notifySubsFailed = v; sp.edit().putBoolean("notify_subs_failed", v).apply() }
     fun updateOnboardingDone(v: Boolean) { onboardingDone = v; sp.edit().putBoolean("onboarding_done", v).apply() }
     fun updateFilterChains(v: String) { filterChains = v; sp.edit().putString("filter_chains", v).apply() }
 
