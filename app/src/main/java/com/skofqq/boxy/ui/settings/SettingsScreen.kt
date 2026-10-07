@@ -172,18 +172,18 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
             SectionCard(stringResource(R.string.settings_module), stringResource(R.string.settings_module_sub)) {
                 val m = moduleSetup
                 val dash = stringResource(R.string.common_dash)
-                SettingsRow(BoxyIcons.Storage, stringResource(R.string.sheet_core_title), if (applying) restarting else m?.core?.title ?: dash) {
+                SettingsRow(BoxyIcons.Core, stringResource(R.string.sheet_core_title), if (applying) restarting else m?.core?.title ?: dash) {
                     if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.CORE
                 }
                 SettingsRow(
-                    BoxyIcons.Router,
+                    BoxyIcons.NetworkMode,
                     stringResource(R.string.sheet_mode_title),
                     m?.mode?.let { com.skofqq.boxy.ui.components.modeTitle(it) + " · " + com.skofqq.boxy.ui.components.modeDescription(it) } ?: dash,
                 ) {
                     if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.MODE
                 }
                 SettingsRow(
-                    BoxyIcons.Language,
+                    BoxyIcons.IpAddress,
                     stringResource(R.string.sheet_ipv6_title),
                     m?.ipv6?.let { stringResource(if (it) R.string.common_on else R.string.common_off) } ?: dash,
                     showDivider = false,

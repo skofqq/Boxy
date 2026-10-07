@@ -238,6 +238,47 @@ object BoxyIcons {
         "M20,13H4c-0.55,0 -1,0.45 -1,1v6c0,0.55 0.45,1 1,1h16c0.55,0 1,-0.45 1,-1v-6c0,-0.55 -0.45,-1 -1,-1zM7,19c-1.1,0 -2,-0.9 -2,-2s0.9,-2 2,-2 2,0.9 2,2 -0.9,2 -2,2zM20,3H4c-0.55,0 -1,0.45 -1,1v6c0,0.55 0.45,1 1,1h16c0.55,0 1,-0.45 1,-1V4c0,-0.55 -0.45,-1 -1,-1zM7,9c-1.1,0 -2,-0.9 -2,-2s0.9,-2 2,-2 2,0.9 2,2 -0.9,2 -2,2z",
     )
 
+    /** Chip with two sliders: the active core (Settings → Module). */
+    val Core = strokeIcon(
+        "Core",
+        "M7.5,4h9a3,3 0 0 1 3,3v10a3,3 0 0 1 -3,3h-9a3,3 0 0 1 -3,-3v-10a3,3 0 0 1 3,-3z" +
+            "M8,2v2M12,2v2M16,2v2M8,20v2M12,20v2M16,20v2M2,8h2M2,12h2M2,16h2M20,8h2M20,12h2M20,16h2" +
+            "M11.1,9.4h4.1M8.9,14.4h4.1" +
+            "M11.1,9.4a1.6,1.6 0 1 1 -3.2,0a1.6,1.6 0 1 1 3.2,0z" +
+            "M16.1,14.4a1.6,1.6 0 1 1 -3.2,0a1.6,1.6 0 1 1 3.2,0z",
+    )
+
+    /** Hub with eight nodes (after the Noun Project "Network" icon by Alzam), redrawn in the app's weight: the network mode. */
+    val NetworkMode: ImageVector = ImageVector.Builder(name = "NetworkMode", defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+        .addPath(
+            pathData = PathParser().parsePathString(
+                "M15.3,12a3.3,3.3 0 1 1 -6.6,0a3.3,3.3 0 1 1 6.6,0zM16.60,12.00L19.40,12.00M15.25,15.25L17.23,17.23M12.00,16.60L12.00,19.40M8.75,15.25L6.77,17.23M7.40,12.00L4.60,12.00M8.75,8.75L6.77,6.77M12.00,7.40L12.00,4.60M15.25,8.75L17.23,6.77",
+            ).toNodes(),
+            stroke = SolidColor(Color.Black),
+            strokeLineWidth = 2f,
+            strokeLineCap = androidx.compose.ui.graphics.StrokeCap.Round,
+        )
+        .addPath(pathData = PathParser().parsePathString("M23.10,12.00a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM20.41,18.51a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM13.90,21.20a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM7.39,18.51a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM4.70,12.00a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM7.39,5.49a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM13.90,2.80a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0zM20.41,5.49a1.9,1.9 0 1 1 -3.80,0a1.9,1.9 0 1 1 3.80,0z").toNodes(), fill = SolidColor(Color.Black))
+        .build()
+
+    /** Rounded box with "IP": IPv6 switch. */
+    val IpAddress = strokeIcon(
+        "IpAddress",
+        "M2,15V9a6,6 0 0 1 6,-6h8a6,6 0 0 1 6,6v6a6,6 0 0 1 -6,6H8a6,6 0 0 1 -6,-6z" +
+            "M12,9v6M9,9v6M12,12h2.5a1.5,1.5 0 0 0 0,-3H12",
+    )
+
+    /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
+    private fun strokeIcon(name: String, path: String): ImageVector =
+        ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+            .addPath(
+                pathData = PathParser().parsePathString(path).toNodes(),
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                strokeLineJoin = androidx.compose.ui.graphics.StrokeJoin.Round,
+            ).build()
+
     private fun icon(name: String, path: String, autoMirror: Boolean = false): ImageVector =
         ImageVector.Builder(
             name = name,
