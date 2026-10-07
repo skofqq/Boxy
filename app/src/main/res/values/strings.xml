@@ -734,4 +734,10 @@
     <string name="notify_subs_failed_download">Could not download the subscription. The previous config is kept.</string>
     <string name="notify_subs_failed_check">The new config did not pass the core check. The previous config is kept.</string>
     <string name="notify_subs_failed_format">The subscription has an unknown format. The previous config is kept.</string>
+    <string name="settings_module">Module</string>
+    <string name="settings_module_sub">Core, network mode and IPv6</string>
+    <string name="module_core_missing">Not installed</string>
+    <string name="module_core_missing_toast">This core is not installed. Download it in Tools → Update → Core.</string>
+    <string name="module_applying">Applying and restarting the service…</string>
+    <string name="module_apply_failed">Could not apply the setting or restart the service. Check the log.</string>
 </resources>

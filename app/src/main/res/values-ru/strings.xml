@@ -722,4 +722,10 @@
     <string name="notify_subs_failed_download">Не удалось скачать подписку. Оставлена прежняя конфигурация.</string>
     <string name="notify_subs_failed_check">Новая конфигурация не прошла проверку ядром. Оставлена прежняя.</string>
     <string name="notify_subs_failed_format">У подписки неизвестный формат. Оставлена прежняя конфигурация.</string>
+    <string name="settings_module">Модуль</string>
+    <string name="settings_module_sub">Ядро, режим сети и IPv6</string>
+    <string name="module_core_missing">Не установлено</string>
+    <string name="module_core_missing_toast">Это ядро не установлено. Скачайте его в «Утилиты → Обновление → Ядро».</string>
+    <string name="module_applying">Применяю и перезапускаю сервис…</string>
+    <string name="module_apply_failed">Не удалось применить настройку или перезапустить сервис. Посмотрите журнал.</string>
 </resources>

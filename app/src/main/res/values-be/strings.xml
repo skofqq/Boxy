@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">Не ўдалося спампаваць падпіску. Пакінута папярэдняя канфігурацыя.</string>
     <string name="notify_subs_failed_check">Новая канфігурацыя не прайшла праверку ядром. Пакінута папярэдняя.</string>
     <string name="notify_subs_failed_format">У падпіскі невядомы фармат. Пакінута папярэдняя канфігурацыя.</string>
+    <string name="settings_module">Модуль</string>
+    <string name="settings_module_sub">Ядро, рэжым сеткі і IPv6</string>
+    <string name="module_core_missing">Не ўсталявана</string>
+    <string name="module_core_missing_toast">Гэта ядро не ўсталявана. Спампуйце яго ў «Утыліты → Абнаўленне → Ядро».</string>
+    <string name="module_applying">Ужываю і перазапускаю сэрвіс…</string>
+    <string name="module_apply_failed">Не ўдалося ўжыць наладу або перазапусціць сэрвіс. Паглядзіце журнал.</string>
 </resources>

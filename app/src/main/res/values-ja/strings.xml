@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">サブスクリプションをダウンロードできませんでした。以前の設定を保持しています。</string>
     <string name="notify_subs_failed_check">新しい設定がコアのチェックに通りませんでした。以前の設定を保持しています。</string>
     <string name="notify_subs_failed_format">サブスクリプションの形式が不明です。以前の設定を保持しています。</string>
+    <string name="settings_module">モジュール</string>
+    <string name="settings_module_sub">コア、ネットワークモード、IPv6</string>
+    <string name="module_core_missing">未インストール</string>
+    <string name="module_core_missing_toast">このコアはインストールされていません。ツール → 更新 → コア からダウンロードしてください。</string>
+    <string name="module_applying">適用してサービスを再起動しています…</string>
+    <string name="module_apply_failed">設定を適用できないか、サービスを再起動できませんでした。ログを確認してください。</string>
 </resources>

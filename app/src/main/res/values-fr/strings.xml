@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">Impossible de télécharger l’abonnement. L’ancienne configuration est conservée.</string>
     <string name="notify_subs_failed_check">La nouvelle configuration n’a pas passé la vérification du cœur. L’ancienne est conservée.</string>
     <string name="notify_subs_failed_format">L’abonnement a un format inconnu. L’ancienne configuration est conservée.</string>
+    <string name="settings_module">Module</string>
+    <string name="settings_module_sub">Cœur, mode réseau et IPv6</string>
+    <string name="module_core_missing">Non installé</string>
+    <string name="module_core_missing_toast">Ce cœur n’est pas installé. Téléchargez-le dans Outils → Mise à jour → Cœur.</string>
+    <string name="module_applying">Application et redémarrage du service…</string>
+    <string name="module_apply_failed">Impossible d’appliquer le réglage ou de redémarrer le service. Consultez le journal.</string>
 </resources>

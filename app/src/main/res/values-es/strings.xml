@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">No se pudo descargar la suscripción. Se mantiene la configuración anterior.</string>
     <string name="notify_subs_failed_check">La nueva configuración no pasó la comprobación del núcleo. Se mantiene la anterior.</string>
     <string name="notify_subs_failed_format">La suscripción tiene un formato desconocido. Se mantiene la configuración anterior.</string>
+    <string name="settings_module">Módulo</string>
+    <string name="settings_module_sub">Núcleo, modo de red e IPv6</string>
+    <string name="module_core_missing">No instalado</string>
+    <string name="module_core_missing_toast">Este núcleo no está instalado. Descárgalo en Herramientas → Actualizar → Núcleo.</string>
+    <string name="module_applying">Aplicando y reiniciando el servicio…</string>
+    <string name="module_apply_failed">No se pudo aplicar el ajuste o reiniciar el servicio. Revisa el registro.</string>
 </resources>

@@ -11,7 +11,7 @@ Languages: English, Русский, Українська, Беларуская, 
 
 **Home**
 - Service status with Start / Stop / Restart, uptime, service details (PID, core version, memory, CPU, affinity) and config reload; DNSCrypt status
-- Switch core, network mode and IPv6 while the service is stopped
+- Switch core (incl. Clash Mihomo / Premium), network mode and IPv6 on Home and in Settings → Module; a running service is restarted automatically
 - Panel and Logs shortcuts, SubStore shortcut when the `sub_store` module is installed
 - Latency to three configurable targets
 - IP card (LAN or public WAN with country flag), public IPv4/IPv6 details

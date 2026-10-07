@@ -35,6 +35,22 @@ object BoxControl {
         return if (BoxModule.state().running) restart(context) else true.also { changed(context) }
     }
 
+    /**
+     * Writes settings.ini keys (core, network mode, IPv6). A running service is stopped first, so iptables
+     * are cleaned up with the old mode, and started again with the new settings.
+     */
+    suspend fun applySettings(context: Context, settings: List<Pair<String, String>>): Boolean {
+        val running = runCatching { BoxModule.state().running }.getOrDefault(false)
+        if (running) {
+            TrafficStats.sample(context)
+            runCatching { BoxModule.stop() }
+        }
+        val ok = settings.all { (k, v) -> BoxModule.writeSetting(k, v) }
+        val started = if (running) runCatching { BoxModule.start() }.getOrDefault(false) else true
+        changed(context)
+        return ok && started
+    }
+
     private suspend fun act(context: Context, block: suspend () -> Boolean): Boolean {
         val ok = runCatching { block() }.getOrDefault(false)
         changed(context)

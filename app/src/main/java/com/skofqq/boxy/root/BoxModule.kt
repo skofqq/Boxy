@@ -55,6 +55,21 @@ enum class IpsetStatus { AVAILABLE, MISSING_BINARY, NOT_SUPPORTED }
 val CORES = listOf("clash", "sing-box", "xray", "v2fly", "hysteria")
 val NETWORK_MODES = listOf("redirect", "tproxy", "mixed", "enhance", "tun")
 
+/** A core as the user picks it; clash comes as two builds (xclash_option). [binary] is relative to bin/. */
+data class CoreChoice(val id: String, val title: String, val binName: String, val xclash: String?, val binary: String)
+
+val CORE_CHOICES = listOf(
+    CoreChoice("mihomo", "Clash Mihomo", "clash", "mihomo", "xclash/mihomo"),
+    CoreChoice("premium", "Clash Premium", "clash", "premium", "xclash/premium"),
+    CoreChoice("sing-box", "Sing-Box", "sing-box", null, "sing-box"),
+    CoreChoice("xray", "Xray", "xray", null, "xray"),
+    CoreChoice("v2fly", "V2Ray", "v2fly", null, "v2fly"),
+    CoreChoice("hysteria", "Hysteria", "hysteria", null, "hysteria"),
+)
+
+/** Core, network mode and IPv6 from settings.ini, plus the cores whose binaries are present. */
+data class ModuleSetup(val core: CoreChoice?, val mode: String?, val ipv6: Boolean?, val installed: Set<String>)
+
 /**
  * Thin wrapper around the Box for Root module files and scripts.
  * Paths and commands follow the module's own action.sh / box.service / box.tool.
@@ -101,6 +116,19 @@ object BoxModule {
             ipv6 = kv["ipv6"]?.let { it == "true" },
             moduleVersion = kv["version"],
             uptimeSec = kv["age"]?.toLongOrNull(),
+        )
+    }
+
+    suspend fun moduleSetup(): ModuleSetup = withContext(Dispatchers.IO) {
+        val checks = CORE_CHOICES.joinToString("; ") { "[ -f $BOX_DIR/bin/${it.binary} ] && echo inst_${it.id}=1" }
+        val kv = parseKv(sh("grep -E '^(bin_name|xclash_option|network_mode|ipv6)=' $SETTINGS 2>/dev/null; $checks"))
+        val bin = unquote(kv["bin_name"])
+        val xclash = unquote(kv["xclash_option"])?.ifBlank { null } ?: "mihomo"
+        ModuleSetup(
+            core = CORE_CHOICES.firstOrNull { it.binName == bin && (it.xclash == null || it.xclash == xclash) },
+            mode = unquote(kv["network_mode"]),
+            ipv6 = unquote(kv["ipv6"])?.let { it == "true" },
+            installed = CORE_CHOICES.filter { kv["inst_${it.id}"] == "1" }.map { it.id }.toSet(),
         )
     }
 

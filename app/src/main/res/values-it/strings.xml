@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">Impossibile scaricare l’abbonamento. Resta la configurazione precedente.</string>
     <string name="notify_subs_failed_check">La nuova configurazione non ha superato il controllo del core. Resta la precedente.</string>
     <string name="notify_subs_failed_format">L’abbonamento ha un formato sconosciuto. Resta la configurazione precedente.</string>
+    <string name="settings_module">Modulo</string>
+    <string name="settings_module_sub">Core, modalità di rete e IPv6</string>
+    <string name="module_core_missing">Non installato</string>
+    <string name="module_core_missing_toast">Questo core non è installato. Scaricalo in Strumenti → Aggiorna → Core.</string>
+    <string name="module_applying">Applico e riavvio il servizio…</string>
+    <string name="module_apply_failed">Impossibile applicare l’impostazione o riavviare il servizio. Controlla il log.</string>
 </resources>

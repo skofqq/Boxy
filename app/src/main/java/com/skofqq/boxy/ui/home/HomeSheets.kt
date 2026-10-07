@@ -21,9 +21,7 @@ import com.skofqq.boxy.data.MetricCard
 import com.skofqq.boxy.data.Prefs
 import com.skofqq.boxy.net.GeoIp
 import com.skofqq.boxy.net.flagEmoji
-import com.skofqq.boxy.root.CORES
 import com.skofqq.boxy.root.IpsetStatus
-import com.skofqq.boxy.root.NETWORK_MODES
 import com.skofqq.boxy.ui.components.BoxySheet
 import com.skofqq.boxy.ui.components.IconInfoRow
 import com.skofqq.boxy.ui.components.InfoRow
@@ -44,35 +42,6 @@ fun HomeSheets(sheet: HomeSheet, vm: HomeViewModel, prefs: Prefs, onDismiss: () 
     val dash = stringResource(R.string.common_dash)
     when (sheet) {
         HomeSheet.NONE -> Unit
-
-        HomeSheet.CORE -> BoxySheet(stringResource(R.string.sheet_core_title), stringResource(R.string.sheet_core_subtitle), onDismiss) {
-            CORES.forEach { core ->
-                val current = vm.state?.core == core
-                OptionRow(core, if (current) stringResource(R.string.sheet_current) else null, current) {
-                    vm.setSetting("bin_name", core)
-                    onDismiss()
-                }
-            }
-        }
-
-        HomeSheet.MODE -> BoxySheet(stringResource(R.string.sheet_mode_title), stringResource(R.string.sheet_mode_subtitle), onDismiss) {
-            NETWORK_MODES.forEach { mode ->
-                val current = vm.state?.mode == mode
-                OptionRow(mode, modeDescription(mode), current) {
-                    vm.setSetting("network_mode", mode)
-                    onDismiss()
-                }
-            }
-        }
-
-        HomeSheet.IPV6 -> BoxySheet(stringResource(R.string.sheet_ipv6_title), stringResource(R.string.sheet_ipv6_subtitle), onDismiss) {
-            listOf(true, false).forEach { on ->
-                OptionRow(stringResource(if (on) R.string.common_on else R.string.common_off), null, vm.state?.ipv6 == on) {
-                    vm.setSetting("ipv6", on.toString())
-                    onDismiss()
-                }
-            }
-        }
 
         HomeSheet.DETAILS -> BoxySheet(stringResource(R.string.details_title), vm.state?.core, onDismiss) {
             val d = vm.details
@@ -196,15 +165,6 @@ private fun expandCpuList(list: String): String = list.split(',').flatMap { part
         else -> (a..b).map { it.toString() }
     }
 }.joinToString(",")
-
-@Composable
-private fun modeDescription(mode: String): String = when (mode) {
-    "redirect" -> "TCP + UDP (direct)"
-    "tproxy" -> "TCP + UDP"
-    "mixed" -> "redirect (TCP) + tun (UDP)"
-    "enhance" -> "redirect (TCP) + tproxy (UDP)"
-    else -> "TCP + UDP (auto-route)"
-}
 
 @Composable
 private fun GeoGroup(title: String, geo: GeoIp?, loading: Boolean) {

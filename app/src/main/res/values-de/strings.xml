@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">Abo konnte nicht geladen werden. Die bisherige Konfiguration bleibt.</string>
     <string name="notify_subs_failed_check">Die neue Konfiguration hat die Kernprüfung nicht bestanden. Die bisherige bleibt.</string>
     <string name="notify_subs_failed_format">Das Abo hat ein unbekanntes Format. Die bisherige Konfiguration bleibt.</string>
+    <string name="settings_module">Modul</string>
+    <string name="settings_module_sub">Kern, Netzwerkmodus und IPv6</string>
+    <string name="module_core_missing">Nicht installiert</string>
+    <string name="module_core_missing_toast">Dieser Kern ist nicht installiert. Lade ihn unter Werkzeuge → Update → Kern.</string>
+    <string name="module_applying">Wird angewendet, Dienst startet neu…</string>
+    <string name="module_apply_failed">Einstellung konnte nicht angewendet oder Dienst nicht neu gestartet werden. Siehe Log.</string>
 </resources>

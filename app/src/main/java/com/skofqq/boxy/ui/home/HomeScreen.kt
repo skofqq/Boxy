@@ -45,7 +45,7 @@ import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
 
-enum class HomeSheet { NONE, CORE, MODE, IPV6, DETAILS, GEO, SPEED, SUBSCRIPTION, SYSTEM, LAYOUT }
+enum class HomeSheet { NONE, DETAILS, GEO, SPEED, SUBSCRIPTION, SYSTEM, LAYOUT }
 
 @Composable
 fun HomeScreen(
@@ -74,9 +74,11 @@ fun HomeScreen(
 
     val state = vm.state
     val running = state?.running == true
-    val stopFirst = stringResource(R.string.home_stop_first)
-    fun editable(target: HomeSheet) {
-        if (running || vm.busy != Busy.NONE) Toast.makeText(context, stopFirst, Toast.LENGTH_SHORT).show() else sheet = target
+    var moduleSheet by remember { mutableStateOf<com.skofqq.boxy.ui.components.ModuleSetting?>(null) }
+    fun editable(target: com.skofqq.boxy.ui.components.ModuleSetting) {
+        if (vm.busy != Busy.NONE) return
+        vm.loadSetup()
+        moduleSheet = target
     }
 
     PinnedLazyPage(contentPadding, header = {
@@ -94,9 +96,9 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                                 state = state,
                                 busy = vm.busy,
                                 onStatusClick = { vm.loadDetails(); sheet = HomeSheet.DETAILS },
-                                onCore = { editable(HomeSheet.CORE) },
-                                onMode = { editable(HomeSheet.MODE) },
-                                onIpv6 = { editable(HomeSheet.IPV6) },
+                                onCore = { editable(com.skofqq.boxy.ui.components.ModuleSetting.CORE) },
+                                onMode = { editable(com.skofqq.boxy.ui.components.ModuleSetting.MODE) },
+                                onIpv6 = { editable(com.skofqq.boxy.ui.components.ModuleSetting.IPV6) },
                                 dnscrypt = vm.dnscrypt,
                                 onDnscrypt = onOpenDns,
                                 onStart = vm::start,
@@ -148,6 +150,9 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
     }
 
     HomeSheets(sheet, vm, prefs) { sheet = HomeSheet.NONE }
+    moduleSheet?.let { target ->
+        com.skofqq.boxy.ui.components.ModuleSettingSheet(target, vm.setup, onApply = vm::applySettings) { moduleSheet = null }
+    }
 }
 
 @Composable

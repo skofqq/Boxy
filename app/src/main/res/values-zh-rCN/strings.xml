@@ -680,4 +680,10 @@
     <string name="notify_subs_failed_download">无法下载订阅，已保留原配置。</string>
     <string name="notify_subs_failed_check">新配置未通过内核检查，已保留原配置。</string>
     <string name="notify_subs_failed_format">订阅格式未知，已保留原配置。</string>
+    <string name="settings_module">模块</string>
+    <string name="settings_module_sub">内核、网络模式和 IPv6</string>
+    <string name="module_core_missing">未安装</string>
+    <string name="module_core_missing_toast">该内核未安装。请在“工具 → 更新 → 内核”中下载。</string>
+    <string name="module_applying">正在应用并重启服务…</string>
+    <string name="module_apply_failed">无法应用设置或重启服务，请查看日志。</string>
 </resources>

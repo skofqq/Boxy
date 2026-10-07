@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -120,6 +121,24 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: "?"
     }
 
+    var moduleSetup by remember { mutableStateOf<com.skofqq.boxy.root.ModuleSetup?>(null) }
+    var settingSheet by remember { mutableStateOf<com.skofqq.boxy.ui.components.ModuleSetting?>(null) }
+    var applying by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { moduleSetup = runCatching { BoxModule.moduleSetup() }.getOrNull() }
+    val restarting = stringResource(R.string.module_applying)
+    val applyFailed = stringResource(R.string.module_apply_failed)
+    fun applyModule(settings: List<Pair<String, String>>) {
+        if (applying) return
+        applying = true
+        scope.launch {
+            if (BoxModule.state().running) Toast.makeText(context, restarting, Toast.LENGTH_SHORT).show()
+            val ok = com.skofqq.boxy.service.BoxControl.applySettings(context.applicationContext, settings)
+            moduleSetup = runCatching { BoxModule.moduleSetup() }.getOrNull()
+            applying = false
+            if (!ok) Toast.makeText(context, applyFailed, Toast.LENGTH_LONG).show()
+        }
+    }
+
     LaunchedEffect(Unit) {
         moduleVersion = runCatching { BoxModule.state().moduleVersion }.getOrNull()
         moduleInstalled = moduleVersion != null
@@ -149,6 +168,30 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
     PinnedLazyPage(contentPadding, header = {
 PageHeader(stringResource(R.string.settings_title), stringResource(R.string.settings_subtitle))
 }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        item {
+            SectionCard(stringResource(R.string.settings_module), stringResource(R.string.settings_module_sub)) {
+                val m = moduleSetup
+                val dash = stringResource(R.string.common_dash)
+                SettingsRow(BoxyIcons.Storage, stringResource(R.string.sheet_core_title), if (applying) restarting else m?.core?.title ?: dash) {
+                    if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.CORE
+                }
+                SettingsRow(
+                    BoxyIcons.Router,
+                    stringResource(R.string.sheet_mode_title),
+                    m?.mode?.let { com.skofqq.boxy.ui.components.modeTitle(it) + " · " + com.skofqq.boxy.ui.components.modeDescription(it) } ?: dash,
+                ) {
+                    if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.MODE
+                }
+                SettingsRow(
+                    BoxyIcons.Language,
+                    stringResource(R.string.sheet_ipv6_title),
+                    m?.ipv6?.let { stringResource(if (it) R.string.common_on else R.string.common_off) } ?: dash,
+                    showDivider = false,
+                ) {
+                    if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.IPV6
+                }
+            }
+        }
         item {
             SectionCard(stringResource(R.string.settings_appearance), stringResource(R.string.settings_appearance_sub)) {
                 SettingsRow(BoxyIcons.Palette, stringResource(R.string.settings_theme), themeChoices.firstOrNull { it.value == prefs.themeMode }?.title) { themeDialog = true }
@@ -246,6 +289,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
         }
     }
 
+    settingSheet?.let { target ->
+        com.skofqq.boxy.ui.components.ModuleSettingSheet(target, moduleSetup, onApply = ::applyModule) { settingSheet = null }
+    }
     if (themeDialog) {
         ChoiceDialog(stringResource(R.string.settings_theme), themeChoices, prefs.themeMode, onSelect = {
             prefs.updateTheme(it)

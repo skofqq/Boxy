@@ -710,4 +710,10 @@
     <string name="notify_subs_failed_download">Жазылымды жүктеу мүмкін болмады. Алдыңғы конфигурация қалдырылды.</string>
     <string name="notify_subs_failed_check">Жаңа конфигурация ядро тексеруінен өтпеді. Алдыңғысы қалдырылды.</string>
     <string name="notify_subs_failed_format">Жазылым пішімі белгісіз. Алдыңғы конфигурация қалдырылды.</string>
+    <string name="settings_module">Модуль</string>
+    <string name="settings_module_sub">Ядро, желі режимі және IPv6</string>
+    <string name="module_core_missing">Орнатылмаған</string>
+    <string name="module_core_missing_toast">Бұл ядро орнатылмаған. Оны «Утилиталар → Жаңарту → Ядро» бөлімінде жүктеңіз.</string>
+    <string name="module_applying">Қолданып, қызметті қайта іске қосудамын…</string>
+    <string name="module_apply_failed">Параметрді қолдану немесе қызметті қайта іске қосу мүмкін болмады. Журналды қараңыз.</string>
 </resources>

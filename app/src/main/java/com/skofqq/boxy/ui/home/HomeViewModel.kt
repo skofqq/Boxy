@@ -291,10 +291,26 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
     }
 
     /** Core, mode and IPv6 can only change while the service is stopped. */
-    fun setSetting(key: String, value: String) {
-        viewModelScope.launch {
-            BoxModule.writeSetting(key, value)
-            state = BoxModule.state()
+    var setup by mutableStateOf<com.skofqq.boxy.root.ModuleSetup?>(null)
+        private set
+
+    fun loadSetup() {
+        viewModelScope.launch { setup = BoxModule.moduleSetup() }
+    }
+
+    /** Core / mode / IPv6 change; a running service is restarted with the new settings. */
+    fun applySettings(settings: List<Pair<String, String>>) {
+        if (state?.running == true) {
+            act(Busy.RESTARTING) {
+                com.skofqq.boxy.service.BoxControl.applySettings(BoxyApp.instance, settings)
+                setup = BoxModule.moduleSetup()
+            }
+        } else {
+            viewModelScope.launch {
+                com.skofqq.boxy.service.BoxControl.applySettings(BoxyApp.instance, settings)
+                setup = BoxModule.moduleSetup()
+                state = BoxModule.state()
+            }
         }
     }
 
