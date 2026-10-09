@@ -1,5 +1,15 @@
 # Box for Root (Boxy edition)
 
+## v1.10.2-ru.8
+
+- Wi-Fi hotspot no longer switches itself off when it is turned on while the service runs: clash `dns.listen`
+  on port 53 is moved to 1053 at start, so Android's tethering DNS (dnsmasq) can bind port 53.
+  The DNS hijack follows the port, nothing else changes
+
+- Точка доступа больше не выключается сама, если её включить при работающем сервисе: `dns.listen` clash
+  с порта 53 при запуске переносится на 1053, и DNS точки доступа (dnsmasq) может занять порт 53.
+  Перехват DNS переключается на новый порт сам, остальное не меняется
+
 ## v1.10.2-ru.7
 
 - A failed subscription update (download, core check, unknown format) is reported to Boxy with `am broadcast`,

@@ -400,7 +400,20 @@ dnscrypt_singbox() {
   fi
 }
 
+# Port 53 must stay free for Android's tethering DNS (dnsmasq): when the core holds it, turning on the
+# hotspot fails with "Address already in use" and the hotspot switches itself off. The DNS hijack
+# redirects port 53 to whatever port the core listens on, so moving the core to 1053 changes nothing else.
+clash_dns_free_53() {
+  [ -f "${clash_config}" ] || return 0
+  local re="^([[:space:]]+listen:[[:space:]]*[\"']?[^#\"']*):53([\"']?)([[:space:]]|\$)"
+  if sed -n '/^dns:/,/^[^ #]/p' "${clash_config}" | grep -qE "${re}"; then
+    sed -i -E "/^dns:/,/^[^ #]/ s/${re}/\1:1053\2\3/" "${clash_config}"
+    log Warning "clash dns.listen moved from port 53 to 1053, so the Wi-Fi hotspot can start (its DNS needs port 53)"
+  fi
+}
+
 prepare_clash() {
+  clash_dns_free_53
   dnscrypt_clash
 
   # check configuration file

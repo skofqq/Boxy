@@ -1,7 +1,7 @@
 id=box_for_root
 name=Box for Magisk/KernelSU/APatch
-version=v1.10.2-ru.7
-versionCode=20260929
+version=v1.10.2-ru.8
+versionCode=20261009
 author=taamarin, skofqq
 description=use sing-box, clash, v2ray, hysteria and xray for tunnel proxy on android device
 updateJson=https://raw.githubusercontent.com/skofqq/Boxy/main/module/update.json
