@@ -1,5 +1,25 @@
 # Box for Root (Boxy edition)
 
+## v1.10.2-ru.9
+
+- Start and stop about 3x faster (Pixel 9 Pro with 75 apps in the list: start 26 s → 7.5 s, stop 6.5 s → 3.6 s):
+  - iptables rules are added in one `iptables-restore --noflush` call instead of hundreds of separate commands
+    (falls back to one by one if the batch is rejected)
+  - cleanup removes the module's rules in one call based on `iptables-save`, and is skipped when there is nothing to remove
+  - the app list is resolved to UIDs in one pass; `start` no longer runs a full stop when nothing is running
+  - the core is considered up as soon as its proxy port listens (no fixed ~3 s wait), dnscrypt-proxy as soon as its port listens
+  - stopping waits for the cores to exit (~0.1 s) instead of a fixed 0.5 s; logging no longer starts a process per line
+- Nothing changes while the service runs: no new background work
+
+- Запуск и остановка примерно в 3 раза быстрее (Pixel 9 Pro, 75 приложений в списке: запуск 26 с → 7,5 с, остановка 6,5 с → 3,6 с):
+  - правила iptables добавляются одним вызовом `iptables-restore --noflush` вместо сотен отдельных команд
+    (если пакет отклонён, правила добавляются по одному, как раньше)
+  - очистка убирает правила модуля одним вызовом по `iptables-save` и пропускается, если убирать нечего
+  - список приложений переводится в UID за один проход; `start` больше не делает полную остановку, если ничего не запущено
+  - ядро считается запущенным, как только слушает порт прокси (без фиксированного ожидания ~3 с), dnscrypt-proxy — как только слушает свой порт
+  - остановка ждёт завершения ядер (~0,1 с) вместо фиксированных 0,5 с; журнал больше не запускает процесс на каждую строку
+- Во время работы ничего не меняется: новой фоновой работы нет
+
 ## v1.10.2-ru.8
 
 - Wi-Fi hotspot no longer switches itself off when it is turned on while the service runs: clash `dns.listen`

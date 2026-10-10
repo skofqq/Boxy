@@ -49,6 +49,81 @@ if [ "$buildVersionMajor" -ge "$minBuildVersion" ]; then
   IP6V="ip6tables -w 100"
 fi
 
+# ---- Batched iptables ----
+# Adding the rules one command at a time costs ~25 ms per call; with an app list that is hundreds of
+# calls and ~10 s per start. While start_tproxy / start_redirect run, the iptables and ip6tables
+# functions below queue -A/-I/-N/-F and apply them in one iptables-restore --noflush call.
+# Anything else (deletes, listings) still runs right away. If the batch is rejected, the queued
+# commands are replayed one by one, exactly as before.
+IPT_BATCH=0
+iptables() { ipt_dispatch v4 "$@"; }
+ip6tables() { ipt_dispatch v6 "$@"; }
+
+ipt_dispatch() {
+  local fam="$1" table="filter"
+  shift
+  if [ "${IPT_BATCH}" != "1" ]; then
+    if [ "${fam}" = "v6" ]; then command ip6tables "$@"; else command iptables "$@"; fi
+    return
+  fi
+  local all="$*"
+  [ "$1" = "-w" ] && shift 2
+  if [ "$1" = "-t" ]; then
+    table="$2"
+    shift 2
+  fi
+  case "$1" in
+    -A|-I|-N|-F)
+      echo "${table} $*" >> "${box_run}/ipt_${fam}.batch"
+      ;;
+    *)
+      if [ "${fam}" = "v6" ]; then command ip6tables ${all}; else command iptables ${all}; fi
+      ;;
+  esac
+}
+
+ipt_commit() {
+  local fam="$1" batch="${box_run}/ipt_${fam}.batch" bin="iptables" t wait=""
+  [ "${fam}" = "v6" ] && bin="ip6tables"
+  [ -s "${batch}" ] || return 0
+  case "${IPV}" in *-w*) wait="-w 100" ;; esac
+  local rules="${batch}.rules"
+  : > "${rules}"
+  for t in raw mangle nat filter; do
+    grep -q "^${t} " "${batch}" || continue
+    echo "*${t}" >> "${rules}"
+    grep "^${t} -N " "${batch}" | busybox awk '{print ":" $3 " - [0:0]"}' | busybox sort -u >> "${rules}"
+    grep "^${t} " "${batch}" | grep -v "^${t} -N " | cut -d' ' -f2- >> "${rules}"
+    echo "COMMIT" >> "${rules}"
+  done
+  if ${bin}-restore ${wait} --noflush < "${rules}" 2> "${batch}.err"; then
+    rm -f "${batch}" "${rules}" "${batch}.err"
+    return 0
+  fi
+  log Warning "${bin}-restore rejected the batch ($(head -c 200 "${batch}.err" | tr '\n' ' ')), adding rules one by one"
+  local rc=0 rest
+  while read -r t rest; do
+    command ${bin} ${wait} -t "${t}" ${rest} || rc=1
+  done < "${batch}"
+  rm -f "${batch}" "${rules}"
+  return ${rc}
+}
+
+ipt_batched() {
+  local fam="v4" rc
+  case "${iptables}" in ip6tables*) fam="v6" ;; esac
+  : > "${box_run}/ipt_${fam}.batch"
+  IPT_BATCH=1
+  "$@"
+  rc=$?
+  IPT_BATCH=0
+  ipt_commit "${fam}" || rc=1
+  return ${rc}
+}
+
+start_tproxy() { ipt_batched start_tproxy_rules; }
+start_redirect() { ipt_batched start_redirect_rules; }
+
 case "${bin_name}" in
   "clash")
     clash_mode=$(busybox awk '!/^ *#/ && /mode: / { print $2;found=1; exit } END{ if(!found) print "rules" }' "${clash_config}" 2>/dev/null)
@@ -137,24 +212,20 @@ bin_alive() {
 }
 
 find_packages_uid() {
-  echo -n "" > "${uid_list}"
-
-  for package in "${packages_list[@]}"; do
-    if [[ "$package" == *:* ]]; then
-      user="${package%%:*}"
-      pkg="${package##*:}"
-    else
-      user=0
-      pkg="$package"
-    fi
-
-    appid="$(busybox awk -v p="$pkg" '$1 == p {print $2}' "$system_packages_file")"
-
-    if [[ -n "$appid" ]]; then
-      uid=$((user * 100000 + appid))
-      echo "$uid" >> "${uid_list}"
-    fi
-  done
+  # One pass over packages.list for the whole app list ("user:package" or "package"), instead of one awk per app.
+  echo "${packages_list[*]}" | busybox tr ' ' '\n' | busybox awk '
+    NR == FNR {
+      if ($0 == "") next
+      u = 0; p = $0
+      i = index(p, ":")
+      if (i > 0) { u = substr(p, 1, i - 1); p = substr(p, i + 1) }
+      want[p] = want[p] " " u
+      next
+    }
+    ($1 in want) {
+      n = split(want[$1], us, " ")
+      for (j = 1; j <= n; j++) print us[j] * 100000 + $2
+    }' - "${system_packages_file}" > "${uid_list}"
 }
 
 probe_user_group() {
@@ -255,7 +326,7 @@ forward() {
 
 } >/dev/null 2>&1
 
-start_redirect() {
+start_redirect_rules() {
   if [ "${iptables}" = "$IPV" ]; then
     ${iptables} -t nat -N BOX_EXTERNAL
     ${iptables} -t nat -F BOX_EXTERNAL
@@ -400,7 +471,7 @@ stop_redirect() {
   fi
 }
 
-start_tproxy() {
+start_tproxy_rules() {
   if [ "${iptables}" = "$IPV" ]; then
     ip rule add fwmark "${fwmark}" table "${table}" pref "${pref}"
     ip route add local default dev lo table "${table}"
@@ -601,7 +672,7 @@ fi
   fi
 }
 
-stop_tproxy() {
+tproxy_routes_del() {
   if [ "${iptables}" = "$IPV" ]; then
     ip rule del fwmark "${fwmark}" table "${table}" pref "${pref}"
     ip route del local default dev lo table "${table}"
@@ -613,6 +684,10 @@ stop_tproxy() {
     ip -6 route flush table "${table}"
     ip -6 rule del pref "${pref}"
   fi
+}
+
+stop_tproxy() {
+  tproxy_routes_del
 
   ${iptables} -t mangle -D PREROUTING -j BOX_EXTERNAL
   ${iptables} -t mangle -D PREROUTING -p tcp -m socket -j DIVERT
@@ -668,8 +743,64 @@ stop_tproxy() {
   fi
 }
 
+# True when this family still has rules of the module (its chains, or the loopback / DNS guard rules).
+# Lets start and stop skip ~100 delete calls (~3 s on a phone) when there is nothing to remove.
+box_rules_present() {
+  local save="iptables-save"
+  case "$1" in ip6tables*) save="ip6tables-save" ;; esac
+  ${save} 2>/dev/null | grep -qE "BOX_|DIVERT|CLASH_DNS|LOCAL_IP_V|--dport (${tproxy_port}|${redir_port}) |--dport 53 -j DROP|--dport (443|80) .*REJECT"
+}
+
+# Removes the module's rules of one family with one iptables-restore call: every rule that jumps to one
+# of the module's chains, and its guard rules, is deleted exactly as iptables-save prints it; then those
+# chains are flushed and removed. ~0.2 s instead of ~100 separate deletes. Non-zero means "use the old way".
+fast_cleanup() {
+  local save="iptables-save" restore="iptables-restore" v6=0 wait="" rules="${box_run}/ipt_cleanup.rules"
+  case "$1" in ip6tables*) save="ip6tables-save"; restore="ip6tables-restore"; v6=1 ;; esac
+  case "${IPV}" in *-w*) wait="-w 100" ;; esac
+  ${save} 2>/dev/null | busybox awk -v tp="${tproxy_port}" -v rp="${redir_port}" -v v6="${v6}" '
+    BEGIN {
+      n = split("BOX_EXTERNAL BOX_LOCAL DIVERT CLASH_DNS_EXTERNAL CLASH_DNS_LOCAL LOCAL_IP_V4 LOCAL_IP_V6", c, " ")
+      for (i = 1; i <= n; i++) ours[c[i]] = 1
+    }
+    /^\*/ { t = substr($0, 2); tables[++nt] = t; next }
+    /^:/ { name = substr($1, 2); if (name in ours) chains[t] = chains[t] " " name; next }
+    /^-A / {
+      if ($2 in ours) next
+      if ($0 ~ /-j (BOX_EXTERNAL|BOX_LOCAL|DIVERT|CLASH_DNS_EXTERNAL|CLASH_DNS_LOCAL|LOCAL_IP_V4|LOCAL_IP_V6)( |$)/ ||
+          ($2 == "OUTPUT" && $0 ~ ("--dport (" tp "|" rp ") .*-j REJECT")) ||
+          ($2 == "OUTPUT" && $0 ~ /-p udp/ && $0 ~ /--dport (443|80) / && $0 ~ /-j REJECT/) ||
+          (v6 == 1 && $2 == "OUTPUT" && $0 ~ /-p udp/ && $0 ~ /--dport 53 -j DROP/) ||
+          (t == "nat" && $0 ~ /-p icmp/ && $0 ~ /-j DNAT --to-destination 127\.0\.0\.1/))
+        dels[t] = dels[t] "-D" substr($0, 3) "\n"
+    }
+    END {
+      for (i = 1; i <= nt; i++) {
+        t = tables[i]
+        if (dels[t] == "" && chains[t] == "") continue
+        print "*" t
+        printf "%s", dels[t]
+        m = split(chains[t], cs, " ")
+        for (j = 1; j <= m; j++) print "-F " cs[j]
+        for (j = 1; j <= m; j++) print "-X " cs[j]
+        print "COMMIT"
+      }
+    }' > "${rules}"
+  [ -s "${rules}" ] || return 0
+  ${restore} ${wait} --noflush < "${rules}" 2>/dev/null
+}
+
 cleanup_iptables() {
   for iptables in "$IPV" "$IP6V"; do
+    if ! box_rules_present "${iptables}"; then
+      tproxy_routes_del >/dev/null 2>&1
+      continue
+    fi
+    if fast_cleanup "${iptables}"; then
+      { tproxy_routes_del; forward -D; } >/dev/null 2>&1
+      continue
+    fi
+    log Warning "fast cleanup failed, removing ${iptables%% *} rules one by one"
     iptables="${iptables}" && {
       stop_redirect
       stop_tproxy
