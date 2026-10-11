@@ -254,7 +254,7 @@ private fun GroupTitle(text: String) {
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun AppRow(vm: AppsViewModel, app: AppEntry, checked: Boolean) {
-    val icon = remember(app.packageName) { vm.icon(app) }
+    val icon = remember(app.key) { vm.icon(app) }
     Row(
         Modifier
             .fillMaxWidth()

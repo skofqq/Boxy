@@ -15,7 +15,10 @@ data class AppEntry(
     val system: Boolean,
     val network: Boolean,
     val installTime: Long,
-    /** Present for apps visible to this app's own user (icons can be loaded). */
+    /**
+     * For loading the label and icon: this user's ApplicationInfo, or for apps that exist only in another
+     * user (work profile, second space) one read from the app's APK.
+     */
     val info: ApplicationInfo?,
 ) {
     /** Entry as stored in package.list.cfg: "pkg" for user 0, "id:pkg" otherwise. */
@@ -55,13 +58,18 @@ object AppsRepository {
                 info = ai,
             )
         }
-        // Other users (second space, work profile, app clones) are listed through the package manager shell.
+        // Other users (second space, work profile, app clones) are listed through the package manager shell,
+        // with APK paths (-f): an app installed only there gets its label and icon from its APK.
         users.filter { it.id != 0 }.forEach { user ->
-            val (_, all) = BoxModule.exec("pm list packages --user ${user.id}")
+            val (_, all) = BoxModule.exec("pm list packages -f --user ${user.id}")
             val (_, sys) = BoxModule.exec("pm list packages -s --user ${user.id}")
             val systemSet = sys.map { it.removePrefix("package:").trim() }.toSet()
-            all.map { it.removePrefix("package:").trim() }.filter { it.isNotEmpty() && !it.contains(' ') }.forEach { pkg ->
-                val base = own[pkg]
+            all.mapNotNull { line ->
+                val entry = line.removePrefix("package:").trim()
+                val eq = entry.lastIndexOf('=')
+                if (eq <= 0) null else entry.substring(eq + 1) to entry.substring(0, eq)
+            }.filter { (pkg, _) -> pkg.isNotEmpty() && !pkg.contains(' ') }.forEach { (pkg, apk) ->
+                val base = own[pkg] ?: fromApk(pm, apk)
                 result += AppEntry(
                     packageName = pkg,
                     label = base?.applicationInfo?.loadLabel(pm)?.toString() ?: pkg,
@@ -75,6 +83,15 @@ object AppsRepository {
         }
         result
     }
+
+    /** Package info read from an APK file (APKs under /data/app are readable by apps). */
+    private fun fromApk(pm: PackageManager, apk: String): android.content.pm.PackageInfo? = runCatching {
+        @Suppress("DEPRECATION")
+        pm.getPackageArchiveInfo(apk, PackageManager.GET_PERMISSIONS)?.also { p ->
+            p.applicationInfo?.sourceDir = apk
+            p.applicationInfo?.publicSourceDir = apk
+        }
+    }.getOrNull()
 
     suspend fun loadRules(): AppRules = withContext(Dispatchers.IO) {
         val text = BoxModule.readFile(PKG_CONFIG).orEmpty()

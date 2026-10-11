@@ -174,11 +174,21 @@ class AppsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun icon(app: AppEntry): ImageBitmap? {
-        val info = app.info ?: return null
-        icons.get(app.packageName)?.let { return it }
-        return runCatching {
-            val pm = getApplication<Application>().packageManager
-            info.loadIcon(pm).toBitmap(96, 96, Bitmap.Config.ARGB_8888).asImageBitmap()
-        }.getOrNull()?.also { icons.put(app.packageName, it) }
+        icons.get(app.key)?.let { return it }
+        val context = getApplication<Application>()
+        val pm = context.packageManager
+        val drawable = if (app.userId == 0) {
+            runCatching { app.info?.loadIcon(pm) }.getOrNull()
+        } else {
+            val user = android.os.UserHandle.getUserHandleForUid(app.userId * 100000)
+            // A work profile's launcher icon, already badged with the briefcase (only for profiles of this user).
+            runCatching {
+                context.getSystemService(android.content.pm.LauncherApps::class.java)
+                    .getActivityList(app.packageName, user).firstOrNull()?.getBadgedIcon(0)
+            }.getOrNull()
+                ?: runCatching { app.info?.loadIcon(pm)?.let { pm.getUserBadgedIcon(it, user) } }.getOrNull()
+        } ?: return null
+        return runCatching { drawable.toBitmap(96, 96, Bitmap.Config.ARGB_8888).asImageBitmap() }
+            .getOrNull()?.also { icons.put(app.key, it) }
     }
 }
