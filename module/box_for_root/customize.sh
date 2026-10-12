@@ -364,6 +364,12 @@ if [ "${backup_box}" = "true" ]; then
   cp -rf "${temp_dir}/ap.list.cfg" "/data/adb/box/ap.list.cfg"
   cp -rf "${temp_dir}/crontab.cfg" "/data/adb/box/crontab.cfg"
   cp -rf "${temp_dir}/package.list.cfg" "/data/adb/box/package.list.cfg"
+
+  # Start at boot off (Boxy → Settings → start at boot, or the "manual" file) stays off after an update
+  if [ -f "${temp_dir}/manual" ]; then
+    cp -f "${temp_dir}/manual" "/data/adb/box/manual"
+    ui_print "     ↳  manual ($(t 'start at boot stays off' 'автозапуск остаётся выключенным'))"
+  fi
 fi
 
 # create_resolv() {

@@ -1,5 +1,13 @@
 # Box for Root (Boxy edition)
 
+## v1.10.4
+
+- Fixed: start at boot turned itself back on after a module update. The installer did not carry over the `manual`
+  file that keeps the service from starting at boot (Boxy → Settings → start at boot)
+
+- Исправлено: после обновления модуля автозапуск при загрузке снова включался. Установщик не переносил файл `manual`,
+  который отключает запуск сервиса при загрузке (Boxy → Настройки → автозапуск)
+
 ## v1.10.3
 
 - Updating over an installed module asks nothing: settings.ini, cores, configs, app lists and the GitHub mirror
