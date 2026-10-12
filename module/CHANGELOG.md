@@ -1,6 +1,6 @@
 # Box for Root (Boxy edition)
 
-## v1.10.2-ru.10
+## v1.10.3
 
 - Updating over an installed module asks nothing: settings.ini, cores, configs, app lists and the GitHub mirror
   are kept as they are (Vol DOWN within 3 s still opens the full setup with all questions).
