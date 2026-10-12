@@ -1,5 +1,21 @@
 # Box for Root (Boxy edition)
 
+## v1.10.2-ru.10
+
+- Updating over an installed module asks nothing: settings.ini, cores, configs, app lists and the GitHub mirror
+  are kept as they are (Vol DOWN within 3 s still opens the full setup with all questions).
+  Before, an update asked up to 9 questions with 10 s timeouts and downloaded clash when nobody answered
+- Fixed: every update moved the previous backup into the new one, so backups nested and grew
+  (2 GB after ~10 updates on a test device) and slowed the installation down. Only the latest backup
+  is kept now, without the cores (they are moved back, not copied). Update time on the test device: 47 s → 6 s
+
+- Обновление поверх установленного модуля проходит без вопросов: settings.ini, ядра, конфигурации, списки приложений
+  и зеркало GitHub остаются как были (Громкость − в течение 3 с открывает полную настройку со всеми вопросами).
+  Раньше обновление задавало до 9 вопросов с ожиданием по 10 с и без ответа скачивало clash
+- Исправлено: каждое обновление переносило прошлую резервную копию внутрь новой, копии вкладывались друг в друга
+  и росли (2 ГБ после ~10 обновлений на тестовом устройстве), замедляя установку. Теперь хранится только последняя копия,
+  без ядер (они переносятся обратно, а не копируются). Обновление на тестовом устройстве: 47 с → 6 с
+
 ## v1.10.2-ru.9
 
 - Start and stop about 3x faster (Pixel 9 Pro with 75 apps in the list: start 26 s → 7.5 s, stop 6.5 s → 3.6 s):

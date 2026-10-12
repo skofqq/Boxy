@@ -69,6 +69,11 @@ ui_print "— $(t 'Installing Box for Magisk/KernelSU/APatch' 'Установк�
 unzip -o "$ZIPFILE" -x 'META-INF/*' -x 'webroot/*' -d "$MODPATH" >&2
 if [ -d "/data/adb/box" ]; then
   ui_print "— $(t 'Backup existing box data' 'Резервная копия текущих данных box')"
+  # Older backups (box.XXXXXXXXXX) would be moved into the new one and nest with every update
+  # (gigabytes after a few updates, and every later step walks through them). Only the latest is kept.
+  for old_bak in /data/adb/box/box.??????????; do
+    [ -d "${old_bak}" ] && rm -rf "${old_bak}"
+  done
   temp_bak=$(mktemp -d "/data/adb/box/box.XXXXXXXXXX")
   temp_dir="${temp_bak}"
   mv /data/adb/box/* "${temp_dir}/"
@@ -102,6 +107,40 @@ set_perm $MODPATH/system/bin/sbfr 0 0 0755
 
 chmod ugo+x ${service_dir}/box_service.sh $MODPATH/uninstall.sh /data/adb/box/scripts/*
 
+# Update over an installed module: settings, cores, configs and the mirror are kept and no questions
+# are asked. Vol DOWN within 3 s still opens the full setup with all questions.
+is_update=false
+if [ "${backup_box}" = "true" ] && [ -f "${temp_dir}/settings.ini" ]; then
+  is_update=true
+  ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  ui_print "— $(t 'Update: settings, cores and configs are kept' 'Обновление: настройки, ядра и конфигурации сохраняются')"
+  ui_print "— $(t '[ Vol DOWN(-) within 3 s: full setup with questions ]' '[ Громкость − в течение 3 с: полная настройка с вопросами ]')"
+  timeout 1 getevent -cl >/dev/null
+  START_TIME=$(date +%s)
+  while [ $(( $(date +%s) - START_TIME )) -lt 3 ]; do
+    timeout 1 getevent -lc 1 2>&1 | grep KEY_VOLUME > "$TMPDIR/events"
+    if grep -q KEY_VOLUMEDOWN "$TMPDIR/events"; then
+      is_update=false
+      ui_print "— $(t 'Full setup' 'Полная настройка')"
+      break
+    fi
+  done
+fi
+
+# The GitHub mirror of the installed module (set by the installer or by Boxy) stays as it was.
+keep_mirror() {
+  local old="${temp_dir}/scripts/box.tool" new="/data/adb/box/scripts/box.tool" line
+  for key in url_ghproxy use_ghproxy; do
+    line=$(grep -m1 "^${key}=" "${old}" 2>/dev/null)
+    [ -n "${line}" ] && sed -i "s|^${key}=.*|${line}|" "${new}"
+  done
+  if grep -q '^use_ghproxy="true"' "${new}"; then
+    ui_print "— $(t 'GitHub mirror kept' 'Зеркало GitHub сохранено'): $(grep -m1 '^url_ghproxy=' "${new}" | cut -d= -f2 | tr -d '"')"
+  else
+    ui_print "— $(t 'GitHub mirror: off (kept)' 'Зеркало GitHub: выключено (как было)')"
+  fi
+}
+
 apply_mirror() {
   ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   ui_print "— $(t "Do you want to use the 'ghfast.top' ?" 'Использовать зеркало «ghfast.top»?')"
@@ -128,8 +167,12 @@ apply_mirror() {
   done
 }
 
-apply_mirror
-timeout 1 getevent -cl >/dev/null
+if [ "${is_update}" = "true" ]; then
+  keep_mirror
+else
+  apply_mirror
+  timeout 1 getevent -cl >/dev/null
+fi
 
 find_bin() {
   bin_dir="$temp_bak"
@@ -207,8 +250,12 @@ find_bin() {
   fi
 }
 
-find_bin
-timeout 1 getevent -cl >/dev/null
+if [ "${is_update}" = "true" ]; then
+  ui_print "— $(t 'Cores and tools: kept, update them from Boxy or box.tool when needed' 'Ядра и утилиты сохранены, обновить их можно из Boxy или box.tool')"
+else
+  find_bin
+  timeout 1 getevent -cl >/dev/null
+fi
 
 restore_ini() {
   backup_ini="$temp_dir/settings.ini"
@@ -260,8 +307,13 @@ apply_ini() {
   done
 }
 
-[ "${backup_box}" = "true" ] && [ -f "$temp_dir/settings.ini" ] && apply_ini
-timeout 1 getevent -cl >/dev/null
+if [ "${is_update}" = "true" ]; then
+  ui_print "— $(t 'Restoring settings.ini...' 'Восстановление settings.ini...')"
+  restore_ini
+else
+  [ "${backup_box}" = "true" ] && [ -f "$temp_dir/settings.ini" ] && apply_ini
+  timeout 1 getevent -cl >/dev/null
+fi
 
 # Restore backup configurations if present
 if [ "${backup_box}" = "true" ]; then
@@ -283,7 +335,7 @@ if [ "${backup_box}" = "true" ]; then
     kernel_name="$1"
     if [ ! -f "/data/adb/box/bin/$kernel_name" ] && [ -f "${temp_dir}/bin/${kernel_name}" ]; then
       ui_print "— $(t "Restoring kernel ${kernel_name}..." "Восстановление ядра ${kernel_name}...")"
-      cp -rf "${temp_dir}/bin/${kernel_name}" "/data/adb/box/bin/${kernel_name}"
+      mv -f "${temp_dir}/bin/${kernel_name}" "/data/adb/box/bin/${kernel_name}"
     fi
   }
 
@@ -296,6 +348,9 @@ if [ "${backup_box}" = "true" ]; then
   ui_print "     ↳  box.pid"
   ui_print "     ↳  uid.list"
   cp -rf "${temp_dir}/run/"* "/data/adb/box/run/"
+
+  # The backup keeps configs and lists; cores were moved back, the rest of its bin/ is not needed
+  rm -rf "${temp_dir}/bin"
 
   # Restored cores and tools stay executable (set_perm above made bin/ 0644)
   chmod 0755 /data/adb/box/bin/* /data/adb/box/bin/xclash/* 2>/dev/null

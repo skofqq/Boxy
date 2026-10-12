@@ -55,6 +55,9 @@ Languages: English, Русский, Українська, Беларуская, 
 The `module/` folder holds the Box for Root module used with Boxy (upstream v1.10.2 plus fixes, Russian installer,
 BSSID matching and hotspot MAC filter). See [module/README.md](module/README.md).
 
+It installs over taamarin's module as an update. Updates ask nothing: `settings.ini` values, configs, cores, app lists and
+the GitHub mirror are kept. Press Volume Down within the first 3 seconds to go through the full setup with questions.
+
 ## Folder structure
 
 Module working directory: `/data/adb/box/`
