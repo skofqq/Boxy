@@ -91,6 +91,11 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
             if (dc?.enabled != null) {
                 item {
                     SectionCard(stringResource(R.string.dnscrypt_title), stringResource(R.string.dnscrypt_sub)) {
+                        com.skofqq.boxy.ui.components.NoticeCard(
+                            stringResource(R.string.update_tip_title),
+                            stringResource(if (core == "clash" || core == "sing-box") R.string.dnscrypt_hint_clash else R.string.dnscrypt_hint_other, "127.0.0.1:${dc.port}"),
+                        )
+                        Spacer(Modifier.height(6.dp))
                         val installed = dc.version != null
                         SwitchRow(
                             BoxyIcons.Shield,
@@ -156,11 +161,6 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                             stringResource(R.string.dnscrypt_config_sub),
                             showDivider = false,
                         ) { onEdit("${BoxModule.BOX_DIR}/dnscrypt/dnscrypt-proxy.toml") }
-                        Spacer(Modifier.height(6.dp))
-                        com.skofqq.boxy.ui.components.NoticeCard(
-                            stringResource(R.string.update_tip_title),
-                            stringResource(if (core == "clash" || core == "sing-box") R.string.dnscrypt_hint_clash else R.string.dnscrypt_hint_other, "127.0.0.1:${dc.port}"),
-                        )
                     }
                 }
             }
