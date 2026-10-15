@@ -740,4 +740,5 @@
     <string name="task_eta">залишилось %1$s</string>
     <string name="task_show_details">Подробиці</string>
     <string name="task_hide_details">Сховати подробиці</string>
+    <string name="settings_haptics_system_off">Вимкнено в Android: увімкніть «Відгук на дотик» у налаштуваннях звуку й вібрації</string>
 </resources>

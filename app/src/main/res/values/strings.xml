@@ -764,4 +764,5 @@
     <string name="task_eta">%1$s left</string>
     <string name="task_show_details">Details</string>
     <string name="task_hide_details">Hide details</string>
+    <string name="settings_haptics_system_off">Off in Android: turn on Touch feedback in Sound &amp; vibration</string>
 </resources>

@@ -56,12 +56,12 @@ fun InputDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            TextButton(onClick = withTap {
                 val e = validate(values)
                 if (e != null) error = e else onConfirm(values.map { it.trim() })
             }) { Text(confirm) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+        dismissButton = { TextButton(onClick = withTap(onDismiss)) { Text(stringResource(R.string.action_cancel)) } },
         containerColor = Boxy.colors.card,
     )
 }
@@ -110,7 +110,7 @@ fun ConfigErrorDialog(
 private fun DialogButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
     androidx.compose.foundation.layout.Box(
         Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)).background(bg)
-            .clickable(onClick = withTap(onClick)),
+            .clickable(onClick = onClick),
         contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
         Text(text, color = fg, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
@@ -131,9 +131,9 @@ fun ConfirmDialog(
         title = { Text(title) },
         text = { Text(message) },
         confirmButton = {
-            TextButton(onClick = onConfirm) { Text(confirm, color = if (danger) Tints.red.fg else Boxy.colors.accent) }
+            TextButton(onClick = withTap(onConfirm)) { Text(confirm, color = if (danger) Tints.red.fg else Boxy.colors.accent) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+        dismissButton = { TextButton(onClick = withTap(onDismiss)) { Text(stringResource(R.string.action_cancel)) } },
         containerColor = Boxy.colors.card,
     )
 }

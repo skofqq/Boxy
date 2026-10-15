@@ -231,7 +231,7 @@ private fun LayoutSheet(prefs: Prefs, onDismiss: () -> Unit) {
                     Spacer(Modifier.width(6.dp))
                     androidx.compose.material3.Switch(
                         checked = card !in prefs.hiddenMetrics,
-                        onCheckedChange = { prefs.setMetricVisible(card, it) },
+                        onCheckedChange = com.skofqq.boxy.ui.components.withTap1 { prefs.setMetricVisible(card, it) },
                         colors = androidx.compose.material3.SwitchDefaults.colors(checkedTrackColor = Boxy.colors.accent),
                     )
                 }

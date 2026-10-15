@@ -710,4 +710,5 @@
     <string name="task_eta">剩余 %1$s</string>
     <string name="task_show_details">详细信息</string>
     <string name="task_hide_details">隐藏详细信息</string>
+    <string name="settings_haptics_system_off">Android 中已关闭：请在“声音和振动”中开启“触摸反馈”</string>
 </resources>

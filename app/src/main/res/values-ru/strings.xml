@@ -752,4 +752,5 @@
     <string name="task_eta">осталось %1$s</string>
     <string name="task_show_details">Подробности</string>
     <string name="task_hide_details">Скрыть подробности</string>
+    <string name="settings_haptics_system_off">Выключено в Android: включите «Отклик на касание» в настройках звука и вибрации</string>
 </resources>

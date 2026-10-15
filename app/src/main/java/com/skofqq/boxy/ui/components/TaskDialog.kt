@@ -112,7 +112,11 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
         else -> TaskVisual.WORKING
     }
     var showLog by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(visual) { if (visual == TaskVisual.FAILED) showLog = true }
+    val view = androidx.compose.ui.platform.LocalView.current
+    LaunchedEffect(visual) {
+        if (visual == TaskVisual.FAILED) showLog = true
+        if (visual == TaskVisual.OK || visual == TaskVisual.FAILED) Haptics.result(view, visual == TaskVisual.OK)
+    }
 
     Dialog(
         onDismissRequest = { if (done) onDismiss() },

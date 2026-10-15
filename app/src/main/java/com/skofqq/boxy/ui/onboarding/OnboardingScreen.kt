@@ -60,6 +60,7 @@ import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
 import kotlinx.coroutines.launch
+import com.skofqq.boxy.ui.components.withTap1
 
 /** First-run flow: agreement, permissions, how to use. */
 @Composable
@@ -118,7 +119,7 @@ private fun AgreementPage(agreed: Boolean, onAgree: (Boolean) -> Unit) {
         Text(stringResource(R.string.onboarding_disclaimer), style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2)
         Spacer(Modifier.height(8.dp))
         Row(Modifier.clickable { onAgree(!agreed) }, verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(agreed, onAgree, colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
+            Checkbox(agreed, withTap1(onAgree), colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
             Text(stringResource(R.string.onboarding_accept), style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text)
         }
     }

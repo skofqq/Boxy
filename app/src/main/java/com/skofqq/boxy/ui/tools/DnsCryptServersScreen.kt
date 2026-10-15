@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
+import com.skofqq.boxy.ui.components.withTap1
 
 /** One server of public-resolvers.md with the properties encoded in its sdns:// stamp. */
 data class DnsServer(
@@ -310,7 +311,7 @@ private fun ServerRow(s: DnsServer, ms: Int?, checked: Boolean, onToggle: () -> 
             .clickable(onClick = onToggle).padding(start = 6.dp, end = 14.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Checkbox(checked, { onToggle() }, colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
+        Checkbox(checked, withTap1<Boolean> { onToggle() }, colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(s.name, Modifier.weight(1f, fill = false), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)

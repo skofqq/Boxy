@@ -56,6 +56,7 @@ import java.time.DayOfWeek
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import com.skofqq.boxy.ui.components.withTap
 
 /** Schedule (start / stop by time) and intents for Tasker, MacroDroid and adb. */
 @Composable
@@ -179,8 +180,8 @@ private fun TimeDialog(minutes: Int, onDismiss: () -> Unit, onPick: (Int) -> Uni
     val state = rememberTimePickerState(m / 60, m % 60, is24Hour = true)
     AlertDialog(
         onDismissRequest = onDismiss,
-        confirmButton = { TextButton(onClick = { onPick(state.hour * 60 + state.minute) }) { Text(stringResource(R.string.action_apply)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+        confirmButton = { TextButton(onClick = withTap { onPick(state.hour * 60 + state.minute) }) { Text(stringResource(R.string.action_apply)) } },
+        dismissButton = { TextButton(onClick = withTap(onDismiss)) { Text(stringResource(R.string.action_cancel)) } },
         text = {
             TimePicker(
                 state,

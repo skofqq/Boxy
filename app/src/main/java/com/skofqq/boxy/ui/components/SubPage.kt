@@ -42,7 +42,7 @@ fun BackPill(onClick: () -> Unit) {
             .padding(start = 12.dp, top = 8.dp)
             .clip(RoundedCornerShape(50))
             .background(Boxy.colors.card)
-            .clickable(onClick = withTap(onClick))
+            .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

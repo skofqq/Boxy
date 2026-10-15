@@ -44,6 +44,7 @@ import com.skofqq.boxy.ui.components.PageHeader
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
+import com.skofqq.boxy.ui.components.withTap
 
 enum class HomeSheet { NONE, DETAILS, GEO, SPEED, SUBSCRIPTION, SYSTEM, LAYOUT }
 
@@ -167,7 +168,7 @@ private fun EnvironmentCard(env: Environment, onRetry: () -> Unit) {
         Spacer(Modifier.height(6.dp))
         Text(stringResource(body), style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2)
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-            TextButton(onClick = onRetry) { Text(stringResource(R.string.action_retry)) }
+            TextButton(onClick = withTap(onRetry)) { Text(stringResource(R.string.action_retry)) }
         }
     }
 }

@@ -164,7 +164,7 @@ fun OptionRow(title: String, subtitle: String?, selected: Boolean, onClick: () -
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(18.dp))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.14f) else Boxy.colors.card)
-            .clickable(onClick = withTap(onClick))
+            .clickable(onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -207,7 +207,7 @@ fun SheetButtons(
 @Composable
 private fun SheetButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
     Box(
-        modifier.height(50.dp).clip(RoundedCornerShape(18.dp)).background(bg).clickable(onClick = withTap(onClick)),
+        modifier.height(50.dp).clip(RoundedCornerShape(18.dp)).background(bg).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = fg, fontWeight = FontWeight.SemiBold)

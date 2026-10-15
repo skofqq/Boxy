@@ -25,6 +25,7 @@ class BoxyApp : Application() {
     /** Re-reads preferences after a restore. */
     fun reloadPrefs() {
         prefs = Prefs(this)
+        com.skofqq.boxy.ui.components.Haptics.enabled = prefs.haptics
     }
 
     companion object {

@@ -740,4 +740,5 @@
     <string name="task_eta">残り %1$s</string>
     <string name="task_show_details">詳細</string>
     <string name="task_hide_details">詳細を隠す</string>
+    <string name="settings_haptics_system_off">Android でオフ：［音とバイブレーション］で「タップの振動」をオンにしてください</string>
 </resources>

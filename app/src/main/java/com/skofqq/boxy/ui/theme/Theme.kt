@@ -92,6 +92,13 @@ fun BoxyTheme(mode: ThemeMode, trueBlack: Boolean, content: @Composable () -> Un
     if (dark && trueBlack) palette = palette.copy(page = Color.Black)
 
     CompositionLocalProvider(LocalBoxyColors provides palette) {
-        MaterialTheme(colorScheme = scheme, typography = BoxyTypography, content = content)
+        MaterialTheme(colorScheme = scheme, typography = BoxyTypography) {
+            // Ripple plus a tap vibration for every clickable with the default indication.
+            CompositionLocalProvider(
+                androidx.compose.foundation.LocalIndication provides
+                    com.skofqq.boxy.ui.components.HapticIndication(androidx.compose.material3.ripple()),
+                content = content,
+            )
+        }
     }
 }

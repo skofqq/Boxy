@@ -58,6 +58,8 @@ import com.skofqq.boxy.ui.components.SheetButtons
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
+import com.skofqq.boxy.ui.components.withTap
+import com.skofqq.boxy.ui.components.withTap1
 
 @Composable
 fun AppsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {}) {
@@ -163,10 +165,10 @@ ModeSwitch(vm.mode, enabled = !vm.coreRouting, onChange = vm::changeMode)
             title = { Text(stringResource(R.string.apps_smart_select)) },
             text = { Text(stringResource(R.string.apps_smart_body)) },
             confirmButton = {
-                TextButton(onClick = { smartDialog = false; vm.smartSelect(replace = false) }) { Text(stringResource(R.string.apps_smart_merge)) }
+                TextButton(onClick = withTap { smartDialog = false; vm.smartSelect(replace = false) }) { Text(stringResource(R.string.apps_smart_merge)) }
             },
             dismissButton = {
-                TextButton(onClick = { smartDialog = false; vm.smartSelect(replace = true) }) { Text(stringResource(R.string.apps_smart_replace)) }
+                TextButton(onClick = withTap { smartDialog = false; vm.smartSelect(replace = true) }) { Text(stringResource(R.string.apps_smart_replace)) }
             },
             containerColor = Boxy.colors.card,
         )
@@ -178,9 +180,9 @@ ModeSwitch(vm.mode, enabled = !vm.coreRouting, onChange = vm::changeMode)
             title = { Text(stringResource(R.string.apps_restart_title)) },
             text = { Text(stringResource(if (vm.dirty) R.string.apps_restart_body_pending else R.string.apps_restart_body)) },
             confirmButton = {
-                TextButton(onClick = { vm.showRestartTip = false; vm.restartService() }) { Text(stringResource(R.string.action_restart)) }
+                TextButton(onClick = withTap { vm.showRestartTip = false; vm.restartService() }) { Text(stringResource(R.string.action_restart)) }
             },
-            dismissButton = { TextButton(onClick = { vm.showRestartTip = false }) { Text(stringResource(R.string.action_later)) } },
+            dismissButton = { TextButton(onClick = withTap { vm.showRestartTip = false }) { Text(stringResource(R.string.action_later)) } },
             containerColor = Boxy.colors.card,
         )
     }
@@ -295,7 +297,7 @@ private fun AppRow(vm: AppsViewModel, app: AppEntry, checked: Boolean) {
                 }
             }
         }
-        Checkbox(checked, { vm.toggle(app) }, colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
+        Checkbox(checked, withTap1<Boolean> { vm.toggle(app) }, colors = CheckboxDefaults.colors(checkedColor = Boxy.colors.accent))
     }
 }
 
