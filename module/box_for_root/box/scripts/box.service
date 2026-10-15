@@ -501,16 +501,27 @@ prepare_clash() {
         sed -i "/^tun:/a \  $mode-package: []" "$clash_config"
     fi
 
-    sed -i "s/exclude-package:.*/exclude-package: []/g" "${clash_config}"
-    sed -i "s/include-package:.*/include-package: []/g" "${clash_config}"
+    list_package_clean=""
+    [ -n "${list_package}" ] && list_package_clean=$(echo "$list_package" | sed 's/999://g' | sed 's/10://g' | sed 's/0://g' | busybox paste -sd, -)
 
-    if [ -n "${list_package}" ]; then
-      list_package_clean=$(echo "$list_package" | sed 's/999://g' | sed 's/10://g' | sed 's/0://g' | busybox paste -sd, -)
-
-      # list_package_clean=$(echo "$list_package" | sed 's/999://g' | sed 's/10://g' | sed 's/0://g' | tr '\n' ',' | sed 's/,$//')
-
-      sed -i "s/${mode}-package:.*/${mode}-package: [\"${list_package_clean//,/\",\"}\"]/g" "${clash_config}"
-    fi
+    # Rewrite include-/exclude-package inside the tun block in flow style. A block list under the key
+    # (one "- package" per line, as many configs have) is removed with it: replacing only the key line
+    # left those items behind and the config failed with "did not find expected key".
+    busybox awk -v mode="${mode}" -v list="${list_package_clean}" '
+      /^tun:/ { intun = 1; print; next }
+      intun && /^[^ \t#]/ { intun = 0 }
+      intun && /^[ \t]+(include|exclude)-package:/ {
+        match($0, /^[ \t]+/); ind = substr($0, 1, RLENGTH)
+        key = $0; sub(/^[ \t]+/, "", key); sub(/:.*/, "", key)
+        val = "[]"
+        if (key == mode "-package" && list != "") { v = list; gsub(/,/, "\",\"", v); val = "[\"" v "\"]" }
+        print ind key ": " val
+        skip = 1; next
+      }
+      skip && /^[ \t]+- / { next }
+      { skip = 0; print }
+    ' "${clash_config}" > "${clash_config}.tun.tmp" && cat "${clash_config}.tun.tmp" > "${clash_config}"
+    rm -f "${clash_config}.tun.tmp"
 
     sed -i "/tun:/,/enable:/ { /enable: false/ s/enable: false/enable: true/ }" "${clash_config}"
   else

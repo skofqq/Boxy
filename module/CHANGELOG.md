@@ -1,5 +1,17 @@
 # Box for Root (Boxy edition)
 
+## v1.10.5
+
+- Fixed: TUN and Mixed modes with clash did not start when the config listed `exclude-package` / `include-package`
+  one package per line ("yaml: did not find expected key"). The list is now rewritten whole, not just its first line
+- Fixed: without `tun.device` in the config the module looked for a "meta" interface while mihomo creates "Meta",
+  so the forwarding rules for the hotspot were not added in TUN mode
+
+- Исправлено: режимы TUN и Mixed с clash не запускались, если в конфигурации список `exclude-package` / `include-package`
+  записан по одному пакету в строке («yaml: did not find expected key»). Теперь список переписывается целиком, а не только первая строка
+- Исправлено: без `tun.device` в конфигурации модуль искал интерфейс «meta», а mihomo создаёт «Meta»,
+  поэтому в режиме TUN не добавлялись правила пересылки для точки доступа
+
 ## v1.10.4
 
 - Fixed: start at boot turned itself back on after a module update. The installer did not carry over the `manual`
