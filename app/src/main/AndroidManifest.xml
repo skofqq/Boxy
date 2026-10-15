@@ -24,6 +24,17 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Boxy">
 
+        <!-- Long press on the Quick Settings tile: opens Boxy, or its panel when that is switched on in Settings -->
+        <activity
+            android:name=".TileLongPressActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
@@ -33,9 +44,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
             <!-- Subscription links from panels and other clients -->
             <intent-filter>

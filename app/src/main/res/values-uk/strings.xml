@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Це ядро не встановлено. Завантажте його в «Утиліти → Оновлення → Ядро».</string>
     <string name="module_applying">Застосовую й перезапускаю сервіс…</string>
     <string name="module_apply_failed">Не вдалося застосувати налаштування або перезапустити сервіс. Перегляньте журнал.</string>
+    <string name="settings_haptics">Віброзворотний зв’язок</string>
+    <string name="settings_haptics_sub">Коротка вібрація при натисканнях</string>
+    <string name="settings_tile_long_press">Довге натискання на плитку — панель</string>
+    <string name="settings_tile_long_press_sub">Вимк.: довге натискання на плитку в шторці просто відкриває Boxy</string>
+    <string name="logs_default_set">★ Відкривати «%1$s» за замовчуванням</string>
+    <string name="logs_default_reset">Знову відкривати runs.log за замовчуванням</string>
+    <string name="editor_save_as">Зберегти як</string>
+    <string name="editor_save_as_name">Ім’я файлу</string>
+    <string name="editor_save_as_hint">Копія з правками збережеться в %1$s, поточний файл не зміниться.</string>
+    <string name="editor_save_as_exists">Файл з такою назвою вже є</string>
+    <string name="editor_save_as_invalid">Введіть нове ім’я файлу</string>
+    <string name="editor_saved_as">Збережено як %1$s</string>
 </resources>

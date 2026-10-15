@@ -12,6 +12,7 @@ class BoxyApp : Application() {
         super.onCreate()
         instance = this
         prefs = Prefs(this)
+        com.skofqq.boxy.ui.components.Haptics.enabled = prefs.haptics
         com.skofqq.boxy.data.TrafficStats.schedule(this)
         com.skofqq.boxy.automation.Automation.reschedule(this)
         com.skofqq.boxy.net.Mirrors.current = prefs.githubMirror

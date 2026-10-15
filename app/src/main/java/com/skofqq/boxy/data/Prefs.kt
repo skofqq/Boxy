@@ -102,6 +102,15 @@ class Prefs(context: Context) {
     /** Notification when the module could not update a subscription (download, core check, format). */
     var notifySubsFailed by mutableStateOf(sp.getBoolean("notify_subs_failed", true))
         private set
+    /** Short vibration on taps. */
+    var haptics by mutableStateOf(sp.getBoolean("haptics", true))
+        private set
+    /** Long press on the Quick Settings tile opens the panel instead of just the app. */
+    var tileLongPressPanel by mutableStateOf(sp.getBoolean("tile_long_press_panel", false))
+        private set
+    /** Log file opened first on the Logs page; empty = runs.log. */
+    var defaultLog by mutableStateOf(sp.getString("default_log", "") ?: "")
+        private set
     var onboardingDone by mutableStateOf(sp.getBoolean("onboarding_done", false))
         private set
     var filterChains by mutableStateOf(sp.getString("filter_chains", "") ?: "")
@@ -127,6 +136,9 @@ class Prefs(context: Context) {
     fun updateOpenPanelOnLaunch(v: Boolean) { openPanelOnLaunch = v; sp.edit().putBoolean("open_panel_on_launch", v).apply() }
     fun updateNotifications(v: Boolean) { notifications = v; sp.edit().putBoolean("notifications", v).apply() }
     fun updateNotifySubsFailed(v: Boolean) { notifySubsFailed = v; sp.edit().putBoolean("notify_subs_failed", v).apply() }
+    fun updateHaptics(v: Boolean) { haptics = v; com.skofqq.boxy.ui.components.Haptics.enabled = v; sp.edit().putBoolean("haptics", v).apply() }
+    fun updateTileLongPressPanel(v: Boolean) { tileLongPressPanel = v; sp.edit().putBoolean("tile_long_press_panel", v).apply() }
+    fun updateDefaultLog(v: String) { defaultLog = v; sp.edit().putString("default_log", v).apply() }
     fun updateOnboardingDone(v: Boolean) { onboardingDone = v; sp.edit().putBoolean("onboarding_done", v).apply() }
     fun updateFilterChains(v: String) { filterChains = v; sp.edit().putString("filter_chains", v).apply() }
 

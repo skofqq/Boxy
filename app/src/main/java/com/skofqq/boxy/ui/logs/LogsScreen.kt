@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.skofqq.boxy.BoxyApp
 import com.skofqq.boxy.R
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.root.RootFile
@@ -80,6 +81,7 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
     var query by rememberSaveable { mutableStateOf("") }
     var level by rememberSaveable { mutableStateOf(LogLevel.ALL) }
     val listState = rememberLazyListState()
+    val prefs = BoxyApp.instance.prefs
     val shown = remember(lines, query, level) { filterLines(lines.orEmpty(), query.trim(), level) }
 
     LaunchedEffect(reload) {
@@ -88,7 +90,9 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
         val core = BoxModule.readSetting("bin_name")
         coreLog = core?.let { "$it.log" }
         if (current == null || list.none { it.name == current }) {
-            current = list.firstOrNull { it.name == "runs.log" }?.name ?: list.firstOrNull()?.name
+            val preferred = BoxyApp.instance.prefs.defaultLog
+            current = list.firstOrNull { preferred.isNotEmpty() && it.name == preferred }?.name
+                ?: list.firstOrNull { it.name == "runs.log" }?.name ?: list.firstOrNull()?.name
         }
     }
     LaunchedEffect(owner, current, auto, reload) {
@@ -139,8 +143,17 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
                 file?.let { "${it.name} · ${Format.bytes(context, it.size)}" } ?: stringResource(R.string.logs_no_files),
                 Boxy.colors.accent,
                 files.orEmpty().map { f ->
-                    "${f.name} · ${Format.bytes(context, f.size)}" to { current = f.name }
-                },
+                    val star = if (f.name == prefs.defaultLog) "★ " else ""
+                    "$star${f.name} · ${Format.bytes(context, f.size)}" to { current = f.name }
+                } + listOfNotNull(
+                    current?.let { name ->
+                        if (name == prefs.defaultLog) {
+                            stringResource(R.string.logs_default_reset) to { prefs.updateDefaultLog("") }
+                        } else {
+                            stringResource(R.string.logs_default_set, name) to { prefs.updateDefaultLog(name) }
+                        }
+                    },
+                ),
             )
             val (levelLabel, levelColor) = levelStyle(level)
             MenuChip(

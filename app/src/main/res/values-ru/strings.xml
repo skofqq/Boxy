@@ -728,4 +728,16 @@
     <string name="module_core_missing_toast">Это ядро не установлено. Скачайте его в «Утилиты → Обновление → Ядро».</string>
     <string name="module_applying">Применяю и перезапускаю сервис…</string>
     <string name="module_apply_failed">Не удалось применить настройку или перезапустить сервис. Посмотрите журнал.</string>
+    <string name="settings_haptics">Виброотклик</string>
+    <string name="settings_haptics_sub">Короткая вибрация при нажатиях</string>
+    <string name="settings_tile_long_press">Долгое нажатие на плитку — панель</string>
+    <string name="settings_tile_long_press_sub">Выкл.: долгое нажатие на плитку в шторке просто открывает Boxy</string>
+    <string name="logs_default_set">★ Открывать «%1$s» по умолчанию</string>
+    <string name="logs_default_reset">Снова открывать runs.log по умолчанию</string>
+    <string name="editor_save_as">Сохранить как</string>
+    <string name="editor_save_as_name">Имя файла</string>
+    <string name="editor_save_as_hint">Копия с правками сохранится в %1$s, текущий файл не изменится.</string>
+    <string name="editor_save_as_exists">Файл с таким именем уже есть</string>
+    <string name="editor_save_as_invalid">Введите новое имя файла</string>
+    <string name="editor_saved_as">Сохранено как %1$s</string>
 </resources>

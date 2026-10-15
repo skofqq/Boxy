@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Гэта ядро не ўсталявана. Спампуйце яго ў «Утыліты → Абнаўленне → Ядро».</string>
     <string name="module_applying">Ужываю і перазапускаю сэрвіс…</string>
     <string name="module_apply_failed">Не ўдалося ўжыць наладу або перазапусціць сэрвіс. Паглядзіце журнал.</string>
+    <string name="settings_haptics">Віброводгук</string>
+    <string name="settings_haptics_sub">Кароткая вібрацыя пры націсканнях</string>
+    <string name="settings_tile_long_press">Доўгае націсканне на плітку — панэль</string>
+    <string name="settings_tile_long_press_sub">Выкл.: доўгае націсканне на плітку ў шторцы проста адкрывае Boxy</string>
+    <string name="logs_default_set">★ Адкрываць «%1$s» па змаўчанні</string>
+    <string name="logs_default_reset">Зноў адкрываць runs.log па змаўчанні</string>
+    <string name="editor_save_as">Захаваць як</string>
+    <string name="editor_save_as_name">Імя файла</string>
+    <string name="editor_save_as_hint">Копія з праўкамі захаваецца ў %1$s, бягучы файл не зменіцца.</string>
+    <string name="editor_save_as_exists">Файл з такой назвай ужо ёсць</string>
+    <string name="editor_save_as_invalid">Увядзіце новае імя файла</string>
+    <string name="editor_saved_as">Захавана як %1$s</string>
 </resources>

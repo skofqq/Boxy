@@ -110,7 +110,7 @@ fun ConfigErrorDialog(
 private fun DialogButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
     androidx.compose.foundation.layout.Box(
         Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)).background(bg)
-            .clickable(onClick = onClick),
+            .clickable(onClick = withTap(onClick)),
         contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
         Text(text, color = fg, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)

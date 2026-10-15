@@ -45,6 +45,7 @@ import com.skofqq.boxy.net.SubscriptionInfo
 import com.skofqq.boxy.net.flagEmoji
 import com.skofqq.boxy.root.ServiceState
 import com.skofqq.boxy.ui.components.Badge
+import com.skofqq.boxy.ui.components.withTap
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tint
@@ -183,7 +184,7 @@ private val IntrinsicMiniWidth = 150.dp
 @Composable
 private fun MiniRow(label: String, value: String?, onClick: () -> Unit, color: androidx.compose.ui.graphics.Color = Boxy.colors.text) {
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 9.dp),
+        Modifier.fillMaxWidth().clickable(onClick = withTap(onClick)).padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 1)
@@ -204,7 +205,7 @@ private fun ActionPill(text: String, tint: Tint, enabled: Boolean, modifier: Mod
             .height(52.dp)
             .clip(RoundedCornerShape(18.dp))
             .background(tint.bg.copy(alpha = if (enabled) tint.bg.alpha else tint.bg.alpha * 0.5f))
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled, onClick = withTap(onClick)),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -233,7 +234,7 @@ fun QuickCard(title: String, subtitle: String, tint: Tint, modifier: Modifier, o
                     center = Offset(size.width, size.height),
                 )
             }
-            .clickable(onClick = onClick)
+            .clickable(onClick = withTap(onClick))
             .padding(18.dp),
     ) {
         Column(Modifier.fillMaxWidth()) {

@@ -126,7 +126,7 @@ fun SettingsRow(
 ) {
     Column {
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 18.dp, vertical = 10.dp),
+            Modifier.fillMaxWidth().clickable(onClick = withTap(onClick)).padding(horizontal = 18.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RowIcon(icon)
@@ -149,11 +149,12 @@ fun SwitchRow(
     showDivider: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    val toggle = withTap1(onCheckedChange)
     Column {
         Row(
             Modifier
                 .fillMaxWidth()
-                .clickable(enabled = enabled) { onCheckedChange(!checked) }
+                .clickable(enabled = enabled) { toggle(!checked) }
                 .padding(horizontal = 18.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -163,7 +164,7 @@ fun SwitchRow(
             Spacer(Modifier.width(8.dp))
             Switch(
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = toggle,
                 enabled = enabled,
                 colors = SwitchDefaults.colors(checkedTrackColor = Boxy.colors.accent),
             )
@@ -186,7 +187,7 @@ fun HeaderAction(
     onClick: () -> Unit,
 ) {
     Box(
-        Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Boxy.colors.card).clickable(onClick = onClick),
+        Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Boxy.colors.card).clickable(onClick = withTap(onClick)),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription, Modifier.size(22.dp), tint = tint)
@@ -204,6 +205,7 @@ fun <T> ChoiceDialog(
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val pick = withTap1(onSelect)
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
@@ -221,7 +223,7 @@ fun <T> ChoiceDialog(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(20.dp))
                             .background(if (isSelected) Boxy.colors.accent.copy(alpha = 0.14f) else Boxy.colors.surface2)
-                            .clickable { onSelect(choice.value) }
+                            .clickable { pick(choice.value) }
                             .padding(horizontal = 18.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

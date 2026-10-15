@@ -253,6 +253,12 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SwitchRow(BoxyIcons.Dashboard, stringResource(R.string.settings_open_panel), stringResource(R.string.settings_open_panel_sub), prefs.openPanelOnLaunch) {
                     prefs.updateOpenPanelOnLaunch(it)
                 }
+                SwitchRow(BoxyIcons.TouchApp, stringResource(R.string.settings_tile_long_press), stringResource(R.string.settings_tile_long_press_sub), prefs.tileLongPressPanel) {
+                    prefs.updateTileLongPressPanel(it)
+                }
+                SwitchRow(BoxyIcons.Vibration, stringResource(R.string.settings_haptics), stringResource(R.string.settings_haptics_sub), prefs.haptics) {
+                    prefs.updateHaptics(it)
+                }
                 SettingsRow(BoxyIcons.Notifications, stringResource(R.string.settings_notifications), stringResource(R.string.settings_notifications_sub)) {
                     push(ROUTE_NOTIFICATIONS)
                 }

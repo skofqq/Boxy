@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Este núcleo no está instalado. Descárgalo en Herramientas → Actualizar → Núcleo.</string>
     <string name="module_applying">Aplicando y reiniciando el servicio…</string>
     <string name="module_apply_failed">No se pudo aplicar el ajuste o reiniciar el servicio. Revisa el registro.</string>
+    <string name="settings_haptics">Respuesta háptica</string>
+    <string name="settings_haptics_sub">Vibración breve al tocar</string>
+    <string name="settings_tile_long_press">Pulsación larga en el mosaico abre el panel</string>
+    <string name="settings_tile_long_press_sub">Desactivado: la pulsación larga solo abre Boxy</string>
+    <string name="logs_default_set">★ Abrir «%1$s» por defecto</string>
+    <string name="logs_default_reset">Volver a abrir runs.log por defecto</string>
+    <string name="editor_save_as">Guardar como</string>
+    <string name="editor_save_as_name">Nombre del archivo</string>
+    <string name="editor_save_as_hint">Se guarda una copia con tus cambios en %1$s; este archivo no cambia.</string>
+    <string name="editor_save_as_exists">Ya existe un archivo con ese nombre</string>
+    <string name="editor_save_as_invalid">Introduce un nombre nuevo</string>
+    <string name="editor_saved_as">Guardado como %1$s</string>
 </resources>

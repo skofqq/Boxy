@@ -686,4 +686,16 @@
     <string name="module_core_missing_toast">该内核未安装。请在“工具 → 更新 → 内核”中下载。</string>
     <string name="module_applying">正在应用并重启服务…</string>
     <string name="module_apply_failed">无法应用设置或重启服务，请查看日志。</string>
+    <string name="settings_haptics">触感反馈</string>
+    <string name="settings_haptics_sub">点击时短振动</string>
+    <string name="settings_tile_long_press">长按磁贴打开面板</string>
+    <string name="settings_tile_long_press_sub">关闭时：长按快捷设置磁贴仅打开 Boxy</string>
+    <string name="logs_default_set">★ 默认打开“%1$s”</string>
+    <string name="logs_default_reset">恢复默认打开 runs.log</string>
+    <string name="editor_save_as">另存为</string>
+    <string name="editor_save_as_name">文件名</string>
+    <string name="editor_save_as_hint">带修改的副本将保存到 %1$s，当前文件保持不变。</string>
+    <string name="editor_save_as_exists">已存在同名文件</string>
+    <string name="editor_save_as_invalid">请输入新的文件名</string>
+    <string name="editor_saved_as">已另存为 %1$s</string>
 </resources>

@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Ce cœur n’est pas installé. Téléchargez-le dans Outils → Mise à jour → Cœur.</string>
     <string name="module_applying">Application et redémarrage du service…</string>
     <string name="module_apply_failed">Impossible d’appliquer le réglage ou de redémarrer le service. Consultez le journal.</string>
+    <string name="settings_haptics">Retour haptique</string>
+    <string name="settings_haptics_sub">Brève vibration au toucher</string>
+    <string name="settings_tile_long_press">Appui long sur la tuile : panneau</string>
+    <string name="settings_tile_long_press_sub">Désactivé : un appui long ouvre simplement Boxy</string>
+    <string name="logs_default_set">★ Ouvrir « %1$s » par défaut</string>
+    <string name="logs_default_reset">Rouvrir runs.log par défaut</string>
+    <string name="editor_save_as">Enregistrer sous</string>
+    <string name="editor_save_as_name">Nom du fichier</string>
+    <string name="editor_save_as_hint">Une copie avec vos modifications est enregistrée dans %1$s ; ce fichier reste inchangé.</string>
+    <string name="editor_save_as_exists">Un fichier portant ce nom existe déjà</string>
+    <string name="editor_save_as_invalid">Saisissez un nouveau nom</string>
+    <string name="editor_saved_as">Enregistré sous %1$s</string>
 </resources>

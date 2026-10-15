@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Бұл ядро орнатылмаған. Оны «Утилиталар → Жаңарту → Ядро» бөлімінде жүктеңіз.</string>
     <string name="module_applying">Қолданып, қызметті қайта іске қосудамын…</string>
     <string name="module_apply_failed">Параметрді қолдану немесе қызметті қайта іске қосу мүмкін болмады. Журналды қараңыз.</string>
+    <string name="settings_haptics">Діріл кері байланысы</string>
+    <string name="settings_haptics_sub">Басқанда қысқа діріл</string>
+    <string name="settings_tile_long_press">Тақтаны ұзақ басу — панель</string>
+    <string name="settings_tile_long_press_sub">Өшірулі: перде тақтасын ұзақ басу Boxy-ді жай ашады</string>
+    <string name="logs_default_set">★ «%1$s» әдепкі бойынша ашу</string>
+    <string name="logs_default_reset">Әдепкі бойынша қайта runs.log ашу</string>
+    <string name="editor_save_as">Басқаша сақтау</string>
+    <string name="editor_save_as_name">Файл атауы</string>
+    <string name="editor_save_as_hint">Түзетулері бар көшірме %1$s ішінде сақталады, ағымдағы файл өзгермейді.</string>
+    <string name="editor_save_as_exists">Мұндай атаулы файл бар</string>
+    <string name="editor_save_as_invalid">Жаңа файл атауын енгізіңіз</string>
+    <string name="editor_saved_as">%1$s ретінде сақталды</string>
 </resources>

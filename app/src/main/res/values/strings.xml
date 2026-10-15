@@ -740,4 +740,16 @@
     <string name="module_core_missing_toast">This core is not installed. Download it in Tools → Update → Core.</string>
     <string name="module_applying">Applying and restarting the service…</string>
     <string name="module_apply_failed">Could not apply the setting or restart the service. Check the log.</string>
+    <string name="settings_haptics">Haptic feedback</string>
+    <string name="settings_haptics_sub">Short vibration on taps</string>
+    <string name="settings_tile_long_press">Tile long press opens the panel</string>
+    <string name="settings_tile_long_press_sub">Off: a long press on the Quick Settings tile just opens Boxy</string>
+    <string name="logs_default_set">★ Open “%1$s” by default</string>
+    <string name="logs_default_reset">Open runs.log by default again</string>
+    <string name="editor_save_as">Save as</string>
+    <string name="editor_save_as_name">File name</string>
+    <string name="editor_save_as_hint">A copy with your changes is saved in %1$s; this file stays as it is.</string>
+    <string name="editor_save_as_exists">A file with this name already exists</string>
+    <string name="editor_save_as_invalid">Enter a new file name</string>
+    <string name="editor_saved_as">Saved as %1$s</string>
 </resources>

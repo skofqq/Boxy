@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">Bu çekirdek yüklü değil. Araçlar → Güncelleme → Çekirdek bölümünden indirin.</string>
     <string name="module_applying">Uygulanıyor, hizmet yeniden başlatılıyor…</string>
     <string name="module_apply_failed">Ayar uygulanamadı veya hizmet yeniden başlatılamadı. Günlüğe bakın.</string>
+    <string name="settings_haptics">Dokunsal geri bildirim</string>
+    <string name="settings_haptics_sub">Dokunuşta kısa titreşim</string>
+    <string name="settings_tile_long_press">Kutucuğa uzun basış paneli açar</string>
+    <string name="settings_tile_long_press_sub">Kapalı: uzun basış yalnızca Boxy’yi açar</string>
+    <string name="logs_default_set">★ “%1$s” varsayılan olarak açılsın</string>
+    <string name="logs_default_reset">Varsayılan olarak yine runs.log açılsın</string>
+    <string name="editor_save_as">Farklı kaydet</string>
+    <string name="editor_save_as_name">Dosya adı</string>
+    <string name="editor_save_as_hint">Değişikliklerinizle bir kopya %1$s içine kaydedilir; bu dosya değişmez.</string>
+    <string name="editor_save_as_exists">Bu adda bir dosya zaten var</string>
+    <string name="editor_save_as_invalid">Yeni bir dosya adı girin</string>
+    <string name="editor_saved_as">%1$s olarak kaydedildi</string>
 </resources>

@@ -716,4 +716,16 @@
     <string name="module_core_missing_toast">このコアはインストールされていません。ツール → 更新 → コア からダウンロードしてください。</string>
     <string name="module_applying">適用してサービスを再起動しています…</string>
     <string name="module_apply_failed">設定を適用できないか、サービスを再起動できませんでした。ログを確認してください。</string>
+    <string name="settings_haptics">触覚フィードバック</string>
+    <string name="settings_haptics_sub">タップ時に短く振動</string>
+    <string name="settings_tile_long_press">タイルの長押しでパネルを開く</string>
+    <string name="settings_tile_long_press_sub">オフ: 長押しで Boxy を開くだけ</string>
+    <string name="logs_default_set">★ 「%1$s」を既定で開く</string>
+    <string name="logs_default_reset">既定を runs.log に戻す</string>
+    <string name="editor_save_as">名前を付けて保存</string>
+    <string name="editor_save_as_name">ファイル名</string>
+    <string name="editor_save_as_hint">変更を含むコピーを %1$s に保存します。このファイルは変わりません。</string>
+    <string name="editor_save_as_exists">同じ名前のファイルがあります</string>
+    <string name="editor_save_as_invalid">新しいファイル名を入力してください</string>
+    <string name="editor_saved_as">%1$s として保存しました</string>
 </resources>

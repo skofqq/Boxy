@@ -43,6 +43,7 @@ data class BarItem(val label: String, val icon: ImageVector)
  */
 @Composable
 fun BottomBar(items: List<BarItem>, selected: Float, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val select = withTap1(onSelect)
     val colors = Boxy.colors
     val shape = RoundedCornerShape(50)
     GlassSurface(
@@ -74,7 +75,7 @@ fun BottomBar(items: List<BarItem>, selected: Float, onSelect: (Int) -> Unit, mo
                             .width(itemWidth)
                             .fillMaxHeight()
                             .clip(shape)
-                            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onSelect(index) },
+                            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { select(index) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {

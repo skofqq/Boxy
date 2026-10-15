@@ -67,6 +67,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     var searching by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var discardDialog by remember { mutableStateOf(false) }
+    var saveAsDialog by remember { mutableStateOf(false) }
     val sp = remember { context.getSharedPreferences("boxy", android.content.Context.MODE_PRIVATE) }
     var wrap by remember { mutableStateOf(sp.getBoolean("editor_wrap", true)) }
     val colors = Boxy.colors
@@ -120,6 +121,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                     sp.edit().putBoolean("editor_wrap", wrap).apply()
                     editor?.isWordwrap = wrap
                 }
+                HeaderAction(BoxyIcons.SaveAs, stringResource(R.string.editor_save_as)) { if (editor != null) saveAsDialog = true }
                 HeaderAction(BoxyIcons.Save, stringResource(R.string.action_save), tint = if (modified) colors.accent else colors.text) { save() }
             }
         }
@@ -203,6 +205,38 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     }
 
     DisposableEffect(Unit) { onDispose { editor = null } }
+
+    if (saveAsDialog) {
+        val dir = path.substringBeforeLast('/')
+        val name = path.substringAfterLast('/')
+        val base = name.substringBeforeLast('.', name)
+        val ext = name.substringAfterLast('.', "").let { if (it.isEmpty()) "" else ".$it" }
+        val exists = stringResource(R.string.editor_save_as_exists)
+        val invalid = stringResource(R.string.editor_save_as_invalid)
+        com.skofqq.boxy.ui.components.InputDialog(
+            title = stringResource(R.string.editor_save_as),
+            fields = listOf(stringResource(R.string.editor_save_as_name) to "$base-copy$ext"),
+            confirm = stringResource(R.string.action_save),
+            message = stringResource(R.string.editor_save_as_hint, dir),
+            validate = { v -> v[0].trim().let { if (it.isEmpty() || it.contains('/') || it == name) invalid else null } },
+            onConfirm = { v ->
+                val target = "$dir/${v[0].trim()}"
+                val content = editor?.text?.toString()
+                saveAsDialog = false
+                if (content != null) {
+                    scope.launch {
+                        val msg = when {
+                            RootFiles.exists(target) -> exists
+                            RootFiles.write(target, content) -> context.getString(R.string.editor_saved_as, target.substringAfterLast('/'))
+                            else -> context.getString(R.string.op_failed)
+                        }
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            onDismiss = { saveAsDialog = false },
+        )
+    }
 
     checkError?.let { output ->
         ConfigErrorDialog(

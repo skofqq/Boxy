@@ -97,6 +97,15 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         ImportLinks.fromIntent(intent)?.let { ImportBus.request = it }
+        tileLongPress(intent)
+    }
+
+    /** TileLongPressActivity asks for the panel (long press on the Quick Settings tile, setting on). */
+    private fun tileLongPress(intent: android.content.Intent?) {
+        if (intent?.getBooleanExtra(TileLongPressActivity.EXTRA_OPEN_PANEL, false) == true) {
+            intent.removeExtra(TileLongPressActivity.EXTRA_OPEN_PANEL)
+            PanelBus.request = true
+        }
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -109,6 +118,7 @@ class MainActivity : ComponentActivity() {
         if (prefs.notifications) BoxStatusService.sync(this, true)
         val firstLaunch = savedInstanceState == null
         if (firstLaunch) ImportLinks.fromIntent(intent)?.let { ImportBus.request = it }
+        if (firstLaunch) tileLongPress(intent)
         setContent {
             BoxyTheme(prefs.themeMode, prefs.trueBlack) {
                 val dark = Boxy.colors.isDark
@@ -145,6 +155,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     val context = LocalContext.current
+    var panelRequest by remember { mutableStateOf(false) }
+    LaunchedEffect(PanelBus.request) {
+        if (PanelBus.request) {
+            panelRequest = true
+            PanelBus.request = false
+        }
+    }
     val tabs = buildList {
         add(Tab.HOME)
         when (prefs.navExtra) {
@@ -157,6 +174,12 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     }
     var current by rememberSaveable { mutableStateOf(Tab.HOME) }
     var subPage by rememberSaveable { mutableStateOf(if (openPanel) Overlay.PANEL else null) }
+    LaunchedEffect(panelRequest) {
+        if (panelRequest) {
+            subPage = Overlay.PANEL
+            panelRequest = false
+        }
+    }
     var lastSub by rememberSaveable { mutableStateOf(Overlay.APPS) }
     subPage?.let { lastSub = it }
     val pager = rememberPagerState(initialPage = tabs.indexOf(current).coerceAtLeast(0)) { tabs.size }
@@ -266,4 +289,9 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             Box(Modifier.fillMaxWidth().height(bottomInset).background(Boxy.colors.page).align(Alignment.BottomCenter))
         }
     }
+}
+
+/** A request from outside the UI (Quick Settings tile long press) to show the panel. */
+object PanelBus {
+    var request by mutableStateOf(false)
 }
