@@ -452,8 +452,10 @@
     <string name="settings_latency_targets_sub">Customize name and URL for latency tests</string>
     <string name="settings_latency_name">Name</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Behavior</string>
+    <string name="settings_behavior_sub">Start, tile, haptics and notifications</string>
     <string name="settings_misc">Misc</string>
-    <string name="settings_misc_sub">Other</string>
+    <string name="settings_misc_sub">GitHub mirror and backups</string>
     <string name="settings_open_panel">Open Panel on launch</string>
     <string name="settings_open_panel_sub">Start on Panel screen</string>
     <string name="settings_notifications">Notifications</string>
@@ -744,8 +746,6 @@
     <string name="settings_haptics_sub">Short vibration on taps</string>
     <string name="settings_tile_long_press">Tile long press opens the panel</string>
     <string name="settings_tile_long_press_sub">Off: a long press on the Quick Settings tile just opens Boxy</string>
-    <string name="logs_default_set">★ Open “%1$s” by default</string>
-    <string name="logs_default_reset">Open runs.log by default again</string>
     <string name="editor_save_as">Save as</string>
     <string name="editor_save_as_name">File name</string>
     <string name="editor_save_as_hint">A copy with your changes is saved in %1$s; this file stays as it is.</string>

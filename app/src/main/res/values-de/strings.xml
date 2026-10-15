@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Name und URL für Latenztests anpassen</string>
     <string name="settings_latency_name">Name</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Verhalten</string>
+    <string name="settings_behavior_sub">Start, Kachel, Vibration und Benachrichtigungen</string>
     <string name="settings_misc">Sonstiges</string>
-    <string name="settings_misc_sub">Weiteres</string>
+    <string name="settings_misc_sub">GitHub-Mirror und Sicherungen</string>
     <string name="settings_open_panel">Beim Start Panel öffnen</string>
     <string name="settings_open_panel_sub">Mit dem Panel-Bildschirm starten</string>
     <string name="settings_notifications">Benachrichtigungen</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Kurze Vibration beim Tippen</string>
     <string name="settings_tile_long_press">Langes Drücken der Kachel öffnet das Panel</string>
     <string name="settings_tile_long_press_sub">Aus: Langes Drücken der Schnelleinstellungs-Kachel öffnet nur Boxy</string>
-    <string name="logs_default_set">★ „%1$s“ standardmäßig öffnen</string>
-    <string name="logs_default_reset">Wieder runs.log standardmäßig öffnen</string>
     <string name="editor_save_as">Speichern unter</string>
     <string name="editor_save_as_name">Dateiname</string>
     <string name="editor_save_as_hint">Eine Kopie mit Ihren Änderungen wird in %1$s gespeichert; diese Datei bleibt unverändert.</string>

@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">遅延テストの名前と URL を設定</string>
     <string name="settings_latency_name">名前</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">動作</string>
+    <string name="settings_behavior_sub">起動、タイル、触覚フィードバック、通知</string>
     <string name="settings_misc">その他</string>
-    <string name="settings_misc_sub">その他</string>
+    <string name="settings_misc_sub">GitHub ミラーとバックアップ</string>
     <string name="settings_open_panel">起動時にパネルを開く</string>
     <string name="settings_open_panel_sub">パネル画面から開始</string>
     <string name="settings_notifications">通知</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">タップ時に短く振動</string>
     <string name="settings_tile_long_press">タイルの長押しでパネルを開く</string>
     <string name="settings_tile_long_press_sub">オフ: 長押しで Boxy を開くだけ</string>
-    <string name="logs_default_set">★ 「%1$s」を既定で開く</string>
-    <string name="logs_default_reset">既定を runs.log に戻す</string>
     <string name="editor_save_as">名前を付けて保存</string>
     <string name="editor_save_as_name">ファイル名</string>
     <string name="editor_save_as_hint">変更を含むコピーを %1$s に保存します。このファイルは変わりません。</string>

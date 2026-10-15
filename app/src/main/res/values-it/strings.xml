@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Nome e URL per i test di latenza</string>
     <string name="settings_latency_name">Nome</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Comportamento</string>
+    <string name="settings_behavior_sub">Avvio, riquadro, vibrazione e notifiche</string>
     <string name="settings_misc">Varie</string>
-    <string name="settings_misc_sub">Altro</string>
+    <string name="settings_misc_sub">Mirror GitHub e backup</string>
     <string name="settings_open_panel">Apri il pannello all’avvio</string>
     <string name="settings_open_panel_sub">Inizia dalla schermata del pannello</string>
     <string name="settings_notifications">Notifiche</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Breve vibrazione al tocco</string>
     <string name="settings_tile_long_press">Pressione lunga sul riquadro apre il pannello</string>
     <string name="settings_tile_long_press_sub">Disattivato: la pressione lunga apre solo Boxy</string>
-    <string name="logs_default_set">★ Apri «%1$s» per impostazione predefinita</string>
-    <string name="logs_default_reset">Torna ad aprire runs.log</string>
     <string name="editor_save_as">Salva con nome</string>
     <string name="editor_save_as_name">Nome file</string>
     <string name="editor_save_as_hint">Una copia con le modifiche viene salvata in %1$s; questo file resta invariato.</string>

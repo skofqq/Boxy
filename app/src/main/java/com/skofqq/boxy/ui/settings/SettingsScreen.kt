@@ -246,7 +246,7 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
             }
         }
         item {
-            SectionCard(stringResource(R.string.settings_misc), stringResource(R.string.settings_misc_sub)) {
+            SectionCard(stringResource(R.string.settings_behavior), stringResource(R.string.settings_behavior_sub)) {
                 SwitchRow(BoxyIcons.Schedule, stringResource(R.string.settings_autostart), stringResource(R.string.settings_autostart_sub), autostart == true, enabled = autostart != null) { on ->
                     scope.launch { if (BoxModule.setAutostart(on)) autostart = on }
                 }
@@ -259,9 +259,13 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SwitchRow(BoxyIcons.Vibration, stringResource(R.string.settings_haptics), stringResource(R.string.settings_haptics_sub), prefs.haptics) {
                     prefs.updateHaptics(it)
                 }
-                SettingsRow(BoxyIcons.Notifications, stringResource(R.string.settings_notifications), stringResource(R.string.settings_notifications_sub)) {
+                SettingsRow(BoxyIcons.Notifications, stringResource(R.string.settings_notifications), stringResource(R.string.settings_notifications_sub), showDivider = false) {
                     push(ROUTE_NOTIFICATIONS)
                 }
+            }
+        }
+        item {
+            SectionCard(stringResource(R.string.settings_misc), stringResource(R.string.settings_misc_sub)) {
                 SettingsRow(
                     BoxyIcons.Link,
                     stringResource(R.string.settings_mirror),

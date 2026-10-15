@@ -403,8 +403,10 @@
     <string name="settings_latency_targets_sub">自定义延迟测试的名称和链接</string>
     <string name="settings_latency_name">名称</string>
     <string name="settings_latency_url">链接</string>
+    <string name="settings_behavior">行为</string>
+    <string name="settings_behavior_sub">启动、磁贴、触感反馈和通知</string>
     <string name="settings_misc">其他</string>
-    <string name="settings_misc_sub">其他</string>
+    <string name="settings_misc_sub">GitHub 镜像和备份</string>
     <string name="settings_open_panel">启动时打开面板</string>
     <string name="settings_open_panel_sub">以面板页面启动</string>
     <string name="settings_notifications">通知</string>
@@ -690,8 +692,6 @@
     <string name="settings_haptics_sub">点击时短振动</string>
     <string name="settings_tile_long_press">长按磁贴打开面板</string>
     <string name="settings_tile_long_press_sub">关闭时：长按快捷设置磁贴仅打开 Boxy</string>
-    <string name="logs_default_set">★ 默认打开“%1$s”</string>
-    <string name="logs_default_reset">恢复默认打开 runs.log</string>
     <string name="editor_save_as">另存为</string>
     <string name="editor_save_as_name">文件名</string>
     <string name="editor_save_as_hint">带修改的副本将保存到 %1$s，当前文件保持不变。</string>

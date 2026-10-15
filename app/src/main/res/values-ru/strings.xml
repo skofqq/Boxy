@@ -440,8 +440,10 @@
     <string name="settings_latency_targets_sub">Названия и адреса для проверки задержки</string>
     <string name="settings_latency_name">Название</string>
     <string name="settings_latency_url">Адрес</string>
+    <string name="settings_behavior">Поведение</string>
+    <string name="settings_behavior_sub">Запуск, плитка, виброотклик и уведомления</string>
     <string name="settings_misc">Разное</string>
-    <string name="settings_misc_sub">Прочее</string>
+    <string name="settings_misc_sub">Зеркало GitHub и резервные копии</string>
     <string name="settings_open_panel">Открывать панель при запуске</string>
     <string name="settings_open_panel_sub">Начинать с экрана панели</string>
     <string name="settings_notifications">Уведомления</string>
@@ -732,8 +734,6 @@
     <string name="settings_haptics_sub">Короткая вибрация при нажатиях</string>
     <string name="settings_tile_long_press">Долгое нажатие на плитку — панель</string>
     <string name="settings_tile_long_press_sub">Выкл.: долгое нажатие на плитку в шторке просто открывает Boxy</string>
-    <string name="logs_default_set">★ Открывать «%1$s» по умолчанию</string>
-    <string name="logs_default_reset">Снова открывать runs.log по умолчанию</string>
     <string name="editor_save_as">Сохранить как</string>
     <string name="editor_save_as_name">Имя файла</string>
     <string name="editor_save_as_hint">Копия с правками сохранится в %1$s, текущий файл не изменится.</string>

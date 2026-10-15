@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Gecikme testleri için ad ve adres</string>
     <string name="settings_latency_name">Ad</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Davranış</string>
+    <string name="settings_behavior_sub">Başlatma, kutucuk, titreşim ve bildirimler</string>
     <string name="settings_misc">Çeşitli</string>
-    <string name="settings_misc_sub">Diğer</string>
+    <string name="settings_misc_sub">GitHub aynası ve yedekler</string>
     <string name="settings_open_panel">Açılışta paneli aç</string>
     <string name="settings_open_panel_sub">Panel ekranıyla başla</string>
     <string name="settings_notifications">Bildirimler</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Dokunuşta kısa titreşim</string>
     <string name="settings_tile_long_press">Kutucuğa uzun basış paneli açar</string>
     <string name="settings_tile_long_press_sub">Kapalı: uzun basış yalnızca Boxy’yi açar</string>
-    <string name="logs_default_set">★ “%1$s” varsayılan olarak açılsın</string>
-    <string name="logs_default_reset">Varsayılan olarak yine runs.log açılsın</string>
     <string name="editor_save_as">Farklı kaydet</string>
     <string name="editor_save_as_name">Dosya adı</string>
     <string name="editor_save_as_hint">Değişikliklerinizle bir kopya %1$s içine kaydedilir; bu dosya değişmez.</string>

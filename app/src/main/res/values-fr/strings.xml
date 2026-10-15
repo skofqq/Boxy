@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Nom et URL des tests de latence</string>
     <string name="settings_latency_name">Nom</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Comportement</string>
+    <string name="settings_behavior_sub">Démarrage, tuile, vibration et notifications</string>
     <string name="settings_misc">Divers</string>
-    <string name="settings_misc_sub">Autres</string>
+    <string name="settings_misc_sub">Miroir GitHub et sauvegardes</string>
     <string name="settings_open_panel">Ouvrir le panneau au lancement</string>
     <string name="settings_open_panel_sub">Démarrer sur l’écran du panneau</string>
     <string name="settings_notifications">Notifications</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Brève vibration au toucher</string>
     <string name="settings_tile_long_press">Appui long sur la tuile : panneau</string>
     <string name="settings_tile_long_press_sub">Désactivé : un appui long ouvre simplement Boxy</string>
-    <string name="logs_default_set">★ Ouvrir « %1$s » par défaut</string>
-    <string name="logs_default_reset">Rouvrir runs.log par défaut</string>
     <string name="editor_save_as">Enregistrer sous</string>
     <string name="editor_save_as_name">Nom du fichier</string>
     <string name="editor_save_as_hint">Une copie avec vos modifications est enregistrée dans %1$s ; ce fichier reste inchangé.</string>

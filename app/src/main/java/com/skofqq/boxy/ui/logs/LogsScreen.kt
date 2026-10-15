@@ -90,7 +90,7 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
         val core = BoxModule.readSetting("bin_name")
         coreLog = core?.let { "$it.log" }
         if (current == null || list.none { it.name == current }) {
-            val preferred = BoxyApp.instance.prefs.defaultLog
+            val preferred = prefs.lastLog
             current = list.firstOrNull { preferred.isNotEmpty() && it.name == preferred }?.name
                 ?: list.firstOrNull { it.name == "runs.log" }?.name ?: list.firstOrNull()?.name
         }
@@ -143,17 +143,8 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
                 file?.let { "${it.name} · ${Format.bytes(context, it.size)}" } ?: stringResource(R.string.logs_no_files),
                 Boxy.colors.accent,
                 files.orEmpty().map { f ->
-                    val star = if (f.name == prefs.defaultLog) "★ " else ""
-                    "$star${f.name} · ${Format.bytes(context, f.size)}" to { current = f.name }
-                } + listOfNotNull(
-                    current?.let { name ->
-                        if (name == prefs.defaultLog) {
-                            stringResource(R.string.logs_default_reset) to { prefs.updateDefaultLog("") }
-                        } else {
-                            stringResource(R.string.logs_default_set, name) to { prefs.updateDefaultLog(name) }
-                        }
-                    },
-                ),
+                    "${f.name} · ${Format.bytes(context, f.size)}" to { current = f.name; prefs.lastLog = f.name }
+                },
             )
             val (levelLabel, levelColor) = levelStyle(level)
             MenuChip(

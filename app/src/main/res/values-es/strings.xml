@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Nombre y URL para las pruebas de latencia</string>
     <string name="settings_latency_name">Nombre</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Comportamiento</string>
+    <string name="settings_behavior_sub">Inicio, mosaico, vibración y notificaciones</string>
     <string name="settings_misc">Varios</string>
-    <string name="settings_misc_sub">Otros</string>
+    <string name="settings_misc_sub">Espejo de GitHub y copias de seguridad</string>
     <string name="settings_open_panel">Abrir el panel al iniciar</string>
     <string name="settings_open_panel_sub">Empezar en la pantalla del panel</string>
     <string name="settings_notifications">Notificaciones</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Vibración breve al tocar</string>
     <string name="settings_tile_long_press">Pulsación larga en el mosaico abre el panel</string>
     <string name="settings_tile_long_press_sub">Desactivado: la pulsación larga solo abre Boxy</string>
-    <string name="logs_default_set">★ Abrir «%1$s» por defecto</string>
-    <string name="logs_default_reset">Volver a abrir runs.log por defecto</string>
     <string name="editor_save_as">Guardar como</string>
     <string name="editor_save_as_name">Nombre del archivo</string>
     <string name="editor_save_as_hint">Se guarda una copia con tus cambios en %1$s; este archivo no cambia.</string>

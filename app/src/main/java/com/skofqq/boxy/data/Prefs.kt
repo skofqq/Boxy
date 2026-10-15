@@ -108,9 +108,10 @@ class Prefs(context: Context) {
     /** Long press on the Quick Settings tile opens the panel instead of just the app. */
     var tileLongPressPanel by mutableStateOf(sp.getBoolean("tile_long_press_panel", false))
         private set
-    /** Log file opened first on the Logs page; empty = runs.log. */
-    var defaultLog by mutableStateOf(sp.getString("default_log", "") ?: "")
-        private set
+    /** Log file the user looked at last; the Logs page opens it first (empty = runs.log). */
+    var lastLog: String
+        get() = sp.getString("last_log", "") ?: ""
+        set(v) { sp.edit().putString("last_log", v).apply() }
     var onboardingDone by mutableStateOf(sp.getBoolean("onboarding_done", false))
         private set
     var filterChains by mutableStateOf(sp.getString("filter_chains", "") ?: "")
@@ -138,7 +139,6 @@ class Prefs(context: Context) {
     fun updateNotifySubsFailed(v: Boolean) { notifySubsFailed = v; sp.edit().putBoolean("notify_subs_failed", v).apply() }
     fun updateHaptics(v: Boolean) { haptics = v; com.skofqq.boxy.ui.components.Haptics.enabled = v; sp.edit().putBoolean("haptics", v).apply() }
     fun updateTileLongPressPanel(v: Boolean) { tileLongPressPanel = v; sp.edit().putBoolean("tile_long_press_panel", v).apply() }
-    fun updateDefaultLog(v: String) { defaultLog = v; sp.edit().putString("default_log", v).apply() }
     fun updateOnboardingDone(v: Boolean) { onboardingDone = v; sp.edit().putBoolean("onboarding_done", v).apply() }
     fun updateFilterChains(v: String) { filterChains = v; sp.edit().putString("filter_chains", v).apply() }
 

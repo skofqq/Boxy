@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Назва і адрас для праверкі затрымкі</string>
     <string name="settings_latency_name">Назва</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Паводзіны</string>
+    <string name="settings_behavior_sub">Запуск, плітка, вібраводгук і апавяшчэнні</string>
     <string name="settings_misc">Іншае</string>
-    <string name="settings_misc_sub">Іншае</string>
+    <string name="settings_misc_sub">Люстэрка GitHub і рэзервовыя копіі</string>
     <string name="settings_open_panel">Адкрываць панэль пры запуску</string>
     <string name="settings_open_panel_sub">Пачынаць з экрана панэлі</string>
     <string name="settings_notifications">Апавяшчэнні</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Кароткая вібрацыя пры націсканнях</string>
     <string name="settings_tile_long_press">Доўгае націсканне на плітку — панэль</string>
     <string name="settings_tile_long_press_sub">Выкл.: доўгае націсканне на плітку ў шторцы проста адкрывае Boxy</string>
-    <string name="logs_default_set">★ Адкрываць «%1$s» па змаўчанні</string>
-    <string name="logs_default_reset">Зноў адкрываць runs.log па змаўчанні</string>
     <string name="editor_save_as">Захаваць як</string>
     <string name="editor_save_as_name">Імя файла</string>
     <string name="editor_save_as_hint">Копія з праўкамі захаваецца ў %1$s, бягучы файл не зменіцца.</string>

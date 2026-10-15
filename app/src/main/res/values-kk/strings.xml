@@ -432,8 +432,10 @@
     <string name="settings_latency_targets_sub">Кідірісті тексеру үшін атау мен мекенжай</string>
     <string name="settings_latency_name">Атауы</string>
     <string name="settings_latency_url">URL</string>
+    <string name="settings_behavior">Әрекет</string>
+    <string name="settings_behavior_sub">Іске қосу, плитка, діріл және хабарландырулар</string>
     <string name="settings_misc">Басқа</string>
-    <string name="settings_misc_sub">Басқа</string>
+    <string name="settings_misc_sub">GitHub айнасы және сақтық көшірмелер</string>
     <string name="settings_open_panel">Іске қосқанда панельді ашу</string>
     <string name="settings_open_panel_sub">Панель экранынан бастау</string>
     <string name="settings_notifications">Хабарландырулар</string>
@@ -720,8 +722,6 @@
     <string name="settings_haptics_sub">Басқанда қысқа діріл</string>
     <string name="settings_tile_long_press">Тақтаны ұзақ басу — панель</string>
     <string name="settings_tile_long_press_sub">Өшірулі: перде тақтасын ұзақ басу Boxy-ді жай ашады</string>
-    <string name="logs_default_set">★ «%1$s» әдепкі бойынша ашу</string>
-    <string name="logs_default_reset">Әдепкі бойынша қайта runs.log ашу</string>
     <string name="editor_save_as">Басқаша сақтау</string>
     <string name="editor_save_as_name">Файл атауы</string>
     <string name="editor_save_as_hint">Түзетулері бар көшірме %1$s ішінде сақталады, ағымдағы файл өзгермейді.</string>
