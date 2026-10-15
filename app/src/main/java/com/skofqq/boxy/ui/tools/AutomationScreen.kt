@@ -188,7 +188,7 @@ private fun TimeDialog(minutes: Int, onDismiss: () -> Unit, onPick: (Int) -> Uni
                     clockDialColor = Boxy.colors.surface2,
                     selectorColor = Boxy.colors.accent,
                     timeSelectorSelectedContainerColor = Boxy.colors.accent.copy(alpha = 0.18f),
-                    timeSelectorUnselectedContainerColor = Boxy.colors.surface2,
+                    timeSelectorContainerColor = Boxy.colors.surface2,
                 ),
             )
         },

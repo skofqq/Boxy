@@ -44,6 +44,7 @@ import com.skofqq.boxy.R
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.root.RootTask
+import com.skofqq.boxy.ui.components.addTaskLine
 import com.skofqq.boxy.ui.components.BoxySheet
 import com.skofqq.boxy.ui.components.SectionCard
 import com.skofqq.boxy.ui.components.SheetButtons
@@ -85,16 +86,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
         taskLines.clear()
         taskDone = false
         scope.launch {
-            val ok = RootTask.run(cmd) { line ->
-                if (line.isBlank()) return@run
-                // Download progress repeats the same prefix; keep only the latest line of it.
-                val last = taskLines.lastOrNull()
-                if (last != null && last.length > 12 && line.take(12) == last.take(12) && line.contains('%')) {
-                    taskLines[taskLines.lastIndex] = line
-                } else {
-                    taskLines.add(line)
-                }
-            }
+            val ok = RootTask.run(cmd) { line -> taskLines.addTaskLine(line) }
             taskOk = ok
             taskDone = true
         }
@@ -144,7 +136,7 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
     if (dashboardSheet) com.skofqq.boxy.ui.panel.DashboardSheet(onDismiss = { dashboardSheet = false })
 
     taskTitle?.let { title ->
-        TaskSheet(title, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null }
+        com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null }
     }
 }
 
@@ -180,34 +172,5 @@ private fun UpdateRow(icon: androidx.compose.ui.graphics.vector.ImageVector, tit
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 2)
         }
         Icon(BoxyIcons.SystemUpdate, null, Modifier.size(24.dp), tint = Boxy.colors.text)
-    }
-}
-
-/** Live output of a running module command. */
-@Composable
-fun TaskSheet(title: String, lines: List<String>, done: Boolean, ok: Boolean, onDismiss: () -> Unit) {
-    BoxySheet(
-        title,
-        when {
-            !done -> stringResource(R.string.update_started, title)
-            ok -> stringResource(R.string.update_completed, title)
-            else -> stringResource(R.string.update_failed)
-        },
-        onDismiss,
-    ) {
-        Box(
-            Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 360.dp).clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(12.dp),
-        ) {
-            val scroll = rememberScrollState()
-            val vScroll = rememberScrollState()
-            LaunchedEffect(lines.size) { vScroll.scrollTo(vScroll.maxValue) }
-            Column(Modifier.verticalScroll(vScroll).horizontalScroll(scroll)) {
-                lines.takeLast(200).forEach {
-                    Text(it, fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Clip)
-                }
-            }
-            if (!done) CircularProgressIndicator(Modifier.align(Alignment.TopEnd).size(20.dp), strokeWidth = 2.dp)
-        }
-        if (done) SheetButtons(stringResource(R.string.action_done), onDismiss)
     }
 }

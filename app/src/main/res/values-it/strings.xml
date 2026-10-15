@@ -649,7 +649,6 @@
     <string name="dnscrypt_download">Scarica dnscrypt-proxy</string>
     <string name="dnscrypt_update">Aggiorna dnscrypt-proxy</string>
     <string name="dnscrypt_installed">Installato: %1$s</string>
-    <string name="dnscrypt_download_failed">Impossibile scaricare dnscrypt-proxy</string>
     <string name="dnscrypt_config">Configurazione di dnscrypt-proxy</string>
     <string name="dnscrypt_config_sub">Server, relay anonimi, liste di blocco</string>
     <string name="dnscrypt_hint_clash">Con i core clash e sing-box il DNS della configurazione attiva passa a %1$s automaticamente e viene ripristinato quando DNSCrypt è disattivato.</string>
@@ -737,4 +736,8 @@
     <string name="tools_row_update">Aggiornamento componenti</string>
     <string name="settings_home">Schermata principale</string>
     <string name="settings_home_sub">Dati per le schede velocità, abbonamento e latenza</string>
+    <string name="task_installing">Installazione…</string>
+    <string name="task_eta">mancano %1$s</string>
+    <string name="task_show_details">Dettagli</string>
+    <string name="task_hide_details">Nascondi dettagli</string>
 </resources>

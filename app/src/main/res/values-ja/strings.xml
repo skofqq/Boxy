@@ -649,7 +649,6 @@
     <string name="dnscrypt_download">dnscrypt-proxy をダウンロード</string>
     <string name="dnscrypt_update">dnscrypt-proxy を更新</string>
     <string name="dnscrypt_installed">インストール済み: %1$s</string>
-    <string name="dnscrypt_download_failed">dnscrypt-proxy をダウンロードできませんでした</string>
     <string name="dnscrypt_config">dnscrypt-proxy の設定</string>
     <string name="dnscrypt_config_sub">サーバー、匿名リレー、ブロックリスト</string>
     <string name="dnscrypt_hint_clash">clash と sing-box コアでは、アクティブな設定の DNS が自動的に %1$s に切り替わり、DNSCrypt をオフにすると元に戻ります。</string>
@@ -737,4 +736,8 @@
     <string name="tools_row_update">コンポーネントの更新</string>
     <string name="settings_home">ホーム画面</string>
     <string name="settings_home_sub">速度・サブスクリプション・遅延カードのデータ</string>
+    <string name="task_installing">インストール中…</string>
+    <string name="task_eta">残り %1$s</string>
+    <string name="task_show_details">詳細</string>
+    <string name="task_hide_details">詳細を隠す</string>
 </resources>

@@ -661,7 +661,6 @@
     <string name="dnscrypt_download">Скачать dnscrypt-proxy</string>
     <string name="dnscrypt_update">Обновить dnscrypt-proxy</string>
     <string name="dnscrypt_installed">Установлен: %1$s</string>
-    <string name="dnscrypt_download_failed">Не удалось скачать dnscrypt-proxy</string>
     <string name="dnscrypt_config">Конфигурация dnscrypt-proxy</string>
     <string name="dnscrypt_config_sub">Серверы, анонимные релеи, блок-листы</string>
     <string name="dnscrypt_hint_clash">С ядрами clash и sing-box DNS активной конфигурации переключается на %1$s автоматически и возвращается при выключении DNSCrypt.</string>
@@ -749,4 +748,8 @@
     <string name="tools_row_update">Обновление компонентов</string>
     <string name="settings_home">Главный экран</string>
     <string name="settings_home_sub">Данные для карточек скорости, подписки и задержки</string>
+    <string name="task_installing">Установка…</string>
+    <string name="task_eta">осталось %1$s</string>
+    <string name="task_show_details">Подробности</string>
+    <string name="task_hide_details">Скрыть подробности</string>
 </resources>

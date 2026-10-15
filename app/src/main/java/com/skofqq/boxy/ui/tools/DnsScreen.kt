@@ -33,6 +33,7 @@ import com.skofqq.boxy.ui.components.SwitchRow
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import kotlinx.coroutines.launch
+import com.skofqq.boxy.ui.components.addTaskLine
 
 /** DNS of the module: the core's DNS hijack and the optional DNSCrypt (dnscrypt-proxy). */
 @Composable
@@ -41,7 +42,11 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
     val scope = rememberCoroutineScope()
     var dnsHijack by remember { mutableStateOf<Boolean?>(null) }
     var dnscrypt by remember { mutableStateOf<com.skofqq.boxy.root.DnsCryptState?>(null) }
-    var dnscryptTask by remember { mutableStateOf<String?>(null) } // last output line while downloading
+    // dnscrypt-proxy download: output lines while the pop-up is open, then whether it worked.
+    var dnscryptTask by remember { mutableStateOf(false) }
+    val dnscryptLines = remember { androidx.compose.runtime.mutableStateListOf<String>() }
+    var dnscryptDone by remember { mutableStateOf(false) }
+    var dnscryptOk by remember { mutableStateOf(false) }
     var dnscryptReload by remember { mutableStateOf(0) }
     var dnsCheck by remember { mutableStateOf(false) }
     var core by remember { mutableStateOf<String?>(null) }
@@ -115,16 +120,17 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                         SettingsRow(
                             BoxyIcons.Download,
                             stringResource(if (installed) R.string.dnscrypt_update else R.string.dnscrypt_download),
-                            dnscryptTask ?: dc.version?.let { stringResource(R.string.dnscrypt_installed, it) } ?: "github.com/DNSCrypt/dnscrypt-proxy",
+                            dc.version?.let { stringResource(R.string.dnscrypt_installed, it) } ?: "github.com/DNSCrypt/dnscrypt-proxy",
                         ) {
-                            if (dnscryptTask != null) return@SettingsRow
-                            dnscryptTask = context.getString(R.string.import_downloading)
+                            if (dnscryptTask) return@SettingsRow
+                            dnscryptLines.clear()
+                            dnscryptDone = false
+                            dnscryptTask = true
                             scope.launch {
-                                val ok = com.skofqq.boxy.root.RootTask.run("${BoxModule.SCRIPTS}/box.tool updnscrypt") { line ->
-                                    if (line.isNotBlank()) dnscryptTask = line.trim().take(80)
+                                dnscryptOk = com.skofqq.boxy.root.RootTask.run("${BoxModule.SCRIPTS}/box.tool updnscrypt") { line ->
+                                    dnscryptLines.addTaskLine(line)
                                 }
-                                dnscryptTask = null
-                                if (!ok) Toast.makeText(context, R.string.dnscrypt_download_failed, Toast.LENGTH_SHORT).show()
+                                dnscryptDone = true
                                 dnscryptReload++
                             }
                         }
@@ -160,6 +166,9 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
             }
     }
 
+    if (dnscryptTask) {
+        com.skofqq.boxy.ui.components.TaskDialog("dnscrypt-proxy", dnscryptLines, dnscryptDone, dnscryptOk) { dnscryptTask = false }
+    }
     if (dnsCheck) {
         dnscrypt?.let { DnsCheckSheet(it.port) { dnsCheck = false } }
     }

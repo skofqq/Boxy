@@ -649,7 +649,6 @@
     <string name="dnscrypt_download">dnscrypt-proxy жүктеу</string>
     <string name="dnscrypt_update">dnscrypt-proxy жаңарту</string>
     <string name="dnscrypt_installed">Орнатылған: %1$s</string>
-    <string name="dnscrypt_download_failed">dnscrypt-proxy жүктеу сәтсіз</string>
     <string name="dnscrypt_config">dnscrypt-proxy конфигурациясы</string>
     <string name="dnscrypt_config_sub">Серверлер, анонимді релелер, бұғаттау тізімдері</string>
     <string name="dnscrypt_hint_clash">clash және sing-box ядроларында белсенді конфигурацияның DNS-і %1$s мекенжайына автоматты түрде ауысады және DNSCrypt өшірілгенде қайтарылады.</string>
@@ -737,4 +736,8 @@
     <string name="tools_row_update">Құрамдас бөліктерді жаңарту</string>
     <string name="settings_home">Басты экран</string>
     <string name="settings_home_sub">Жылдамдық, жазылым және кідіріс карталарының деректері</string>
+    <string name="task_installing">Орнатылуда…</string>
+    <string name="task_eta">%1$s қалды</string>
+    <string name="task_show_details">Толығырақ</string>
+    <string name="task_hide_details">Толығырақты жасыру</string>
 </resources>

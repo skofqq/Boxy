@@ -619,7 +619,6 @@
     <string name="dnscrypt_download">下载 dnscrypt-proxy</string>
     <string name="dnscrypt_update">更新 dnscrypt-proxy</string>
     <string name="dnscrypt_installed">已安装：%1$s</string>
-    <string name="dnscrypt_download_failed">无法下载 dnscrypt-proxy</string>
     <string name="dnscrypt_config">dnscrypt-proxy 配置</string>
     <string name="dnscrypt_config_sub">服务器、匿名中继、拦截列表</string>
     <string name="dnscrypt_hint_clash">使用 clash 和 sing-box 内核时，当前配置的 DNS 会自动切换到 %1$s，关闭 DNSCrypt 后恢复。</string>
@@ -707,4 +706,8 @@
     <string name="tools_row_update">组件更新</string>
     <string name="settings_home">主屏幕</string>
     <string name="settings_home_sub">速度、订阅和延迟卡片的数据</string>
+    <string name="task_installing">正在安装…</string>
+    <string name="task_eta">剩余 %1$s</string>
+    <string name="task_show_details">详细信息</string>
+    <string name="task_hide_details">隐藏详细信息</string>
 </resources>

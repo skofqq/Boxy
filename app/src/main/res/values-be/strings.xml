@@ -649,7 +649,6 @@
     <string name="dnscrypt_download">Спампаваць dnscrypt-proxy</string>
     <string name="dnscrypt_update">Абнавіць dnscrypt-proxy</string>
     <string name="dnscrypt_installed">Усталяваны: %1$s</string>
-    <string name="dnscrypt_download_failed">Не ўдалося спампаваць dnscrypt-proxy</string>
     <string name="dnscrypt_config">Канфігурацыя dnscrypt-proxy</string>
     <string name="dnscrypt_config_sub">Серверы, ананімныя рэлеі, блок-лісты</string>
     <string name="dnscrypt_hint_clash">З ядрамі clash і sing-box DNS актыўнай канфігурацыі пераключаецца на %1$s аўтаматычна і вяртаецца пры выключэнні DNSCrypt.</string>
@@ -737,4 +736,8 @@
     <string name="tools_row_update">Абнаўленне кампанентаў</string>
     <string name="settings_home">Галоўны экран</string>
     <string name="settings_home_sub">Даныя для картак хуткасці, падпіскі і затрымкі</string>
+    <string name="task_installing">Усталёўка…</string>
+    <string name="task_eta">засталося %1$s</string>
+    <string name="task_show_details">Падрабязнасці</string>
+    <string name="task_hide_details">Схаваць падрабязнасці</string>
 </resources>
