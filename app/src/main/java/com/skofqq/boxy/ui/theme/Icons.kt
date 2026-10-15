@@ -280,6 +280,12 @@ object BoxyIcons {
             "M12,9v6M9,9v6M12,12h2.5a1.5,1.5 0 0 0 0,-3H12",
     )
 
+    /** Clock with a circular arrow: automatic update check. */
+    val Update = strokeIcon(
+        "Update",
+        "M20.5,12a8.5,8.5 0 1 1 -2.5,-6M20.5,3.5v4.5h-4.5M12,7.5v4.5l3,2",
+    )
+
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =
         ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)

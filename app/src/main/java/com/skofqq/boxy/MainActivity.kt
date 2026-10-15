@@ -91,6 +91,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         BoxyApp.foreground = false
+        // The theme may have been changed in Settings since onCreate.
+        if (android.os.Build.VERSION.SDK_INT >= 33) splashTheme((application as BoxyApp).prefs.themeMode)
         super.onStop()
     }
 
@@ -100,12 +102,67 @@ class MainActivity : ComponentActivity() {
         tileLongPress(intent)
     }
 
-    /** TileLongPressActivity asks for the panel (long press on the Quick Settings tile, setting on). */
+    /**
+     * Pages asked for by an intent: the panel (long press on the Quick Settings tile, setting on)
+     * or Settings (an update notification).
+     */
     private fun tileLongPress(intent: android.content.Intent?) {
         if (intent?.getBooleanExtra(TileLongPressActivity.EXTRA_OPEN_PANEL, false) == true) {
             intent.removeExtra(TileLongPressActivity.EXTRA_OPEN_PANEL)
             PanelBus.request = true
         }
+        if (intent?.getBooleanExtra(EXTRA_OPEN_SETTINGS, false) == true) {
+            intent.removeExtra(EXTRA_OPEN_SETTINGS)
+            PanelBus.settings = true
+        }
+    }
+
+    companion object {
+        const val EXTRA_OPEN_SETTINGS = "com.skofqq.boxy.extra.OPEN_SETTINGS"
+        /** How long the launch screen may hold the first frame so the logo animation can play out. */
+        private const val SPLASH_MS = 720L
+    }
+
+    /**
+     * Launch screen (Android 12+): the first frame waits for the animated logo to finish (at most [SPLASH_MS]),
+     * then the logo grows and fades while the launch screen dissolves into the app.
+     */
+    @androidx.annotation.RequiresApi(31)
+    private fun splashAnimation() {
+        val start = android.os.SystemClock.uptimeMillis()
+        val content = findViewById<android.view.View>(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(object : android.view.ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                val left = SPLASH_MS - (android.os.SystemClock.uptimeMillis() - start)
+                if (left > 0) {
+                    content.postDelayed({ content.invalidate() }, left)
+                    return false
+                }
+                content.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
+        splashScreen.setOnExitAnimationListener { splash ->
+            val icon = splash.iconView
+            val ease = android.view.animation.PathInterpolator(0.3f, 0f, 0.8f, 0.15f)
+            icon?.animate()?.scaleX(1.35f)?.scaleY(1.35f)?.alpha(0f)?.setDuration(320)?.setInterpolator(ease)?.start()
+            splash.animate().alpha(0f).setStartDelay(80).setDuration(300)
+                .setInterpolator(android.view.animation.PathInterpolator(0.4f, 0f, 0.2f, 1f))
+                .withEndAction { splash.remove() }
+                .start()
+        }
+    }
+
+    /** The next launch screen follows Boxy's theme when it is forced light or dark (the system remembers it). */
+    @androidx.annotation.RequiresApi(33)
+    private fun splashTheme(mode: com.skofqq.boxy.data.ThemeMode) {
+        splashScreen.setSplashScreenTheme(
+            when (mode) {
+                com.skofqq.boxy.data.ThemeMode.LIGHT -> R.style.Theme_Boxy_SplashLight
+                com.skofqq.boxy.data.ThemeMode.DARK -> R.style.Theme_Boxy_SplashDark
+                else -> android.content.res.Resources.ID_NULL
+            },
+        )
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -114,7 +171,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (android.os.Build.VERSION.SDK_INT >= 31 && savedInstanceState == null) splashAnimation()
         val prefs = (application as BoxyApp).prefs
+        if (android.os.Build.VERSION.SDK_INT >= 33) splashTheme(prefs.themeMode)
         if (prefs.notifications) BoxStatusService.sync(this, true)
         val firstLaunch = savedInstanceState == null
         if (firstLaunch) ImportLinks.fromIntent(intent)?.let { ImportBus.request = it }
@@ -192,6 +251,13 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
         if (pager.currentPage != index) pager.scrollToPage(index)
     }
     LaunchedEffect(pager.settledPage) { current = tabs.getOrElse(pager.settledPage) { Tab.HOME } }
+    LaunchedEffect(PanelBus.settings) {
+        if (PanelBus.settings) {
+            PanelBus.settings = false
+            subPage = null
+            pager.scrollToPage(tabs.indexOf(Tab.SETTINGS).coerceAtLeast(0))
+        }
+    }
     BackHandler(enabled = subPage == null && pager.currentPage != 0) { scope.launch { pager.animateScrollToPage(0) } }
     val backAgain = stringResource(R.string.app_back_again)
     BackHandler(enabled = subPage == null && pager.currentPage == 0) {
@@ -291,7 +357,8 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     }
 }
 
-/** A request from outside the UI (Quick Settings tile long press) to show the panel. */
+/** Requests from outside the UI: the panel (Quick Settings tile long press), Settings (update notification). */
 object PanelBus {
     var request by mutableStateOf(false)
+    var settings by mutableStateOf(false)
 }

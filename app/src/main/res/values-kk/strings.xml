@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Мұндай атаулы файл бар</string>
     <string name="editor_save_as_invalid">Жаңа файл атауын енгізіңіз</string>
     <string name="editor_saved_as">%1$s ретінде сақталды</string>
+    <string name="settings_update_check">Жаңартуларды автотексеру</string>
+    <string name="update_interval_off">Өшірулі</string>
+    <string name="update_interval_off_desc">Тек Баптауларда қолмен тексеру</string>
+    <string name="update_interval_daily">Күніне бір рет</string>
+    <string name="update_interval_weekly">Аптасына бір рет</string>
+    <string name="update_interval_monthly">Айына бір рет</string>
+    <string name="notify_channel_updates">Жаңартулар</string>
+    <string name="notify_update_app_title">Boxy жаңартуы бар</string>
+    <string name="notify_update_app_text">Нұсқа %1$s. Баптауларды ашу үшін түртіңіз.</string>
+    <string name="notify_update_module_title">Модуль жаңартуы бар</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Баптауларды ашу үшін түртіңіз.</string>
 </resources>

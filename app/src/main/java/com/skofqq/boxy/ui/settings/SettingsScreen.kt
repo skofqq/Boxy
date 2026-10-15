@@ -108,6 +108,11 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
     var sourceDialog by remember { mutableStateOf(false) }
     var chainsDialog by remember { mutableStateOf(false) }
     var infoSheet by remember { mutableStateOf(false) }
+    var updateDialog by remember { mutableStateOf(false) }
+    // Update notifications need the permission; the check is scheduled either way.
+    val notifyPermission = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) {}
     var autostart by remember { mutableStateOf<Boolean?>(null) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     LaunchedEffect(Unit) { autostart = BoxModule.autostartEnabled() }
@@ -156,6 +161,12 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
             add(Choice(ThemeMode.MATERIAL, stringResource(R.string.theme_material), stringResource(R.string.theme_material_desc)))
         }
     }
+    val updateChoices = listOf(
+        Choice(com.skofqq.boxy.data.UpdateInterval.OFF, stringResource(R.string.update_interval_off), stringResource(R.string.update_interval_off_desc)),
+        Choice(com.skofqq.boxy.data.UpdateInterval.DAILY, stringResource(R.string.update_interval_daily)),
+        Choice(com.skofqq.boxy.data.UpdateInterval.WEEKLY, stringResource(R.string.update_interval_weekly)),
+        Choice(com.skofqq.boxy.data.UpdateInterval.MONTHLY, stringResource(R.string.update_interval_monthly)),
+    )
     val systemLanguage = stringResource(R.string.lang_system)
     val languageChoices = AppLanguage.entries.map { Choice(it, it.nativeName ?: systemLanguage, leading = it.flag) }
     val sourceChoices = listOf(
@@ -292,6 +303,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                         else -> moduleVersion ?: stringResource(R.string.common_dash)
                     },
                 ) { moduleSheet = true }
+                SettingsRow(BoxyIcons.Update, stringResource(R.string.settings_update_check), updateChoices.first { it.value == prefs.updateInterval }.title) {
+                    updateDialog = true
+                }
                 SettingsRow(BoxyIcons.Code, stringResource(R.string.settings_licenses), stringResource(R.string.settings_licenses_sub), showDivider = false) {
                     push(ROUTE_LICENSES)
                 }
@@ -301,6 +315,19 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
 
     settingSheet?.let { target ->
         com.skofqq.boxy.ui.components.ModuleSettingSheet(target, moduleSetup, onApply = ::applyModule) { settingSheet = null }
+    }
+    if (updateDialog) {
+        ChoiceDialog(stringResource(R.string.settings_update_check), updateChoices, prefs.updateInterval, onSelect = {
+            prefs.updateUpdateInterval(it)
+            com.skofqq.boxy.notify.UpdateCheckJob.schedule(context.applicationContext)
+            updateDialog = false
+            if (it != com.skofqq.boxy.data.UpdateInterval.OFF && Build.VERSION.SDK_INT >= 33 &&
+                androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) !=
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                notifyPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }, onDismiss = { updateDialog = false })
     }
     if (themeDialog) {
         ChoiceDialog(stringResource(R.string.settings_theme), themeChoices, prefs.themeMode, onSelect = {

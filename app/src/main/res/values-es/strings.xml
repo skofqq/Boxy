@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Ya existe un archivo con ese nombre</string>
     <string name="editor_save_as_invalid">Introduce un nombre nuevo</string>
     <string name="editor_saved_as">Guardado como %1$s</string>
+    <string name="settings_update_check">Buscar actualizaciones automáticamente</string>
+    <string name="update_interval_off">Desactivado</string>
+    <string name="update_interval_off_desc">Buscar solo a mano en Ajustes</string>
+    <string name="update_interval_daily">Una vez al día</string>
+    <string name="update_interval_weekly">Una vez a la semana</string>
+    <string name="update_interval_monthly">Una vez al mes</string>
+    <string name="notify_channel_updates">Actualizaciones</string>
+    <string name="notify_update_app_title">Actualización de Boxy disponible</string>
+    <string name="notify_update_app_text">Versión %1$s. Toca para abrir Ajustes.</string>
+    <string name="notify_update_module_title">Actualización del módulo disponible</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Toca para abrir Ajustes.</string>
 </resources>

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFFFF</color>
+    <color name="splash_logo">#FF0B0B0B</color>
+    <color name="splash_logo_light">#FF0B0B0B</color>
+    <color name="splash_logo_dark">#FFF5F7FA</color>
+    <color name="window_background_light">#FFF6F8FA</color>
+    <color name="window_background_dark">#FF0A0C0F</color>
     <color name="window_background">#FFF6F8FA</color>
 
     <style name="Theme.Boxy" parent="android:Theme.Material.Light.NoActionBar">

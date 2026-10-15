@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Eine Datei mit diesem Namen existiert bereits</string>
     <string name="editor_save_as_invalid">Neuen Dateinamen eingeben</string>
     <string name="editor_saved_as">Gespeichert als %1$s</string>
+    <string name="settings_update_check">Automatische Update-Prüfung</string>
+    <string name="update_interval_off">Aus</string>
+    <string name="update_interval_off_desc">Nur manuell in den Einstellungen prüfen</string>
+    <string name="update_interval_daily">Einmal täglich</string>
+    <string name="update_interval_weekly">Einmal pro Woche</string>
+    <string name="update_interval_monthly">Einmal im Monat</string>
+    <string name="notify_channel_updates">Updates</string>
+    <string name="notify_update_app_title">Boxy-Update verfügbar</string>
+    <string name="notify_update_app_text">Version %1$s. Tippen, um die Einstellungen zu öffnen.</string>
+    <string name="notify_update_module_title">Modul-Update verfügbar</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Tippen, um die Einstellungen zu öffnen.</string>
 </resources>

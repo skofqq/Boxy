@@ -740,4 +740,15 @@
     <string name="editor_save_as_exists">Файл с таким именем уже есть</string>
     <string name="editor_save_as_invalid">Введите новое имя файла</string>
     <string name="editor_saved_as">Сохранено как %1$s</string>
+    <string name="settings_update_check">Автопроверка обновлений</string>
+    <string name="update_interval_off">Выключена</string>
+    <string name="update_interval_off_desc">Проверять только вручную в Настройках</string>
+    <string name="update_interval_daily">Раз в день</string>
+    <string name="update_interval_weekly">Раз в неделю</string>
+    <string name="update_interval_monthly">Раз в месяц</string>
+    <string name="notify_channel_updates">Обновления</string>
+    <string name="notify_update_app_title">Доступно обновление Boxy</string>
+    <string name="notify_update_app_text">Версия %1$s. Нажмите, чтобы открыть Настройки.</string>
+    <string name="notify_update_module_title">Доступно обновление модуля</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Нажмите, чтобы открыть Настройки.</string>
 </resources>

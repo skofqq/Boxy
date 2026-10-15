@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">同じ名前のファイルがあります</string>
     <string name="editor_save_as_invalid">新しいファイル名を入力してください</string>
     <string name="editor_saved_as">%1$s として保存しました</string>
+    <string name="settings_update_check">アップデートの自動確認</string>
+    <string name="update_interval_off">オフ</string>
+    <string name="update_interval_off_desc">設定から手動でのみ確認</string>
+    <string name="update_interval_daily">1日1回</string>
+    <string name="update_interval_weekly">週1回</string>
+    <string name="update_interval_monthly">月1回</string>
+    <string name="notify_channel_updates">アップデート</string>
+    <string name="notify_update_app_title">Boxy のアップデートがあります</string>
+    <string name="notify_update_app_text">バージョン %1$s。タップして設定を開きます。</string>
+    <string name="notify_update_module_title">モジュールのアップデートがあります</string>
+    <string name="notify_update_module_text">Box for Root %1$s。タップして設定を開きます。</string>
 </resources>

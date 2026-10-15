@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Файл з такою назвою вже є</string>
     <string name="editor_save_as_invalid">Введіть нове ім’я файлу</string>
     <string name="editor_saved_as">Збережено як %1$s</string>
+    <string name="settings_update_check">Автоперевірка оновлень</string>
+    <string name="update_interval_off">Вимкнено</string>
+    <string name="update_interval_off_desc">Перевіряти лише вручну в Налаштуваннях</string>
+    <string name="update_interval_daily">Раз на день</string>
+    <string name="update_interval_weekly">Раз на тиждень</string>
+    <string name="update_interval_monthly">Раз на місяць</string>
+    <string name="notify_channel_updates">Оновлення</string>
+    <string name="notify_update_app_title">Доступне оновлення Boxy</string>
+    <string name="notify_update_app_text">Версія %1$s. Натисніть, щоб відкрити Налаштування.</string>
+    <string name="notify_update_module_title">Доступне оновлення модуля</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Натисніть, щоб відкрити Налаштування.</string>
 </resources>

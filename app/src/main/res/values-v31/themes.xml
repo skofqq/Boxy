@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Boxy" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowSplashScreenBackground">@color/window_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo_anim</item>
+        <item name="android:windowSplashScreenAnimationDuration">700</item>
+        <item name="splashLogoColor">@color/splash_logo</item>
+    </style>
+
+    <!-- Launch screen when Boxy's own theme is forced light or dark (Settings → Theme), whatever the system uses. -->
+    <style name="Theme.Boxy.SplashLight" parent="Theme.Boxy">
+        <item name="android:windowSplashScreenBackground">@color/window_background_light</item>
+        <item name="splashLogoColor">@color/splash_logo_light</item>
+    </style>
+
+    <style name="Theme.Boxy.SplashDark" parent="Theme.Boxy">
+        <item name="android:windowSplashScreenBackground">@color/window_background_dark</item>
+        <item name="splashLogoColor">@color/splash_logo_dark</item>
+    </style>
+</resources>

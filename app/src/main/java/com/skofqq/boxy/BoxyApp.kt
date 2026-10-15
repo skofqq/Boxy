@@ -18,6 +18,8 @@ class BoxyApp : Application() {
         com.skofqq.boxy.net.Mirrors.current = prefs.githubMirror
         com.skofqq.boxy.service.BoxStatusService.createChannel(this)
         com.skofqq.boxy.notify.ModuleEventReceiver.createChannel(this)
+        com.skofqq.boxy.notify.UpdateCheckJob.createChannel(this)
+        com.skofqq.boxy.notify.UpdateCheckJob.schedule(this)
     }
 
     /** Re-reads preferences after a restore. */

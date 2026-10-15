@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Файл з такой назвай ужо ёсць</string>
     <string name="editor_save_as_invalid">Увядзіце новае імя файла</string>
     <string name="editor_saved_as">Захавана як %1$s</string>
+    <string name="settings_update_check">Аўтаправерка абнаўленняў</string>
+    <string name="update_interval_off">Выключана</string>
+    <string name="update_interval_off_desc">Правяраць толькі ўручную ў Наладах</string>
+    <string name="update_interval_daily">Раз на дзень</string>
+    <string name="update_interval_weekly">Раз на тыдзень</string>
+    <string name="update_interval_monthly">Раз на месяц</string>
+    <string name="notify_channel_updates">Абнаўленні</string>
+    <string name="notify_update_app_title">Даступна абнаўленне Boxy</string>
+    <string name="notify_update_app_text">Версія %1$s. Націсніце, каб адкрыць Налады.</string>
+    <string name="notify_update_module_title">Даступна абнаўленне модуля</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Націсніце, каб адкрыць Налады.</string>
 </resources>

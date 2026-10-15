@@ -728,4 +728,15 @@
     <string name="editor_save_as_exists">Bu adda bir dosya zaten var</string>
     <string name="editor_save_as_invalid">Yeni bir dosya adı girin</string>
     <string name="editor_saved_as">%1$s olarak kaydedildi</string>
+    <string name="settings_update_check">Otomatik güncelleme denetimi</string>
+    <string name="update_interval_off">Kapalı</string>
+    <string name="update_interval_off_desc">Yalnızca Ayarlar\'dan elle denetle</string>
+    <string name="update_interval_daily">Günde bir</string>
+    <string name="update_interval_weekly">Haftada bir</string>
+    <string name="update_interval_monthly">Ayda bir</string>
+    <string name="notify_channel_updates">Güncellemeler</string>
+    <string name="notify_update_app_title">Boxy güncellemesi var</string>
+    <string name="notify_update_app_text">Sürüm %1$s. Ayarlar\'ı açmak için dokunun.</string>
+    <string name="notify_update_module_title">Modül güncellemesi var</string>
+    <string name="notify_update_module_text">Box for Root %1$s. Ayarlar\'ı açmak için dokunun.</string>
 </resources>

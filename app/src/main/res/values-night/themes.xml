@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="splash_logo">#FFF5F7FA</color>
     <color name="window_background">#FF0A0C0F</color>
 
     <style name="Theme.Boxy" parent="android:Theme.Material.NoActionBar">

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logo color on the launch screen; set by the launch screen themes. -->
+    <attr name="splashLogoColor" format="color" />
+</resources>

@@ -698,4 +698,15 @@
     <string name="editor_save_as_exists">已存在同名文件</string>
     <string name="editor_save_as_invalid">请输入新的文件名</string>
     <string name="editor_saved_as">已另存为 %1$s</string>
+    <string name="settings_update_check">自动检查更新</string>
+    <string name="update_interval_off">关闭</string>
+    <string name="update_interval_off_desc">仅在设置中手动检查</string>
+    <string name="update_interval_daily">每天一次</string>
+    <string name="update_interval_weekly">每周一次</string>
+    <string name="update_interval_monthly">每月一次</string>
+    <string name="notify_channel_updates">更新</string>
+    <string name="notify_update_app_title">Boxy 有可用更新</string>
+    <string name="notify_update_app_text">版本 %1$s。点按打开设置。</string>
+    <string name="notify_update_module_title">模块有可用更新</string>
+    <string name="notify_update_module_text">Box for Root %1$s。点按打开设置。</string>
 </resources>

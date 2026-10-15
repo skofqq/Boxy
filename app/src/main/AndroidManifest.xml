@@ -68,6 +68,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Background update check (Settings → Automatic update check) -->
+        <service
+            android:name=".notify.UpdateCheckJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".service.BoxStatusService"
             android:exported="false"
