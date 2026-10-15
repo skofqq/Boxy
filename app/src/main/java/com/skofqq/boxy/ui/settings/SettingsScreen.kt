@@ -212,27 +212,19 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     stringResource(R.string.settings_system_bars),
                     stringResource(R.string.settings_bars_summary, barState(prefs.opaqueStatusBar), barState(prefs.opaqueNavBar)),
                 ) { barsDialog = true }
+                SwitchRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.nav_apps_desc), checked = prefs.navExtra == NavExtra.APPS) {
+                    prefs.setNavPage(NavExtra.APPS, it)
+                }
+                SwitchRow(BoxyIcons.Description, stringResource(R.string.tab_logs), stringResource(R.string.nav_logs_desc), checked = prefs.navExtra == NavExtra.LOGS) {
+                    prefs.setNavPage(NavExtra.LOGS, it)
+                }
                 SettingsRow(BoxyIcons.Tune, stringResource(R.string.settings_appearance_more), stringResource(R.string.settings_appearance_more_sub), showDivider = false) {
                     push(ROUTE_APPEARANCE)
                 }
             }
         }
         item {
-            SectionCard(stringResource(R.string.settings_navigation), stringResource(R.string.settings_navigation_sub)) {
-                SwitchRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.nav_apps_desc), checked = prefs.navExtra == NavExtra.APPS) {
-                    prefs.setNavPage(NavExtra.APPS, it)
-                }
-                SwitchRow(
-                    BoxyIcons.Description,
-                    stringResource(R.string.tab_logs),
-                    stringResource(R.string.nav_logs_desc),
-                    checked = prefs.navExtra == NavExtra.LOGS,
-                    showDivider = false,
-                ) { prefs.setNavPage(NavExtra.LOGS, it) }
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.settings_net_speed), stringResource(R.string.settings_net_speed_sub)) {
+            SectionCard(stringResource(R.string.settings_home), stringResource(R.string.settings_home_sub)) {
                 SwitchRow(BoxyIcons.Speed, stringResource(R.string.settings_use_clash_api), stringResource(R.string.settings_use_clash_api_sub), prefs.useClashApi) {
                     prefs.updateUseClashApi(it)
                 }
@@ -240,12 +232,7 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     BoxyIcons.FilterList,
                     stringResource(R.string.settings_filter_chains),
                     prefs.filterChains.ifBlank { stringResource(R.string.settings_filter_chains_sub) },
-                    showDivider = false,
                 ) { chainsDialog = true }
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.settings_subscription), stringResource(R.string.settings_subscription_sub)) {
                 SettingsRow(
                     BoxyIcons.Subscriptions,
                     stringResource(R.string.settings_data_source),
@@ -277,6 +264,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
         }
         item {
             SectionCard(stringResource(R.string.settings_misc), stringResource(R.string.settings_misc_sub)) {
+                SettingsRow(BoxyIcons.Update, stringResource(R.string.settings_update_check), updateChoices.first { it.value == prefs.updateInterval }.title) {
+                    updateDialog = true
+                }
                 SettingsRow(
                     BoxyIcons.Link,
                     stringResource(R.string.settings_mirror),
@@ -303,9 +293,6 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                         else -> moduleVersion ?: stringResource(R.string.common_dash)
                     },
                 ) { moduleSheet = true }
-                SettingsRow(BoxyIcons.Update, stringResource(R.string.settings_update_check), updateChoices.first { it.value == prefs.updateInterval }.title) {
-                    updateDialog = true
-                }
                 SettingsRow(BoxyIcons.Code, stringResource(R.string.settings_licenses), stringResource(R.string.settings_licenses_sub), showDivider = false) {
                     push(ROUTE_LICENSES)
                 }

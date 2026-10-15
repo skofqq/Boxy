@@ -47,17 +47,15 @@
     <!-- Tools -->
     <string name="tools_title">Tools</string>
     <string name="tools_subtitle">Module preferences</string>
-    <string name="tools_config">Config</string>
-    <string name="tools_config_sub">Manage &amp; select active config</string>
+    <string name="tools_config">Configs</string>
+    <string name="tools_config_sub">Files, active config and subscriptions</string>
     <string name="tools_network">Network control</string>
     <string name="tools_network_sub">Wi‑Fi based module control</string>
     <string name="tools_update">Update</string>
-    <string name="tools_row_manage">Manage</string>
+    <string name="tools_row_manage">Files</string>
     <string name="tools_row_manage_sub">Browse / search / create</string>
-    <string name="tools_row_select">Select</string>
-    <string name="tools_row_select_sub">Choose active config</string>
-    <string name="tools_row_open">Open</string>
-    <string name="tools_row_open_sub">Configure Wi‑Fi rules</string>
+    <string name="tools_row_select">Active config</string>
+    <string name="tools_row_select_sub">The config the module starts with</string>
     <string name="tools_row_apps_sub">Manage app rules</string>
     <string name="tools_row_logs_sub">Open logs view</string>
 
@@ -65,7 +63,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_subtitle">App preferences</string>
     <string name="settings_appearance">Appearance</string>
-    <string name="settings_appearance_sub">Theme &amp; display</string>
+    <string name="settings_appearance_sub">Theme, language and tabs</string>
     <string name="settings_theme">Theme mode</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
@@ -79,8 +77,6 @@
     <string name="settings_true_black_sub">Make dark theme backgrounds pure black</string>
     <string name="settings_language">Language</string>
     <string name="lang_system">Follow system</string>
-    <string name="settings_navigation">Navigation</string>
-    <string name="settings_navigation_sub">Navigation panel settings</string>
     <string name="nav_apps_desc">Show the Apps page in the navigation bar</string>
     <string name="nav_logs_desc">Show the Logs page in the navigation bar</string>
     <string name="settings_about">About</string>
@@ -433,15 +429,11 @@
     <string name="settings_display">Display</string>
     <string name="settings_ui_scale">UI scale (%1$d%%)</string>
     <string name="settings_ui_scale_sub">Scale the entire interface (80–120%)</string>
-    <string name="settings_net_speed">Net speed</string>
-    <string name="settings_net_speed_sub">Data source of the speed card</string>
     <string name="settings_use_clash_api">Use Clash API</string>
     <string name="settings_use_clash_api_sub">Read traffic from the core instead of network counters</string>
     <string name="settings_filter_chains">Filter connection types</string>
     <string name="settings_filter_chains_sub">Comma or newline separated (e.g. DIRECT,REJECT)</string>
-    <string name="settings_subscription">Subscription</string>
-    <string name="settings_subscription_sub">Data source</string>
-    <string name="settings_data_source">Data source</string>
+    <string name="settings_data_source">Subscription data</string>
     <string name="settings_url_mode">URL mode</string>
     <string name="settings_url_mode_desc">Subscription URLs from the module settings</string>
     <string name="settings_providers_mode">Providers mode</string>
@@ -454,8 +446,8 @@
     <string name="settings_latency_url">URL</string>
     <string name="settings_behavior">Behavior</string>
     <string name="settings_behavior_sub">Start, tile, haptics and notifications</string>
-    <string name="settings_misc">Misc</string>
-    <string name="settings_misc_sub">GitHub mirror and backups</string>
+    <string name="settings_misc">Updates and data</string>
+    <string name="settings_misc_sub">Auto check, GitHub mirror and backups</string>
     <string name="settings_open_panel">Open Panel on launch</string>
     <string name="settings_open_panel_sub">Start on Panel screen</string>
     <string name="settings_notifications">Notifications</string>
@@ -606,8 +598,6 @@
     <string name="import_download">Download config</string>
     <string name="import_add_to_subs">Add to module</string>
     <string name="import_added">Added to the module subscriptions</string>
-    <string name="tools_extra">Statistics and automation</string>
-    <string name="tools_extra_sub">Traffic history, schedule, Tasker</string>
     <string name="traffic_title">Traffic statistics</string>
     <string name="traffic_subtitle">Proxy traffic counted by the core</string>
     <string name="traffic_row_sub">By day, week and month</string>
@@ -763,4 +753,12 @@
     <string name="notify_update_app_text">Version %1$s. Tap to open Settings.</string>
     <string name="notify_update_module_title">Module update available</string>
     <string name="notify_update_module_text">Box for Root %1$s. Tap to open Settings.</string>
+    <string name="tools_net_dns">Network and DNS</string>
+    <string name="tools_net_dns_sub">Wi‑Fi rules, DNS hijack and DNSCrypt</string>
+    <string name="tools_row_wifi">Wi‑Fi rules</string>
+    <string name="tools_maint">Maintenance</string>
+    <string name="tools_maint_sub">Updates, statistics and automation</string>
+    <string name="tools_row_update">Component updates</string>
+    <string name="settings_home">Home screen</string>
+    <string name="settings_home_sub">Data for the speed, subscription and latency cards</string>
 </resources>

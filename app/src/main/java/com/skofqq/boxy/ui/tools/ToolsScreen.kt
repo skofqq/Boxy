@@ -125,28 +125,20 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
             SectionCard(stringResource(R.string.tools_config), stringResource(R.string.tools_config_sub)) {
                 SettingsRow(BoxyIcons.Folder, stringResource(R.string.tools_row_manage), stringResource(R.string.tools_row_manage_sub)) { push(ROUTE_FILES) }
                 SettingsRow(BoxyIcons.Tune, stringResource(R.string.tools_row_select), stringResource(R.string.tools_row_select_sub)) { push(ROUTE_CONFIGS) }
-                SettingsRow(BoxyIcons.QrCode, stringResource(R.string.import_title), stringResource(R.string.import_row_sub), showDivider = false) { importChooser = true }
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.tools_network), stringResource(R.string.tools_network_sub)) {
-                SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_open), stringResource(R.string.tools_row_open_sub), showDivider = false) { push(ROUTE_NETWORK) }
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_sub)) {
-                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_row_open), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
-                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub), showDivider = false) { push(ROUTE_DNSCRYPT) }
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.tools_update), stringResource(R.string.tools_update_sub)) {
-                SettingsRow(BoxyIcons.Download, stringResource(R.string.tools_row_open), stringResource(R.string.tools_update_row_sub)) { push(ROUTE_UPDATE) }
+                SettingsRow(BoxyIcons.QrCode, stringResource(R.string.import_title), stringResource(R.string.import_row_sub)) { importChooser = true }
                 SettingsRow(BoxyIcons.Subscriptions, stringResource(R.string.tools_subscription), stringResource(R.string.tools_subscription_sub), showDivider = false) { push(ROUTE_SUBSCRIPTION) }
             }
         }
         item {
-            SectionCard(stringResource(R.string.tools_extra), stringResource(R.string.tools_extra_sub)) {
+            SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
+                SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
+                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
+                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub), showDivider = false) { push(ROUTE_DNSCRYPT) }
+            }
+        }
+        item {
+            SectionCard(stringResource(R.string.tools_maint), stringResource(R.string.tools_maint_sub)) {
+                SettingsRow(BoxyIcons.Download, stringResource(R.string.tools_row_update), stringResource(R.string.tools_update_row_sub)) { push(ROUTE_UPDATE) }
                 SettingsRow(BoxyIcons.BarChart, stringResource(R.string.traffic_title), stringResource(R.string.traffic_row_sub)) { push(ROUTE_TRAFFIC) }
                 SettingsRow(BoxyIcons.Schedule, stringResource(R.string.auto_title), stringResource(R.string.auto_row_sub), showDivider = false) { push(ROUTE_AUTOMATION) }
             }

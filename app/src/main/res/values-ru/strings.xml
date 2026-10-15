@@ -36,24 +36,22 @@
 
     <string name="tools_title">Утилиты</string>
     <string name="tools_subtitle">Параметры модуля</string>
-    <string name="tools_config">Конфигурация</string>
-    <string name="tools_config_sub">Управление и выбор активной конфигурации</string>
+    <string name="tools_config">Конфигурации</string>
+    <string name="tools_config_sub">Файлы, активная конфигурация и подписки</string>
     <string name="tools_network">Управление сетью</string>
     <string name="tools_network_sub">Управление модулем по Wi‑Fi</string>
     <string name="tools_update">Обновление</string>
-    <string name="tools_row_manage">Управление</string>
+    <string name="tools_row_manage">Файлы</string>
     <string name="tools_row_manage_sub">Обзор / поиск / создание</string>
-    <string name="tools_row_select">Выбрать</string>
-    <string name="tools_row_select_sub">Выбор активной конфигурации</string>
-    <string name="tools_row_open">Открыть</string>
-    <string name="tools_row_open_sub">Настройка правил Wi‑Fi</string>
+    <string name="tools_row_select">Активная конфигурация</string>
+    <string name="tools_row_select_sub">С какой конфигурацией запускается модуль</string>
     <string name="tools_row_apps_sub">Правила приложений</string>
     <string name="tools_row_logs_sub">Открыть просмотр логов</string>
 
     <string name="settings_title">Настройки</string>
     <string name="settings_subtitle">Параметры приложения</string>
     <string name="settings_appearance">Оформление</string>
-    <string name="settings_appearance_sub">Тема и отображение</string>
+    <string name="settings_appearance_sub">Тема, язык и вкладки</string>
     <string name="settings_theme">Тема</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
@@ -67,8 +65,6 @@
     <string name="settings_true_black_sub">Делать фон тёмной темы полностью чёрным</string>
     <string name="settings_language">Язык</string>
     <string name="lang_system">Как в системе</string>
-    <string name="settings_navigation">Навигация</string>
-    <string name="settings_navigation_sub">Настройки панели навигации</string>
     <string name="nav_apps_desc">Показывать страницу «Приложения» в панели навигации</string>
     <string name="nav_logs_desc">Показывать страницу «Журнал» в панели навигации</string>
     <string name="settings_about">О приложении</string>
@@ -421,15 +417,11 @@
     <string name="settings_display">Отображение</string>
     <string name="settings_ui_scale">Масштаб интерфейса (%1$d%%)</string>
     <string name="settings_ui_scale_sub">Масштаб всего интерфейса (80–120%)</string>
-    <string name="settings_net_speed">Скорость сети</string>
-    <string name="settings_net_speed_sub">Источник данных карточки скорости</string>
     <string name="settings_use_clash_api">Clash API</string>
     <string name="settings_use_clash_api_sub">Брать трафик из ядра, а не из счётчиков сети</string>
     <string name="settings_filter_chains">Исключить типы соединений</string>
     <string name="settings_filter_chains_sub">Через запятую или с новой строки (например DIRECT,REJECT)</string>
-    <string name="settings_subscription">Подписка</string>
-    <string name="settings_subscription_sub">Источник данных</string>
-    <string name="settings_data_source">Источник данных</string>
+    <string name="settings_data_source">Данные подписки</string>
     <string name="settings_url_mode">По ссылкам</string>
     <string name="settings_url_mode_desc">Ссылки подписок из настроек модуля</string>
     <string name="settings_providers_mode">По провайдерам</string>
@@ -442,8 +434,8 @@
     <string name="settings_latency_url">Адрес</string>
     <string name="settings_behavior">Поведение</string>
     <string name="settings_behavior_sub">Запуск, плитка, виброотклик и уведомления</string>
-    <string name="settings_misc">Разное</string>
-    <string name="settings_misc_sub">Зеркало GitHub и резервные копии</string>
+    <string name="settings_misc">Обновления и данные</string>
+    <string name="settings_misc_sub">Автопроверка, зеркало GitHub и резервные копии</string>
     <string name="settings_open_panel">Открывать панель при запуске</string>
     <string name="settings_open_panel_sub">Начинать с экрана панели</string>
     <string name="settings_notifications">Уведомления</string>
@@ -594,8 +586,6 @@
     <string name="import_download">Скачать конфигурацию</string>
     <string name="import_add_to_subs">В подписки модуля</string>
     <string name="import_added">Добавлено в подписки модуля</string>
-    <string name="tools_extra">Статистика и автоматизация</string>
-    <string name="tools_extra_sub">История трафика, расписание, Tasker</string>
     <string name="traffic_title">Статистика трафика</string>
     <string name="traffic_subtitle">Трафик через прокси по данным ядра</string>
     <string name="traffic_row_sub">По дням, неделям и месяцам</string>
@@ -751,4 +741,12 @@
     <string name="notify_update_app_text">Версия %1$s. Нажмите, чтобы открыть Настройки.</string>
     <string name="notify_update_module_title">Доступно обновление модуля</string>
     <string name="notify_update_module_text">Box for Root %1$s. Нажмите, чтобы открыть Настройки.</string>
+    <string name="tools_net_dns">Сеть и DNS</string>
+    <string name="tools_net_dns_sub">Правила Wi‑Fi, перехват DNS и DNSCrypt</string>
+    <string name="tools_row_wifi">Правила Wi‑Fi</string>
+    <string name="tools_maint">Обслуживание</string>
+    <string name="tools_maint_sub">Обновления, статистика и автоматизация</string>
+    <string name="tools_row_update">Обновление компонентов</string>
+    <string name="settings_home">Главный экран</string>
+    <string name="settings_home_sub">Данные для карточек скорости, подписки и задержки</string>
 </resources>
