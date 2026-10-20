@@ -1,17 +1,19 @@
 package com.skofqq.boxy.ui.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -114,6 +116,12 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
         else -> TaskVisual.WORKING
     }
     var showLog by rememberSaveable { mutableStateOf(false) }
+    // Shown percentage only goes up: wget can print a lower figure after a reconnect. A big drop means a new download.
+    val percentHold = remember { floatArrayOf(0f) }
+    val percent = p.percent?.let { now ->
+        if (now >= percentHold[0] || percentHold[0] - now > 50f) percentHold[0] = now
+        percentHold[0]
+    }
     val view = androidx.compose.ui.platform.LocalView.current
     LaunchedEffect(visual) {
         if (visual == TaskVisual.FAILED) showLog = true
@@ -131,8 +139,15 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
         val appear = remember { Animatable(0f) }
         LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.62f, stiffness = 420f)) }
         val cardShape = RoundedCornerShape(32.dp)
+        // The window fills the screen and the card is centred inside it, so a taller card grows smoothly
+        // (animateContentSize) instead of the dialog window being re-centred with a jump.
+        Box(
+            Modifier.fillMaxSize().clickable(remember { MutableInteractionSource() }, indication = null) { if (done) onDismiss() },
+            contentAlignment = Alignment.Center,
+        ) {
         Column(
             Modifier
+                .clickable(remember { MutableInteractionSource() }, indication = null) {}
                 .padding(horizontal = 28.dp)
                 .widthIn(max = 440.dp)
                 .fillMaxWidth()
@@ -158,6 +173,7 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                         Modifier.background(Boxy.colors.page)
                     },
                 )
+                .animateContentSize(spring(dampingRatio = 0.85f, stiffness = 380f))
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -175,7 +191,7 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                             TaskVisual.WORKING -> LoadingIndicator(Modifier.size(104.dp), color = Boxy.colors.accent)
                             TaskVisual.PROGRESS -> {
                                 val shown by animateFloatAsState(
-                                    (p.percent ?: 0f) / 100f,
+                                    (percent ?: 0f) / 100f,
                                     spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessVeryLow),
                                     label = "task-progress",
                                 )
@@ -213,10 +229,14 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                 TaskVisual.PROGRESS -> stringResource(R.string.import_downloading)
                 TaskVisual.WORKING -> if (p.percent != null) stringResource(R.string.task_installing) else stringResource(R.string.update_started, title)
             }
-            AnimatedContent(targetState = status, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "task-status") {
+            AnimatedContent(
+                targetState = status,
+                transitionSpec = { (fadeIn() togetherWith fadeOut()).using(SizeTransform(clip = false)) },
+                label = "task-status",
+            ) {
                 Text(it, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2, textAlign = TextAlign.Center)
             }
-            AnimatedVisibility(visual == TaskVisual.PROGRESS && p.size != null) {
+            AnimatedVisibility(visual == TaskVisual.PROGRESS && p.size != null, enter = fadeIn(), exit = fadeOut()) {
                 val parts = listOfNotNull(
                     p.size?.let { Format.bytes(context, it) },
                     p.eta?.let { stringResource(R.string.task_eta, it) },
@@ -239,8 +259,8 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
             }
             AnimatedVisibility(
                 showLog,
-                enter = expandVertically(spring(dampingRatio = 0.8f, stiffness = 380f)) + fadeIn(),
-                exit = shrinkVertically() + fadeOut(),
+                enter = fadeIn(),
+                exit = fadeOut(),
             ) {
                 val vScroll = rememberScrollState()
                 LaunchedEffect(lines.size) { vScroll.scrollTo(vScroll.maxValue) }
@@ -255,11 +275,12 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                     }
                 }
             }
-            AnimatedVisibility(done, enter = expandVertically(spring(dampingRatio = 0.7f, stiffness = 400f)) + fadeIn()) {
+            AnimatedVisibility(done, enter = fadeIn(), exit = fadeOut()) {
                 Column(Modifier.padding(top = 16.dp)) {
                     SheetButtons(stringResource(R.string.action_done), onDismiss)
                 }
             }
+        }
         }
     }
 }
