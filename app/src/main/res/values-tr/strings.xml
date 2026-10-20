@@ -741,4 +741,6 @@
     <string name="task_show_details">Ayrıntılar</string>
     <string name="task_hide_details">Ayrıntıları gizle</string>
     <string name="settings_haptics_system_off">Android\'de kapalı: Ses ve titreşim\'de \"Dokunma geri bildirimi\"ni açın</string>
+    <string name="settings_glass_elements">Öğeler için Liquid Glass</string>
+    <string name="settings_glass_elements_sub">Sayfa başlıkları, başlık düğmeleri ve açılır pencereler</string>
 </resources>

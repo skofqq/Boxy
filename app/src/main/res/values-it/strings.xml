@@ -741,4 +741,6 @@
     <string name="task_show_details">Dettagli</string>
     <string name="task_hide_details">Nascondi dettagli</string>
     <string name="settings_haptics_system_off">Disattivato in Android: attiva «Feedback tattile» in Suono e vibrazione</string>
+    <string name="settings_glass_elements">Liquid Glass per gli elementi</string>
+    <string name="settings_glass_elements_sub">Intestazioni, pulsanti dell’intestazione e finestre a comparsa</string>
 </resources>

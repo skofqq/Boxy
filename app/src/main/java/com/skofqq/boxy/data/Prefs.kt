@@ -93,6 +93,9 @@ class Prefs(context: Context) {
         private set
     var sheetBlur by mutableStateOf(sp.getBoolean("sheet_blur", true))
         private set
+    /** Liquid glass on page headers, header buttons and pop-up windows (with blur effects on). */
+    var glassElements by mutableStateOf(sp.getBoolean("glass_elements", true))
+        private set
     var glassTranslucent by mutableStateOf(sp.getBoolean("glass_translucent", true))
         private set
     var blurStrength by mutableStateOf(sp.getFloat("blur_strength", 0.5f))
@@ -140,6 +143,7 @@ class Prefs(context: Context) {
     fun updateOpaqueNavBar(v: Boolean) { opaqueNavBar = v; sp.edit().putBoolean("opaque_nav_bar", v).apply() }
     fun updateBlurEffects(v: Boolean) { blurEffects = v; sp.edit().putBoolean("blur_effects", v).apply() }
     fun updateSheetBlur(v: Boolean) { sheetBlur = v; sp.edit().putBoolean("sheet_blur", v).apply() }
+    fun updateGlassElements(v: Boolean) { glassElements = v; sp.edit().putBoolean("glass_elements", v).apply() }
     fun updateGlassTranslucent(v: Boolean) { glassTranslucent = v; sp.edit().putBoolean("glass_translucent", v).apply() }
     fun updateBlurStrength(v: Float) { blurStrength = v; sp.edit().putFloat("blur_strength", v).apply() }
     fun updateLensStrength(v: Float) { lensStrength = v; sp.edit().putFloat("lens_strength", v).apply() }

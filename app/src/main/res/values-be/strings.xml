@@ -741,4 +741,6 @@
     <string name="task_show_details">Падрабязнасці</string>
     <string name="task_hide_details">Схаваць падрабязнасці</string>
     <string name="settings_haptics_system_off">Выключана ў Android: уключыце «Водгук на дотык» у наладах гуку і вібрацыі</string>
+    <string name="settings_glass_elements">Liquid Glass для элементаў</string>
+    <string name="settings_glass_elements_sub">Шапкі старонак, кнопкі ў шапцы і ўсплывальныя вокны</string>
 </resources>

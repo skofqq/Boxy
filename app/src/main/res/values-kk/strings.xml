@@ -741,4 +741,6 @@
     <string name="task_show_details">Толығырақ</string>
     <string name="task_hide_details">Толығырақты жасыру</string>
     <string name="settings_haptics_system_off">Android-та өшірулі: дыбыс және діріл баптауларында «Түрту кезіндегі діріл» опциясын қосыңыз</string>
+    <string name="settings_glass_elements">Элементтерге арналған Liquid Glass</string>
+    <string name="settings_glass_elements_sub">Бет тақырыптары, тақырыптағы түймелер және қалқымалы терезелер</string>
 </resources>

@@ -286,6 +286,12 @@ object BoxyIcons {
         "M20.5,12a8.5,8.5 0 1 1 -2.5,-6M20.5,3.5v4.5h-4.5M12,7.5v4.5l3,2",
     )
 
+    /** Pane of glass with two glints: liquid glass on elements. */
+    val Glass = strokeIcon(
+        "Glass",
+        "M7,3.5h10a3.5,3.5 0 0 1 3.5,3.5v10a3.5,3.5 0 0 1 -3.5,3.5h-10a3.5,3.5 0 0 1 -3.5,-3.5v-10a3.5,3.5 0 0 1 3.5,-3.5zM8,13.5l5.5,-5.5M10.5,16l5.5,-5.5",
+    )
+
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =
         ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)

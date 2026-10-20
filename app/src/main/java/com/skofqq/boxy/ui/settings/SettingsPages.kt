@@ -105,6 +105,13 @@ SubPageHeader(stringResource(R.string.settings_appearance_more), stringResource(
                     enabled = blurSupported,
                 ) { prefs.updateBlurEffects(it) }
                 SwitchRow(
+                    BoxyIcons.Glass,
+                    stringResource(R.string.settings_glass_elements),
+                    stringResource(R.string.settings_glass_elements_sub),
+                    prefs.glassElements && prefs.blurEffects && blurSupported,
+                    enabled = blurSupported && prefs.blurEffects,
+                ) { prefs.updateGlassElements(it) }
+                SwitchRow(
                     BoxyIcons.BottomSheet,
                     stringResource(R.string.settings_sheet_blur),
                     stringResource(R.string.settings_sheet_blur_sub),
@@ -124,13 +131,17 @@ SubPageHeader(stringResource(R.string.settings_appearance_more), stringResource(
                     stringResource(R.string.settings_blur_strength_sub),
                     prefs.blurStrength,
                     enabled = blurSupported && prefs.blurEffects,
-                ) { prefs.updateBlurStrength(it) }
+                    steps = 9,
+                    percent = true,
+                ) { prefs.updateBlurStrength(Math.round(it * 10) / 10f) }
                 SliderRow(
                     stringResource(R.string.settings_lens_strength),
                     stringResource(R.string.settings_lens_strength_sub),
                     prefs.lensStrength,
                     enabled = Build.VERSION.SDK_INT >= 33 && prefs.blurEffects,
-                ) { prefs.updateLensStrength(it) }
+                    steps = 9,
+                    percent = true,
+                ) { prefs.updateLensStrength(Math.round(it * 10) / 10f) }
             }
         }
         item {
@@ -155,10 +166,18 @@ SubPageHeader(stringResource(R.string.settings_appearance_more), stringResource(
 }
 
 @Composable
-private fun SliderRow(title: String, subtitle: String, value: Float, enabled: Boolean = true, steps: Int = 0, onChange: (Float) -> Unit) {
+private fun SliderRow(
+    title: String,
+    subtitle: String,
+    value: Float,
+    enabled: Boolean = true,
+    steps: Int = 0,
+    percent: Boolean = false,
+    onChange: (Float) -> Unit,
+) {
     var local by remember(value) { mutableStateOf(value) }
     Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text.copy(alpha = if (enabled) 1f else 0.45f))
+        Text(if (percent) "$title · ${Math.round(local * 100)}%" else title, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text.copy(alpha = if (enabled) 1f else 0.45f))
         Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2.copy(alpha = if (enabled) 1f else 0.45f))
         Slider(
             value = local,

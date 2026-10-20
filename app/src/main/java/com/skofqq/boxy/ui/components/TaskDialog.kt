@@ -14,6 +14,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -122,9 +124,13 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
         onDismissRequest = { if (done) onDismiss() },
         properties = DialogProperties(dismissOnBackPress = done, dismissOnClickOutside = done, usePlatformDefaultWidth = false),
     ) {
+        // Liquid glass: a translucent card with a light rim over the blurred app.
+        val frosted = rememberFrostedDialog()
+        val translucent = LocalGlass.current.translucent
         // Springy entrance: the card grows from 85 % with a little overshoot.
         val appear = remember { Animatable(0f) }
         LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.62f, stiffness = 420f)) }
+        val cardShape = RoundedCornerShape(32.dp)
         Column(
             Modifier
                 .padding(horizontal = 28.dp)
@@ -136,8 +142,22 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                     scaleY = 0.85f + 0.15f * v
                     alpha = v.coerceIn(0f, 1f)
                 }
-                .clip(RoundedCornerShape(32.dp))
-                .background(Boxy.colors.page)
+                .clip(cardShape)
+                .then(
+                    if (frosted) {
+                        Modifier
+                            .background(Boxy.colors.page.copy(alpha = if (translucent) 0.72f else 0.88f))
+                            .border(
+                                1.dp,
+                                androidx.compose.ui.graphics.Brush.verticalGradient(
+                                    listOf(Color.White.copy(alpha = if (Boxy.colors.isDark) 0.22f else 0.7f), Color.White.copy(alpha = 0.06f)),
+                                ),
+                                cardShape,
+                            )
+                    } else {
+                        Modifier.background(Boxy.colors.page)
+                    },
+                )
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

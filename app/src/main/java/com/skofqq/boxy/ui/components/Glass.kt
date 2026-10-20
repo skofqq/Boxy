@@ -42,25 +42,39 @@ data class GlassStyle(
     /** 0..1 */
     val lens: Float,
     val sheetBlur: Boolean,
+    /** Glass on page headers, header buttons and pop-up windows too, not only on the bottom bar. */
+    val elements: Boolean = true,
 ) {
     val blurRadius: Dp get() = (6 + blur * 34).dp
 }
 
 val LocalGlass = staticCompositionLocalOf { GlassStyle(false, true, 0.5f, 0.5f, false) }
 
+/** Content recorded for glass surfaces to sample from, and where it sits on the screen. */
+class Backdrop(val layer: GraphicsLayer) {
+    var origin by mutableStateOf(Offset.Zero)
+}
+
+@Composable
+fun rememberBackdrop(): Backdrop {
+    val layer = androidx.compose.ui.graphics.rememberGraphicsLayer()
+    return remember(layer) { Backdrop(layer) }
+}
+
 /** Screen content recorded for glass surfaces to sample from. */
-val LocalBackdrop = staticCompositionLocalOf<GraphicsLayer?> { null }
+val LocalBackdrop = staticCompositionLocalOf<Backdrop?> { null }
 
 /** Number of open bottom sheets; the main content is blurred while it is above zero. */
 object SheetBlurState {
     var open by mutableIntStateOf(0)
 }
 
-/** Records the content into [layer] and draws it as usual. */
-fun Modifier.backdropSource(layer: GraphicsLayer): Modifier = drawWithContent {
-    layer.record { this@drawWithContent.drawContent() }
-    drawLayer(layer)
-}
+/** Records the content into [backdrop] and draws it as usual. */
+fun Modifier.backdropSource(backdrop: Backdrop): Modifier = onGloballyPositioned { backdrop.origin = it.positionInRoot() }
+    .drawWithContent {
+        backdrop.layer.record { this@drawWithContent.drawContent() }
+        drawLayer(backdrop.layer)
+    }
 
 private const val LENS_SHADER = """
 uniform shader content;
@@ -87,11 +101,17 @@ fun GlassSurface(
     tint: Color,
     cornerRadius: Dp,
     modifier: Modifier = Modifier,
+    /** A page element (header, button): follows the "Liquid Glass for elements" switch. */
+    element: Boolean = false,
+    /** Refraction near the edges; off for flat bars. */
+    lens: Boolean = true,
+    /** Light rim along the shape. */
+    edge: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val glass = LocalGlass.current
     val backdrop = LocalBackdrop.current
-    val active = glass.enabled && backdrop != null && Build.VERSION.SDK_INT >= 31
+    val active = glass.enabled && (!element || glass.elements) && backdrop != null && Build.VERSION.SDK_INT >= 31
     var pos by remember { mutableStateOf(Offset.Zero) }
     Box(modifier.onGloballyPositioned { pos = it.positionInRoot() }.clip(shape)) {
         if (active && backdrop != null) {
@@ -101,7 +121,7 @@ fun GlassSurface(
                     .graphicsLayer {
                         val blurPx = glass.blurRadius.toPx()
                         val blur = RenderEffect.createBlurEffect(blurPx, blurPx, Shader.TileMode.CLAMP)
-                        renderEffect = if (Build.VERSION.SDK_INT >= 33 && glass.lens > 0.01f) {
+                        renderEffect = if (Build.VERSION.SDK_INT >= 33 && lens && glass.lens > 0.01f && cornerRadius > 0.dp) {
                             val shader = RuntimeShader(LENS_SHADER)
                             shader.setFloatUniform("size", size.width, size.height)
                             shader.setFloatUniform("radius", cornerRadius.toPx().coerceAtMost(size.minDimension / 2))
@@ -113,11 +133,11 @@ fun GlassSurface(
                         clip = true
                         this.shape = shape
                     }
-                    .drawBehind { translate(-pos.x, -pos.y) { drawLayer(backdrop) } },
+                    .drawBehind { translate(backdrop.origin.x - pos.x, backdrop.origin.y - pos.y) { drawLayer(backdrop.layer) } },
             )
             Box(Modifier.matchParentSize().background(tint.copy(alpha = if (glass.translucent) 0.45f else 0.78f)))
             // Light edge that sells the glass; stronger with a stronger lens.
-            Box(
+            if (edge) Box(
                 Modifier.matchParentSize().border(
                     1.dp,
                     Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.18f + glass.lens * 0.3f), Color.White.copy(alpha = 0.04f))),
@@ -129,4 +149,24 @@ fun GlassSurface(
         }
         content()
     }
+}
+
+/**
+ * Inside a Dialog with liquid glass on: blurs the app behind the dialog (like under bottom sheets) and lightens
+ * the dim, so a translucent card on top reads as frosted glass. Returns whether that is active.
+ */
+@Composable
+fun rememberFrostedDialog(): Boolean {
+    val glass = LocalGlass.current
+    val view = androidx.compose.ui.platform.LocalView.current
+    val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
+    val active = Build.VERSION.SDK_INT >= 31 && glass.enabled && glass.elements && window != null
+    if (active && window != null) {
+        androidx.compose.runtime.DisposableEffect(window) {
+            window.setDimAmount(0.2f)
+            SheetBlurState.open++
+            onDispose { SheetBlurState.open-- }
+        }
+    }
+    return active
 }

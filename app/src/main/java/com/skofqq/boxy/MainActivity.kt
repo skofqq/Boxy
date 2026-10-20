@@ -198,6 +198,7 @@ class MainActivity : ComponentActivity() {
                     blur = prefs.blurStrength,
                     lens = prefs.lensStrength,
                     sheetBlur = prefs.sheetBlur,
+                    elements = prefs.glassElements,
                 )
                 CompositionLocalProvider(LocalDensity provides scaled, LocalGlass provides glass) {
                     if (!prefs.onboardingDone) {
@@ -280,7 +281,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
         tween(250),
         label = "sheetBlur",
     )
-    val backdrop = rememberGraphicsLayer()
+    val backdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
 
     Box(Modifier.fillMaxSize().background(Boxy.colors.page).blur(sheetBlur)) {
         Box(Modifier.fillMaxSize().backdropSource(backdrop)) {

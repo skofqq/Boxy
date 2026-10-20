@@ -186,11 +186,10 @@ fun HeaderAction(
     tint: androidx.compose.ui.graphics.Color = Boxy.colors.text,
     onClick: () -> Unit,
 ) {
-    Box(
-        Modifier.size(44.dp).clip(RoundedCornerShape(50)).background(Boxy.colors.card).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(icon, contentDescription, Modifier.size(22.dp), tint = tint)
+    GlassSurface(RoundedCornerShape(50), Boxy.colors.card, 22.dp, Modifier.size(44.dp), element = true) {
+        Box(Modifier.matchParentSize().clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription, Modifier.size(22.dp), tint = tint)
+        }
     }
 }
 

@@ -741,4 +741,6 @@
     <string name="task_show_details">Details</string>
     <string name="task_hide_details">Details ausblenden</string>
     <string name="settings_haptics_system_off">In Android aus: „Haptisches Feedback“ unter Ton &amp; Vibration einschalten</string>
+    <string name="settings_glass_elements">Liquid Glass für Elemente</string>
+    <string name="settings_glass_elements_sub">Seitenköpfe, Kopfzeilen-Schaltflächen und Pop-up-Fenster</string>
 </resources>

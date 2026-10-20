@@ -37,18 +37,15 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 /** Compact "← Back" pill used on pages opened from another page. */
 @Composable
 fun BackPill(onClick: () -> Unit) {
-    Row(
-        Modifier
-            .padding(start = 12.dp, top = 8.dp)
-            .clip(RoundedCornerShape(50))
-            .background(Boxy.colors.card)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(BoxyIcons.ArrowBack, null, Modifier.size(18.dp), tint = Boxy.colors.text)
-        Spacer(Modifier.width(6.dp))
-        Text(stringResource(R.string.action_back), style = MaterialTheme.typography.labelLarge, color = Boxy.colors.text)
+    GlassSurface(RoundedCornerShape(50), Boxy.colors.card, 18.dp, Modifier.padding(start = 12.dp, top = 8.dp), element = true) {
+        Row(
+            Modifier.clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(BoxyIcons.ArrowBack, null, Modifier.size(18.dp), tint = Boxy.colors.text)
+            Spacer(Modifier.width(6.dp))
+            Text(stringResource(R.string.action_back), style = MaterialTheme.typography.labelLarge, color = Boxy.colors.text)
+        }
     }
 }
 
