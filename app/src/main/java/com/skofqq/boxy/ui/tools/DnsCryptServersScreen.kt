@@ -354,28 +354,14 @@ private fun Tag(text: String, color: Color) {
 
 @Composable
 private fun ToggleChip(text: String, active: Boolean, onClick: () -> Unit) {
-    Text(
-        text,
-        Modifier.clip(RoundedCornerShape(50)).background(if (active) Boxy.colors.accent.copy(alpha = 0.15f) else Boxy.colors.card)
-            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
-        color = if (active) Boxy.colors.accent else Boxy.colors.text,
-        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-        maxLines = 1,
-    )
+    com.skofqq.boxy.ui.components.GlassChip(text, active, onClick = onClick)
 }
 
 @Composable
 private fun ChoiceChip(text: String, items: List<Pair<String, () -> Unit>>, active: Boolean = true) {
     var open by remember { mutableStateOf(false) }
     Box {
-        Row(
-            Modifier.clip(RoundedCornerShape(50)).background(if (active) Boxy.colors.accent.copy(alpha = 0.15f) else Boxy.colors.card)
-                .clickable { open = true }.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(text, color = if (active) Boxy.colors.accent else Boxy.colors.text, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
-            Icon(BoxyIcons.ExpandMore, null, Modifier.padding(start = 2.dp).size(20.dp), tint = if (active) Boxy.colors.accent else Boxy.colors.text2)
-        }
+        com.skofqq.boxy.ui.components.GlassChip(text, active, trailing = BoxyIcons.ExpandMore) { open = true }
         GlassMenu(open, { open = false }) {
             items.forEach { (label, action) -> GlassMenuItem(label, { open = false; action() }, selected = label == text) }
         }

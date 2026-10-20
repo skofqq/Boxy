@@ -7,6 +7,9 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -118,6 +121,8 @@ fun GlassSurface(
     tintAlpha: Float? = null,
     /** In a popup window: samples the whole screen ([LocalScreenBackdrop]) rather than the page under it. */
     popup: Boolean = false,
+    /** Background without glass; the tint by default. */
+    fallback: Color? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val glass = LocalGlass.current
@@ -159,7 +164,7 @@ fun GlassSurface(
                 ),
             )
         } else {
-            Box(Modifier.matchParentSize().background(tint))
+            Box(Modifier.matchParentSize().background(fallback ?: tint))
         }
         content()
     }
@@ -183,4 +188,47 @@ fun rememberFrostedDialog(): Boolean {
         }
     }
     return active
+}
+
+/**
+ * Pill-shaped filter chip in liquid glass: neutral glass when off, tinted with [color] when [active].
+ * An optional [trailing] icon (a menu arrow) follows the text.
+ */
+@Composable
+fun GlassChip(
+    text: String,
+    active: Boolean,
+    color: Color = Boxy.colors.accent,
+    trailing: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    onClick: () -> Unit,
+) {
+    GlassSurface(
+        androidx.compose.foundation.shape.RoundedCornerShape(50),
+        if (active) color else Boxy.colors.card,
+        18.dp,
+        element = true,
+        tintAlpha = if (active) 0.18f else null,
+        fallback = if (active) color.copy(alpha = 0.15f) else Boxy.colors.card,
+    ) {
+        androidx.compose.foundation.layout.Row(
+            Modifier.clickable(onClick = onClick)
+                .padding(start = 14.dp, end = if (trailing != null) 8.dp else 14.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            androidx.compose.material3.Text(
+                text,
+                color = if (active) color else Boxy.colors.text,
+                fontWeight = if (active) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal,
+                maxLines = 1,
+            )
+            if (trailing != null) {
+                androidx.compose.material3.Icon(
+                    trailing,
+                    null,
+                    Modifier.padding(start = 2.dp).size(20.dp),
+                    tint = if (active) color else Boxy.colors.text2,
+                )
+            }
+        }
+    }
 }

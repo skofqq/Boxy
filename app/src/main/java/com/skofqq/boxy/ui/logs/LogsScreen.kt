@@ -62,6 +62,7 @@ import com.skofqq.boxy.util.Format
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.backdropSource
 import com.skofqq.boxy.ui.components.GlassMenuItem
 
 private const val TAIL_BYTES = 256 * 1024
@@ -113,6 +114,8 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
     val palette = logPalette()
     val mark = Boxy.colors.accent.copy(alpha = 0.28f)
     // Fixed page: header and one row of filters on top, a rounded card below whose text scrolls on its own.
+    val backdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
+    androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides backdrop) {
     Column(Modifier.fillMaxSize().padding(top = contentPadding.calculateTopPadding())) {
         header()
         SubPageHeader(
@@ -163,6 +166,7 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
         Box(
             Modifier.weight(1f).fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = contentPadding.calculateBottomPadding())
+                .backdropSource(backdrop)
                 .clip(RoundedCornerShape(22.dp))
                 .background(Boxy.colors.card),
         ) {
@@ -190,6 +194,8 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
                 }
             }
         }
+    }
+
     }
 
     if (deleteDialog) {
@@ -338,14 +344,7 @@ private fun levelStyle(lv: LogLevel): Pair<Int, Color> = when (lv) {
 private fun MenuChip(text: String, color: Color, items: List<Pair<String, () -> Unit>>, active: Boolean = true) {
     var open by remember { mutableStateOf(false) }
     Box {
-        Row(
-            Modifier.clip(RoundedCornerShape(50)).background(if (active) color.copy(alpha = 0.15f) else Boxy.colors.card)
-                .clickable { open = true }.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(text, color = if (active) color else Boxy.colors.text, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
-            androidx.compose.material3.Icon(BoxyIcons.ExpandMore, null, Modifier.padding(start = 2.dp).size(20.dp), tint = if (active) color else Boxy.colors.text2)
-        }
+        com.skofqq.boxy.ui.components.GlassChip(text, active, color, BoxyIcons.ExpandMore) { open = true }
         GlassMenu(open, { open = false }) {
             items.forEach { (label, action) -> GlassMenuItem(label, { open = false; action() }, selected = label == text) }
         }
@@ -354,13 +353,6 @@ private fun MenuChip(text: String, color: Color, items: List<Pair<String, () -> 
 
 @Composable
 private fun Chip(text: String, active: Boolean, color: Color, onClick: () -> Unit) {
-    Text(
-        text,
-        Modifier.clip(RoundedCornerShape(50)).background(if (active) color.copy(alpha = 0.15f) else Boxy.colors.card).clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        color = if (active) color else Boxy.colors.text,
-        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
-        maxLines = 1,
-    )
+    com.skofqq.boxy.ui.components.GlassChip(text, active, color, onClick = onClick)
 }
 
