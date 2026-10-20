@@ -743,4 +743,5 @@
     <string name="settings_haptics_system_off">Désactivé dans Android : activez « Retour tactile » dans Son et vibreur</string>
     <string name="settings_glass_elements">Liquid Glass pour les éléments</string>
     <string name="settings_glass_elements_sub">En-têtes de page, boutons d’en-tête et fenêtres contextuelles</string>
+    <string name="task_up_to_date">Déjà la dernière version : %1$s</string>
 </resources>

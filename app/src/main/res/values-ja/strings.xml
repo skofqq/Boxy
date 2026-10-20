@@ -743,4 +743,5 @@
     <string name="settings_haptics_system_off">Android でオフ：［音とバイブレーション］で「タップの振動」をオンにしてください</string>
     <string name="settings_glass_elements">要素の Liquid Glass</string>
     <string name="settings_glass_elements_sub">ページヘッダー、ヘッダーのボタン、ポップアップウィンドウ</string>
+    <string name="task_up_to_date">すでに最新バージョンです：%1$s</string>
 </resources>

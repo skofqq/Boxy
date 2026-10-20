@@ -596,6 +596,11 @@ updnscrypt() {
     log Error "Failed to get the latest dnscrypt-proxy version"
     return 1
   fi
+  # Nothing to download when the latest release is already installed ("updnscrypt force" reinstalls it).
+  if [ "$1" != "force" ] && [ -x "${bin_dir}/dnscrypt-proxy" ] &&     [ "$("${bin_dir}/dnscrypt-proxy" -version 2>/dev/null | head -n 1)" = "${ver}" ]; then
+    log Info "Latest dnscrypt-proxy ${ver} is already installed"
+    return 0
+  fi
   url="https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/${ver}/dnscrypt-proxy-android_${a}-${ver}.zip"
   zip="${bin_dir}/dnscrypt-proxy.zip"
   tmp="${bin_dir}/dnscrypt.tmp"
@@ -1279,7 +1284,7 @@ case "$1" in
     $1
     ;;
   updnscrypt)
-    updnscrypt
+    updnscrypt "$2"
     exit $?
     ;;
   geosub)

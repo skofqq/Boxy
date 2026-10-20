@@ -743,4 +743,5 @@
     <string name="settings_haptics_system_off">In Android aus: „Haptisches Feedback“ unter Ton &amp; Vibration einschalten</string>
     <string name="settings_glass_elements">Liquid Glass für Elemente</string>
     <string name="settings_glass_elements_sub">Seitenköpfe, Kopfzeilen-Schaltflächen und Pop-up-Fenster</string>
+    <string name="task_up_to_date">Bereits die neueste Version: %1$s</string>
 </resources>

@@ -743,4 +743,5 @@
     <string name="settings_haptics_system_off">Вимкнено в Android: увімкніть «Відгук на дотик» у налаштуваннях звуку й вібрації</string>
     <string name="settings_glass_elements">Liquid Glass для елементів</string>
     <string name="settings_glass_elements_sub">Шапки сторінок, кнопки в шапці та спливні вікна</string>
+    <string name="task_up_to_date">Уже остання версія: %1$s</string>
 </resources>

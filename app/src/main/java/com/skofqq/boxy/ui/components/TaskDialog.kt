@@ -82,6 +82,8 @@ private class TaskProgress(lines: List<String>) {
     val size: Long?
     val eta: String?
     val version: String?
+    /** The module found nothing newer and skipped the download (box.tool: "... is already installed"). */
+    val upToDate: Boolean
 
     init {
         val lastProgress = lines.indexOfLast { PERCENT.containsMatchIn(it) }
@@ -96,6 +98,7 @@ private class TaskProgress(lines: List<String>) {
         }
         eta = m?.groupValues?.get(3)?.removePrefix("0:")?.takeIf { it != "00:00" }
         version = lines.asReversed().firstNotNullOfOrNull { VERSION.find(it)?.groupValues?.get(1) }
+        upToDate = percent == null && lines.any { it.contains("is already installed") }
     }
 }
 
@@ -224,7 +227,10 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
             Spacer(Modifier.height(16.dp))
             Text(title, style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, textAlign = TextAlign.Center)
             val status = when (visual) {
-                TaskVisual.OK -> stringResource(R.string.update_completed, listOfNotNull(title, p.version).joinToString(" "))
+                TaskVisual.OK -> stringResource(
+                    if (p.upToDate) R.string.task_up_to_date else R.string.update_completed,
+                    listOfNotNull(title, p.version).joinToString(" "),
+                )
                 TaskVisual.FAILED -> stringResource(R.string.update_failed)
                 TaskVisual.PROGRESS -> stringResource(R.string.import_downloading)
                 TaskVisual.WORKING -> if (p.percent != null) stringResource(R.string.task_installing) else stringResource(R.string.update_started, title)

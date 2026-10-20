@@ -743,4 +743,5 @@
     <string name="settings_haptics_system_off">Desactivado en Android: activa «Respuesta táctil» en Sonido y vibración</string>
     <string name="settings_glass_elements">Liquid Glass en elementos</string>
     <string name="settings_glass_elements_sub">Cabeceras de página, botones de cabecera y ventanas emergentes</string>
+    <string name="task_up_to_date">Ya es la última versión: %1$s</string>
 </resources>

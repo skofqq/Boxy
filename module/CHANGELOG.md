@@ -1,5 +1,13 @@
 # Box for Root (Boxy edition)
 
+## v1.10.6
+
+- `box.tool updnscrypt` no longer downloads dnscrypt-proxy again when the latest release is already installed
+  (`box.tool updnscrypt force` still reinstalls it)
+
+- `box.tool updnscrypt` больше не скачивает dnscrypt-proxy заново, если уже установлена последняя версия
+  (`box.tool updnscrypt force` по-прежнему переустанавливает)
+
 ## v1.10.5
 
 - Fixed: TUN and Mixed modes with clash did not start when the config listed `exclude-package` / `include-package`

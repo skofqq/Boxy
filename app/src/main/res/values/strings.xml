@@ -767,4 +767,5 @@
     <string name="settings_haptics_system_off">Off in Android: turn on Touch feedback in Sound &amp; vibration</string>
     <string name="settings_glass_elements">Liquid Glass for elements</string>
     <string name="settings_glass_elements_sub">Page headers, header buttons and pop-up windows</string>
+    <string name="task_up_to_date">Already the latest version: %1$s</string>
 </resources>

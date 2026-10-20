@@ -713,4 +713,5 @@
     <string name="settings_haptics_system_off">Android 中已关闭：请在“声音和振动”中开启“触摸反馈”</string>
     <string name="settings_glass_elements">元素液态玻璃</string>
     <string name="settings_glass_elements_sub">页面标题栏、标题栏按钮和弹出窗口</string>
+    <string name="task_up_to_date">已是最新版本：%1$s</string>
 </resources>
