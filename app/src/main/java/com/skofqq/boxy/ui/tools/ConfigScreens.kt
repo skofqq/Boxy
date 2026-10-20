@@ -63,6 +63,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
+import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.GlassMenuItem
 
 /** Config folder and settings key of each core. */
 fun coreConfig(core: String): Pair<String, String> = when (core) {
@@ -308,11 +310,11 @@ SubPageHeader(
                 }
                 Box {
                     HeaderAction(BoxyIcons.Add, stringResource(R.string.config_menu_create)) { createMenu = true }
-                    DropdownMenu(createMenu, { createMenu = false }, containerColor = Boxy.colors.card) {
-                        DropdownMenuItem({ Text(stringResource(R.string.config_new_file)) }, { createMenu = false; createKind = false })
-                        DropdownMenuItem({ Text(stringResource(R.string.config_new_folder)) }, { createMenu = false; createKind = true })
-                        DropdownMenuItem({ Text(stringResource(R.string.config_download)) }, { createMenu = false; downloadDialog = true })
-                        DropdownMenuItem({ Text(stringResource(R.string.action_refresh)) }, { createMenu = false; reload++ })
+                    GlassMenu(createMenu, { createMenu = false }) {
+                        GlassMenuItem(stringResource(R.string.config_new_file), { createMenu = false; createKind = false }, BoxyIcons.File)
+                        GlassMenuItem(stringResource(R.string.config_new_folder), { createMenu = false; createKind = true }, BoxyIcons.Folder)
+                        GlassMenuItem(stringResource(R.string.config_download), { createMenu = false; downloadDialog = true }, BoxyIcons.Download)
+                        GlassMenuItem(stringResource(R.string.action_refresh), { createMenu = false; reload++ }, BoxyIcons.Refresh)
                     }
                 }
             }
@@ -342,9 +344,9 @@ SubPageHeader(
                             f.name,
                             if (results != null) f.path.removePrefix("$dir/") else sub,
                             menu = { close ->
-                                if (!f.isDir) DropdownMenuItem({ Text(stringResource(R.string.config_edit)) }, { close(); onEdit(f.path) })
-                                DropdownMenuItem({ Text(stringResource(R.string.config_rename)) }, { close(); renameTarget = f })
-                                DropdownMenuItem({ Text(stringResource(R.string.action_delete), color = Tints.red.fg) }, { close(); deleteTarget = f })
+                                if (!f.isDir) GlassMenuItem(stringResource(R.string.config_edit), { close(); onEdit(f.path) }, BoxyIcons.Edit)
+                                GlassMenuItem(stringResource(R.string.config_rename), { close(); renameTarget = f }, BoxyIcons.Rename)
+                                GlassMenuItem(stringResource(R.string.action_delete), { close(); deleteTarget = f }, BoxyIcons.Delete, destructive = true)
                             },
                             onClick = { if (f.isDir) onOpenDir(f.path) else onEdit(f.path) },
                         )
@@ -433,7 +435,7 @@ private fun FileRow(
         if (menu != null) {
             Box {
                 Icon(BoxyIcons.MoreVert, stringResource(R.string.action_more), Modifier.size(40.dp).clip(RoundedCornerShape(50)).clickable { open = true }.padding(9.dp), tint = Boxy.colors.text2)
-                DropdownMenu(open, { open = false }, containerColor = Boxy.colors.card) { menu { open = false } }
+                GlassMenu(open, { open = false }) { menu { open = false } }
             }
         }
     }

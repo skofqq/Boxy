@@ -64,6 +64,8 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import com.skofqq.boxy.ui.components.withTap1
+import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.GlassMenuItem
 
 /** One server of public-resolvers.md with the properties encoded in its sdns:// stamp. */
 data class DnsServer(
@@ -374,8 +376,8 @@ private fun ChoiceChip(text: String, items: List<Pair<String, () -> Unit>>, acti
             Text(text, color = if (active) Boxy.colors.accent else Boxy.colors.text, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
             Icon(BoxyIcons.ExpandMore, null, Modifier.padding(start = 2.dp).size(20.dp), tint = if (active) Boxy.colors.accent else Boxy.colors.text2)
         }
-        DropdownMenu(open, { open = false }, containerColor = Boxy.colors.card) {
-            items.forEach { (label, action) -> DropdownMenuItem({ Text(label) }, { open = false; action() }) }
+        GlassMenu(open, { open = false }) {
+            items.forEach { (label, action) -> GlassMenuItem(label, { open = false; action() }, selected = label == text) }
         }
     }
 }

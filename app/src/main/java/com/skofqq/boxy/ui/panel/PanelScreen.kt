@@ -58,6 +58,8 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
 import org.json.JSONArray
 import org.json.JSONObject
+import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.GlassMenuItem
 
 enum class PanelKind { CORE, SUBSTORE }
 
@@ -150,12 +152,12 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
             HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh_page)) { webView?.reload() }
             Box {
                 HeaderAction(BoxyIcons.MoreVert, stringResource(R.string.action_more)) { menu = true }
-                DropdownMenu(menu, { menu = false }, containerColor = Boxy.colors.card) {
-                    DropdownMenuItem({ Text(stringResource(R.string.panel_open_browser)) }, {
+                GlassMenu(menu, { menu = false }) {
+                    GlassMenuItem(stringResource(R.string.panel_open_browser), {
                         menu = false
                         current?.let { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url))) } }
-                    })
-                    DropdownMenuItem({ Text(stringResource(R.string.web_clear_cache)) }, { menu = false; clearDialog = true })
+                    }, BoxyIcons.Launch)
+                    GlassMenuItem(stringResource(R.string.web_clear_cache), { menu = false; clearDialog = true }, BoxyIcons.Delete, destructive = true)
                 }
             }
             }

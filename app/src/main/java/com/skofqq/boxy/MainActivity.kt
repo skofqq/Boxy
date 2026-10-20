@@ -285,6 +285,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
 
     Box(Modifier.fillMaxSize().background(Boxy.colors.page).blur(sheetBlur)) {
         Box(Modifier.fillMaxSize().backdropSource(backdrop)) {
+          CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalScreenBackdrop provides backdrop) {
             HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1, key = { tabs[it] }) { index ->
                 when (tabs[index]) {
                     Tab.HOME -> HomeScreen(
@@ -310,6 +311,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                     Tab.SETTINGS -> SettingsScreen(padding, prefs, active = subPage == null && pager.currentPage == index)
                 }
             }
+          }
         }
         val labels = mapOf(
             Tab.HOME to BarItem(stringResource(R.string.tab_home), BoxyIcons.Home),
@@ -336,13 +338,16 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             BackHandler { subPage = null }
             val subPadding = PaddingValues(top = topInset, bottom = bottomInset + 24.dp)
             val header: @Composable () -> Unit = { BackPill { subPage = null } }
-            Box(Modifier.fillMaxSize().background(Boxy.colors.page)) {
+            val overlayBackdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
+            Box(Modifier.fillMaxSize().background(Boxy.colors.page).backdropSource(overlayBackdrop)) {
+              CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalScreenBackdrop provides overlayBackdrop) {
                 when (lastSub) {
                     Overlay.LOGS -> LogsScreen(subPadding, header)
                     Overlay.APPS -> AppsScreen(subPadding, header)
                     Overlay.PANEL -> PanelScreen(subPadding, header, PanelKind.CORE) { subPage = null }
                     Overlay.SUBSTORE -> PanelScreen(subPadding, header, PanelKind.SUBSTORE) { subPage = null }
                 }
+              }
             }
         }
 

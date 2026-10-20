@@ -29,7 +29,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionOnScreen
+import com.skofqq.boxy.ui.theme.Boxy
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -64,13 +65,19 @@ fun rememberBackdrop(): Backdrop {
 /** Screen content recorded for glass surfaces to sample from. */
 val LocalBackdrop = staticCompositionLocalOf<Backdrop?> { null }
 
+/**
+ * Everything on screen (tabs or the page opened over them), for glass in popup windows. Popups are separate
+ * windows, so sampling the whole screen cannot draw a surface into itself the way an in-page one could.
+ */
+val LocalScreenBackdrop = staticCompositionLocalOf<Backdrop?> { null }
+
 /** Number of open bottom sheets; the main content is blurred while it is above zero. */
 object SheetBlurState {
     var open by mutableIntStateOf(0)
 }
 
 /** Records the content into [backdrop] and draws it as usual. */
-fun Modifier.backdropSource(backdrop: Backdrop): Modifier = onGloballyPositioned { backdrop.origin = it.positionInRoot() }
+fun Modifier.backdropSource(backdrop: Backdrop): Modifier = onGloballyPositioned { backdrop.origin = it.positionOnScreen() }
     .drawWithContent {
         backdrop.layer.record { this@drawWithContent.drawContent() }
         drawLayer(backdrop.layer)
@@ -107,14 +114,21 @@ fun GlassSurface(
     lens: Boolean = true,
     /** Light rim along the shape. */
     edge: Boolean = true,
+    /** Tint opacity instead of the translucency setting (menus need a fixed, readable one). */
+    tintAlpha: Float? = null,
+    /** In a popup window: samples the whole screen ([LocalScreenBackdrop]) rather than the page under it. */
+    popup: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val glass = LocalGlass.current
-    val backdrop = LocalBackdrop.current
+    val backdrop = if (popup) LocalScreenBackdrop.current ?: LocalBackdrop.current else LocalBackdrop.current
     val active = glass.enabled && (!element || glass.elements) && backdrop != null && Build.VERSION.SDK_INT >= 31
     var pos by remember { mutableStateOf(Offset.Zero) }
-    Box(modifier.onGloballyPositioned { pos = it.positionInRoot() }.clip(shape)) {
+    Box(modifier.onGloballyPositioned { pos = it.positionOnScreen() }.clip(shape)) {
         if (active && backdrop != null) {
+            // Opaque page colour first: the glass replaces what is under it. Without it, translucent content
+            // (tinted cards, gaps between rows) let the sharp original show through the blurred copy.
+            Box(Modifier.matchParentSize().background(Boxy.colors.page))
             Box(
                 Modifier
                     .matchParentSize()
@@ -135,7 +149,7 @@ fun GlassSurface(
                     }
                     .drawBehind { translate(backdrop.origin.x - pos.x, backdrop.origin.y - pos.y) { drawLayer(backdrop.layer) } },
             )
-            Box(Modifier.matchParentSize().background(tint.copy(alpha = if (glass.translucent) 0.45f else 0.78f)))
+            Box(Modifier.matchParentSize().background(tint.copy(alpha = tintAlpha ?: if (glass.translucent) 0.45f else 0.78f)))
             // Light edge that sells the glass; stronger with a stronger lens.
             if (edge) Box(
                 Modifier.matchParentSize().border(

@@ -61,6 +61,8 @@ import com.skofqq.boxy.ui.theme.Tints
 import com.skofqq.boxy.util.Format
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.GlassMenuItem
 
 private const val TAIL_BYTES = 256 * 1024
 
@@ -344,10 +346,8 @@ private fun MenuChip(text: String, color: Color, items: List<Pair<String, () -> 
             Text(text, color = if (active) color else Boxy.colors.text, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
             androidx.compose.material3.Icon(BoxyIcons.ExpandMore, null, Modifier.padding(start = 2.dp).size(20.dp), tint = if (active) color else Boxy.colors.text2)
         }
-        androidx.compose.material3.DropdownMenu(open, { open = false }, containerColor = Boxy.colors.card) {
-            items.forEach { (label, action) ->
-                androidx.compose.material3.DropdownMenuItem({ Text(label) }, { open = false; action() })
-            }
+        GlassMenu(open, { open = false }) {
+            items.forEach { (label, action) -> GlassMenuItem(label, { open = false; action() }, selected = label == text) }
         }
     }
 }

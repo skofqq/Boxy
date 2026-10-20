@@ -292,6 +292,15 @@ object BoxyIcons {
         "M7,3.5h10a3.5,3.5 0 0 1 3.5,3.5v10a3.5,3.5 0 0 1 -3.5,3.5h-10a3.5,3.5 0 0 1 -3.5,-3.5v-10a3.5,3.5 0 0 1 3.5,-3.5zM8,13.5l5.5,-5.5M10.5,16l5.5,-5.5",
     )
 
+    /** Checked box: select all. */
+    val SelectAll = strokeIcon("SelectAll", "M9,11l3,3 8,-8M20,12v6a2,2 0 0 1 -2,2h-12a2,2 0 0 1 -2,-2v-12a2,2 0 0 1 2,-2h9")
+
+    /** Two opposite arrows: invert the selection. */
+    val Invert = strokeIcon("Invert", "M7,4l-3,3 3,3M4,7h13M17,20l3,-3 -3,-3M20,17h-13")
+
+    /** Letter T with a baseline: rename. */
+    val Rename = strokeIcon("Rename", "M5,7v-2h14v2M12,5v14M9,19h6")
+
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =
         ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)

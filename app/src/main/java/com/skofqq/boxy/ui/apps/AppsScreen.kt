@@ -60,6 +60,8 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
 import com.skofqq.boxy.ui.components.withTap
 import com.skofqq.boxy.ui.components.withTap1
+import com.skofqq.boxy.ui.components.GlassMenu
+import com.skofqq.boxy.ui.components.GlassMenuItem
 
 @Composable
 fun AppsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {}) {
@@ -104,11 +106,11 @@ Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verti
                         HeaderAction(BoxyIcons.FilterList, stringResource(R.string.apps_sort_filter)) { filterSheet = true }
                         Box {
                             HeaderAction(BoxyIcons.MoreVert, stringResource(R.string.action_more)) { menu = true }
-                            DropdownMenu(menu, { menu = false }, containerColor = Boxy.colors.card) {
-                                MenuItem(R.string.action_refresh) { menu = false; vm.refresh() }
-                                MenuItem(R.string.apps_select_all) { menu = false; vm.selectAll() }
-                                MenuItem(R.string.apps_invert) { menu = false; vm.invert() }
-                                MenuItem(R.string.apps_smart_select) { menu = false; smartDialog = true }
+                            GlassMenu(menu, { menu = false }) {
+                                GlassMenuItem(stringResource(R.string.action_refresh), { menu = false; vm.refresh() }, BoxyIcons.Refresh)
+                                GlassMenuItem(stringResource(R.string.apps_select_all), { menu = false; vm.selectAll() }, BoxyIcons.SelectAll)
+                                GlassMenuItem(stringResource(R.string.apps_invert), { menu = false; vm.invert() }, BoxyIcons.Invert)
+                                GlassMenuItem(stringResource(R.string.apps_smart_select), { menu = false; smartDialog = true }, BoxyIcons.AutoAwesome)
                             }
                         }
                     }
@@ -188,10 +190,6 @@ ModeSwitch(vm.mode, enabled = !vm.coreRouting, onChange = vm::changeMode)
     }
 }
 
-@Composable
-private fun MenuItem(text: Int, onClick: () -> Unit) {
-    DropdownMenuItem(text = { Text(stringResource(text), color = Boxy.colors.text) }, onClick = onClick)
-}
 
 @Composable
 private fun ModeSwitch(mode: ProxyMode, enabled: Boolean, onChange: (ProxyMode) -> Unit) {
