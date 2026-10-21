@@ -109,6 +109,7 @@ object TrafficStats {
             CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                 try {
                     sample(context.applicationContext)
+                    Subscriptions.check(context.applicationContext)
                 } finally {
                     pending.finish()
                 }

@@ -56,6 +56,7 @@ fun HomeScreen(
     onOpenLogs: () -> Unit,
     onOpenSubStore: () -> Unit,
     onOpenDns: () -> Unit = {},
+    onOpenProxies: () -> Unit = {},
 ) {
     val vm: HomeViewModel = viewModel { HomeViewModel(prefs) }
     val context = LocalContext.current
@@ -107,7 +108,7 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                                 onRestart = vm::restart,
                             )
                         }
-                        HomeSection.QUICK -> item(key = "quick") {
+                        HomeSection.QUICK -> item(key = "quick") { Column {
                             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 val mod = Modifier.weight(1f).fillMaxHeight()
                                 QuickCard(stringResource(R.string.quick_panel), stringResource(R.string.quick_panel_sub), Tints.blue, mod, onOpenPanel)
@@ -116,7 +117,10 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                                     QuickCard(stringResource(R.string.quick_subs), stringResource(R.string.quick_subs_sub), Tints.purple, mod, onOpenSubStore)
                                 }
                             }
-                        }
+                            vm.proxyNow?.let { now ->
+                                ProxyQuickCard(now, Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp).fillMaxWidth(), onOpenProxies)
+                            }
+                        } }
                         HomeSection.LATENCY -> item(key = "latency") {
                             val results = vm.latency.ifEmpty { prefs.latencyTargets.map { LatencyResult(it.name, null) } }
                             LatencyCard(results, vm.latencyBadge, vm::testLatency)

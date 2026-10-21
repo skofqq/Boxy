@@ -137,6 +137,7 @@ fun TrafficScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
                 Spacer(Modifier.height(6.dp))
             }
         }
+        item { AppTrafficSection(reload) }
         item {
             SectionCard(stringResource(listOf(R.string.traffic_by_day, R.string.traffic_by_week, R.string.traffic_by_month)[period])) {
                 val rows: List<Pair<String, TrafficBucket>> = when (period) {

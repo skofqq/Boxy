@@ -250,6 +250,31 @@ fun QuickCard(title: String, subtitle: String, tint: Tint, modifier: Modifier, o
     }
 }
 
+/** Wide card under the quick actions: the node the main proxy group uses and its delay; opens Proxies. */
+@Composable
+fun ProxyQuickCard(now: ProxyNow, modifier: Modifier, onClick: () -> Unit) {
+    Row(
+        modifier.clip(CardShape).background(Boxy.colors.card).clickable(onClick = onClick).padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(9.dp).clip(CircleShape).background(Tints.orange.fg))
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
+            Text(now.node, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(
+                stringResource(R.string.quick_proxies_sub, now.group),
+                style = MaterialTheme.typography.bodySmall,
+                color = Boxy.colors.text2,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+        }
+        com.skofqq.boxy.ui.proxies.DelayText(now.delay)
+        Spacer(Modifier.width(6.dp))
+        Icon(BoxyIcons.ChevronRight, null, Modifier.size(22.dp), tint = Boxy.colors.text2)
+    }
+}
+
 // ---------- Latency ----------
 
 @Composable

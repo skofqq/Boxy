@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Per-app traffic from Android's counters; Boxy grants itself the app op with root -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
     <!-- Schedule start / stop at the set minute (granted at install on Android 13+) -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -82,6 +86,35 @@
                 android:value="Shows the state of the Box proxy service with stop and restart actions" />
         </service>
 
+        <!-- Config switching from outside the app: tile, widget and the chooser window they open -->
+        <activity
+            android:name=".configs.ConfigChooserActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <service
+            android:name=".configs.ConfigTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_config"
+            android:label="@string/config_switch_title"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <receiver
+            android:name=".configs.ConfigWidget"
+            android:exported="true"
+            android:label="@string/widget_config_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/box_widget_config_info" />
+        </receiver>
         <service
             android:name=".service.BoxTileService"
             android:exported="true"

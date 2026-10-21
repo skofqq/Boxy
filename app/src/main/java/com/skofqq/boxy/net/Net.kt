@@ -43,6 +43,27 @@ data class SubscriptionInfo(
 
 data class ClashApi(val base: String, val secret: String?)
 
+data class CoreConnection(val id: String, val app: String?, val uid: Int?, val upload: Long, val download: Long, val direct: Boolean)
+
+data class ProxyNode(val name: String, val type: String, /** Last test in ms, 0 = timed out, null = never tested. */ val delay: Int?)
+
+data class ProxyGroup(val name: String, val type: String, val now: String?, val all: List<String>) {
+    val selectable: Boolean get() = type == "Selector"
+}
+
+data class ProxySnapshot(val groups: List<ProxyGroup>, val nodes: Map<String, ProxyNode>) {
+    private val byName = groups.associateBy { it.name }
+
+    /** The proxy a group finally uses, following nested groups. */
+    fun leaf(group: String): String? {
+        var cur = byName[group]?.now ?: return null
+        repeat(8) { cur = byName[cur]?.now ?: return cur }
+        return cur
+    }
+
+    fun group(name: String) = byName[name]
+}
+
 object Net {
     private const val TIMEOUT = 5000
 
@@ -256,6 +277,117 @@ object Net {
             }
         }.getOrNull()
     }
+
+    /**
+     * Live connections with the app that opened them (metadata.process, the package name on Android; empty
+     * when the core does not look processes up) and whether the core sent them DIRECT.
+     */
+    suspend fun clashConnections(api: ClashApi): List<CoreConnection>? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/connections")
+            try {
+                val arr = JSONObject(c.inputStream.bufferedReader().readText()).optJSONArray("connections") ?: return@runCatching emptyList()
+                (0 until arr.length()).map { i ->
+                    val conn = arr.getJSONObject(i)
+                    val meta = conn.optJSONObject("metadata")
+                    val chains = conn.optJSONArray("chains")
+                    val first = chains?.optString(0).orEmpty()
+                    CoreConnection(
+                        id = conn.optString("id"),
+                        app = meta?.optString("process")?.takeIf { it.isNotBlank() },
+                        uid = meta?.optInt("uid", -1)?.takeIf { it >= 0 },
+                        upload = conn.optLong("upload"),
+                        download = conn.optLong("download"),
+                        direct = first == "DIRECT" || first == "REJECT" || first.isEmpty(),
+                    )
+                }
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    // ---- Proxy groups ----
+
+    private fun enc(name: String) = java.net.URLEncoder.encode(name, "UTF-8").replace("+", "%20")
+
+    /**
+     * Proxy groups (in the config's order, taken from GLOBAL) and every proxy with its last delay.
+     * Null when the API cannot be reached.
+     */
+    suspend fun clashProxies(api: ClashApi): ProxySnapshot? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/proxies")
+            try {
+                val all = JSONObject(c.inputStream.bufferedReader().readText()).optJSONObject("proxies") ?: return@runCatching null
+                val nodes = mutableMapOf<String, ProxyNode>()
+                val groups = mutableMapOf<String, ProxyGroup>()
+                all.keys().forEach { key ->
+                    val p = all.optJSONObject(key) ?: return@forEach
+                    val name = p.optString("name", key)
+                    val type = p.optString("type")
+                    val history = p.optJSONArray("history")
+                    val delay = history?.takeIf { it.length() > 0 }?.optJSONObject(history.length() - 1)?.optInt("delay")
+                    nodes[name] = ProxyNode(name, type, delay)
+                    val members = p.optJSONArray("all")
+                    if (members != null && type in GROUP_TYPES) {
+                        groups[name] = ProxyGroup(name, type, p.optString("now").ifBlank { null }, (0 until members.length()).map { members.optString(it) })
+                    }
+                }
+                val order = groups["GLOBAL"]?.all.orEmpty()
+                val sorted = groups.values.filter { it.name != "GLOBAL" }
+                    .sortedWith(compareBy({ order.indexOf(it.name).let { i -> if (i < 0) Int.MAX_VALUE else i } }, { it.name }))
+                ProxySnapshot(sorted, nodes)
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    /** Picks [name] in the selector [group]. */
+    suspend fun clashSelect(api: ClashApi, group: String, name: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/proxies/${enc(group)}", "PUT")
+            c.doOutput = true
+            c.setRequestProperty("Content-Type", "application/json")
+            c.outputStream.use { it.write(JSONObject().put("name", name).toString().toByteArray()) }
+            try {
+                c.responseCode in 200..299
+            } finally {
+                c.disconnect()
+            }
+        }.getOrDefault(false)
+    }
+
+    /** Delay test of every member of [group] at once (mihomo); null when the core has no group test. */
+    suspend fun clashGroupDelay(api: ClashApi, group: String): Map<String, Int>? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/group/${enc(group)}/delay?url=${enc(DELAY_URL)}&timeout=$DELAY_TIMEOUT", timeout = DELAY_TIMEOUT + 4000)
+            try {
+                if (c.responseCode !in 200..299) return@runCatching null
+                val j = JSONObject(c.inputStream.bufferedReader().readText())
+                j.keys().asSequence().associateWith { j.optInt(it) }
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    /** Delay of one proxy in ms; 0 when it timed out, null when the request failed. */
+    suspend fun clashProxyDelay(api: ClashApi, name: String): Int? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/proxies/${enc(name)}/delay?url=${enc(DELAY_URL)}&timeout=$DELAY_TIMEOUT", timeout = DELAY_TIMEOUT + 2000)
+            try {
+                if (c.responseCode !in 200..299) 0 else JSONObject(c.inputStream.bufferedReader().readText()).optInt("delay")
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    private val GROUP_TYPES = setOf("Selector", "URLTest", "Fallback", "LoadBalance", "Relay", "Smart")
+    private const val DELAY_URL = "https://www.gstatic.com/generate_204"
+    private const val DELAY_TIMEOUT = 5000
 
     /** Names and URLs of proxy-providers declared in the active Clash config. */
     suspend fun providerUrls(): List<Pair<String, String>> {

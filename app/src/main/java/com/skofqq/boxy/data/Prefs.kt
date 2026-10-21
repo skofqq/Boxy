@@ -113,6 +113,9 @@ class Prefs(context: Context) {
     /** Notification when the module could not update a subscription (download, core check, format). */
     var notifySubsFailed by mutableStateOf(sp.getBoolean("notify_subs_failed", true))
         private set
+    /** Warn when a subscription's traffic or time is about to run out. */
+    var notifySubsEnding by mutableStateOf(sp.getBoolean("notify_subs_ending", true))
+        private set
     var updateInterval by mutableStateOf(enumOf(sp.getString("update_interval", null), UpdateInterval.OFF))
         private set
     /** Short vibration on taps. */
@@ -151,6 +154,7 @@ class Prefs(context: Context) {
     fun updateOpenPanelOnLaunch(v: Boolean) { openPanelOnLaunch = v; sp.edit().putBoolean("open_panel_on_launch", v).apply() }
     fun updateNotifications(v: Boolean) { notifications = v; sp.edit().putBoolean("notifications", v).apply() }
     fun updateNotifySubsFailed(v: Boolean) { notifySubsFailed = v; sp.edit().putBoolean("notify_subs_failed", v).apply() }
+    fun updateNotifySubsEnding(v: Boolean) { notifySubsEnding = v; sp.edit().putBoolean("notify_subs_ending", v).apply() }
     fun updateUpdateInterval(v: UpdateInterval) { updateInterval = v; sp.edit().putString("update_interval", v.name).apply() }
     fun updateHaptics(v: Boolean) { haptics = v; com.skofqq.boxy.ui.components.Haptics.enabled = v; sp.edit().putBoolean("haptics", v).apply() }
     fun updateTileLongPressPanel(v: Boolean) { tileLongPressPanel = v; sp.edit().putBoolean("tile_long_press_panel", v).apply() }

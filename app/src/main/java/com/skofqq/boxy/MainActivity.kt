@@ -80,7 +80,7 @@ import kotlinx.coroutines.launch
 private enum class Tab { HOME, APPS, LOGS, TOOLS, SETTINGS }
 
 /** Full-screen pages opened on top of the tabs. */
-private enum class Overlay { APPS, LOGS, PANEL, SUBSTORE }
+private enum class Overlay { APPS, LOGS, PANEL, SUBSTORE, PROXIES }
 
 class MainActivity : ComponentActivity() {
 
@@ -297,6 +297,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                             if (i >= 0) scope.launch { pager.animateScrollToPage(i) } else subPage = Overlay.LOGS
                         },
                         onOpenSubStore = { subPage = Overlay.SUBSTORE },
+                        onOpenProxies = { subPage = Overlay.PROXIES },
                         onOpenDns = {
                             com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_DNS
                             val i = tabs.indexOf(Tab.TOOLS)
@@ -346,6 +347,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                     Overlay.APPS -> AppsScreen(subPadding, header)
                     Overlay.PANEL -> PanelScreen(subPadding, header, PanelKind.CORE) { subPage = null }
                     Overlay.SUBSTORE -> PanelScreen(subPadding, header, PanelKind.SUBSTORE) { subPage = null }
+                    Overlay.PROXIES -> com.skofqq.boxy.ui.proxies.ProxiesScreen(subPadding, header)
                 }
               }
             }

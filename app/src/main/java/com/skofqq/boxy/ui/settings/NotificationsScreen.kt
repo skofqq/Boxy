@@ -93,6 +93,14 @@ fun NotificationsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () 
                 ) { on ->
                     if (on) withPermission { prefs.updateNotifySubsFailed(true) } else prefs.updateNotifySubsFailed(false)
                 }
+                SwitchRow(
+                    BoxyIcons.Subscriptions,
+                    stringResource(R.string.notify_sub_ending),
+                    stringResource(R.string.notify_sub_ending_sub),
+                    prefs.notifySubsEnding && permission,
+                ) { on ->
+                    if (on) withPermission { prefs.updateNotifySubsEnding(true) } else prefs.updateNotifySubsEnding(false)
+                }
                 SettingsRow(
                     BoxyIcons.Settings,
                     stringResource(R.string.notify_system),

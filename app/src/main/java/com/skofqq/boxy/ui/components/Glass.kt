@@ -65,6 +65,9 @@ fun rememberBackdrop(): Backdrop {
     return remember(layer) { Backdrop(layer) }
 }
 
+/** True in windows shown over other apps (the config chooser), where the system blurs what is behind. */
+val LocalOutsideApp = staticCompositionLocalOf { false }
+
 /** Screen content recorded for glass surfaces to sample from. */
 val LocalBackdrop = staticCompositionLocalOf<Backdrop?> { null }
 
@@ -176,13 +179,20 @@ fun GlassSurface(
  */
 @Composable
 fun rememberFrostedDialog(): Boolean {
+    val outside = LocalOutsideApp.current
     val glass = LocalGlass.current
     val view = androidx.compose.ui.platform.LocalView.current
     val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
     val active = Build.VERSION.SDK_INT >= 31 && glass.enabled && glass.elements && window != null
     if (active && window != null) {
+        val density = androidx.compose.ui.platform.LocalDensity.current
         androidx.compose.runtime.DisposableEffect(window) {
-            window.setDimAmount(0.2f)
+            window.setDimAmount(if (outside) 0.3f else 0.2f)
+            // Over another app there is no Boxy content to blur: the system blurs the screen behind instead.
+            if (outside) {
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+                window.attributes = window.attributes.also { it.blurBehindRadius = with(density) { glass.blurRadius.roundToPx() } }
+            }
             SheetBlurState.open++
             onDispose { SheetBlurState.open-- }
         }

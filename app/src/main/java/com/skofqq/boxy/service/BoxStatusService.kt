@@ -88,6 +88,8 @@ class BoxStatusService : Service() {
                     last = state.running
                 }
                 if (tick++ % 12 == 0) TrafficStats.sample(applicationContext)
+                // Proxied traffic per app (screen on only, like this loop); at most every 8 s.
+                if (state?.running == true) com.skofqq.boxy.data.AppTraffic.sample(applicationContext)
                 delay(5000)
             }
         }

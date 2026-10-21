@@ -61,5 +61,6 @@ object BoxControl {
     fun changed(context: Context) {
         BoxWidget.refresh(context)
         runCatching { TileService.requestListeningState(context, ComponentName(context, BoxTileService::class.java)) }
+        com.skofqq.boxy.configs.ConfigSwitch.refreshViews(context)
     }
 }
