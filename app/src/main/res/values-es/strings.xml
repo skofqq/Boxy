@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Información de la app y el módulo</string>
     <string name="settings_version">Versión</string>
     <string name="settings_module_version">Versión del módulo</string>
-    <string name="settings_credits">Diseño basado en BFR de boxproxy · módulo de taamarin</string>
     <string name="tools_more">Más</string>
     <string name="tools_more_sub">Páginas ocultas de la barra de navegación</string>
     <string name="settings_author">Autor</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">Activo · %1$d min</string>
     <string name="home_uptime_hours_minutes">Activo · %1$d h %2$d min</string>
     <string name="home_edit">Editar</string>
-    <string name="home_stop_first">Detén el servicio para cambiar esto</string>
     <string name="home_reload_config">Recargar configuración</string>
     <string name="home_reload_success">Recargada</string>
     <string name="home_reload_failed">Error al recargar</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">Bajar</string>
     <string name="action_reset">Restablecer</string>
     <string name="action_done">Listo</string>
-    <string name="panel_title">Panel</string>
     <string name="panel_unavailable">La interfaz web no está disponible. Inicia el servicio y revisa external-controller en la configuración del núcleo.</string>
     <string name="sub_expire_label">Caduca</string>
     <string name="sub_updated_label">Actualizado</string>
@@ -237,10 +234,8 @@
     <string name="config_download">Descargar configuración por URL</string>
     <string name="config_download_hint">Descargar un archivo de configuración desde una URL remota</string>
     <string name="config_active">Configuración activa</string>
-    <string name="config_none">Ninguna</string>
     <string name="config_edit">Editar</string>
     <string name="config_files">Archivos de configuración</string>
-    <string name="config_supported">Formatos admitidos: .yaml, .yml, .json</string>
     <string name="config_no_files">No se encontraron archivos de configuración</string>
     <string name="config_create_file">Crear archivo</string>
     <string name="config_create_file_helper">Crear un archivo vacío</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">Disponible</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Actualización automática</string>
-    <string name="logs_auto_on">Actualización automática SÍ</string>
-    <string name="logs_manual">Actualización manual</string>
     <string name="logs_no_files">No hay archivos de registro</string>
     <string name="logs_delete_title">¿Eliminar el archivo de registro?</string>
     <string name="logs_delete_body">Se eliminará %1$s de %2$s de forma permanente.</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">Actualizar el contenido del módulo</string>
     <string name="panel_local">Local</string>
     <string name="substore_local">Local</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore no está disponible. Asegúrate de que el módulo sub_store esté instalado y en ejecución.</string>
     <string name="action_refresh_page">Recargar página</string>
     <string name="action_add">Añadir</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">Las versiones preliminares son para pruebas y pueden ser inestables.</string>
     <string name="about_date">Fecha</string>
     <string name="about_commit">Commit</string>
-    <string name="about_download_app">Descargar la app</string>
     <string name="about_download_module">Descargar el módulo</string>
     <string name="about_view_browser">Ver en el navegador</string>
     <string name="about_module">Módulo</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">Compartir</string>
     <string name="logs_search_hint">Buscar en el registro</string>
     <string name="logs_no_match">No hay líneas que coincidan</string>
-    <string name="logs_level_all">Todo</string>
     <string name="logs_level_error">Errores</string>
     <string name="logs_level_warning">Avisos</string>
     <string name="logs_level_info">Info</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">Operador o MCC+MNC, p. ej. Movistar o 21407</string>
     <string name="net_sim_picker_title">SIM del teléfono</string>
     <string name="net_sim_picker_empty">No se encontró SIM</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">Redirigir DNS al núcleo</string>
     <string name="net_dns_hijack_on">El puerto 53 va al DNS del núcleo</string>
     <string name="net_dns_hijack_off">El DNS queda para el sistema u otro módulo (AdGuard Home)</string>

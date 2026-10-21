@@ -71,7 +71,6 @@
     <string name="settings_about_sub">アプリとモジュールの情報</string>
     <string name="settings_version">バージョン</string>
     <string name="settings_module_version">モジュールのバージョン</string>
-    <string name="settings_credits">デザインは boxproxy の BFR に基づく · モジュール: taamarin</string>
     <string name="tools_more">その他</string>
     <string name="tools_more_sub">ナビゲーションバーから隠したページ</string>
     <string name="settings_author">作者</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">稼働 · %1$d分</string>
     <string name="home_uptime_hours_minutes">稼働 · %1$d時間%2$d分</string>
     <string name="home_edit">編集</string>
-    <string name="home_stop_first">変更するにはサービスを停止してください</string>
     <string name="home_reload_config">設定を再読み込み</string>
     <string name="home_reload_success">再読み込みしました</string>
     <string name="home_reload_failed">再読み込みに失敗しました</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">下へ</string>
     <string name="action_reset">リセット</string>
     <string name="action_done">完了</string>
-    <string name="panel_title">パネル</string>
     <string name="panel_unavailable">Web UI を利用できません。サービスを開始し、コア設定の external-controller を確認してください。</string>
     <string name="sub_expire_label">有効期限</string>
     <string name="sub_updated_label">更新日時</string>
@@ -237,10 +234,8 @@
     <string name="config_download">URL から設定をダウンロード</string>
     <string name="config_download_hint">リモート URL から設定ファイルをダウンロード</string>
     <string name="config_active">有効な設定</string>
-    <string name="config_none">なし</string>
     <string name="config_edit">編集</string>
     <string name="config_files">設定ファイル</string>
-    <string name="config_supported">対応形式: .yaml, .yml, .json</string>
     <string name="config_no_files">設定ファイルが見つかりません</string>
     <string name="config_create_file">ファイルを作成</string>
     <string name="config_create_file_helper">空のファイルを新規作成</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">利用可能</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">自動更新</string>
-    <string name="logs_auto_on">自動更新 オン</string>
-    <string name="logs_manual">手動更新</string>
     <string name="logs_no_files">ログファイルがありません</string>
     <string name="logs_delete_title">ログファイルを削除しますか？</string>
     <string name="logs_delete_body">%2$s から %1$s を完全に削除します。</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">モジュールの内容を更新</string>
     <string name="panel_local">ローカル</string>
     <string name="substore_local">ローカル</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore を利用できません。sub_store モジュールがインストールされ、実行されていることを確認してください。</string>
     <string name="action_refresh_page">ページを再読み込み</string>
     <string name="action_add">追加</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">プレリリース版はテスト用で、不安定な場合があります。</string>
     <string name="about_date">日付</string>
     <string name="about_commit">コミット</string>
-    <string name="about_download_app">アプリをダウンロード</string>
     <string name="about_download_module">モジュールをダウンロード</string>
     <string name="about_view_browser">ブラウザで表示</string>
     <string name="about_module">モジュール</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">共有</string>
     <string name="logs_search_hint">ログを検索</string>
     <string name="logs_no_match">一致する行がありません</string>
-    <string name="logs_level_all">すべて</string>
     <string name="logs_level_error">エラー</string>
     <string name="logs_level_warning">警告</string>
     <string name="logs_level_info">情報</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">事業者名または MCC+MNC（例 docomo、44010）</string>
     <string name="net_sim_picker_title">端末の SIM カード</string>
     <string name="net_sim_picker_empty">SIM が見つかりません</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">DNS をコアへリダイレクト</string>
     <string name="net_dns_hijack_on">ポート 53 はコアの DNS が処理</string>
     <string name="net_dns_hijack_off">DNS はシステムや他のモジュール（AdGuard Home）に任せる</string>

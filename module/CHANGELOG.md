@@ -1,5 +1,13 @@
 # Box for Root (Boxy edition)
 
+## v1.10.7
+
+- `box.tool upkernel` no longer downloads a core again when the installed one already reports the latest
+  version (mihomo, sing-box, xray, v2fly, hysteria); `box.tool upkernel force` still reinstalls it
+
+- `box.tool upkernel` больше не скачивает ядро заново, если установленное уже последней версии
+  (mihomo, sing-box, xray, v2fly, hysteria); `box.tool upkernel force` по-прежнему переустанавливает
+
 ## v1.10.6
 
 - `box.tool updnscrypt` no longer downloads dnscrypt-proxy again when the latest release is already installed

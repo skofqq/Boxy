@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Приложение и модуль</string>
     <string name="settings_version">Версия</string>
     <string name="settings_module_version">Версия модуля</string>
-    <string name="settings_credits">Дизайн основан на BFR от boxproxy · модуль от taamarin</string>
     <string name="tools_more">Ещё</string>
     <string name="tools_more_sub">Страницы, скрытые из панели навигации</string>
     <string name="settings_author">Автор</string>
@@ -91,7 +90,6 @@
     <string name="home_uptime_minutes">Работает · %1$d мин</string>
     <string name="home_uptime_hours_minutes">Работает · %1$d ч %2$d мин</string>
     <string name="home_edit">Изменить</string>
-    <string name="home_stop_first">Остановите сервис, чтобы изменить</string>
     <string name="home_reload_config">Перечитать конфиг</string>
     <string name="home_reload_success">Конфиг перечитан</string>
     <string name="home_reload_failed">Не удалось перечитать конфиг</string>
@@ -177,7 +175,6 @@
     <string name="layout_move_down">Ниже</string>
     <string name="action_reset">Сбросить</string>
     <string name="action_done">Готово</string>
-    <string name="panel_title">Панель</string>
     <string name="panel_unavailable">Веб-интерфейс недоступен. Запустите сервис и проверьте external-controller в конфиге ядра.</string>
 
     <string name="sub_expire_label">Действует до</string>
@@ -242,10 +239,8 @@
     <string name="config_download">Загрузить конфиг по ссылке</string>
     <string name="config_download_hint">Скачать файл конфигурации по адресу</string>
     <string name="config_active">Активная конфигурация</string>
-    <string name="config_none">Нет</string>
     <string name="config_edit">Изменить</string>
     <string name="config_files">Файлы конфигурации</string>
-    <string name="config_supported">Поддерживаются .yaml, .yml, .json</string>
     <string name="config_no_files">Файлы конфигурации не найдены</string>
     <string name="config_create_file">Создать файл</string>
     <string name="config_create_file_helper">Создать новый пустой файл</string>
@@ -365,8 +360,6 @@
     <string name="logs_status_available">Доступен</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Автообновление</string>
-    <string name="logs_auto_on">Автообновление ВКЛ</string>
-    <string name="logs_manual">Обновить вручную</string>
     <string name="logs_no_files">Нет файлов журнала</string>
     <string name="logs_delete_title">Удалить файл журнала?</string>
     <string name="logs_delete_body">Файл %1$s будет удалён из %2$s без возможности восстановления.</string>
@@ -376,7 +369,6 @@
 
     <string name="panel_local">Локальная</string>
     <string name="substore_local">Локальный</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore недоступен. Убедитесь, что модуль sub_store установлен и запущен.</string>
     <string name="action_refresh_page">Обновить страницу</string>
     <string name="action_add">Добавить</string>
@@ -479,7 +471,6 @@
     <string name="about_prerelease_warning">Тестовые сборки предназначены для проверки и могут работать нестабильно.</string>
     <string name="about_date">Дата</string>
     <string name="about_commit">Коммит</string>
-    <string name="about_download_app">Скачать приложение</string>
     <string name="about_download_module">Скачать модуль</string>
     <string name="about_view_browser">Открыть в браузере</string>
     <string name="about_module">Модуль</string>
@@ -563,7 +554,6 @@
     <string name="logs_share">Поделиться</string>
     <string name="logs_search_hint">Поиск по журналу</string>
     <string name="logs_no_match">Нет подходящих строк</string>
-    <string name="logs_level_all">Все</string>
     <string name="logs_level_error">Ошибки</string>
     <string name="logs_level_warning">Предупреждения</string>
     <string name="logs_level_info">Инфо</string>
@@ -644,7 +634,6 @@
     <string name="net_hint_sim">Оператор или MCC+MNC, напр. MTS или 25001</string>
     <string name="net_sim_picker_title">SIM-карты в телефоне</string>
     <string name="net_sim_picker_empty">SIM не найдена</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">Перехват DNS ядром</string>
     <string name="net_dns_hijack_on">Запросы на порт 53 обрабатывает ядро</string>
     <string name="net_dns_hijack_off">DNS остаётся системе или другому модулю (AdGuard Home)</string>

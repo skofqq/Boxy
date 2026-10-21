@@ -62,6 +62,7 @@ import com.skofqq.boxy.ui.components.withTap
 import com.skofqq.boxy.ui.components.withTap1
 import com.skofqq.boxy.ui.components.GlassMenu
 import com.skofqq.boxy.ui.components.GlassMenuItem
+import com.skofqq.boxy.ui.components.GlassAlertDialog
 
 @Composable
 fun AppsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {}) {
@@ -162,7 +163,7 @@ ModeSwitch(vm.mode, enabled = !vm.coreRouting, onChange = vm::changeMode)
     if (filterSheet) FilterSheet(vm) { filterSheet = false }
 
     if (smartDialog) {
-        AlertDialog(
+        GlassAlertDialog(
             onDismissRequest = { smartDialog = false },
             title = { Text(stringResource(R.string.apps_smart_select)) },
             text = { Text(stringResource(R.string.apps_smart_body)) },
@@ -177,7 +178,7 @@ ModeSwitch(vm.mode, enabled = !vm.coreRouting, onChange = vm::changeMode)
     }
 
     if (vm.showRestartTip) {
-        AlertDialog(
+        GlassAlertDialog(
             onDismissRequest = { vm.showRestartTip = false },
             title = { Text(stringResource(R.string.apps_restart_title)) },
             text = { Text(stringResource(if (vm.dirty) R.string.apps_restart_body_pending else R.string.apps_restart_body)) },

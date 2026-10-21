@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Uygulama ve modül bilgisi</string>
     <string name="settings_version">Sürüm</string>
     <string name="settings_module_version">Modül sürümü</string>
-    <string name="settings_credits">Tasarım boxproxy’nin BFR’sine dayanır · modül: taamarin</string>
     <string name="tools_more">Daha fazla</string>
     <string name="tools_more_sub">Gezinme çubuğundan gizlenen sayfalar</string>
     <string name="settings_author">Yazar</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">Çalışma · %1$d dk</string>
     <string name="home_uptime_hours_minutes">Çalışma · %1$d sa %2$d dk</string>
     <string name="home_edit">Düzenle</string>
-    <string name="home_stop_first">Bunu değiştirmek için hizmeti durdurun</string>
     <string name="home_reload_config">Yapılandırmayı yeniden yükle</string>
     <string name="home_reload_success">Yeniden yüklendi</string>
     <string name="home_reload_failed">Yeniden yükleme başarısız</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">Aşağı taşı</string>
     <string name="action_reset">Sıfırla</string>
     <string name="action_done">Bitti</string>
-    <string name="panel_title">Panel</string>
     <string name="panel_unavailable">Web arayüzü kullanılamıyor. Hizmeti başlatın ve çekirdek yapılandırmasındaki external-controller ayarını kontrol edin.</string>
     <string name="sub_expire_label">Bitiş</string>
     <string name="sub_updated_label">Güncellendi</string>
@@ -237,10 +234,8 @@
     <string name="config_download">URL’den yapılandırma indir</string>
     <string name="config_download_hint">Uzak bir adresten yapılandırma dosyası indir</string>
     <string name="config_active">Etkin yapılandırma</string>
-    <string name="config_none">Yok</string>
     <string name="config_edit">Düzenle</string>
     <string name="config_files">Yapılandırma dosyaları</string>
-    <string name="config_supported">Desteklenen biçimler: .yaml, .yml, .json</string>
     <string name="config_no_files">Yapılandırma dosyası bulunamadı</string>
     <string name="config_create_file">Dosya oluştur</string>
     <string name="config_create_file_helper">Yeni boş dosya oluştur</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">Mevcut</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Otomatik yenileme</string>
-    <string name="logs_auto_on">Otomatik yenileme AÇIK</string>
-    <string name="logs_manual">Elle yenileme</string>
     <string name="logs_no_files">Günlük dosyası yok</string>
     <string name="logs_delete_title">Günlük dosyası silinsin mi?</string>
     <string name="logs_delete_body">%1$s, %2$s konumundan kalıcı olarak silinecek.</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">Modül içeriğini güncelle</string>
     <string name="panel_local">Yerel</string>
     <string name="substore_local">Yerel</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore kullanılamıyor. sub_store modülünün yüklü ve çalışır olduğundan emin olun.</string>
     <string name="action_refresh_page">Sayfayı yenile</string>
     <string name="action_add">Ekle</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">Ön sürümler test içindir ve kararsız olabilir.</string>
     <string name="about_date">Tarih</string>
     <string name="about_commit">Commit</string>
-    <string name="about_download_app">Uygulamayı indir</string>
     <string name="about_download_module">Modülü indir</string>
     <string name="about_view_browser">Tarayıcıda görüntüle</string>
     <string name="about_module">Modül</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">Paylaş</string>
     <string name="logs_search_hint">Günlükte ara</string>
     <string name="logs_no_match">Eşleşen satır yok</string>
-    <string name="logs_level_all">Tümü</string>
     <string name="logs_level_error">Hatalar</string>
     <string name="logs_level_warning">Uyarılar</string>
     <string name="logs_level_info">Bilgi</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">Operatör veya MCC+MNC, ör. Turkcell veya 28601</string>
     <string name="net_sim_picker_title">Telefondaki SIM kartlar</string>
     <string name="net_sim_picker_empty">SIM bulunamadı</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">DNS’i çekirdeğe yönlendir</string>
     <string name="net_dns_hijack_on">53. port çekirdeğin DNS’ine gider</string>
     <string name="net_dns_hijack_off">DNS sisteme veya başka bir modüle kalır (AdGuard Home)</string>

@@ -1,6 +1,7 @@
 package com.skofqq.boxy.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,10 +53,26 @@ fun BoxySheet(
         SheetBlurState.open++
         onDispose { SheetBlurState.open-- }
     }
+    // Liquid glass: translucent sheet with a light rim along its rounded top over the blurred app.
+    val frosted = glass.enabled && glass.elements && android.os.Build.VERSION.SDK_INT >= 31
+    val sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+    val rim = androidx.compose.ui.graphics.Brush.verticalGradient(
+        listOf(
+            androidx.compose.ui.graphics.Color.White.copy(alpha = if (Boxy.colors.isDark) 0.22f else 0.75f),
+            androidx.compose.ui.graphics.Color.White.copy(alpha = 0f),
+        ),
+        endY = 160f,
+    )
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded),
-        containerColor = if (blurBehind) Boxy.colors.page.copy(alpha = 0.9f) else Boxy.colors.page,
+        modifier = if (frosted) Modifier.border(1.dp, rim, sheetShape) else Modifier,
+        shape = sheetShape,
+        containerColor = when {
+            frosted -> Boxy.colors.page.copy(alpha = if (glass.translucent) 0.8f else 0.9f)
+            blurBehind -> Boxy.colors.page.copy(alpha = 0.9f)
+            else -> Boxy.colors.page
+        },
         scrimColor = if (blurBehind) androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.2f) else androidx.compose.material3.BottomSheetDefaults.ScrimColor,
         contentColor = Boxy.colors.text,
     ) {

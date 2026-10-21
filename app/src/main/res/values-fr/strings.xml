@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Infos sur l’appli et le module</string>
     <string name="settings_version">Version</string>
     <string name="settings_module_version">Version du module</string>
-    <string name="settings_credits">Design basé sur BFR de boxproxy · module par taamarin</string>
     <string name="tools_more">Plus</string>
     <string name="tools_more_sub">Pages masquées de la barre de navigation</string>
     <string name="settings_author">Auteur</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">Actif · %1$d min</string>
     <string name="home_uptime_hours_minutes">Actif · %1$d h %2$d min</string>
     <string name="home_edit">Modifier</string>
-    <string name="home_stop_first">Arrêtez le service pour modifier ceci</string>
     <string name="home_reload_config">Recharger la configuration</string>
     <string name="home_reload_success">Rechargée</string>
     <string name="home_reload_failed">Échec du rechargement</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">Descendre</string>
     <string name="action_reset">Réinitialiser</string>
     <string name="action_done">Terminé</string>
-    <string name="panel_title">Panneau</string>
     <string name="panel_unavailable">L’interface web n’est pas disponible. Démarrez le service et vérifiez external-controller dans la configuration du cœur.</string>
     <string name="sub_expire_label">Expire</string>
     <string name="sub_updated_label">Mis à jour</string>
@@ -237,10 +234,8 @@
     <string name="config_download">Télécharger une configuration par URL</string>
     <string name="config_download_hint">Télécharger un fichier de configuration depuis une URL distante</string>
     <string name="config_active">Configuration active</string>
-    <string name="config_none">Aucune</string>
     <string name="config_edit">Modifier</string>
     <string name="config_files">Fichiers de configuration</string>
-    <string name="config_supported">Formats pris en charge : .yaml, .yml, .json</string>
     <string name="config_no_files">Aucun fichier de configuration trouvé</string>
     <string name="config_create_file">Créer un fichier</string>
     <string name="config_create_file_helper">Créer un fichier vide</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">Disponible</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Actualisation auto</string>
-    <string name="logs_auto_on">Actualisation auto ACTIVÉE</string>
-    <string name="logs_manual">Actualisation manuelle</string>
     <string name="logs_no_files">Aucun fichier journal</string>
     <string name="logs_delete_title">Supprimer le fichier journal ?</string>
     <string name="logs_delete_body">%1$s sera définitivement supprimé de %2$s.</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">Mise à jour du contenu du module</string>
     <string name="panel_local">Local</string>
     <string name="substore_local">Local</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore n’est pas disponible. Vérifiez que le module sub_store est installé et en marche.</string>
     <string name="action_refresh_page">Recharger la page</string>
     <string name="action_add">Ajouter</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">Les préversions servent aux tests et peuvent être instables.</string>
     <string name="about_date">Date</string>
     <string name="about_commit">Commit</string>
-    <string name="about_download_app">Télécharger l’appli</string>
     <string name="about_download_module">Télécharger le module</string>
     <string name="about_view_browser">Voir dans le navigateur</string>
     <string name="about_module">Module</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">Partager</string>
     <string name="logs_search_hint">Rechercher dans le journal</string>
     <string name="logs_no_match">Aucune ligne correspondante</string>
-    <string name="logs_level_all">Tout</string>
     <string name="logs_level_error">Erreurs</string>
     <string name="logs_level_warning">Avertissements</string>
     <string name="logs_level_info">Info</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">Opérateur ou MCC+MNC, ex. Orange ou 20801</string>
     <string name="net_sim_picker_title">Cartes SIM du téléphone</string>
     <string name="net_sim_picker_empty">Aucune SIM trouvée</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">Rediriger le DNS vers le cœur</string>
     <string name="net_dns_hijack_on">Le port 53 va au DNS du cœur</string>
     <string name="net_dns_hijack_off">Le DNS reste au système ou à un autre module (AdGuard Home)</string>

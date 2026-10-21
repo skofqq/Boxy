@@ -67,7 +67,6 @@
     <string name="settings_about_sub">应用与模块信息</string>
     <string name="settings_version">版本</string>
     <string name="settings_module_version">模块版本</string>
-    <string name="settings_credits">设计参考 boxproxy 的 BFR · 模块作者 taamarin</string>
     <string name="tools_more">更多</string>
     <string name="tools_more_sub">未显示在导航栏中的页面</string>
     <string name="settings_author">作者</string>
@@ -80,7 +79,6 @@
     <string name="home_uptime_minutes">运行时间 · %1$d 分钟</string>
     <string name="home_uptime_hours_minutes">运行时间 · %1$d 小时 %2$d 分钟</string>
     <string name="home_edit">编辑</string>
-    <string name="home_stop_first">请先停止服务再修改</string>
     <string name="home_reload_config">重载配置</string>
     <string name="home_reload_success">已重载</string>
     <string name="home_reload_failed">重载失败</string>
@@ -155,7 +153,6 @@
     <string name="layout_move_down">下移</string>
     <string name="action_reset">重置</string>
     <string name="action_done">完成</string>
-    <string name="panel_title">面板</string>
     <string name="panel_unavailable">Web UI 不可用。请启动服务并检查核心配置中的 external-controller。</string>
     <string name="sub_expire_label">到期</string>
     <string name="sub_updated_label">更新</string>
@@ -216,10 +213,8 @@
     <string name="config_download">从链接下载配置</string>
     <string name="config_download_hint">从远程链接下载配置文件</string>
     <string name="config_active">当前配置</string>
-    <string name="config_none">无</string>
     <string name="config_edit">编辑</string>
     <string name="config_files">配置文件</string>
-    <string name="config_supported">支持格式：.yaml、.yml、.json</string>
     <string name="config_no_files">未找到配置文件</string>
     <string name="config_create_file">新建文件</string>
     <string name="config_create_file_helper">新建一个空文件</string>
@@ -332,8 +327,6 @@
     <string name="logs_status_current">当前</string>
     <string name="logs_status_available">可用</string>
     <string name="logs_auto">自动刷新</string>
-    <string name="logs_auto_on">自动刷新已开启</string>
-    <string name="logs_manual">手动刷新</string>
     <string name="logs_no_files">没有日志文件</string>
     <string name="logs_delete_title">删除日志文件？</string>
     <string name="logs_delete_body">将从 %2$s 永久删除 %1$s。</string>
@@ -441,7 +434,6 @@
     <string name="about_prerelease_warning">预发布版用于测试，可能不稳定。</string>
     <string name="about_date">日期</string>
     <string name="about_commit">提交</string>
-    <string name="about_download_app">下载应用</string>
     <string name="about_download_module">下载模块</string>
     <string name="about_view_browser">在浏览器中查看</string>
     <string name="about_module">模块</string>
@@ -521,7 +513,6 @@
     <string name="logs_share">分享</string>
     <string name="logs_search_hint">在日志中搜索</string>
     <string name="logs_no_match">没有匹配的行</string>
-    <string name="logs_level_all">全部</string>
     <string name="logs_level_error">错误</string>
     <string name="logs_level_warning">警告</string>
     <string name="logs_level_info">信息</string>
@@ -602,7 +593,6 @@
     <string name="net_hint_sim">运营商或 MCC+MNC，例如 China Mobile 或 46000</string>
     <string name="net_sim_picker_title">手机中的 SIM 卡</string>
     <string name="net_sim_picker_empty">未找到 SIM 卡</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">将 DNS 重定向到核心</string>
     <string name="net_dns_hijack_on">53 端口由核心的 DNS 处理</string>
     <string name="net_dns_hijack_off">DNS 交给系统或其他模块（AdGuard Home）</string>

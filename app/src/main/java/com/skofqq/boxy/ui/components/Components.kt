@@ -204,7 +204,7 @@ fun <T> ChoiceDialog(
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
+    GlassAlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
         dismissButton = { TextButton(onClick = withTap(onDismiss)) { Text(stringResource(R.string.action_cancel)) } },

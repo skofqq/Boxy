@@ -620,8 +620,25 @@ updnscrypt() {
   log Info "dnscrypt-proxy ${ver} installed"
 }
 
+# True (and logged) when the installed core already reports version $2 (with or without a leading v),
+# so upkernel has nothing to download. "box.tool upkernel force" downloads anyway.
+kernel_current() {
+  [ "${force_update}" = "true" ] && return 1
+  local bin="${bin_dir}/$1" want="${2#v}" have
+  [ -x "${bin}" ] && [ -n "${want}" ] || return 1
+  case "$1" in
+    clash) have=$("${bin}" -v 2>/dev/null | head -n 1) ;;
+    *) have=$("${bin}" version 2>/dev/null | head -n 3) ;;
+  esac
+  echo "${have}" | grep -qF -- "${want}" || return 1
+  log Info "Latest $1 ${want} is already installed"
+  return 0
+}
+
 upkernel() {
-  # su -c /data/adb/box/scripts/box.tool upkernel
+  # su -c /data/adb/box/scripts/box.tool upkernel [force]
+  force_update=false
+  [ "$1" = "force" ] && force_update=true
   mkdir -p "${bin_dir}/backup"
   if [ -f "${bin_dir}/${bin_name}" ]; then
     cp "${bin_dir}/${bin_name}" "${bin_dir}/backup/${bin_name}.bak" >/dev/null 2>&1
@@ -655,6 +672,7 @@ upkernel() {
         return 1
       fi
       log Info "Latest ${bin_name} version: ${latest_version}"
+      kernel_current "${bin_name}" "${latest_version}" && return 0
     
       download_link="${url_down}/download/${latest_version}/sing-box-${latest_version#v}-${platform}-${arch}.tar.gz"
       log Info "Downloading from: ${download_link}"
@@ -700,6 +718,8 @@ upkernel() {
           log Info "Latest alpha version: ${latest_version}"
         fi
 
+        kernel_current clash "${latest_version}" && return 0
+
         # Set file names according to platform and architecture
         filename="mihomo-${platform}-${arch}-${latest_version}"
         log Info "Preparing to download: ${filename}.gz"
@@ -740,6 +760,7 @@ upkernel() {
         exit 1
       fi
       log Info "Latest ${bin_name} version: ${latest_version}"
+      kernel_current "${bin_name}" "${latest_version}" && return 0
     
       # Specify files according to architecture
       case $(uname -m) in
@@ -805,6 +826,7 @@ upkernel() {
         return 1
       fi
       log Info "Latest Hysteria version: v${latest_version}"
+      kernel_current hysteria "${latest_version}" && return 0
     
       local download_link="https://github.com/apernet/hysteria/releases/download/app%2Fv${latest_version}/hysteria-android-${arch}"
       log Info "Downloading Hysteria from: ${download_link}"
@@ -1308,7 +1330,7 @@ case "$1" in
     fi
     ;;
   upkernel)
-    upkernel
+    upkernel "$2"
     ;;
   upxui)
     upxui

@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Відомості про застосунок і модуль</string>
     <string name="settings_version">Версія</string>
     <string name="settings_module_version">Версія модуля</string>
-    <string name="settings_credits">Дизайн на основі BFR від boxproxy · модуль від taamarin</string>
     <string name="tools_more">Ще</string>
     <string name="tools_more_sub">Сторінки, приховані з панелі навігації</string>
     <string name="settings_author">Автор</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">Працює · %1$d хв</string>
     <string name="home_uptime_hours_minutes">Працює · %1$d год %2$d хв</string>
     <string name="home_edit">Змінити</string>
-    <string name="home_stop_first">Зупиніть сервіс, щоб змінити це</string>
     <string name="home_reload_config">Перезавантажити конфігурацію</string>
     <string name="home_reload_success">Перезавантажено</string>
     <string name="home_reload_failed">Не вдалося перезавантажити</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">Вниз</string>
     <string name="action_reset">Скинути</string>
     <string name="action_done">Готово</string>
-    <string name="panel_title">Панель</string>
     <string name="panel_unavailable">Веб-інтерфейс недоступний. Запустіть сервіс і перевірте external-controller у конфігурації ядра.</string>
     <string name="sub_expire_label">Діє до</string>
     <string name="sub_updated_label">Оновлено</string>
@@ -237,10 +234,8 @@
     <string name="config_download">Завантажити конфігурацію за URL</string>
     <string name="config_download_hint">Завантажити файл конфігурації з віддаленої адреси</string>
     <string name="config_active">Активна конфігурація</string>
-    <string name="config_none">Немає</string>
     <string name="config_edit">Змінити</string>
     <string name="config_files">Файли конфігурації</string>
-    <string name="config_supported">Підтримувані формати: .yaml, .yml, .json</string>
     <string name="config_no_files">Файли конфігурації не знайдено</string>
     <string name="config_create_file">Створити файл</string>
     <string name="config_create_file_helper">Створити новий порожній файл</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">Доступний</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Автооновлення</string>
-    <string name="logs_auto_on">Автооновлення УВІМК.</string>
-    <string name="logs_manual">Ручне оновлення</string>
     <string name="logs_no_files">Немає файлів журналу</string>
     <string name="logs_delete_title">Видалити файл журналу?</string>
     <string name="logs_delete_body">%1$s буде остаточно видалено з %2$s.</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">Оновлення вмісту модуля</string>
     <string name="panel_local">Локальна</string>
     <string name="substore_local">Локальний</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore недоступний. Переконайтеся, що модуль sub_store встановлено та запущено.</string>
     <string name="action_refresh_page">Оновити сторінку</string>
     <string name="action_add">Додати</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">Попередні збірки призначені для тестування і можуть бути нестабільними.</string>
     <string name="about_date">Дата</string>
     <string name="about_commit">Коміт</string>
-    <string name="about_download_app">Завантажити застосунок</string>
     <string name="about_download_module">Завантажити модуль</string>
     <string name="about_view_browser">Відкрити в браузері</string>
     <string name="about_module">Модуль</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">Поділитися</string>
     <string name="logs_search_hint">Пошук у журналі</string>
     <string name="logs_no_match">Немає відповідних рядків</string>
-    <string name="logs_level_all">Усі</string>
     <string name="logs_level_error">Помилки</string>
     <string name="logs_level_warning">Попередження</string>
     <string name="logs_level_info">Інфо</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">Оператор або MCC+MNC, напр. Kyivstar або 25503</string>
     <string name="net_sim_picker_title">SIM-картки в телефоні</string>
     <string name="net_sim_picker_empty">SIM не знайдено</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">Перехоплення DNS ядром</string>
     <string name="net_dns_hijack_on">Запити на порт 53 обробляє ядро</string>
     <string name="net_dns_hijack_off">DNS залишається системі або іншому модулю (AdGuard Home)</string>

@@ -71,7 +71,6 @@
     <string name="settings_about_sub">Қолданба және модуль туралы</string>
     <string name="settings_version">Нұсқа</string>
     <string name="settings_module_version">Модуль нұсқасы</string>
-    <string name="settings_credits">Дизайн boxproxy әзірлеген BFR негізінде · модуль авторы taamarin</string>
     <string name="tools_more">Тағы</string>
     <string name="tools_more_sub">Навигация панелінен жасырылған беттер</string>
     <string name="settings_author">Автор</string>
@@ -90,7 +89,6 @@
     <string name="home_uptime_minutes">Жұмыс уақыты · %1$d мин</string>
     <string name="home_uptime_hours_minutes">Жұмыс уақыты · %1$d сағ %2$d мин</string>
     <string name="home_edit">Өзгерту</string>
-    <string name="home_stop_first">Мұны өзгерту үшін қызметті тоқтатыңыз</string>
     <string name="home_reload_config">Конфигурацияны қайта жүктеу</string>
     <string name="home_reload_success">Қайта жүктелді</string>
     <string name="home_reload_failed">Қайта жүктеу сәтсіз</string>
@@ -176,7 +174,6 @@
     <string name="layout_move_down">Төмен</string>
     <string name="action_reset">Қалпына келтіру</string>
     <string name="action_done">Дайын</string>
-    <string name="panel_title">Панель</string>
     <string name="panel_unavailable">Веб-интерфейс қолжетімсіз. Қызметті іске қосып, ядро конфигурациясындағы external-controller параметрін тексеріңіз.</string>
     <string name="sub_expire_label">Мерзімі</string>
     <string name="sub_updated_label">Жаңартылды</string>
@@ -237,10 +234,8 @@
     <string name="config_download">Конфигурацияны URL арқылы жүктеу</string>
     <string name="config_download_hint">Конфигурация файлын қашықтағы мекенжайдан жүктеу</string>
     <string name="config_active">Белсенді конфигурация</string>
-    <string name="config_none">Жоқ</string>
     <string name="config_edit">Өзгерту</string>
     <string name="config_files">Конфигурация файлдары</string>
-    <string name="config_supported">Қолдау көрсетілетін пішімдер: .yaml, .yml, .json</string>
     <string name="config_no_files">Конфигурация файлдары табылмады</string>
     <string name="config_create_file">Файл жасау</string>
     <string name="config_create_file_helper">Жаңа бос файл жасау</string>
@@ -360,8 +355,6 @@
     <string name="logs_status_available">Қолжетімді</string>
     <string name="logs_current">%1$s • %2$s</string>
     <string name="logs_auto">Автожаңарту</string>
-    <string name="logs_auto_on">Автожаңарту ҚОСУЛЫ</string>
-    <string name="logs_manual">Қолмен жаңарту</string>
     <string name="logs_no_files">Журнал файлдары жоқ</string>
     <string name="logs_delete_title">Журнал файлын жою керек пе?</string>
     <string name="logs_delete_body">%1$s файлы %2$s ішінен біржола жойылады.</string>
@@ -369,7 +362,6 @@
     <string name="tools_update_sub">Модуль мазмұнын жаңарту</string>
     <string name="panel_local">Жергілікті</string>
     <string name="substore_local">Жергілікті</string>
-    <string name="substore_title">SubStore</string>
     <string name="substore_unavailable">SubStore қолжетімсіз. sub_store модулі орнатылып, іске қосылғанына көз жеткізіңіз.</string>
     <string name="action_refresh_page">Бетті жаңарту</string>
     <string name="action_add">Қосу</string>
@@ -471,7 +463,6 @@
     <string name="about_prerelease_warning">Алдын ала құрастырулар сынауға арналған және тұрақсыз болуы мүмкін.</string>
     <string name="about_date">Күні</string>
     <string name="about_commit">Коммит</string>
-    <string name="about_download_app">Қолданбаны жүктеу</string>
     <string name="about_download_module">Модульді жүктеу</string>
     <string name="about_view_browser">Браузерде ашу</string>
     <string name="about_module">Модуль</string>
@@ -551,7 +542,6 @@
     <string name="logs_share">Бөлісу</string>
     <string name="logs_search_hint">Журналдан іздеу</string>
     <string name="logs_no_match">Сәйкес жолдар жоқ</string>
-    <string name="logs_level_all">Барлығы</string>
     <string name="logs_level_error">Қателер</string>
     <string name="logs_level_warning">Ескертулер</string>
     <string name="logs_level_info">Ақпарат</string>
@@ -632,7 +622,6 @@
     <string name="net_hint_sim">Оператор немесе MCC+MNC, мысалы Beeline не 40101</string>
     <string name="net_sim_picker_title">Телефондағы SIM карталар</string>
     <string name="net_sim_picker_empty">SIM табылмады</string>
-    <string name="net_dns_title">DNS</string>
     <string name="net_dns_hijack">DNS-ті ядроға бағыттау</string>
     <string name="net_dns_hijack_on">53-порт сұрауларын ядро өңдейді</string>
     <string name="net_dns_hijack_off">DNS жүйеге немесе басқа модульге қалады (AdGuard Home)</string>

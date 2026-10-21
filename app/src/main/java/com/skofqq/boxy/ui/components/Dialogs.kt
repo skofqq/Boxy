@@ -43,7 +43,7 @@ fun InputDialog(
 ) {
     var values by remember { mutableStateOf(fields.map { it.second }) }
     var error by remember { mutableStateOf<String?>(null) }
-    AlertDialog(
+    GlassAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
@@ -75,7 +75,7 @@ fun ConfigErrorDialog(
     onDismiss: () -> Unit,
     onEdit: (() -> Unit)? = null,
 ) {
-    AlertDialog(
+    GlassAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.check_failed_title)) },
         text = {
@@ -126,7 +126,7 @@ fun ConfirmDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
+    GlassAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = { Text(message) },
