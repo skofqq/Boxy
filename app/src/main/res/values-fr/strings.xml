@@ -736,7 +736,7 @@
     <string name="proxies_title">Proxys</string>
     <string name="proxies_sub">Groupes : %1$d</string>
     <string name="proxies_hint">Groupes et nœuds du cœur</string>
-    <string name="proxies_stopped">Le service n’est pas lancé. Démarrez-le pour voir les groupes.</string>
+    <string name="proxies_stopped">Démarrez-le pour voir les groupes et changer de nœud.</string>
     <string name="proxies_no_api">L’API du cœur est indisponible : la configuration doit contenir external-controller (clash) ou clash_api (sing-box).</string>
     <string name="proxies_test">Tester la latence</string>
     <string name="proxies_timeout">délai dépassé</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">Nœud actuel</string>
     <string name="panel_boxy">Boxy (intégré)</string>
     <string name="panel_boxy_sub">Groupes et nœuds sans panneau web</string>
+    <string name="proxies_stopped_title">Service arrêté</string>
+    <string name="proxies_no_api_title">Pas d’accès au cœur</string>
 </resources>

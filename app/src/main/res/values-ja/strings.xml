@@ -736,7 +736,7 @@
     <string name="proxies_title">プロキシ</string>
     <string name="proxies_sub">グループ：%1$d</string>
     <string name="proxies_hint">コアのプロキシグループとノード</string>
-    <string name="proxies_stopped">サービスが動作していません。起動するとグループが表示されます。</string>
+    <string name="proxies_stopped">起動するとプロキシグループを表示し、ノードを切り替えられます。</string>
     <string name="proxies_no_api">コアの API を利用できません：設定に external-controller（clash）または clash_api（sing-box）が必要です。</string>
     <string name="proxies_test">遅延をテスト</string>
     <string name="proxies_timeout">タイムアウト</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">現在のノード</string>
     <string name="panel_boxy">Boxy（内蔵）</string>
     <string name="panel_boxy_sub">Web パネルなしでグループとノード</string>
+    <string name="proxies_stopped_title">サービスは停止中</string>
+    <string name="proxies_no_api_title">コアにアクセスできません</string>
 </resources>

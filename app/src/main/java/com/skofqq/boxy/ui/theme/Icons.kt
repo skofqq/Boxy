@@ -307,6 +307,9 @@ object BoxyIcons {
     /** Arrow in a circle: the node a group goes through. */
     val ArrowCircle = strokeIcon("ArrowCircle", "M12,3a9,9 0 1 0 0.01,0zM8,12h8M13,9l3,3 -3,3")
 
+    /** Power symbol: start the service. */
+    val Power = strokeIcon("Power", "M12,3v8M7.05,6.05a7,7 0 1 0 9.9,0")
+
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =
         ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)

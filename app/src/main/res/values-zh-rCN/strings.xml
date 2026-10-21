@@ -707,7 +707,7 @@
     <string name="proxies_title">代理</string>
     <string name="proxies_sub">分组：%1$d</string>
     <string name="proxies_hint">核心的代理分组和节点</string>
-    <string name="proxies_stopped">服务未运行。启动后即可查看代理分组。</string>
+    <string name="proxies_stopped">启动后即可查看代理分组并切换节点。</string>
     <string name="proxies_no_api">核心 API 不可用：配置中需要 external-controller（clash）或 clash_api（sing-box）。</string>
     <string name="proxies_test">测试延迟</string>
     <string name="proxies_timeout">超时</string>
@@ -746,4 +746,6 @@
     <string name="layout_section_proxy">当前节点</string>
     <string name="panel_boxy">Boxy（内置）</string>
     <string name="panel_boxy_sub">无需网页面板的分组和节点</string>
+    <string name="proxies_stopped_title">服务已停止</string>
+    <string name="proxies_no_api_title">无法访问核心</string>
 </resources>

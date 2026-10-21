@@ -736,7 +736,7 @@
     <string name="proxies_title">Проксі</string>
     <string name="proxies_sub">Груп: %1$d</string>
     <string name="proxies_hint">Групы і вузлы ядра</string>
-    <string name="proxies_stopped">Сэрвіс не запушчаны. Запусціце яго, каб убачыць групы проксі.</string>
+    <string name="proxies_stopped">Запусціце яго, каб бачыць групы проксі і пераключаць вузлы.</string>
     <string name="proxies_no_api">API ядра недаступны: у канфігурацыі патрэбны external-controller (clash) або clash_api (sing-box).</string>
     <string name="proxies_test">Праверыць затрымку</string>
     <string name="proxies_timeout">тайм-аўт</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">Бягучы вузел</string>
     <string name="panel_boxy">Boxy (убудаваны)</string>
     <string name="panel_boxy_sub">Групы і вузлы без вэб-панэлі</string>
+    <string name="proxies_stopped_title">Сэрвіс спынены</string>
+    <string name="proxies_no_api_title">Няма доступу да ядра</string>
 </resources>

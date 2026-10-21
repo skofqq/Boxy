@@ -736,7 +736,7 @@
     <string name="proxies_title">Прокси</string>
     <string name="proxies_sub">Топтар: %1$d</string>
     <string name="proxies_hint">Ядроның топтары мен түйіндері</string>
-    <string name="proxies_stopped">Қызмет іске қосылмаған. Прокси топтарын көру үшін оны іске қосыңыз.</string>
+    <string name="proxies_stopped">Прокси топтарын көріп, түйіндерді ауыстыру үшін оны іске қосыңыз.</string>
     <string name="proxies_no_api">Ядро API қолжетімсіз: конфигурацияда external-controller (clash) немесе clash_api (sing-box) керек.</string>
     <string name="proxies_test">Кідірісті тексеру</string>
     <string name="proxies_timeout">күту уақыты бітті</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">Ағымдағы түйін</string>
     <string name="panel_boxy">Boxy (кірістірілген)</string>
     <string name="panel_boxy_sub">Веб-панельсіз топтар мен түйіндер</string>
+    <string name="proxies_stopped_title">Қызмет тоқтатылған</string>
+    <string name="proxies_no_api_title">Ядроға қол жетімсіз</string>
 </resources>

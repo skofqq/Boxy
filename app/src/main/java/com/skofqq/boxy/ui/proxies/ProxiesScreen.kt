@@ -42,6 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.material3.toShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -89,6 +91,8 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
     val testing = remember { mutableStateMapOf<String, Boolean>() }
     var expanded by remember { mutableStateOf<String?>(null) }
     var reload by remember { mutableStateOf(0) }
+    var starting by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     suspend fun refresh() {
         val s = runCatching { BoxModule.state() }.getOrNull()
@@ -131,6 +135,21 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         }
     }
 
+    fun start() {
+        if (starting) return
+        starting = true
+        scope.launch {
+            com.skofqq.boxy.service.BoxControl.start(context.applicationContext)
+            // The core opens its API a moment after it starts.
+            repeat(8) {
+                refresh()
+                if (state == LoadState.READY) return@repeat
+                kotlinx.coroutines.delay(1000)
+            }
+            starting = false
+        }
+    }
+
     fun select(group: ProxyGroup, name: String) {
         val a = api ?: return
         scope.launch { if (Net.clashSelect(a, group.name, name)) refresh() }
@@ -169,11 +188,15 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
                 Box(Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             }
             LoadState.STOPPED, LoadState.NO_API -> item {
-                Text(
-                    stringResource(if (state == LoadState.STOPPED) R.string.proxies_stopped else R.string.proxies_no_api),
-                    Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 40.dp),
-                    color = Boxy.colors.text2,
-                    style = MaterialTheme.typography.bodyLarge,
+                val stopped = state == LoadState.STOPPED
+                EmptyState(
+                    Modifier.fillParentMaxHeight(0.82f),
+                    icon = if (stopped) BoxyIcons.Power else BoxyIcons.Core,
+                    title = stringResource(if (stopped) R.string.proxies_stopped_title else R.string.proxies_no_api_title),
+                    body = stringResource(if (stopped) R.string.proxies_stopped else R.string.proxies_no_api),
+                    action = if (stopped) stringResource(R.string.action_start) else stringResource(R.string.action_refresh),
+                    busy = starting,
+                    onAction = { if (stopped) start() else reload++ },
                 )
             }
             LoadState.READY -> {
@@ -206,6 +229,75 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
 }
 
 private enum class LoadState { LOADING, STOPPED, NO_API, READY }
+
+/**
+ * Material 3 Expressive empty state: a slowly turning cookie shape with the symbol, a title, a line of help
+ * and one big action (start the service / try again). While the action runs the shape becomes the
+ * shape-morphing loading indicator.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun EmptyState(
+    modifier: Modifier,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    body: String,
+    action: String,
+    busy: Boolean,
+    onAction: () -> Unit,
+) {
+    val turn by androidx.compose.animation.core.rememberInfiniteTransition(label = "empty").animateFloat(
+        0f,
+        360f,
+        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(24_000, easing = androidx.compose.animation.core.LinearEasing)),
+        label = "turn",
+    )
+    val appear = remember { androidx.compose.animation.core.Animatable(0f) }
+    LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.55f, stiffness = 300f)) }
+    Column(
+        modifier.fillMaxWidth().padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Box(Modifier.size(150.dp).graphicsLayer { scaleX = appear.value; scaleY = appear.value }, contentAlignment = Alignment.Center) {
+            androidx.compose.animation.AnimatedContent(busy, label = "empty-shape") { b ->
+                Box(Modifier.size(150.dp), contentAlignment = Alignment.Center) {
+                    if (b) {
+                        androidx.compose.material3.LoadingIndicator(Modifier.size(120.dp), color = Boxy.colors.accent)
+                    } else {
+                        Box(
+                            Modifier.size(140.dp).graphicsLayer { rotationZ = turn }
+                                .clip(androidx.compose.material3.MaterialShapes.Cookie12Sided.toShape())
+                                .background(Boxy.colors.accent.copy(alpha = 0.16f)),
+                        )
+                        Box(
+                            Modifier.size(72.dp).clip(androidx.compose.material3.MaterialShapes.Cookie4Sided.toShape())
+                                .background(Boxy.colors.accent),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(icon, null, Modifier.size(34.dp), tint = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Spacer(Modifier.height(8.dp))
+        Text(body, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Spacer(Modifier.height(28.dp))
+        Row(
+            Modifier.clip(RoundedCornerShape(50)).background(if (busy) Boxy.colors.accent.copy(alpha = 0.5f) else Boxy.colors.accent)
+                .clickable(enabled = !busy, onClick = onAction)
+                .padding(horizontal = 28.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, null, Modifier.size(20.dp), tint = Color.White)
+            Spacer(Modifier.width(10.dp))
+            Text(action, style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
 
 /**
  * The opened group as a card over the page, like Zashboard's: the grid stays where it is, the rest of the

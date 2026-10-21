@@ -760,7 +760,7 @@
     <string name="proxies_title">Proxies</string>
     <string name="proxies_sub">Groups: %1$d</string>
     <string name="proxies_hint">Proxy groups and nodes of the core</string>
-    <string name="proxies_stopped">The service is not running. Start it to see proxy groups.</string>
+    <string name="proxies_stopped">Start it to see proxy groups and switch nodes.</string>
     <string name="proxies_no_api">The core API is not available: the config needs external-controller (clash) or clash_api (sing-box).</string>
     <string name="proxies_test">Test delay</string>
     <string name="proxies_timeout">timeout</string>
@@ -799,4 +799,6 @@
     <string name="layout_section_proxy">Current proxy</string>
     <string name="panel_boxy">Boxy (built-in)</string>
     <string name="panel_boxy_sub">Proxy groups and nodes without a web panel</string>
+    <string name="proxies_stopped_title">Service stopped</string>
+    <string name="proxies_no_api_title">No access to the core</string>
 </resources>

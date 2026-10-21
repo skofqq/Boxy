@@ -736,7 +736,7 @@
     <string name="proxies_title">Proxies</string>
     <string name="proxies_sub">Grupos: %1$d</string>
     <string name="proxies_hint">Grupos y nodos del núcleo</string>
-    <string name="proxies_stopped">El servicio no está en marcha. Inícialo para ver los grupos.</string>
+    <string name="proxies_stopped">Inícialo para ver los grupos y cambiar de nodo.</string>
     <string name="proxies_no_api">La API del núcleo no está disponible: la configuración necesita external-controller (clash) o clash_api (sing-box).</string>
     <string name="proxies_test">Probar latencia</string>
     <string name="proxies_timeout">tiempo agotado</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">Nodo actual</string>
     <string name="panel_boxy">Boxy (integrado)</string>
     <string name="panel_boxy_sub">Grupos y nodos sin panel web</string>
+    <string name="proxies_stopped_title">Servicio detenido</string>
+    <string name="proxies_no_api_title">Sin acceso al núcleo</string>
 </resources>

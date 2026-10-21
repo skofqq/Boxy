@@ -736,7 +736,7 @@
     <string name="proxies_title">Proxy\'ler</string>
     <string name="proxies_sub">Grup: %1$d</string>
     <string name="proxies_hint">Çekirdeğin proxy grupları ve düğümleri</string>
-    <string name="proxies_stopped">Hizmet çalışmıyor. Grupları görmek için başlatın.</string>
+    <string name="proxies_stopped">Proxy gruplarını görmek ve düğüm değiştirmek için başlatın.</string>
     <string name="proxies_no_api">Çekirdek API\'si kullanılamıyor: yapılandırmada external-controller (clash) veya clash_api (sing-box) gerekli.</string>
     <string name="proxies_test">Gecikmeyi test et</string>
     <string name="proxies_timeout">zaman aşımı</string>
@@ -775,4 +775,6 @@
     <string name="layout_section_proxy">Geçerli düğüm</string>
     <string name="panel_boxy">Boxy (yerleşik)</string>
     <string name="panel_boxy_sub">Web paneli olmadan gruplar ve düğümler</string>
+    <string name="proxies_stopped_title">Hizmet durduruldu</string>
+    <string name="proxies_no_api_title">Çekirdeğe erişim yok</string>
 </resources>
