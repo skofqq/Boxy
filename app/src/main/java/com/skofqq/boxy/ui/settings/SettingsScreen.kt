@@ -212,6 +212,14 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     stringResource(R.string.settings_system_bars),
                     stringResource(R.string.settings_bars_summary, barState(prefs.opaqueStatusBar), barState(prefs.opaqueNavBar)),
                 ) { barsDialog = true }
+                // Shortcut to the switch in "More appearance settings"; needs blur effects (Android 12+).
+                SwitchRow(
+                    BoxyIcons.Glass,
+                    stringResource(R.string.settings_glass_elements),
+                    stringResource(R.string.settings_glass_elements_sub),
+                    prefs.glassElements && prefs.blurEffects && Build.VERSION.SDK_INT >= 31,
+                    enabled = prefs.blurEffects && Build.VERSION.SDK_INT >= 31,
+                ) { prefs.updateGlassElements(it) }
                 SwitchRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.nav_apps_desc), checked = prefs.navExtra == NavExtra.APPS) {
                     prefs.setNavPage(NavExtra.APPS, it)
                 }
