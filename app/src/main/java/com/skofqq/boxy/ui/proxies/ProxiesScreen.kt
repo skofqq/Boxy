@@ -42,6 +42,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.Image
 import com.skofqq.boxy.R
 import com.skofqq.boxy.net.ClashApi
 import com.skofqq.boxy.net.Net
@@ -73,7 +81,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
     var state by remember { mutableStateOf(LoadState.LOADING) }
     val delays = remember { mutableStateMapOf<String, Int>() }
     val testing = remember { mutableStateMapOf<String, Boolean>() }
-    val expanded = remember { mutableStateMapOf<String, Boolean>() }
+    var expanded by remember { mutableStateOf<String?>(null) }
     var reload by remember { mutableStateOf(0) }
 
     suspend fun refresh() {
@@ -86,8 +94,6 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
         val snap = a?.let { Net.clashProxies(it) }
         snapshot = snap
         state = if (snap == null) LoadState.NO_API else LoadState.READY
-        // Open the first group the first time, so the page is useful right away.
-        if (snap != null && expanded.isEmpty()) snap.groups.firstOrNull()?.let { expanded[it.name] = true }
     }
     LaunchedEffect(reload) { refresh() }
 
@@ -106,6 +112,16 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
             group.all.forEach { n -> delays[n] = result[n] ?: 0 }
             testing[group.name] = false
             refresh()
+        }
+    }
+
+    fun testNode(name: String) {
+        val a = api ?: return
+        if (testing[name] == true) return
+        testing[name] = true
+        scope.launch {
+            delays[name] = Net.clashProxyDelay(a, name) ?: 0
+            testing[name] = false
         }
     }
 
@@ -138,18 +154,51 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
             }
             LoadState.READY -> {
                 val snap = snapshot ?: return@PinnedLazyPage
+                // Zashboard layout in Boxy's style: group tiles two per row; the open group takes a whole row
+                // and shows its nodes as tiles too.
+                val rows = mutableListOf<List<ProxyGroup>>()
+                var pending = mutableListOf<ProxyGroup>()
                 snap.groups.forEach { g ->
-                    item(key = g.name) {
-                        GroupCard(
-                            g,
-                            snap,
-                            delays,
-                            open = expanded[g.name] == true,
-                            busy = testing[g.name] == true,
-                            onToggle = { expanded[g.name] = expanded[g.name] != true },
-                            onTest = { test(g) },
-                            onSelect = { select(g, it) },
-                        )
+                    if (g.name == expanded) {
+                        if (pending.isNotEmpty()) rows += pending
+                        pending = mutableListOf()
+                        rows += listOf(g)
+                    } else {
+                        pending += g
+                        if (pending.size == 2) {
+                            rows += pending
+                            pending = mutableListOf()
+                        }
+                    }
+                }
+                if (pending.isNotEmpty()) rows += pending
+                rows.forEach { row ->
+                    item(key = row.joinToString("|") { it.name }) {
+                        if (row.size == 1 && row[0].name == expanded) {
+                            val g = row[0]
+                            OpenGroup(
+                                g, snap, delays, testing,
+                                onClose = { expanded = null },
+                                onTestGroup = { test(g) },
+                                onTestNode = ::testNode,
+                                onSelect = { select(g, it) },
+                            )
+                        } else {
+                            Row(
+                                Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(IntrinsicSize.Min),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                row.forEach { g ->
+                                    GroupTile(
+                                        g, snap, delays, testing[g.name] == true,
+                                        Modifier.weight(1f).fillMaxHeight(),
+                                        onOpen = { expanded = g.name },
+                                        onTest = { test(g) },
+                                    )
+                                }
+                                if (row.size == 1) Spacer(Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
             }
@@ -159,87 +208,188 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
 
 private enum class LoadState { LOADING, STOPPED, NO_API, READY }
 
+private fun delayOf(name: String, snap: ProxySnapshot, delays: Map<String, Int>): Int? =
+    delays[name] ?: snap.nodes[name]?.delay?.takeIf { snap.group(name) == null } ?: snap.leaf(name)?.let { delays[it] ?: snap.nodes[it]?.delay }
+
+private fun aliveText(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>): String {
+    val alive = group.all.count { (delayOf(it, snap, delays) ?: 0) > 0 }
+    return "${group.type.uppercase()} · $alive/${group.all.size}"
+}
+
 @Composable
-private fun GroupCard(
+private fun GroupIcon(url: String?, size: Dp) {
+    val context = LocalContext.current
+    val img by produceState<ImageBitmap?>(null, url) { value = url?.let { ProxyIcons.load(context, it) } }
+    img?.let { Image(it, null, Modifier.size(size).clip(RoundedCornerShape(50))) }
+}
+
+/** Group head: name, type with live / total nodes, its icon. */
+@Composable
+private fun GroupHead(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>, iconSize: Dp) {
+    Row(verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f)) {
+            Text(group.name, style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                aliveText(group, snap, delays),
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.2.sp),
+                color = Boxy.colors.text2,
+                maxLines = 1,
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        GroupIcon(group.icon, iconSize)
+    }
+}
+
+/** The node a group goes through, and the group's delay (tap the pill to test the whole group). */
+@Composable
+private fun GroupNow(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>, busy: Boolean, onTest: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(BoxyIcons.ArrowCircle, null, Modifier.size(18.dp), tint = Boxy.colors.text2)
+        Spacer(Modifier.width(6.dp))
+        Text(
+            group.now ?: "—",
+            Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyLarge,
+            color = Boxy.colors.text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(Modifier.width(6.dp))
+        DelayPill(snap.leaf(group.name)?.let { delayOf(it, snap, delays) }, busy, onTest)
+    }
+}
+
+@Composable
+private fun GroupTile(
     group: ProxyGroup,
     snap: ProxySnapshot,
     delays: Map<String, Int>,
-    open: Boolean,
     busy: Boolean,
-    onToggle: () -> Unit,
+    modifier: Modifier,
+    onOpen: () -> Unit,
     onTest: () -> Unit,
+) {
+    Column(
+        modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card).clickable(onClick = onOpen).padding(14.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        GroupHead(group, snap, delays, 44.dp)
+        Spacer(Modifier.height(10.dp))
+        GroupNow(group, snap, delays, busy, onTest)
+    }
+}
+
+@Composable
+private fun OpenGroup(
+    group: ProxyGroup,
+    snap: ProxySnapshot,
+    delays: Map<String, Int>,
+    testing: Map<String, Boolean>,
+    onClose: () -> Unit,
+    onTestGroup: () -> Unit,
+    onTestNode: (String) -> Unit,
     onSelect: (String) -> Unit,
 ) {
-    val leaf = snap.leaf(group.name)
-    fun delayOf(name: String): Int? = delays[name] ?: snap.nodes[name]?.delay ?: snap.leaf(name)?.let { delays[it] ?: snap.nodes[it]?.delay }
-    Column(Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card)) {
-        Row(
-            Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(start = 18.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(group.name, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    listOfNotNull(stringResource(typeLabel(group.type)), leaf).joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Boxy.colors.text2,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            leaf?.let { DelayText(delayOf(it)) }
-            Box(Modifier.size(40.dp).clip(RoundedCornerShape(50)).clickable(enabled = !busy, onClick = onTest), contentAlignment = Alignment.Center) {
-                if (busy) {
-                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                } else {
-                    Icon(BoxyIcons.Speed, stringResource(R.string.proxies_test), Modifier.size(20.dp), tint = Boxy.colors.accent)
-                }
-            }
-            val turn by animateFloatAsState(if (open) 180f else 0f, spring(stiffness = 500f), label = "chevron")
-            Icon(BoxyIcons.ExpandMore, null, Modifier.size(22.dp).rotate(turn), tint = Boxy.colors.text2)
+    Column(Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(26.dp)).background(Boxy.colors.card).padding(14.dp)) {
+        Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
+            GroupHead(group, snap, delays, 52.dp)
+            Spacer(Modifier.height(10.dp))
+            GroupNow(group, snap, delays, testing[group.name] == true, onTestGroup)
         }
-        AnimatedVisibility(open, enter = expandVertically(spring(dampingRatio = 0.85f, stiffness = 420f)) + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-            Column(Modifier.padding(bottom = 8.dp)) {
-                group.all.forEach { name ->
-                    val current = name == group.now
-                    Row(
-                        Modifier.fillMaxWidth()
-                            .then(if (group.selectable) Modifier.clickable { onSelect(name) } else Modifier)
-                            .padding(horizontal = 18.dp, vertical = 9.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            Modifier.size(8.dp).clip(RoundedCornerShape(50))
-                                .background(if (current) Boxy.colors.accent else Color.Transparent),
-                        )
-                        Spacer(Modifier.width(10.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (current) Boxy.colors.accent else Boxy.colors.text,
-                                fontWeight = if (current) FontWeight.SemiBold else FontWeight.Normal,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            snap.nodes[name]?.type?.takeIf { it.isNotBlank() }?.let {
-                                Text(it, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 1)
-                            }
-                        }
-                        DelayText(delayOf(name))
-                    }
-                }
-                if (!group.selectable) {
-                    Text(
-                        stringResource(R.string.proxies_auto_note),
-                        Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Boxy.colors.text2,
+        Spacer(Modifier.height(12.dp))
+        group.all.chunked(2).forEach { pair ->
+            Row(
+                Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                pair.forEach { name ->
+                    NodeTile(
+                        name,
+                        snap,
+                        delays,
+                        selected = name == group.now,
+                        busy = testing[name] == true || testing[group.name] == true,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        onClick = if (group.selectable) ({ onSelect(name) }) else null,
+                        onTest = { onTestNode(name) },
                     )
                 }
+                if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
         }
-        Spacer(Modifier.height(2.dp))
+        if (!group.selectable) {
+            Text(stringResource(R.string.proxies_auto_note), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+        }
+    }
+}
+
+@Composable
+private fun NodeTile(
+    name: String,
+    snap: ProxySnapshot,
+    delays: Map<String, Int>,
+    selected: Boolean,
+    busy: Boolean,
+    modifier: Modifier,
+    onClick: (() -> Unit)?,
+    onTest: () -> Unit,
+) {
+    val node = snap.nodes[name]
+    val proto = node?.let { n ->
+        val transport = when {
+            n.xudp -> "xudp"
+            n.udp -> "udp"
+            else -> null
+        }
+        listOfNotNull(n.type.lowercase().ifBlank { null }, transport).joinToString(" / ")
+    }
+    Column(
+        modifier.clip(RoundedCornerShape(16.dp))
+            .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Boxy.colors.surface2)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            name,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (selected) Boxy.colors.accent else Boxy.colors.text,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(proto.orEmpty(), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            DelayPill(delayOf(name, snap, delays), busy, onTest)
+        }
+    }
+}
+
+/** Delay pill: the number in its colour, a bolt before the first test, a cross on timeout; tap to test. */
+@Composable
+private fun DelayPill(delay: Int?, busy: Boolean, onTest: () -> Unit) {
+    Box(
+        Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.page).clickable(enabled = !busy, onClick = onTest)
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        when {
+            busy -> CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp)
+            delay == null -> Icon(BoxyIcons.Bolt, stringResource(R.string.proxies_test), Modifier.size(14.dp), tint = Boxy.colors.text2)
+            delay <= 0 -> Text("×", style = MaterialTheme.typography.labelMedium, color = Tints.red.fg)
+            else -> Text(
+                delay.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = when {
+                    delay < 300 -> Tints.green.fg
+                    delay < 800 -> Tints.amber.fg
+                    else -> Tints.red.fg
+                },
+            )
+        }
     }
 }
 
@@ -254,12 +404,4 @@ fun DelayText(delay: Int?) {
         else -> stringResource(R.string.unit_ms, delay) to Tints.red.fg
     }
     Text(text, Modifier.padding(start = 8.dp), style = MaterialTheme.typography.labelMedium, color = color, maxLines = 1)
-}
-
-private fun typeLabel(type: String): Int = when (type) {
-    "Selector" -> R.string.proxies_type_select
-    "URLTest" -> R.string.proxies_type_auto
-    "Fallback" -> R.string.proxies_type_fallback
-    "LoadBalance" -> R.string.proxies_type_balance
-    else -> R.string.proxies_type_other
 }

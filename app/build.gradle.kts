@@ -19,8 +19,8 @@ android {
         applicationId = "com.skofqq.boxy"
         minSdk = 28
         targetSdk = 36
-        versionCode = 44
-        versionName = "0.6.0"
+        versionCode = 45
+        versionName = "0.6.1"
     }
 
     signingConfigs {
@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
+    // Proxy group icons in configs are usually SVG
+    implementation(libs.androidsvg)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

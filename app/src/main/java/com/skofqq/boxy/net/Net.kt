@@ -45,9 +45,16 @@ data class ClashApi(val base: String, val secret: String?)
 
 data class CoreConnection(val id: String, val app: String?, val uid: Int?, val upload: Long, val download: Long, val direct: Boolean)
 
-data class ProxyNode(val name: String, val type: String, /** Last test in ms, 0 = timed out, null = never tested. */ val delay: Int?)
+data class ProxyNode(
+    val name: String,
+    val type: String,
+    /** Last test in ms, 0 = timed out, null = never tested. */
+    val delay: Int?,
+    val udp: Boolean = false,
+    val xudp: Boolean = false,
+)
 
-data class ProxyGroup(val name: String, val type: String, val now: String?, val all: List<String>) {
+data class ProxyGroup(val name: String, val type: String, val now: String?, val all: List<String>, val icon: String? = null) {
     val selectable: Boolean get() = type == "Selector"
 }
 
@@ -328,10 +335,36 @@ object Net {
                     val type = p.optString("type")
                     val history = p.optJSONArray("history")
                     val delay = history?.takeIf { it.length() > 0 }?.optJSONObject(history.length() - 1)?.optInt("delay")
-                    nodes[name] = ProxyNode(name, type, delay)
+                    nodes[name] = ProxyNode(name, type, delay, p.optBoolean("udp"), p.optBoolean("xudp"))
                     val members = p.optJSONArray("all")
                     if (members != null && type in GROUP_TYPES) {
-                        groups[name] = ProxyGroup(name, type, p.optString("now").ifBlank { null }, (0 until members.length()).map { members.optString(it) })
+                        groups[name] = ProxyGroup(
+                            name,
+                            type,
+                            p.optString("now").ifBlank { null },
+                            (0 until members.length()).map { members.optString(it) },
+                            p.optString("icon").takeIf { it.startsWith("http") },
+                        )
+                    }
+                }
+                // Nodes from proxy-providers (subscriptions) are listed under /providers/proxies, not /proxies.
+                runCatching {
+                    val pc = openApi(api, "/providers/proxies")
+                    try {
+                        val providers = JSONObject(pc.inputStream.bufferedReader().readText()).optJSONObject("providers")
+                        providers?.keys()?.forEach { key ->
+                            val list = providers.optJSONObject(key)?.optJSONArray("proxies") ?: return@forEach
+                            for (i in 0 until list.length()) {
+                                val p = list.optJSONObject(i) ?: continue
+                                val name = p.optString("name").ifBlank { continue }
+                                if (name in nodes) continue
+                                val history = p.optJSONArray("history")
+                                val delay = history?.takeIf { it.length() > 0 }?.optJSONObject(history.length() - 1)?.optInt("delay")
+                                nodes[name] = ProxyNode(name, p.optString("type"), delay, p.optBoolean("udp"), p.optBoolean("xudp"))
+                            }
+                        }
+                    } finally {
+                        pc.disconnect()
                     }
                 }
                 val order = groups["GLOBAL"]?.all.orEmpty()

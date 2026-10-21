@@ -8,8 +8,10 @@ activityCompose = "1.13.0"
 libsu = "6.0.0"
 soraEditor = "0.24.6"
 zxingEmbedded = "4.3.0"
+androidsvg = "1.4"
 
 [libraries]
+androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidsvg" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

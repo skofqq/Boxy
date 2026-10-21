@@ -301,6 +301,12 @@ object BoxyIcons {
     /** Letter T with a baseline: rename. */
     val Rename = strokeIcon("Rename", "M5,7v-2h14v2M12,5v14M9,19h6")
 
+    /** Lightning bolt: test delay. */
+    val Bolt = strokeIcon("Bolt", "M13,3l-8,11h6l-1,7 8,-11h-6z")
+
+    /** Arrow in a circle: the node a group goes through. */
+    val ArrowCircle = strokeIcon("ArrowCircle", "M12,3a9,9 0 1 0 0.01,0zM8,12h8M13,9l3,3 -3,3")
+
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =
         ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
