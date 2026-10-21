@@ -263,11 +263,11 @@ private fun GroupIcon(url: String?, size: Dp) {
 private fun GroupHead(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>, iconSize: Dp) {
     Row(verticalAlignment = Alignment.Top) {
         Column(Modifier.weight(1f)) {
-            Text(group.name, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(group.name, style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold), color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(4.dp))
             Text(
                 aliveText(group, snap, delays),
-                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.2.sp),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, letterSpacing = 1.sp),
                 color = Boxy.colors.text2,
                 maxLines = 1,
             )
@@ -281,12 +281,12 @@ private fun GroupHead(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String
 @Composable
 private fun GroupNow(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>, busy: Boolean, onTest: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(BoxyIcons.ArrowCircle, null, Modifier.size(18.dp), tint = Boxy.colors.text2)
+        Icon(BoxyIcons.ArrowCircle, null, Modifier.size(16.dp), tint = Boxy.colors.text2)
         Spacer(Modifier.width(6.dp))
         Text(
             group.now ?: "—",
             Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
             color = Boxy.colors.text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -310,8 +310,8 @@ private fun GroupTile(
         modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card).clickable(onClick = onOpen).padding(14.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        GroupHead(group, snap, delays, 44.dp)
-        Spacer(Modifier.height(10.dp))
+        GroupHead(group, snap, delays, 38.dp)
+        Spacer(Modifier.height(8.dp))
         GroupNow(group, snap, delays, busy, onTest)
     }
 }
@@ -330,7 +330,7 @@ private fun OpenGroup(
 ) {
     Column(modifier) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
-            GroupHead(group, snap, delays, 52.dp)
+            GroupHead(group, snap, delays, 46.dp)
             Spacer(Modifier.height(10.dp))
             GroupNow(group, snap, delays, testing[group.name] == true, onTestGroup)
         }
@@ -390,7 +390,7 @@ private fun NodeTile(
     ) {
         Text(
             name,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
             color = if (selected) Boxy.colors.accent else Boxy.colors.text,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             maxLines = 1,
@@ -398,7 +398,7 @@ private fun NodeTile(
         )
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(proto.orEmpty(), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(proto.orEmpty(), Modifier.weight(1f), style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
             DelayPill(delayOf(name, snap, delays), busy, onTest)
         }
     }
@@ -409,16 +409,16 @@ private fun NodeTile(
 private fun DelayPill(delay: Int?, busy: Boolean, onTest: () -> Unit) {
     Box(
         Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.page).clickable(enabled = !busy, onClick = onTest)
-            .padding(horizontal = 10.dp, vertical = 4.dp),
+            .padding(horizontal = 9.dp, vertical = 3.dp),
         contentAlignment = Alignment.Center,
     ) {
         when {
             busy -> CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp)
             delay == null -> Icon(BoxyIcons.Bolt, stringResource(R.string.proxies_test), Modifier.size(14.dp), tint = Boxy.colors.text2)
-            delay <= 0 -> Text("×", style = MaterialTheme.typography.labelMedium, color = Tints.red.fg)
+            delay <= 0 -> Text("×", style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = Tints.red.fg)
             else -> Text(
                 delay.toString(),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
                 color = when {
                     delay < 300 -> Tints.green.fg
                     delay < 800 -> Tints.amber.fg
