@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Grupos y nodos sin panel web</string>
     <string name="proxies_stopped_title">Servicio detenido</string>
     <string name="proxies_no_api_title">Sin acceso al núcleo</string>
-    <string name="settings_latency_presets">Elección rápida</string>
+    <string name="settings_latency_limit">Como máximo %1$d activos</string>
+    <string name="settings_latency_keep_one">Deja al menos una dirección</string>
+    <string name="settings_latency_selected">Activos: %1$d de %2$d</string>
+    <string name="settings_latency_add">Dirección propia</string>
+    <string name="settings_latency_hint">Toca una tarjeta para activarla o desactivarla. Hasta %1$d activas; el número es su orden en el inicio.</string>
 </resources>

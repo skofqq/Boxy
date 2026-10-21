@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Web paneli olmadan gruplar ve düğümler</string>
     <string name="proxies_stopped_title">Hizmet durduruldu</string>
     <string name="proxies_no_api_title">Çekirdeğe erişim yok</string>
-    <string name="settings_latency_presets">Hızlı seçim</string>
+    <string name="settings_latency_limit">En fazla %1$d etkin olabilir</string>
+    <string name="settings_latency_keep_one">En az bir adres kalmalı</string>
+    <string name="settings_latency_selected">Etkin: %1$d / %2$d</string>
+    <string name="settings_latency_add">Kendi adresin</string>
+    <string name="settings_latency_hint">Açmak veya kapatmak için karta dokunun. En fazla %1$d etkin; numara ana ekrandaki sıradır.</string>
 </resources>

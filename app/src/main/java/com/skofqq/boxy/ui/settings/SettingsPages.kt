@@ -46,6 +46,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.skofqq.boxy.ui.components.InputDialog
+import com.skofqq.boxy.ui.components.HeaderAction
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import com.skofqq.boxy.BoxyApp
@@ -194,8 +198,8 @@ private fun SliderRow(
 
 /** Services offered for the latency test (small, fast answers where possible). */
 private val LATENCY_PRESETS = listOf(
-    LatencyTarget("Google", "https://www.google.com/generate_204"),
-    LatencyTarget("Cloudflare", "https://cp.cloudflare.com"),
+    LatencyTarget("Google", "https://google.com"),
+    LatencyTarget("Cloudflare", "https://cloudflare.com"),
     LatencyTarget("YouTube", "https://www.youtube.com/generate_204"),
     LatencyTarget("Telegram", "https://web.telegram.org"),
     LatencyTarget("GitHub", "https://github.com"),
@@ -207,116 +211,127 @@ private val LATENCY_PRESETS = listOf(
     LatencyTarget("Baidu", "https://baidu.com"),
 )
 
+/** Most targets the home Latency card shows. */
+private const val MAX_LATENCY_TARGETS = 3
+
 /**
- * Name and URL of each latency target shown on the home page. BFR-style card: each target is a compact
- * "#n / name · host" row that expands into its name and URL fields when tapped.
+ * Latency test targets as a grid of provider cards: a tap makes a card active (highlighted, with its place
+ * in the order) or inactive again; up to [MAX_LATENCY_TARGETS] at once. Saved right away. A custom address
+ * can be added as a card of its own.
  */
 @Composable
 fun LatencyTargetsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () -> Unit) {
     val context = LocalContext.current
     val colors = Boxy.colors
-    var targets by remember { mutableStateOf(prefs.latencyTargets) }
-    var open by remember { mutableStateOf(-1) }
+    var active by remember { mutableStateOf(prefs.latencyTargets) }
+    // Custom addresses (not among the presets) stay as cards even when switched off during this visit.
+    var customs by remember { mutableStateOf(prefs.latencyTargets.filter { t -> LATENCY_PRESETS.none { it.url == t.url } }) }
+    var addDialog by remember { mutableStateOf(false) }
+    val limit = stringResource(R.string.settings_latency_limit, MAX_LATENCY_TARGETS)
+
+    fun save(list: List<LatencyTarget>) {
+        active = list
+        prefs.updateLatencyTargets(list.ifEmpty { null })
+    }
+
+    fun toggle(t: LatencyTarget) {
+        val on = active.any { it.url == t.url }
+        when {
+            on && active.size == 1 -> Toast.makeText(context, R.string.settings_latency_keep_one, Toast.LENGTH_SHORT).show()
+            on -> save(active.filter { it.url != t.url })
+            active.size >= MAX_LATENCY_TARGETS -> Toast.makeText(context, limit, Toast.LENGTH_SHORT).show()
+            else -> save(active + t)
+        }
+    }
+
     PinnedLazyPage(contentPadding, header = {
-        SubPageHeader(stringResource(R.string.settings_latency_targets), stringResource(R.string.settings_latency_targets_sub), onBack)
-    }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item {
-            SectionCard(null) {
-                Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    targets.forEachIndexed { i, t ->
-                        val expanded = open == i
-                        Column(
-                            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(colors.surface2)
-                                .animateContentSize(),
-                        ) {
-                            Column(
-                                Modifier.fillMaxWidth().clickable { open = if (expanded) -1 else i }
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                            ) {
-                                Text("#${i + 1}", style = MaterialTheme.typography.labelMedium, color = colors.text2)
-                                val host = t.url.trim().substringAfter("://").trimEnd('/')
-                                Text(
-                                    listOf(t.name.trim(), host).filter { it.isNotEmpty() }.joinToString("  ·  ").ifEmpty { "—" },
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = colors.text,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                            if (expanded) {
-                                Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    // Quick pick of well-known services; the fields below stay editable.
-                                    LatencyFieldLabel(BoxyIcons.Router, stringResource(R.string.settings_latency_presets))
-                                    Row(
-                                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        LATENCY_PRESETS.forEach { preset ->
-                                            com.skofqq.boxy.ui.components.GlassChip(preset.name, preset.url == t.url.trim()) {
-                                                targets = targets.toMutableList().also { it[i] = preset }
-                                            }
-                                        }
-                                    }
-                                    LatencyFieldLabel(BoxyIcons.Tune, stringResource(R.string.settings_latency_name))
-                                    BoxyTextField(
-                                        t.name,
-                                        { v -> targets = targets.toMutableList().also { it[i] = t.copy(name = v) } },
-                                        stringResource(R.string.settings_latency_name),
-                                        Modifier.fillMaxWidth(),
-                                        container = colors.card,
-                                    )
-                                    LatencyFieldLabel(BoxyIcons.Link, stringResource(R.string.settings_latency_url))
-                                    BoxyTextField(
-                                        t.url,
-                                        { v -> targets = targets.toMutableList().also { it[i] = t.copy(url = v) } },
-                                        "https://",
-                                        Modifier.fillMaxWidth(),
-                                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Uri,
-                                        container = colors.card,
-                                    )
-                                }
-                            }
-                        }
+        SubPageHeader(
+            stringResource(R.string.settings_latency_targets),
+            stringResource(R.string.settings_latency_selected, active.size, MAX_LATENCY_TARGETS),
+            onBack,
+        ) {
+            HeaderAction(BoxyIcons.Add, stringResource(R.string.settings_latency_add)) { addDialog = true }
+        }
+    }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        val cards = LATENCY_PRESETS + customs
+        cards.chunked(2).forEach { pair ->
+            item(key = pair.joinToString("|") { it.url }) {
+                Row(
+                    Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    pair.forEach { t ->
+                        val place = active.indexOfFirst { it.url == t.url }
+                        LatencyCard(t, place, Modifier.weight(1f).fillMaxHeight()) { toggle(t) }
                     }
-                    Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Box(
-                            Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(18.dp))
-                                .border(1.dp, colors.outline, RoundedCornerShape(18.dp))
-                                .clickable {
-                                    targets = DEFAULT_LATENCY_TARGETS
-                                    open = -1
-                                    prefs.updateLatencyTargets(null)
-                                },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(stringResource(R.string.action_reset), color = colors.text, fontWeight = FontWeight.SemiBold)
-                        }
-                        Box(
-                            Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(18.dp)).background(colors.accent)
-                                .clickable {
-                                    val clean = targets.map { LatencyTarget(it.name.trim().ifBlank { it.url }, it.url.trim()) }.filter { it.url.isNotBlank() }
-                                    prefs.updateLatencyTargets(clean.ifEmpty { null })
-                                    Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
-                                    onBack()
-                                },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(stringResource(R.string.action_save), color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
         }
+        item {
+            Text(
+                stringResource(R.string.settings_latency_hint, MAX_LATENCY_TARGETS),
+                Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.text2,
+            )
+        }
+    }
+
+    if (addDialog) {
+        val urlInvalid = stringResource(R.string.panel_error_url_invalid)
+        InputDialog(
+            stringResource(R.string.settings_latency_add),
+            listOf(stringResource(R.string.settings_latency_name) to "", stringResource(R.string.settings_latency_url) to "https://"),
+            confirm = stringResource(R.string.action_add),
+            validate = { v -> if (!(v[1].startsWith("http://") || v[1].startsWith("https://")) || v[1].length < 10) urlInvalid else null },
+            onConfirm = { v ->
+                val t = LatencyTarget(v[0].ifBlank { v[1].substringAfter("://").substringBefore('/') }, v[1])
+                if (customs.none { it.url == t.url } && LATENCY_PRESETS.none { it.url == t.url }) customs = customs + t
+                if (active.none { it.url == t.url } && active.size < MAX_LATENCY_TARGETS) save(active + t)
+                addDialog = false
+            },
+            onDismiss = { addDialog = false },
+        )
     }
 }
 
+/** Provider card: name and host; highlighted with its number in the order when active. */
 @Composable
-private fun LatencyFieldLabel(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
-    Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, Modifier.size(20.dp), tint = Boxy.colors.text2)
-        Spacer(Modifier.width(10.dp))
-        Text(text, style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text)
+private fun LatencyCard(t: LatencyTarget, place: Int, modifier: Modifier, onClick: () -> Unit) {
+    val colors = Boxy.colors
+    val on = place >= 0
+    Column(
+        modifier.clip(RoundedCornerShape(20.dp))
+            .background(if (on) colors.accent.copy(alpha = 0.16f) else colors.card)
+            .border(1.5.dp, if (on) colors.accent else androidx.compose.ui.graphics.Color.Transparent, RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                t.name,
+                Modifier.weight(1f),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
+                color = if (on) colors.accent else colors.text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (on) {
+                Box(Modifier.size(22.dp).clip(RoundedCornerShape(50)).background(colors.accent), contentAlignment = Alignment.Center) {
+                    Text((place + 1).toString(), style = MaterialTheme.typography.labelSmall, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            t.url.substringAfter("://").substringBefore('/'),
+            style = MaterialTheme.typography.bodySmall,
+            color = colors.text2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

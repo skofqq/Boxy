@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Groupes et nœuds sans panneau web</string>
     <string name="proxies_stopped_title">Service arrêté</string>
     <string name="proxies_no_api_title">Pas d’accès au cœur</string>
-    <string name="settings_latency_presets">Choix rapide</string>
+    <string name="settings_latency_limit">Au plus %1$d actives</string>
+    <string name="settings_latency_keep_one">Gardez au moins une adresse</string>
+    <string name="settings_latency_selected">Actives : %1$d sur %2$d</string>
+    <string name="settings_latency_add">Adresse perso</string>
+    <string name="settings_latency_hint">Touchez une carte pour l’activer ou la désactiver. Jusqu’à %1$d actives ; le numéro est leur ordre sur l’accueil.</string>
 </resources>

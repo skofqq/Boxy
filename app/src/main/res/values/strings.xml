@@ -801,5 +801,9 @@
     <string name="panel_boxy_sub">Proxy groups and nodes without a web panel</string>
     <string name="proxies_stopped_title">Service stopped</string>
     <string name="proxies_no_api_title">No access to the core</string>
-    <string name="settings_latency_presets">Quick pick</string>
+    <string name="settings_latency_limit">Up to %1$d can be active</string>
+    <string name="settings_latency_keep_one">Keep at least one address</string>
+    <string name="settings_latency_selected">Active: %1$d of %2$d</string>
+    <string name="settings_latency_add">Own address</string>
+    <string name="settings_latency_hint">Tap a card to turn it on or off. Up to %1$d can be active; the number is their order on Home.</string>
 </resources>

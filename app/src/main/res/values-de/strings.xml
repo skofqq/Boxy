@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Proxy-Gruppen und Knoten ohne Web-Panel</string>
     <string name="proxies_stopped_title">Dienst gestoppt</string>
     <string name="proxies_no_api_title">Kein Zugriff auf den Kern</string>
-    <string name="settings_latency_presets">Schnellauswahl</string>
+    <string name="settings_latency_limit">Höchstens %1$d können aktiv sein</string>
+    <string name="settings_latency_keep_one">Mindestens eine Adresse behalten</string>
+    <string name="settings_latency_selected">Aktiv: %1$d von %2$d</string>
+    <string name="settings_latency_add">Eigene Adresse</string>
+    <string name="settings_latency_hint">Tippe auf eine Karte, um sie ein- oder auszuschalten. Bis zu %1$d können aktiv sein; die Zahl ist ihre Reihenfolge auf der Startseite.</string>
 </resources>

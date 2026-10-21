@@ -748,5 +748,9 @@
     <string name="panel_boxy_sub">无需网页面板的分组和节点</string>
     <string name="proxies_stopped_title">服务已停止</string>
     <string name="proxies_no_api_title">无法访问核心</string>
-    <string name="settings_latency_presets">快速选择</string>
+    <string name="settings_latency_limit">最多可启用 %1$d 个</string>
+    <string name="settings_latency_keep_one">至少保留一个地址</string>
+    <string name="settings_latency_selected">已启用：%1$d / %2$d</string>
+    <string name="settings_latency_add">自定义地址</string>
+    <string name="settings_latency_hint">点按卡片即可启用或停用。最多启用 %1$d 个；数字为其在主页上的顺序。</string>
 </resources>

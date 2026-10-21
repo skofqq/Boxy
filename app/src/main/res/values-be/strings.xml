@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Групы і вузлы без вэб-панэлі</string>
     <string name="proxies_stopped_title">Сэрвіс спынены</string>
     <string name="proxies_no_api_title">Няма доступу да ядра</string>
-    <string name="settings_latency_presets">Хуткі выбар</string>
+    <string name="settings_latency_limit">Актыўных можа быць не больш за %1$d</string>
+    <string name="settings_latency_keep_one">Патрэбны хаця б адзін адрас</string>
+    <string name="settings_latency_selected">Актыўна: %1$d з %2$d</string>
+    <string name="settings_latency_add">Свой адрас</string>
+    <string name="settings_latency_hint">Націсніце на картку, каб уключыць або выключыць яе. Актыўных можа быць да %1$d; нумар — парадак на галоўнай.</string>
 </resources>

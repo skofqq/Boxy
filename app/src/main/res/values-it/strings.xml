@@ -777,5 +777,9 @@
     <string name="panel_boxy_sub">Gruppi e nodi senza pannello web</string>
     <string name="proxies_stopped_title">Servizio fermo</string>
     <string name="proxies_no_api_title">Nessun accesso al core</string>
-    <string name="settings_latency_presets">Scelta rapida</string>
+    <string name="settings_latency_limit">Al massimo %1$d attivi</string>
+    <string name="settings_latency_keep_one">Tieni almeno un indirizzo</string>
+    <string name="settings_latency_selected">Attivi: %1$d di %2$d</string>
+    <string name="settings_latency_add">Indirizzo personale</string>
+    <string name="settings_latency_hint">Tocca una scheda per attivarla o disattivarla. Fino a %1$d attive; il numero è il loro ordine nella home.</string>
 </resources>
