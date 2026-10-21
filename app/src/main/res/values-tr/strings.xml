@@ -746,7 +746,6 @@
     <string name="proxies_type_fallback">Yedek</string>
     <string name="proxies_type_balance">Yük dengeleme</string>
     <string name="proxies_type_other">Grup</string>
-    <string name="quick_proxies_sub">Proxy · %1$s</string>
     <string name="config_switch_title">Yapılandırma</string>
     <string name="config_switch_applying">Yapılandırma değiştiriliyor…</string>
     <string name="config_switch_current">Geçerli</string>
@@ -772,14 +771,13 @@
     <string name="notify_sub_ending_title">“%1$s” aboneliği bitiyor</string>
     <string name="notify_sub_traffic_left">%2$s içinden %1$s kaldı</string>
     <string name="notify_sub_expires">%1$s tarihinde sona eriyor (%2$d gün sonra)</string>
-    <string name="layout_section_proxy">Geçerli düğüm</string>
     <string name="panel_boxy">Boxy (yerleşik)</string>
     <string name="panel_boxy_sub">Web paneli olmadan gruplar ve düğümler</string>
     <string name="proxies_stopped_title">Hizmet durduruldu</string>
     <string name="proxies_no_api_title">Çekirdeğe erişim yok</string>
     <string name="settings_latency_limit">En fazla %1$d etkin olabilir</string>
-    <string name="settings_latency_keep_one">En az bir adres kalmalı</string>
     <string name="settings_latency_selected">Etkin: %1$d / %2$d</string>
     <string name="settings_latency_add">Kendi adresin</string>
-    <string name="settings_latency_hint">Açmak veya kapatmak için karta dokunun. En fazla %1$d etkin; numara ana ekrandaki sıradır.</string>
+    <string name="settings_latency_hint">Açmak veya kapatmak için karta dokunun. Tam %1$d kullanılır; numara ana ekrandaki sıradır. %1$d seçildiğinde kaydedilir.</string>
+    <string name="settings_latency_pick_more">%1$d tane daha seçin — tam üç gerekir</string>
 </resources>

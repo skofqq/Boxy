@@ -82,6 +82,9 @@ object SheetBlurState {
     var open by mutableIntStateOf(0)
 }
 
+/** [backdropSource] for callers outside this file that do not import the extension. */
+fun Modifier.backdropSourceOf(backdrop: Backdrop): Modifier = backdropSource(backdrop)
+
 /** Records the content into [backdrop] and draws it as usual. */
 fun Modifier.backdropSource(backdrop: Backdrop): Modifier = onGloballyPositioned { backdrop.origin = it.positionOnScreen() }
     .drawWithContent {

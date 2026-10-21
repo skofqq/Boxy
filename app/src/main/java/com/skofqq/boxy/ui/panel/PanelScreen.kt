@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.skofqq.boxy.ui.components.backdropSource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -142,6 +143,8 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
         if (w != null && w.canGoBack()) w.goBack() else onClose()
     }
 
+    val backdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
+    androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides backdrop) {
     Column(Modifier.fillMaxSize().padding(contentPadding)) {
         Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             header()
@@ -169,7 +172,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
             }
         }
         Box(
-            Modifier.fillMaxSize().then(
+            Modifier.fillMaxSize().backdropSource(backdrop).then(
                 if (native) Modifier else Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp).clip(RoundedCornerShape(20.dp)).background(Boxy.colors.card),
             ),
             contentAlignment = Alignment.Center,
@@ -219,6 +222,8 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                 )
             }
         }
+    }
+
     }
 
     if (listSheet) {

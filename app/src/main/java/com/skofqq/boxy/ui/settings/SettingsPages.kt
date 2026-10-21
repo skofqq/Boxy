@@ -229,25 +229,26 @@ fun LatencyTargetsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: ()
     var addDialog by remember { mutableStateOf(false) }
     val limit = stringResource(R.string.settings_latency_limit, MAX_LATENCY_TARGETS)
 
-    fun save(list: List<LatencyTarget>) {
-        active = list
-        prefs.updateLatencyTargets(list.ifEmpty { null })
-    }
-
+    // Exactly three: a card can be switched off to pick another, but only a full set of three is saved.
     fun toggle(t: LatencyTarget) {
         val on = active.any { it.url == t.url }
-        when {
-            on && active.size == 1 -> Toast.makeText(context, R.string.settings_latency_keep_one, Toast.LENGTH_SHORT).show()
-            on -> save(active.filter { it.url != t.url })
-            active.size >= MAX_LATENCY_TARGETS -> Toast.makeText(context, limit, Toast.LENGTH_SHORT).show()
-            else -> save(active + t)
+        val next = when {
+            on -> active.filter { it.url != t.url }
+            active.size >= MAX_LATENCY_TARGETS -> {
+                Toast.makeText(context, limit, Toast.LENGTH_SHORT).show()
+                return
+            }
+            else -> active + t
         }
+        active = next
+        if (next.size == MAX_LATENCY_TARGETS) prefs.updateLatencyTargets(next)
     }
 
     PinnedLazyPage(contentPadding, header = {
         SubPageHeader(
             stringResource(R.string.settings_latency_targets),
-            stringResource(R.string.settings_latency_selected, active.size, MAX_LATENCY_TARGETS),
+            if (active.size < MAX_LATENCY_TARGETS) stringResource(R.string.settings_latency_pick_more, MAX_LATENCY_TARGETS - active.size)
+            else stringResource(R.string.settings_latency_selected, active.size, MAX_LATENCY_TARGETS),
             onBack,
         ) {
             HeaderAction(BoxyIcons.Add, stringResource(R.string.settings_latency_add)) { addDialog = true }
@@ -288,7 +289,10 @@ fun LatencyTargetsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: ()
             onConfirm = { v ->
                 val t = LatencyTarget(v[0].ifBlank { v[1].substringAfter("://").substringBefore('/') }, v[1])
                 if (customs.none { it.url == t.url } && LATENCY_PRESETS.none { it.url == t.url }) customs = customs + t
-                if (active.none { it.url == t.url } && active.size < MAX_LATENCY_TARGETS) save(active + t)
+                if (active.none { it.url == t.url } && active.size < MAX_LATENCY_TARGETS) {
+                    active = active + t
+                    if (active.size == MAX_LATENCY_TARGETS) prefs.updateLatencyTargets(active)
+                }
                 addDialog = false
             },
             onDismiss = { addDialog = false },

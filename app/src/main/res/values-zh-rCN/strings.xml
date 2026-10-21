@@ -717,7 +717,6 @@
     <string name="proxies_type_fallback">故障转移</string>
     <string name="proxies_type_balance">负载均衡</string>
     <string name="proxies_type_other">分组</string>
-    <string name="quick_proxies_sub">代理 · %1$s</string>
     <string name="config_switch_title">配置</string>
     <string name="config_switch_applying">正在切换配置…</string>
     <string name="config_switch_current">当前</string>
@@ -743,14 +742,13 @@
     <string name="notify_sub_ending_title">订阅“%1$s”即将用完</string>
     <string name="notify_sub_traffic_left">剩余 %1$s / 共 %2$s</string>
     <string name="notify_sub_expires">将于 %1$s 到期（%2$d 天后）</string>
-    <string name="layout_section_proxy">当前节点</string>
     <string name="panel_boxy">Boxy（内置）</string>
     <string name="panel_boxy_sub">无需网页面板的分组和节点</string>
     <string name="proxies_stopped_title">服务已停止</string>
     <string name="proxies_no_api_title">无法访问核心</string>
     <string name="settings_latency_limit">最多可启用 %1$d 个</string>
-    <string name="settings_latency_keep_one">至少保留一个地址</string>
     <string name="settings_latency_selected">已启用：%1$d / %2$d</string>
     <string name="settings_latency_add">自定义地址</string>
-    <string name="settings_latency_hint">点按卡片即可启用或停用。最多启用 %1$d 个；数字为其在主页上的顺序。</string>
+    <string name="settings_latency_hint">点按卡片即可启用或停用。正好使用 %1$d 个；数字为其在主页上的顺序。选满 %1$d 个后自动保存。</string>
+    <string name="settings_latency_pick_more">再选择 %1$d 个——需要正好三个</string>
 </resources>

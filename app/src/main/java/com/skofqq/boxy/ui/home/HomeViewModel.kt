@@ -45,8 +45,6 @@ data class SpeedState(
 
 data class SystemState(val cpuPercent: Float, val rssBytes: Long)
 
-data class ProxyNow(val group: String, val node: String, val delay: Int?)
-
 class HomeViewModel(private val prefs: Prefs) : ViewModel() {
     var env by mutableStateOf<Environment?>(null)
         private set
@@ -81,8 +79,6 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
     var subscriptions by mutableStateOf(loadCachedSubscriptions())
         private set
     var subStore by mutableStateOf(false)
-    /** Main proxy group of the running core and the node it uses (Clash API), for the Home card. */
-    var proxyNow by mutableStateOf<ProxyNow?>(null)
         private set
 
     var details by mutableStateOf<ServiceDetails?>(null)
@@ -132,24 +128,7 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
         launch { systemLoop() }
         launch { while (true) { testLatency(); delay(60_000) } }
         launch { refreshSubscription() }
-        launch { while (true) { refreshProxyNow(); delay(15_000) } }
         launch { while (true) { com.skofqq.boxy.data.AppTraffic.sample(BoxyApp.instance); delay(10_000) } }
-    }
-
-    private suspend fun refreshProxyNow() {
-        val s = state ?: BoxModule.state()
-        if (!s.running) {
-            proxyNow = null
-            return
-        }
-        val snap = Net.clashApi(s.core)?.let { Net.clashProxies(it) }
-        if (snap == null) {
-            proxyNow = null
-            return
-        }
-        val group = snap.groups.firstOrNull { it.selectable } ?: snap.groups.firstOrNull()
-        val leaf = group?.let { snap.leaf(it.name) }
-        proxyNow = if (group == null || leaf == null) null else ProxyNow(group.name, leaf, snap.nodes[leaf]?.delay)
     }
 
     private suspend fun refreshState() {

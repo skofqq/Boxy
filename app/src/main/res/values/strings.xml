@@ -770,7 +770,6 @@
     <string name="proxies_type_fallback">Fallback</string>
     <string name="proxies_type_balance">Load balance</string>
     <string name="proxies_type_other">Group</string>
-    <string name="quick_proxies_sub">Proxy · %1$s</string>
     <string name="config_switch_title">Config</string>
     <string name="config_switch_applying">Switching config…</string>
     <string name="config_switch_current">Current</string>
@@ -796,14 +795,13 @@
     <string name="notify_sub_ending_title">Subscription “%1$s” is running out</string>
     <string name="notify_sub_traffic_left">%1$s left of %2$s</string>
     <string name="notify_sub_expires">Expires on %1$s (in %2$d d)</string>
-    <string name="layout_section_proxy">Current proxy</string>
     <string name="panel_boxy">Boxy (built-in)</string>
     <string name="panel_boxy_sub">Proxy groups and nodes without a web panel</string>
     <string name="proxies_stopped_title">Service stopped</string>
     <string name="proxies_no_api_title">No access to the core</string>
     <string name="settings_latency_limit">Up to %1$d can be active</string>
-    <string name="settings_latency_keep_one">Keep at least one address</string>
     <string name="settings_latency_selected">Active: %1$d of %2$d</string>
     <string name="settings_latency_add">Own address</string>
-    <string name="settings_latency_hint">Tap a card to turn it on or off. Up to %1$d can be active; the number is their order on Home.</string>
+    <string name="settings_latency_hint">Tap a card to turn it on or off. Exactly %1$d are used; the number is their order on Home. Changes are saved once %1$d are picked.</string>
+    <string name="settings_latency_pick_more">Pick %1$d more — exactly three are used</string>
 </resources>

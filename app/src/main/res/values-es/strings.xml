@@ -746,7 +746,6 @@
     <string name="proxies_type_fallback">Respaldo</string>
     <string name="proxies_type_balance">Balanceo</string>
     <string name="proxies_type_other">Grupo</string>
-    <string name="quick_proxies_sub">Proxy · %1$s</string>
     <string name="config_switch_title">Configuración</string>
     <string name="config_switch_applying">Cambiando la configuración…</string>
     <string name="config_switch_current">Actual</string>
@@ -772,14 +771,13 @@
     <string name="notify_sub_ending_title">La suscripción «%1$s» se agota</string>
     <string name="notify_sub_traffic_left">Quedan %1$s de %2$s</string>
     <string name="notify_sub_expires">Caduca el %1$s (en %2$d d)</string>
-    <string name="layout_section_proxy">Nodo actual</string>
     <string name="panel_boxy">Boxy (integrado)</string>
     <string name="panel_boxy_sub">Grupos y nodos sin panel web</string>
     <string name="proxies_stopped_title">Servicio detenido</string>
     <string name="proxies_no_api_title">Sin acceso al núcleo</string>
     <string name="settings_latency_limit">Como máximo %1$d activos</string>
-    <string name="settings_latency_keep_one">Deja al menos una dirección</string>
     <string name="settings_latency_selected">Activos: %1$d de %2$d</string>
     <string name="settings_latency_add">Dirección propia</string>
-    <string name="settings_latency_hint">Toca una tarjeta para activarla o desactivarla. Hasta %1$d activas; el número es su orden en el inicio.</string>
+    <string name="settings_latency_hint">Toca una tarjeta para activarla o desactivarla. Se usan exactamente %1$d; el número es su orden en el inicio. Se guarda cuando hay %1$d elegidas.</string>
+    <string name="settings_latency_pick_more">Elige %1$d más — se usan exactamente tres</string>
 </resources>

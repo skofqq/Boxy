@@ -746,7 +746,6 @@
     <string name="proxies_type_fallback">Riserva</string>
     <string name="proxies_type_balance">Bilanciamento</string>
     <string name="proxies_type_other">Gruppo</string>
-    <string name="quick_proxies_sub">Proxy · %1$s</string>
     <string name="config_switch_title">Configurazione</string>
     <string name="config_switch_applying">Cambio configurazione…</string>
     <string name="config_switch_current">Attuale</string>
@@ -772,14 +771,13 @@
     <string name="notify_sub_ending_title">L’abbonamento «%1$s» sta finendo</string>
     <string name="notify_sub_traffic_left">Restano %1$s di %2$s</string>
     <string name="notify_sub_expires">Scade il %1$s (tra %2$d g)</string>
-    <string name="layout_section_proxy">Nodo attuale</string>
     <string name="panel_boxy">Boxy (integrato)</string>
     <string name="panel_boxy_sub">Gruppi e nodi senza pannello web</string>
     <string name="proxies_stopped_title">Servizio fermo</string>
     <string name="proxies_no_api_title">Nessun accesso al core</string>
     <string name="settings_latency_limit">Al massimo %1$d attivi</string>
-    <string name="settings_latency_keep_one">Tieni almeno un indirizzo</string>
     <string name="settings_latency_selected">Attivi: %1$d di %2$d</string>
     <string name="settings_latency_add">Indirizzo personale</string>
-    <string name="settings_latency_hint">Tocca una scheda per attivarla o disattivarla. Fino a %1$d attive; il numero è il loro ordine nella home.</string>
+    <string name="settings_latency_hint">Tocca una scheda per attivarla o disattivarla. Ne servono esattamente %1$d; il numero è il loro ordine nella home. Si salva quando ne sono scelte %1$d.</string>
+    <string name="settings_latency_pick_more">Scegline ancora %1$d — ne servono esattamente tre</string>
 </resources>

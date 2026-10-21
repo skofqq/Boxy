@@ -746,7 +746,6 @@
     <string name="proxies_type_fallback">Ausweich</string>
     <string name="proxies_type_balance">Lastverteilung</string>
     <string name="proxies_type_other">Gruppe</string>
-    <string name="quick_proxies_sub">Proxy · %1$s</string>
     <string name="config_switch_title">Konfiguration</string>
     <string name="config_switch_applying">Konfiguration wird gewechselt…</string>
     <string name="config_switch_current">Aktuell</string>
@@ -772,14 +771,13 @@
     <string name="notify_sub_ending_title">Abo „%1$s“ läuft aus</string>
     <string name="notify_sub_traffic_left">Noch %1$s von %2$s</string>
     <string name="notify_sub_expires">Läuft am %1$s ab (in %2$d T.)</string>
-    <string name="layout_section_proxy">Aktueller Knoten</string>
     <string name="panel_boxy">Boxy (integriert)</string>
     <string name="panel_boxy_sub">Proxy-Gruppen und Knoten ohne Web-Panel</string>
     <string name="proxies_stopped_title">Dienst gestoppt</string>
     <string name="proxies_no_api_title">Kein Zugriff auf den Kern</string>
     <string name="settings_latency_limit">Höchstens %1$d können aktiv sein</string>
-    <string name="settings_latency_keep_one">Mindestens eine Adresse behalten</string>
     <string name="settings_latency_selected">Aktiv: %1$d von %2$d</string>
     <string name="settings_latency_add">Eigene Adresse</string>
-    <string name="settings_latency_hint">Tippe auf eine Karte, um sie ein- oder auszuschalten. Bis zu %1$d können aktiv sein; die Zahl ist ihre Reihenfolge auf der Startseite.</string>
+    <string name="settings_latency_hint">Tippe auf eine Karte, um sie ein- oder auszuschalten. Genau %1$d werden genutzt; die Zahl ist ihre Reihenfolge auf der Startseite. Gespeichert wird, sobald %1$d gewählt sind.</string>
+    <string name="settings_latency_pick_more">Noch %1$d wählen — genau drei werden genutzt</string>
 </resources>

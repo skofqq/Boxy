@@ -746,7 +746,6 @@
     <string name="proxies_type_fallback">Рэзерв</string>
     <string name="proxies_type_balance">Балансаванне</string>
     <string name="proxies_type_other">Група</string>
-    <string name="quick_proxies_sub">Проксі · %1$s</string>
     <string name="config_switch_title">Канфігурацыя</string>
     <string name="config_switch_applying">Пераключаю канфігурацыю…</string>
     <string name="config_switch_current">Бягучая</string>
@@ -772,14 +771,13 @@
     <string name="notify_sub_ending_title">Падпіска «%1$s» заканчваецца</string>
     <string name="notify_sub_traffic_left">Засталося %1$s з %2$s</string>
     <string name="notify_sub_expires">Сканчаецца %1$s (праз %2$d дз.)</string>
-    <string name="layout_section_proxy">Бягучы вузел</string>
     <string name="panel_boxy">Boxy (убудаваны)</string>
     <string name="panel_boxy_sub">Групы і вузлы без вэб-панэлі</string>
     <string name="proxies_stopped_title">Сэрвіс спынены</string>
     <string name="proxies_no_api_title">Няма доступу да ядра</string>
     <string name="settings_latency_limit">Актыўных можа быць не больш за %1$d</string>
-    <string name="settings_latency_keep_one">Патрэбны хаця б адзін адрас</string>
     <string name="settings_latency_selected">Актыўна: %1$d з %2$d</string>
     <string name="settings_latency_add">Свой адрас</string>
-    <string name="settings_latency_hint">Націсніце на картку, каб уключыць або выключыць яе. Актыўных можа быць да %1$d; нумар — парадак на галоўнай.</string>
+    <string name="settings_latency_hint">Націсніце на картку, каб уключыць або выключыць яе. Выкарыстоўваецца роўна %1$d; нумар — парадак на галоўнай. Змены захоўваюцца, калі выбрана %1$d.</string>
+    <string name="settings_latency_pick_more">Выберыце яшчэ %1$d — патрэбна роўна тры</string>
 </resources>
