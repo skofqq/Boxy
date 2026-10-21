@@ -42,6 +42,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
@@ -130,6 +136,24 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
         scope.launch { if (Net.clashSelect(a, group.name, name)) refresh() }
     }
 
+    val openGroup = snapshot?.group(expanded ?: "")
+    if (openGroup != null) {
+        val snap = snapshot!!
+        GroupDialog(
+            content = { m ->
+                OpenGroup(
+                    openGroup, snap, delays, testing,
+                    onClose = { expanded = null },
+                    onTestGroup = { test(openGroup) },
+                    onTestNode = ::testNode,
+                    onSelect = { select(openGroup, it) },
+                    modifier = m,
+                )
+            },
+            onClose = { expanded = null },
+        )
+    }
+
     PinnedLazyPage(contentPadding, header = {
         header()
         SubPageHeader(
@@ -154,36 +178,11 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
             }
             LoadState.READY -> {
                 val snap = snapshot ?: return@PinnedLazyPage
-                // Zashboard layout in Boxy's style: group tiles two per row; the open group takes a whole row
-                // and shows its nodes as tiles too.
-                val rows = mutableListOf<List<ProxyGroup>>()
-                var pending = mutableListOf<ProxyGroup>()
-                snap.groups.forEach { g ->
-                    if (g.name == expanded) {
-                        if (pending.isNotEmpty()) rows += pending
-                        pending = mutableListOf()
-                        rows += listOf(g)
-                    } else {
-                        pending += g
-                        if (pending.size == 2) {
-                            rows += pending
-                            pending = mutableListOf()
-                        }
-                    }
-                }
-                if (pending.isNotEmpty()) rows += pending
+                // Zashboard layout in Boxy's style: group tiles two per row; an opened group pops up over the page.
+                val rows = snap.groups.chunked(2)
                 rows.forEach { row ->
                     item(key = row.joinToString("|") { it.name }) {
-                        if (row.size == 1 && row[0].name == expanded) {
-                            val g = row[0]
-                            OpenGroup(
-                                g, snap, delays, testing,
-                                onClose = { expanded = null },
-                                onTestGroup = { test(g) },
-                                onTestNode = ::testNode,
-                                onSelect = { select(g, it) },
-                            )
-                        } else {
+                        run {
                             Row(
                                 Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(IntrinsicSize.Min),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -207,6 +206,42 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
 }
 
 private enum class LoadState { LOADING, STOPPED, NO_API, READY }
+
+/**
+ * The opened group as a card over the page, like Zashboard's: the grid stays where it is, the rest of the
+ * screen is dimmed (and blurred with liquid glass); a tap outside or Back closes it.
+ */
+@Composable
+private fun GroupDialog(content: @Composable (Modifier) -> Unit, onClose: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onClose, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+        val frosted = com.skofqq.boxy.ui.components.rememberFrostedDialog()
+        val appear = remember { androidx.compose.animation.core.Animatable(0f) }
+        LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.7f, stiffness = 520f)) }
+        val maxHeight = (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp * 0.86f).dp
+        Box(
+            Modifier.fillMaxSize().clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null, onClick = onClose),
+            contentAlignment = Alignment.Center,
+        ) {
+            content(
+                Modifier
+                    .clickable(remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null) {}
+                    .padding(horizontal = 14.dp)
+                    .widthIn(max = 560.dp)
+                    .fillMaxWidth()
+                    .heightIn(max = maxHeight)
+                    .graphicsLayer {
+                        val v = appear.value
+                        scaleX = 0.9f + 0.1f * v
+                        scaleY = 0.9f + 0.1f * v
+                        alpha = v.coerceIn(0f, 1f)
+                    }
+                    .then(with(com.skofqq.boxy.ui.components.GlassCardScope) { Modifier.card(frosted) })
+                    .verticalScroll(rememberScrollState())
+                    .padding(14.dp),
+            )
+        }
+    }
+}
 
 private fun delayOf(name: String, snap: ProxySnapshot, delays: Map<String, Int>): Int? =
     delays[name] ?: snap.nodes[name]?.delay?.takeIf { snap.group(name) == null } ?: snap.leaf(name)?.let { delays[it] ?: snap.nodes[it]?.delay }
@@ -291,8 +326,9 @@ private fun OpenGroup(
     onTestGroup: () -> Unit,
     onTestNode: (String) -> Unit,
     onSelect: (String) -> Unit,
+    modifier: Modifier,
 ) {
-    Column(Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(26.dp)).background(Boxy.colors.card).padding(14.dp)) {
+    Column(modifier) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
             GroupHead(group, snap, delays, 52.dp)
             Spacer(Modifier.height(10.dp))

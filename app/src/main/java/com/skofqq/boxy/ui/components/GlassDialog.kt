@@ -49,6 +49,12 @@ fun Modifier.glassCard(frosted: Boolean, shape: Shape, solid: Color = Boxy.color
         .border(1.dp, rim, shape)
 }
 
+/** Frosted card of a pop-up (30 dp corners, card colour without glass), for windows built by hand. */
+object GlassCardScope {
+    @Composable
+    fun Modifier.card(frosted: Boolean): Modifier = glassCard(frosted, RoundedCornerShape(30.dp), Boxy.colors.card)
+}
+
 /**
  * Drop-in for Material's AlertDialog in the app's liquid glass style: a frosted card that springs in over the
  * blurred app, title, content, and the buttons at the bottom right.

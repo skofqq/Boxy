@@ -54,12 +54,23 @@ data class ProxyNode(
     val xudp: Boolean = false,
 )
 
-data class ProxyGroup(val name: String, val type: String, val now: String?, val all: List<String>, val icon: String? = null) {
+data class ProxyGroup(
+    val name: String,
+    val type: String,
+    val now: String?,
+    val all: List<String>,
+    val icon: String? = null,
+    /** `hidden: true` in the config: used by other groups but not shown (Zashboard hides them too). */
+    val hidden: Boolean = false,
+) {
     val selectable: Boolean get() = type == "Selector"
 }
 
-data class ProxySnapshot(val groups: List<ProxyGroup>, val nodes: Map<String, ProxyNode>) {
-    private val byName = groups.associateBy { it.name }
+data class ProxySnapshot(val all: List<ProxyGroup>, val nodes: Map<String, ProxyNode>) {
+    private val byName = all.associateBy { it.name }
+
+    /** Groups to show: the config's hidden ones are left out but still resolve as members. */
+    val groups: List<ProxyGroup> = all.filter { !it.hidden }
 
     /** The proxy a group finally uses, following nested groups. */
     fun leaf(group: String): String? {
@@ -344,6 +355,7 @@ object Net {
                             p.optString("now").ifBlank { null },
                             (0 until members.length()).map { members.optString(it) },
                             p.optString("icon").takeIf { it.startsWith("http") },
+                            p.optBoolean("hidden"),
                         )
                     }
                 }
