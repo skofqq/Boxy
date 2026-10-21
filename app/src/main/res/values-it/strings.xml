@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">L’abbonamento «%1$s» sta finendo</string>
     <string name="notify_sub_traffic_left">Restano %1$s di %2$s</string>
     <string name="notify_sub_expires">Scade il %1$s (tra %2$d g)</string>
+    <string name="layout_section_proxy">Nodo attuale</string>
+    <string name="panel_boxy">Boxy (integrato)</string>
+    <string name="panel_boxy_sub">Gruppi e nodi senza pannello web</string>
 </resources>

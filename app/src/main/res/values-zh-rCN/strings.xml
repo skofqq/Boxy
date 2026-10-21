@@ -743,4 +743,7 @@
     <string name="notify_sub_ending_title">订阅“%1$s”即将用完</string>
     <string name="notify_sub_traffic_left">剩余 %1$s / 共 %2$s</string>
     <string name="notify_sub_expires">将于 %1$s 到期（%2$d 天后）</string>
+    <string name="layout_section_proxy">当前节点</string>
+    <string name="panel_boxy">Boxy（内置）</string>
+    <string name="panel_boxy_sub">无需网页面板的分组和节点</string>
 </resources>

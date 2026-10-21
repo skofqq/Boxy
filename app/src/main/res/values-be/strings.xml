@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">Падпіска «%1$s» заканчваецца</string>
     <string name="notify_sub_traffic_left">Засталося %1$s з %2$s</string>
     <string name="notify_sub_expires">Сканчаецца %1$s (праз %2$d дз.)</string>
+    <string name="layout_section_proxy">Бягучы вузел</string>
+    <string name="panel_boxy">Boxy (убудаваны)</string>
+    <string name="panel_boxy_sub">Групы і вузлы без вэб-панэлі</string>
 </resources>

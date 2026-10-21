@@ -30,7 +30,7 @@ enum class AppLanguage(val tag: String?, val flag: String, val nativeName: Strin
 enum class NavExtra { NONE, APPS, LOGS }
 
 /** Blocks of the home page, top to bottom. */
-enum class HomeSection { HERO, QUICK, LATENCY, GRID }
+enum class HomeSection { HERO, QUICK, PROXY, LATENCY, GRID }
 
 /** Small cards of the home metrics grid. */
 enum class MetricCard { IP, SPEED, SUBSCRIPTION, SYSTEM }

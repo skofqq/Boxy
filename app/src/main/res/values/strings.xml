@@ -796,4 +796,7 @@
     <string name="notify_sub_ending_title">Subscription “%1$s” is running out</string>
     <string name="notify_sub_traffic_left">%1$s left of %2$s</string>
     <string name="notify_sub_expires">Expires on %1$s (in %2$d d)</string>
+    <string name="layout_section_proxy">Current proxy</string>
+    <string name="panel_boxy">Boxy (built-in)</string>
+    <string name="panel_boxy_sub">Proxy groups and nodes without a web panel</string>
 </resources>

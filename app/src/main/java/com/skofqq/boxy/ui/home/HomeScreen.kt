@@ -117,10 +117,10 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                                     QuickCard(stringResource(R.string.quick_subs), stringResource(R.string.quick_subs_sub), Tints.purple, mod, onOpenSubStore)
                                 }
                             }
-                            vm.proxyNow?.let { now ->
-                                ProxyQuickCard(now, Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp).fillMaxWidth(), onOpenProxies)
-                            }
                         } }
+                        HomeSection.PROXY -> vm.proxyNow?.let { now ->
+                            item(key = "proxy") { ProxyQuickCard(now, Modifier.padding(horizontal = 16.dp).fillMaxWidth(), onOpenProxies) }
+                        }
                         HomeSection.LATENCY -> item(key = "latency") {
                             val results = vm.latency.ifEmpty { prefs.latencyTargets.map { LatencyResult(it.name, null) } }
                             LatencyCard(results, vm.latencyBadge, vm::testLatency)

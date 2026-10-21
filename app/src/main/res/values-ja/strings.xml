@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">サブスクリプション「%1$s」の残りがわずかです</string>
     <string name="notify_sub_traffic_left">残り %1$s / %2$s</string>
     <string name="notify_sub_expires">%1$s に期限切れ（あと %2$d 日）</string>
+    <string name="layout_section_proxy">現在のノード</string>
+    <string name="panel_boxy">Boxy（内蔵）</string>
+    <string name="panel_boxy_sub">Web パネルなしでグループとノード</string>
 </resources>

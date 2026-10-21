@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">La suscripción «%1$s» se agota</string>
     <string name="notify_sub_traffic_left">Quedan %1$s de %2$s</string>
     <string name="notify_sub_expires">Caduca el %1$s (en %2$d d)</string>
+    <string name="layout_section_proxy">Nodo actual</string>
+    <string name="panel_boxy">Boxy (integrado)</string>
+    <string name="panel_boxy_sub">Grupos y nodos sin panel web</string>
 </resources>

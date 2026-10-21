@@ -67,6 +67,9 @@ data class WebPanel(val id: String, val name: String, val url: String)
 
 private const val LOCAL_ID = "local"
 
+/** Boxy's own proxy page, offered in the panel list next to the web dashboards. */
+private const val BOXY_ID = "boxy"
+
 /** User panels are kept per kind in shared preferences (same keys BFR used). */
 private class PanelStore(context: Context, kind: PanelKind) {
     private val sp = context.getSharedPreferences("boxy", Context.MODE_PRIVATE)
@@ -128,8 +131,11 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
         local = localUrl(kind)
         localChecked = true
     }
-    val panels = listOfNotNull(local?.let { WebPanel(LOCAL_ID, localName, it) }) + custom
+    val boxyPanel = if (kind == PanelKind.CORE) WebPanel(BOXY_ID, stringResource(R.string.panel_boxy), stringResource(R.string.panel_boxy_sub)) else null
+    val panels = listOfNotNull(local?.let { WebPanel(LOCAL_ID, localName, it) }, boxyPanel) + custom
     val current = panels.firstOrNull { it.id == selectedId } ?: panels.firstOrNull()
+    val native = current?.id == BOXY_ID
+    var nativeReload by remember { mutableStateOf(0) }
 
     BackHandler {
         val w = webView
@@ -149,8 +155,8 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                 HeaderAction(BoxyIcons.Palette, stringResource(R.string.dashboard_title)) { dashboardSheet = true }
             }
             HeaderAction(BoxyIcons.Dashboard, stringResource(R.string.panel_sheet_title)) { listSheet = true }
-            HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh_page)) { webView?.reload() }
-            Box {
+            HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh_page)) { if (native) nativeReload++ else webView?.reload() }
+            if (!native) Box {
                 HeaderAction(BoxyIcons.MoreVert, stringResource(R.string.action_more)) { menu = true }
                 GlassMenu(menu, { menu = false }) {
                     GlassMenuItem(stringResource(R.string.panel_open_browser), {
@@ -163,10 +169,18 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
             }
         }
         Box(
-            Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, bottom = 12.dp).clip(RoundedCornerShape(20.dp)).background(Boxy.colors.card),
+            Modifier.fillMaxSize().then(
+                if (native) Modifier else Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp).clip(RoundedCornerShape(20.dp)).background(Boxy.colors.card),
+            ),
             contentAlignment = Alignment.Center,
         ) {
             when {
+                native -> com.skofqq.boxy.ui.proxies.ProxiesScreen(
+                    PaddingValues(bottom = 12.dp),
+                    header = {},
+                    embedded = true,
+                    reloadKey = nativeReload,
+                )
                 current == null && !localChecked -> CircularProgressIndicator()
                 current == null -> Text(
                     stringResource(if (kind == PanelKind.CORE) R.string.panel_unavailable else R.string.substore_unavailable),
@@ -201,7 +215,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                             w.loadUrl(current.url)
                         }
                     },
-                    onRelease = { it.destroy() },
+                    onRelease = { if (webView === it) webView = null; it.destroy() },
                 )
             }
         }
@@ -227,7 +241,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                         Text(p.url, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     if (sel) Icon(BoxyIcons.Check, null, tint = Boxy.colors.accent)
-                    if (p.id != LOCAL_ID) {
+                    if (p.id != LOCAL_ID && p.id != BOXY_ID) {
                         Spacer(Modifier.width(4.dp))
                         Icon(
                             BoxyIcons.Delete,

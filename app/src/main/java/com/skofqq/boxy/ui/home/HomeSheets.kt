@@ -200,6 +200,7 @@ private fun LayoutSheet(prefs: Prefs, onDismiss: () -> Unit) {
                 val (title, icon) = when (section) {
                     HomeSection.HERO -> R.string.layout_section_hero to BoxyIcons.Home
                     HomeSection.QUICK -> R.string.layout_section_quick to BoxyIcons.Apps
+                    HomeSection.PROXY -> R.string.layout_section_proxy to BoxyIcons.ArrowCircle
                     HomeSection.LATENCY -> R.string.layout_section_latency to BoxyIcons.Router
                     HomeSection.GRID -> R.string.layout_section_grid to BoxyIcons.Tune
                 }

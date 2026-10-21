@@ -80,7 +80,7 @@ import kotlinx.coroutines.sync.withPermit
  * in selector groups. Talks to the core only while open or on a tap, so it costs nothing in the background.
  */
 @Composable
-fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit) {
+fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, embedded: Boolean = false, reloadKey: Int = 0) {
     val scope = rememberCoroutineScope()
     var api by remember { mutableStateOf<ClashApi?>(null) }
     var snapshot by remember { mutableStateOf<ProxySnapshot?>(null) }
@@ -101,7 +101,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
         snapshot = snap
         state = if (snap == null) LoadState.NO_API else LoadState.READY
     }
-    LaunchedEffect(reload) { refresh() }
+    LaunchedEffect(reload, reloadKey) { refresh() }
 
     fun test(group: ProxyGroup) {
         val a = api ?: return
@@ -156,7 +156,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit)
 
     PinnedLazyPage(contentPadding, header = {
         header()
-        SubPageHeader(
+        if (!embedded) SubPageHeader(
             stringResource(R.string.proxies_title),
             snapshot?.let { stringResource(R.string.proxies_sub, it.groups.size) } ?: stringResource(R.string.proxies_hint),
             null,

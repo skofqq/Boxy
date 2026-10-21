@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">«%1$s» жазылымы аяқталуда</string>
     <string name="notify_sub_traffic_left">%2$s ішінен %1$s қалды</string>
     <string name="notify_sub_expires">%1$s аяқталады (%2$d күннен кейін)</string>
+    <string name="layout_section_proxy">Ағымдағы түйін</string>
+    <string name="panel_boxy">Boxy (кірістірілген)</string>
+    <string name="panel_boxy_sub">Веб-панельсіз топтар мен түйіндер</string>
 </resources>

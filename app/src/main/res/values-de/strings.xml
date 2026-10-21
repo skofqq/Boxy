@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">Abo „%1$s“ läuft aus</string>
     <string name="notify_sub_traffic_left">Noch %1$s von %2$s</string>
     <string name="notify_sub_expires">Läuft am %1$s ab (in %2$d T.)</string>
+    <string name="layout_section_proxy">Aktueller Knoten</string>
+    <string name="panel_boxy">Boxy (integriert)</string>
+    <string name="panel_boxy_sub">Proxy-Gruppen und Knoten ohne Web-Panel</string>
 </resources>

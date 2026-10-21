@@ -772,4 +772,7 @@
     <string name="notify_sub_ending_title">“%1$s” aboneliği bitiyor</string>
     <string name="notify_sub_traffic_left">%2$s içinden %1$s kaldı</string>
     <string name="notify_sub_expires">%1$s tarihinde sona eriyor (%2$d gün sonra)</string>
+    <string name="layout_section_proxy">Geçerli düğüm</string>
+    <string name="panel_boxy">Boxy (yerleşik)</string>
+    <string name="panel_boxy_sub">Web paneli olmadan gruplar ve düğümler</string>
 </resources>
