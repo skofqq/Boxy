@@ -71,7 +71,8 @@ import com.skofqq.boxy.util.Format
 
 private enum class TaskVisual { WORKING, PROGRESS, OK, FAILED }
 
-private val PERCENT = Regex("""(\d{1,3}(?:[.,]\d+)?)\s*%""")
+// Percent after a space or at the start ("%20" in URLs is not progress).
+private val PERCENT = Regex("""(?:^|\s|\|)(\d{1,3}(?:[.,]\d+)?)\s*%""")
 private val WGET_SIZE = Regex("""(\d+)([kKMG])\s+(\d+:\d\d:\d\d)\s+ETA""")
 private val VERSION = Regex("""(?i)(?:download|latest|version|installed)\D*?\bv?(\d+\.\d+(?:\.\d+)?)""")
 

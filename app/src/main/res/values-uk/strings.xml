@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Групи та вузли без вебпанелі</string>
     <string name="proxies_stopped_title">Сервіс зупинено</string>
     <string name="proxies_no_api_title">Немає доступу до ядра</string>
+    <string name="settings_latency_presets">Швидкий вибір</string>
 </resources>

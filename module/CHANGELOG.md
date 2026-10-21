@@ -1,5 +1,15 @@
 # Box for Root (Boxy edition)
 
+## v1.10.8
+
+- Fixed: updating a core that is not the active one (for example xray while clash runs) restarted the service
+  with that core, which usually failed and left the service stopped. A core update now restarts the service
+  only when that core is the one running
+
+- Исправлено: обновление неактивного ядра (например, xray при работающем clash) перезапускало сервис с этим
+  ядром, обычно неудачно, и сервис оставался остановлен. Теперь сервис перезапускается, только если обновлено
+  именно работающее ядро
+
 ## v1.10.7
 
 - `box.tool upkernel` no longer downloads a core again when the installed one already reports the latest

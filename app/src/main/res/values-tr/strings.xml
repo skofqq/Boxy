@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Web paneli olmadan gruplar ve düğümler</string>
     <string name="proxies_stopped_title">Hizmet durduruldu</string>
     <string name="proxies_no_api_title">Çekirdeğe erişim yok</string>
+    <string name="settings_latency_presets">Hızlı seçim</string>
 </resources>

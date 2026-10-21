@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Gruppi e nodi senza pannello web</string>
     <string name="proxies_stopped_title">Servizio fermo</string>
     <string name="proxies_no_api_title">Nessun accesso al core</string>
+    <string name="settings_latency_presets">Scelta rapida</string>
 </resources>

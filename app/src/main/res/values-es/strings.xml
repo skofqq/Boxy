@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Grupos y nodos sin panel web</string>
     <string name="proxies_stopped_title">Servicio detenido</string>
     <string name="proxies_no_api_title">Sin acceso al núcleo</string>
+    <string name="settings_latency_presets">Elección rápida</string>
 </resources>

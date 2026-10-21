@@ -801,4 +801,5 @@
     <string name="panel_boxy_sub">Proxy groups and nodes without a web panel</string>
     <string name="proxies_stopped_title">Service stopped</string>
     <string name="proxies_no_api_title">No access to the core</string>
+    <string name="settings_latency_presets">Quick pick</string>
 </resources>

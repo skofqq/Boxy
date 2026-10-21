@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Groupes et nœuds sans panneau web</string>
     <string name="proxies_stopped_title">Service arrêté</string>
     <string name="proxies_no_api_title">Pas d’accès au cœur</string>
+    <string name="settings_latency_presets">Choix rapide</string>
 </resources>

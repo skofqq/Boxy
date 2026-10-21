@@ -848,6 +848,12 @@ upkernel() {
 }
 
 # Check and update kernel
+# True when the service is running with this very core. Updating another core (Boxy sets bin_name for the
+# update only) must not restart the service with it.
+box_runs_core() {
+  [ -f "${box_pid}" ] && busybox pidof "${bin_name}" >/dev/null 2>&1
+}
+
 xkernel() {
   case "${bin_name}" in
     "clash")
@@ -873,7 +879,7 @@ xkernel() {
           log Info "Creating symlink: ${bin_dir}/${bin_name} -> ${bin_dir}/xclash/${xclash_option}"
           ln -sf "${bin_dir}/xclash/${xclash_option}" "${bin_dir}/${bin_name}"
       
-          if [ -f "${box_pid}" ]; then
+          if box_runs_core; then
             log Info "Restarting ${bin_name} service..."
             restart_box
           else
@@ -904,7 +910,7 @@ xkernel() {
         if mv "${src_dir}/sing-box" "${bin_dir}/${bin_name}"; then
           log Info "Kernel binary moved successfully."
       
-          if [ -f "${box_pid}" ]; then
+          if box_runs_core; then
             log Info "Removing cache.db for clean restart..."
             rm -rf /data/adb/box/sing-box/cache.db
       
@@ -951,7 +957,7 @@ xkernel() {
         if mv "${bin_dir}/update/${bin}" "${bin_dir}/${bin_name}"; then
           log Info "Kernel binary moved successfully."
       
-          if [ -f "${box_pid}" ]; then
+          if box_runs_core; then
             log Info "Restarting ${bin_name}..."
             restart_box
           else
@@ -968,7 +974,7 @@ xkernel() {
       rm -rf "${bin_dir}/update"
       ;;
     "hysteria")
-      if [ -f "${box_pid}" ]; then
+      if box_runs_core; then
         restart_box
       else
         log Debug "${bin_name} does not need to be restarted."

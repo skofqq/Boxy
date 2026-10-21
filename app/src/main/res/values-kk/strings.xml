@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Веб-панельсіз топтар мен түйіндер</string>
     <string name="proxies_stopped_title">Қызмет тоқтатылған</string>
     <string name="proxies_no_api_title">Ядроға қол жетімсіз</string>
+    <string name="settings_latency_presets">Жылдам таңдау</string>
 </resources>

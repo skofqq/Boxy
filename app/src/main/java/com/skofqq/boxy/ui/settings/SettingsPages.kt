@@ -46,6 +46,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import com.skofqq.boxy.BoxyApp
 import com.skofqq.boxy.R
 import com.skofqq.boxy.ui.components.PinnedLazyPage
@@ -190,6 +192,21 @@ private fun SliderRow(
     }
 }
 
+/** Services offered for the latency test (small, fast answers where possible). */
+private val LATENCY_PRESETS = listOf(
+    LatencyTarget("Google", "https://www.google.com/generate_204"),
+    LatencyTarget("Cloudflare", "https://cp.cloudflare.com"),
+    LatencyTarget("YouTube", "https://www.youtube.com/generate_204"),
+    LatencyTarget("Telegram", "https://web.telegram.org"),
+    LatencyTarget("GitHub", "https://github.com"),
+    LatencyTarget("Apple", "https://www.apple.com/library/test/success.html"),
+    LatencyTarget("Microsoft", "http://www.msftconnecttest.com/connecttest.txt"),
+    LatencyTarget("Instagram", "https://www.instagram.com"),
+    LatencyTarget("Discord", "https://discord.com"),
+    LatencyTarget("Yandex", "https://ya.ru"),
+    LatencyTarget("Baidu", "https://baidu.com"),
+)
+
 /**
  * Name and URL of each latency target shown on the home page. BFR-style card: each target is a compact
  * "#n / name · host" row that expands into its name and URL fields when tapped.
@@ -229,6 +246,18 @@ fun LatencyTargetsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: ()
                             }
                             if (expanded) {
                                 Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    // Quick pick of well-known services; the fields below stay editable.
+                                    LatencyFieldLabel(BoxyIcons.Router, stringResource(R.string.settings_latency_presets))
+                                    Row(
+                                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        LATENCY_PRESETS.forEach { preset ->
+                                            com.skofqq.boxy.ui.components.GlassChip(preset.name, preset.url == t.url.trim()) {
+                                                targets = targets.toMutableList().also { it[i] = preset }
+                                            }
+                                        }
+                                    }
                                     LatencyFieldLabel(BoxyIcons.Tune, stringResource(R.string.settings_latency_name))
                                     BoxyTextField(
                                         t.name,

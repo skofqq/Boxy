@@ -777,4 +777,5 @@
     <string name="panel_boxy_sub">Proxy-Gruppen und Knoten ohne Web-Panel</string>
     <string name="proxies_stopped_title">Dienst gestoppt</string>
     <string name="proxies_no_api_title">Kein Zugriff auf den Kern</string>
+    <string name="settings_latency_presets">Schnellauswahl</string>
 </resources>
