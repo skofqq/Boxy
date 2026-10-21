@@ -263,7 +263,7 @@ private fun GroupIcon(url: String?, size: Dp) {
 private fun GroupHead(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>, iconSize: Dp) {
     Row(verticalAlignment = Alignment.Top) {
         Column(Modifier.weight(1f)) {
-            Text(group.name, style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(group.name, style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(4.dp))
             Text(
                 aliveText(group, snap, delays),
