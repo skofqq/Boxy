@@ -1001,6 +1001,13 @@ if command -v ksud &>/dev/null; then
  $scripts_dir/box.tool webroot >/dev/null 2>&1
 fi
 
+# Tells Boxy right away that the service started or stopped, so its notification, tile and widget follow
+# without frequent polling. Not exported in Boxy: only root and the system can send it.
+notify_state() {
+  am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.STATE_CHANGED \
+    -n com.skofqq.boxy/.notify.ModuleEventReceiver >/dev/null 2>&1 &
+}
+
 case "$1" in
   start)
     # Clean up a previous run only when something of it is left (saves ~1.5 s on a normal start).
@@ -1008,13 +1015,16 @@ case "$1" in
       stop_box >/dev/null 2>&1
     fi
     start_box
+    notify_state
     ;;
   stop)
     stop_box
+    notify_state
     ;;
   restart)
     "${scripts_dir}/box.iptables" disable && stop_box
     start_box && "${scripts_dir}/box.iptables" renew
+    notify_state
     ;;
   status)
     if busybox pidof "${bin_name}" >/dev/null; then

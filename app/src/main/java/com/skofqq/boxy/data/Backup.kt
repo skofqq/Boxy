@@ -15,7 +15,8 @@ import java.util.zip.ZipOutputStream
 enum class BackupScope { MODULES, APPS, BOTH }
 
 /**
- * Backup archive: module settings and configs (modules/…) and this app's preferences (apps/prefs.json).
+ * Backup archive: module settings and configs (modules/…), this app's preferences (apps/prefs.json) and
+ * its collected data (apps/<name>.json: traffic history, traffic per app, subscription checks).
  * Large binary data (cores, geo databases, dashboards, logs) is not included.
  */
 object Backup {
@@ -23,6 +24,8 @@ object Backup {
     // Core configs and the dnscrypt-proxy config (dnscrypt-proxy.toml with the picked servers, block lists).
     private val CORE_DIRS = listOf("clash", "sing-box", "xray", "v2fly", "hysteria", "dnscrypt")
     private val CONFIG_EXT = setOf("yaml", "yml", "json", "txt", "list", "conf", "toml")
+    // Preference files with data the app collects (TrafficStats, AppTraffic, Subscriptions).
+    private val DATA_PREFS = listOf("traffic", "app_traffic", "subscriptions")
 
     suspend fun export(context: Context, uri: Uri, prefs: Prefs, scope: BackupScope = BackupScope.BOTH): Boolean = withContext(Dispatchers.IO) {
         runCatching {
@@ -43,11 +46,11 @@ object Backup {
                         }
                     }
                     if (scope != BackupScope.MODULES) {
-                        val json = JSONObject()
-                        prefs.exportAll().forEach { (k, v) ->
-                            json.put(k, JSONObject().put("t", typeOf(v)).put("v", v))
+                        put("apps/prefs.json", encode(prefs.exportAll()).toString(2).toByteArray())
+                        DATA_PREFS.forEach { name ->
+                            val all = context.getSharedPreferences(name, Context.MODE_PRIVATE).all
+                            if (all.isNotEmpty()) put("apps/$name.json", encode(all).toString().toByteArray())
                         }
-                        put("apps/prefs.json", json.toString(2).toByteArray())
                     }
                     put("manifest.json", JSONObject().put("app", "Boxy").put("created", System.currentTimeMillis()).toString().toByteArray())
                 }
@@ -93,18 +96,12 @@ object Backup {
                                 ok = writeBytes("${BoxModule.BOX_DIR}/$rel", bytes) && ok
                             }
                             e.name == "apps/prefs.json" && scope != BackupScope.MODULES -> {
-                                val json = JSONObject(String(bytes))
-                                val map = json.keys().asSequence().associateWith { k ->
-                                    val o = json.getJSONObject(k)
-                                    when (o.optString("t")) {
-                                        "b" -> o.getBoolean("v")
-                                        "i" -> o.getInt("v")
-                                        "l" -> o.getLong("v")
-                                        "f" -> o.getDouble("v").toFloat()
-                                        else -> o.optString("v")
-                                    }
-                                }
+                                val map = decode(JSONObject(String(bytes)))
                                 withContext(Dispatchers.Main) { prefs.importAll(map) }
+                            }
+                            e.name.startsWith("apps/") && scope != BackupScope.MODULES -> {
+                                val name = e.name.removePrefix("apps/").removeSuffix(".json")
+                                if (name in DATA_PREFS) writePrefs(context, name, decode(JSONObject(String(bytes))))
                             }
                         }
                     }
@@ -112,6 +109,38 @@ object Backup {
             }
             ok
         }.getOrDefault(false)
+    }
+
+    private fun encode(values: Map<String, *>): JSONObject {
+        val json = JSONObject()
+        values.forEach { (k, v) -> json.put(k, JSONObject().put("t", typeOf(v)).put("v", v)) }
+        return json
+    }
+
+    private fun decode(json: JSONObject): Map<String, Any?> = json.keys().asSequence().associateWith { k ->
+        val o = json.getJSONObject(k)
+        when (o.optString("t")) {
+            "b" -> o.getBoolean("v")
+            "i" -> o.getInt("v")
+            "l" -> o.getLong("v")
+            "f" -> o.getDouble("v").toFloat()
+            else -> o.optString("v")
+        }
+    }
+
+    /** Replaces the whole preference file [name] with [values]. */
+    private fun writePrefs(context: Context, name: String, values: Map<String, Any?>) {
+        val e = context.getSharedPreferences(name, Context.MODE_PRIVATE).edit().clear()
+        values.forEach { (k, v) ->
+            when (v) {
+                is Boolean -> e.putBoolean(k, v)
+                is Int -> e.putInt(k, v)
+                is Long -> e.putLong(k, v)
+                is Float -> e.putFloat(k, v)
+                is String -> e.putString(k, v)
+            }
+        }
+        e.commit()
     }
 
     private fun typeOf(v: Any?): String = when (v) {

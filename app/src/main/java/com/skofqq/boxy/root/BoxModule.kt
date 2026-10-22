@@ -168,6 +168,7 @@ object BoxModule {
 
     /** Writes key=<raw> (raw may be a quoted string or a bash array). */
     suspend fun writeSettingRaw(key: String, raw: String): Boolean = withContext(Dispatchers.IO) {
+        com.skofqq.boxy.net.Net.invalidateApi()
         val sedValue = raw.replace("\\", "\\\\").replace("/", "\\/").replace("&", "\\&").replace("'", "'\\''")
         val echoValue = raw.replace("'", "'\\''")
         Shell.cmd(
@@ -354,6 +355,7 @@ object BoxModule {
 
     /** Writes text to a root-owned file (content goes through base64, so any characters are safe). */
     suspend fun writeFile(path: String, content: String): Boolean = withContext(Dispatchers.IO) {
+        com.skofqq.boxy.net.Net.invalidateApi()
         val b64 = android.util.Base64.encodeToString(content.toByteArray(), android.util.Base64.NO_WRAP)
         val job = Shell.getShell().newJob()
         // Long files are sent in chunks to stay well under the shell's line limit.

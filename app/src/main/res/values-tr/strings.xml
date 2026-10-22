@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Güç düğmesi ve hizmet durumu</string>
     <string name="backup_export_scope">Neler kaydedilsin</string>
     <string name="backup_scope_modules_desc">settings.ini, uygulama listeleri, çekirdek yapılandırmaları</string>
-    <string name="backup_scope_apps_desc">Boxy ayarları: tema, ana sayfa, paneller, ayna</string>
+    <string name="backup_scope_apps_desc">Boxy ayarları: tema, ana sayfa, paneller, ayna, trafik istatistikleri</string>
     <string name="backup_scope_both_desc">Modül dosyaları ve Boxy ayarları</string>
     <string name="traffic_by_week">Haftalar</string>
     <string name="net_sim_title">Mobil ağ</string>

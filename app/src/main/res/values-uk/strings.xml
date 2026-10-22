@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Кнопка живлення і стан сервісу</string>
     <string name="backup_export_scope">Що зберігати</string>
     <string name="backup_scope_modules_desc">settings.ini, списки застосунків, конфігурації ядер</string>
-    <string name="backup_scope_apps_desc">Налаштування Boxy: тема, головна, панелі, дзеркало</string>
+    <string name="backup_scope_apps_desc">Налаштування Boxy: тема, головна, панелі, дзеркало, статистика трафіку</string>
     <string name="backup_scope_both_desc">Файли модуля та налаштування Boxy</string>
     <string name="traffic_by_week">Тижні</string>
     <string name="net_sim_title">Мобільна мережа</string>

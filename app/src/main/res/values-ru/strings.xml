@@ -621,7 +621,7 @@
     <string name="widget_compact_description">Кнопка питания и статус сервиса</string>
     <string name="backup_export_scope">Что сохранять</string>
     <string name="backup_scope_modules_desc">settings.ini, списки приложений, конфигурации ядер</string>
-    <string name="backup_scope_apps_desc">Настройки Boxy: тема, главная, панели, зеркало</string>
+    <string name="backup_scope_apps_desc">Настройки Boxy: тема, главная, панели, зеркало, статистика трафика</string>
     <string name="backup_scope_both_desc">Файлы модуля и настройки Boxy</string>
     <string name="traffic_by_week">Недели</string>
     <string name="net_sim_title">Мобильная сеть</string>

@@ -196,12 +196,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-        <!-- Events from the module (am broadcast as root), e.g. a failed subscription update. -->
+        <!-- Events from the module (am broadcast as root): service started / stopped, a failed subscription update. -->
         <receiver
             android:name=".notify.ModuleEventReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.skofqq.boxy.action.SUBS_FAILED" />
+                <action android:name="com.skofqq.boxy.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
     </application>

@@ -633,7 +633,7 @@
     <string name="widget_compact_description">Power button and service status</string>
     <string name="backup_export_scope">What to save</string>
     <string name="backup_scope_modules_desc">settings.ini, app lists, core configs</string>
-    <string name="backup_scope_apps_desc">Boxy preferences: theme, layout, panels, mirror</string>
+    <string name="backup_scope_apps_desc">Boxy preferences: theme, layout, panels, mirror, traffic stats</string>
     <string name="backup_scope_both_desc">Module files and Boxy preferences</string>
     <string name="traffic_by_week">Weeks</string>
     <string name="net_sim_title">Mobile network</string>

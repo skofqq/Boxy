@@ -17,11 +17,16 @@ import com.skofqq.boxy.R
 import com.skofqq.boxy.util.withAppLocale
 
 /**
- * Events sent by the module with `am broadcast` as root (box.tool notify_subs_failed).
- * Not exported: only root and the system can reach it.
+ * Events sent by the module with `am broadcast` as root (box.service notify_state, box.tool
+ * notify_subs_failed). Not exported: only root and the system can reach it.
  */
 class ModuleEventReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == ACTION_STATE_CHANGED) {
+            // The service started or stopped: notification, tile and widgets follow at once.
+            com.skofqq.boxy.service.BoxControl.changed(context)
+            return
+        }
         if (intent.action != ACTION_SUBS_FAILED) return
         val app = BoxyApp.instance
         // Off in Settings → Notifications, or the user is looking at the app (the update page shows the error).
@@ -56,6 +61,7 @@ class ModuleEventReceiver : BroadcastReceiver() {
 
     companion object {
         const val ACTION_SUBS_FAILED = "com.skofqq.boxy.action.SUBS_FAILED"
+        const val ACTION_STATE_CHANGED = "com.skofqq.boxy.action.STATE_CHANGED"
         const val CHANNEL_ID = "module_events"
         private const val NOTIFICATION_ID = 2
 

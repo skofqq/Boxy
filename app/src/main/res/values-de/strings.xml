@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Ein/Aus-Taste und Dienststatus</string>
     <string name="backup_export_scope">Was sichern</string>
     <string name="backup_scope_modules_desc">settings.ini, App-Listen, Kern-Konfigurationen</string>
-    <string name="backup_scope_apps_desc">Boxy-Einstellungen: Design, Startseite, Panels, Spiegel</string>
+    <string name="backup_scope_apps_desc">Boxy-Einstellungen: Design, Startseite, Panels, Spiegel, Traffic-Statistik</string>
     <string name="backup_scope_both_desc">Moduldateien und Boxy-Einstellungen</string>
     <string name="traffic_by_week">Wochen</string>
     <string name="net_sim_title">Mobilfunknetz</string>

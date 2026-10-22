@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Pulsante di accensione e stato del servizio</string>
     <string name="backup_export_scope">Cosa salvare</string>
     <string name="backup_scope_modules_desc">settings.ini, elenchi app, configurazioni dei core</string>
-    <string name="backup_scope_apps_desc">Impostazioni di Boxy: tema, home, pannelli, mirror</string>
+    <string name="backup_scope_apps_desc">Impostazioni di Boxy: tema, home, pannelli, mirror, statistiche del traffico</string>
     <string name="backup_scope_both_desc">File del modulo e impostazioni di Boxy</string>
     <string name="traffic_by_week">Settimane</string>
     <string name="net_sim_title">Rete mobile</string>

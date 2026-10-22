@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Қуат түймесі және қызмет күйі</string>
     <string name="backup_export_scope">Нені сақтау</string>
     <string name="backup_scope_modules_desc">settings.ini, қолданбалар тізімдері, ядро конфигурациялары</string>
-    <string name="backup_scope_apps_desc">Boxy баптаулары: тақырып, басты бет, панельдер, айна</string>
+    <string name="backup_scope_apps_desc">Boxy баптаулары: тақырып, басты бет, панельдер, айна, трафик статистикасы</string>
     <string name="backup_scope_both_desc">Модуль файлдары және Boxy баптаулары</string>
     <string name="traffic_by_week">Апталар</string>
     <string name="net_sim_title">Мобильді желі</string>

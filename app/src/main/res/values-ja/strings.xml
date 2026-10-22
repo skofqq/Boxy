@@ -609,7 +609,7 @@
     <string name="widget_compact_description">電源ボタンとサービスの状態</string>
     <string name="backup_export_scope">保存する内容</string>
     <string name="backup_scope_modules_desc">settings.ini、アプリ一覧、コアの設定</string>
-    <string name="backup_scope_apps_desc">Boxy の設定: テーマ、ホーム、パネル、ミラー</string>
+    <string name="backup_scope_apps_desc">Boxy の設定: テーマ、ホーム、パネル、ミラー、通信量の統計</string>
     <string name="backup_scope_both_desc">モジュールのファイルと Boxy の設定</string>
     <string name="traffic_by_week">週</string>
     <string name="net_sim_title">モバイルネットワーク</string>

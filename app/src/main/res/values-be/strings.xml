@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Кнопка харчавання і стан сэрвісу</string>
     <string name="backup_export_scope">Што захоўваць</string>
     <string name="backup_scope_modules_desc">settings.ini, спісы праграм, канфігурацыі ядраў</string>
-    <string name="backup_scope_apps_desc">Налады Boxy: тэма, галоўная, панэлі, люстэрка</string>
+    <string name="backup_scope_apps_desc">Налады Boxy: тэма, галоўная, панэлі, люстэрка, статыстыка трафіку</string>
     <string name="backup_scope_both_desc">Файлы модуля і налады Boxy</string>
     <string name="traffic_by_week">Тыдні</string>
     <string name="net_sim_title">Мабільная сетка</string>

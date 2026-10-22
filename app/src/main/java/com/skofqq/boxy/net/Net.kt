@@ -189,8 +189,28 @@ object Net {
 
     // ---- Clash API (mihomo / sing-box clash_api) ----
 
-    /** Reads external-controller and secret from the active core config. */
+    private var apiCache: Triple<String, ClashApi, Long>? = null
+
+    /**
+     * external-controller and secret of the active core config. Kept for a few minutes per core, so the
+     * screens, the status service and the samplers do not read the config with root every time; dropped by
+     * [invalidateApi] when the service, the settings or a config file change.
+     */
     suspend fun clashApi(core: String?): ClashApi? {
+        val key = core ?: "clash"
+        val now = android.os.SystemClock.elapsedRealtime()
+        apiCache?.takeIf { it.first == key && now - it.third < API_TTL_MS }?.let { return it.second }
+        return readClashApi(core)?.also { apiCache = Triple(key, it, now) }
+    }
+
+    /** Forgets the remembered API address; the next [clashApi] reads the config again. */
+    fun invalidateApi() {
+        apiCache = null
+    }
+
+    private const val API_TTL_MS = 10 * 60_000L
+
+    private suspend fun readClashApi(core: String?): ClashApi? {
         val (addr, secret) = when (core) {
             "sing-box" -> {
                 val name = BoxModule.readSetting("name_sing_config") ?: "config.json"

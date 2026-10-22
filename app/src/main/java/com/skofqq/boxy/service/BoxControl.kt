@@ -59,6 +59,8 @@ object BoxControl {
 
     /** Widget and Quick Settings tile show the new state. */
     fun changed(context: Context) {
+        com.skofqq.boxy.net.Net.invalidateApi()
+        BoxStatusService.poke()
         BoxWidget.refresh(context)
         runCatching { TileService.requestListeningState(context, ComponentName(context, BoxTileService::class.java)) }
         com.skofqq.boxy.configs.ConfigSwitch.refreshViews(context)

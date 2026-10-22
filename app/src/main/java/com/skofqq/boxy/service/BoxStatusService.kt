@@ -26,16 +26,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Persistent notification with the Box service status and Stop / Restart actions
- * (Settings → Notifications). Polls the module every few seconds while the screen is on and
- * redraws the notification only when something changed; the uptime is a system chronometer.
+ * (Settings → Notifications). The module announces start and stop right away ([poke]); besides that the
+ * module is polled every [POLL_MS] while the screen is on, and the notification is redrawn only when
+ * something changed; the uptime is a system chronometer.
  */
 class BoxStatusService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -87,10 +90,12 @@ class BoxStatusService : Service() {
                     if (last != null) BoxControl.changed(this@BoxStatusService)
                     last = state.running
                 }
-                if (tick++ % 12 == 0) TrafficStats.sample(applicationContext)
+                // Once a minute.
+                if (tick++ % 4 == 0) TrafficStats.sample(applicationContext)
                 // Proxied traffic per app (screen on only, like this loop); at most every 8 s.
                 if (state?.running == true) com.skofqq.boxy.data.AppTraffic.sample(applicationContext)
-                delay(5000)
+                // A start / stop announced by the module (or done by the app) wakes the loop early.
+                withTimeoutOrNull(POLL_MS) { pokes.first() }
             }
         }
     }
@@ -180,6 +185,14 @@ class BoxStatusService : Service() {
         private const val ACTION_STOP = "com.skofqq.boxy.STOP"
         private const val ACTION_START = "com.skofqq.boxy.START"
         private const val ACTION_RESTART = "com.skofqq.boxy.RESTART"
+        private const val POLL_MS = 15_000L
+
+        private val pokes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+        /** Re-reads the service state now instead of at the next poll. */
+        fun poke() {
+            pokes.tryEmit(Unit)
+        }
 
         fun createChannel(context: Context) {
             val nm = context.getSystemService(NotificationManager::class.java)

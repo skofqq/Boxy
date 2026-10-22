@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_OPEN_SETTINGS = "com.skofqq.boxy.extra.OPEN_SETTINGS"
         /** How long the launch screen may hold the first frame so the logo animation can play out. */
-        private const val SPLASH_MS = 720L
+        private const val SPLASH_MS = 400L
     }
 
     /**

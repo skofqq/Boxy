@@ -1,5 +1,13 @@
 # Box for Root (Boxy edition)
 
+## v1.10.9
+
+- The service tells Boxy right away when it starts, stops or restarts, so the app's notification, tile and
+  widgets update at once while the app checks the state much less often (saves battery)
+
+- Сервис сразу сообщает Boxy о запуске, остановке и перезапуске: уведомление, плитка и виджеты приложения
+  обновляются мгновенно, а приложение проверяет состояние гораздо реже (экономит батарею)
+
 ## v1.10.8
 
 - Fixed: updating a core that is not the active one (for example xray while clash runs) restarted the service

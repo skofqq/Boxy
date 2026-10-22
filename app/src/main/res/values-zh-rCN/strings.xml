@@ -580,7 +580,7 @@
     <string name="widget_compact_description">电源按钮和服务状态</string>
     <string name="backup_export_scope">保存内容</string>
     <string name="backup_scope_modules_desc">settings.ini、应用列表、核心配置</string>
-    <string name="backup_scope_apps_desc">Boxy 设置：主题、主页、面板、镜像</string>
+    <string name="backup_scope_apps_desc">Boxy 设置：主题、主页、面板、镜像、流量统计</string>
     <string name="backup_scope_both_desc">模块文件和 Boxy 设置</string>
     <string name="traffic_by_week">按周</string>
     <string name="net_sim_title">移动网络</string>

@@ -6,7 +6,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowSplashScreenBackground">@color/window_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo_anim</item>
-        <item name="android:windowSplashScreenAnimationDuration">700</item>
+        <item name="android:windowSplashScreenAnimationDuration">400</item>
         <item name="splashLogoColor">@color/splash_logo</item>
     </style>
 </resources>

@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Bouton marche/arrêt et état du service</string>
     <string name="backup_export_scope">Que sauvegarder</string>
     <string name="backup_scope_modules_desc">settings.ini, listes d’applis, configurations des cœurs</string>
-    <string name="backup_scope_apps_desc">Réglages de Boxy : thème, accueil, panneaux, miroir</string>
+    <string name="backup_scope_apps_desc">Réglages de Boxy : thème, accueil, panneaux, miroir, statistiques de trafic</string>
     <string name="backup_scope_both_desc">Fichiers du module et réglages de Boxy</string>
     <string name="traffic_by_week">Semaines</string>
     <string name="net_sim_title">Réseau mobile</string>

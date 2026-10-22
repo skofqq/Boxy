@@ -47,8 +47,6 @@ object AppTraffic {
     private val lock = Any()
     private val last = HashMap<String, LongArray>()
     private var lastAt = 0L
-    private var api: Pair<String, ClashApi>? = null
-    private var apiAt = 0L
 
     /** Whether the core reports apps in its connections (find-process-mode); null until known. */
     @Volatile
@@ -67,10 +65,7 @@ object AppTraffic {
             return@withContext
         }
         val core = state.core ?: "clash"
-        // The API address comes from the config file (a root read): keep it for a few minutes.
-        val a = api?.takeIf { it.first == core && now - apiAt < 300_000 }?.second
-            ?: Net.clashApi(core)?.also { api = core to it; apiAt = now }
-            ?: return@withContext
+        val a = Net.clashApi(core) ?: return@withContext
         val conns = Net.clashConnections(a) ?: return@withContext
         if (conns.isNotEmpty()) coreKnowsApps = conns.any { it.app != null || it.uid != null }
         val add = HashMap<String, LongArray>()

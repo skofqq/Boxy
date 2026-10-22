@@ -609,7 +609,7 @@
     <string name="widget_compact_description">Botón de encendido y estado del servicio</string>
     <string name="backup_export_scope">Qué guardar</string>
     <string name="backup_scope_modules_desc">settings.ini, listas de apps, configuraciones de núcleos</string>
-    <string name="backup_scope_apps_desc">Ajustes de Boxy: tema, inicio, paneles, espejo</string>
+    <string name="backup_scope_apps_desc">Ajustes de Boxy: tema, inicio, paneles, espejo, estadísticas de tráfico</string>
     <string name="backup_scope_both_desc">Archivos del módulo y ajustes de Boxy</string>
     <string name="traffic_by_week">Semanas</string>
     <string name="net_sim_title">Red móvil</string>
