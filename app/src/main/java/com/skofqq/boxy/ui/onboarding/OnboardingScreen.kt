@@ -23,6 +23,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -93,20 +95,21 @@ private class Story(
     val shape: RoundedPolygon,
     val title: Int,
     val body: Int?,
+    /** Screen recording shown instead of the art: (Russian, English) clip. */
+    val video: Pair<Int, Int>? = null,
+    /** How long the story stays before the next one opens by itself (a clip loops meanwhile). */
+    val ms: Int = 7000,
     val tint: @Composable () -> Color,
 )
-
-/** How long an info story stays before the next one opens by itself. */
-private const val STORY_MS = 7000
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private fun stories(introOnly: Boolean): List<Story> = buildList {
     add(Story(StoryKind.INFO, BoxyIcons.Shield, MaterialShapes.Cookie12Sided, R.string.story_welcome_title, R.string.story_welcome_body) { Tints.blue.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Power, MaterialShapes.Sunny, R.string.story_home_title, R.string.story_home_body) { Tints.green.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Apps, MaterialShapes.Clover8Leaf, R.string.story_apps_title, R.string.story_apps_body) { Tints.purple.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Dashboard, MaterialShapes.SoftBurst, R.string.story_panel_title, R.string.story_panel_body) { Tints.teal.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Build, MaterialShapes.Cookie9Sided, R.string.story_tools_title, R.string.story_tools_body) { Tints.orange.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Bolt, MaterialShapes.Flower, R.string.story_quick_title, R.string.story_quick_body) { Tints.amber.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Power, MaterialShapes.Sunny, R.string.story_home_title, R.string.story_home_body, R.raw.story_home_ru to R.raw.story_home_en, 9000) { Tints.green.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Apps, MaterialShapes.Clover8Leaf, R.string.story_apps_title, R.string.story_apps_body, R.raw.story_apps_ru to R.raw.story_apps_en, 9000) { Tints.purple.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Dashboard, MaterialShapes.SoftBurst, R.string.story_panel_title, R.string.story_panel_body, R.raw.story_panel_ru to R.raw.story_panel_en, 9000) { Tints.teal.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Build, MaterialShapes.Cookie9Sided, R.string.story_tools_title, R.string.story_tools_body, R.raw.story_tools_ru to R.raw.story_tools_en, 10000) { Tints.orange.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Bolt, MaterialShapes.Flower, R.string.story_quick_title, R.string.story_quick_body, R.raw.story_quick_ru to R.raw.story_quick_en, 11000) { Tints.amber.fg })
     if (!introOnly) {
         add(Story(StoryKind.AGREEMENT, BoxyIcons.Description, MaterialShapes.Cookie7Sided, R.string.onboarding_agreement_title, null) { Tints.gray.fg })
         add(Story(StoryKind.PERMISSIONS, BoxyIcons.Memory, MaterialShapes.Cookie6Sided, R.string.onboarding_permissions, null) { Boxy.colors.accent })
@@ -150,7 +153,7 @@ fun OnboardingScreen(onFinish: () -> Unit, introOnly: Boolean = false) {
         if (story.kind != StoryKind.INFO) return@LaunchedEffect
         snapshotFlow { paused }.collectLatest { p ->
             if (!p) {
-                progress.animateTo(1f, tween(((1f - progress.value) * STORY_MS).toInt(), easing = LinearEasing))
+                progress.animateTo(1f, tween(((1f - progress.value) * story.ms).toInt(), easing = LinearEasing))
                 next()
             }
         }
@@ -230,8 +233,12 @@ fun OnboardingScreen(onFinish: () -> Unit, introOnly: Boolean = false) {
                     verticalArrangement = if (s.kind == StoryKind.INFO) Arrangement.Center else Arrangement.Top,
                 ) {
                     Spacer(Modifier.height(if (s.kind == StoryKind.INFO) 0.dp else 12.dp))
-                    StoryArt(s, if (s.kind == StoryKind.INFO) 210.dp else 120.dp)
-                    Spacer(Modifier.height(if (s.kind == StoryKind.INFO) 36.dp else 20.dp))
+                    if (s.video != null) {
+                        StoryVideo(s.video, paused && i == index, s.tint())
+                    } else {
+                        StoryArt(s, if (s.kind == StoryKind.INFO) 210.dp else 120.dp)
+                    }
+                    Spacer(Modifier.height(if (s.video != null) 20.dp else if (s.kind == StoryKind.INFO) 36.dp else 20.dp))
                     Text(
                         stringResource(s.title),
                         style = MaterialTheme.typography.headlineMedium,
@@ -291,6 +298,56 @@ private fun StoryArt(s: Story, size: Dp) {
         ) {
             Icon(s.icon, null, Modifier.size(size * 0.24f).graphicsLayer { rotationZ = turn / 2 }, tint = Color.White)
         }
+    }
+}
+
+/**
+ * A short screen recording in a phone-like frame, muted and looping; paused while the story is held.
+ * Russian clips for Russian, Ukrainian, Belarusian and Kazakh, English ones for the other languages.
+ */
+@Composable
+private fun StoryVideo(clips: Pair<Int, Int>, paused: Boolean, tint: Color) {
+    val context = LocalContext.current
+    val lang = context.resources.configuration.locales[0].language
+    val res = if (lang in setOf("ru", "uk", "be", "kk")) clips.first else clips.second
+    val player = remember(res) { android.media.MediaPlayer() }
+    var ready by remember(res) { mutableStateOf(false) }
+    androidx.compose.runtime.DisposableEffect(res) { onDispose { runCatching { player.release() } } }
+    LaunchedEffect(paused, ready) {
+        if (!ready) return@LaunchedEffect
+        runCatching { if (paused) player.pause() else player.start() }
+    }
+    val shape = RoundedCornerShape(26.dp)
+    Box(
+        Modifier.height(androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp.dp * 0.52f)
+            .aspectRatio(480f / 1072f)
+            .clip(shape)
+            .background(Boxy.colors.card)
+            .border(3.dp, tint.copy(alpha = 0.55f), shape),
+    ) {
+        androidx.compose.ui.viewinterop.AndroidView(
+            factory = { ctx ->
+                android.view.TextureView(ctx).apply {
+                    surfaceTextureListener = object : android.view.TextureView.SurfaceTextureListener {
+                        override fun onSurfaceTextureAvailable(st: android.graphics.SurfaceTexture, w: Int, h: Int) {
+                            runCatching {
+                                ctx.resources.openRawResourceFd(res).use { afd -> player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length) }
+                                player.setSurface(android.view.Surface(st))
+                                player.isLooping = true
+                                player.setVolume(0f, 0f)
+                                player.setOnPreparedListener { ready = true }
+                                player.prepareAsync()
+                            }
+                        }
+
+                        override fun onSurfaceTextureSizeChanged(st: android.graphics.SurfaceTexture, w: Int, h: Int) {}
+                        override fun onSurfaceTextureDestroyed(st: android.graphics.SurfaceTexture): Boolean = true
+                        override fun onSurfaceTextureUpdated(st: android.graphics.SurfaceTexture) {}
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize().padding(3.dp).clip(RoundedCornerShape(23.dp)),
+        )
     }
 }
 

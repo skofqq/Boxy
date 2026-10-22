@@ -123,7 +123,8 @@ class BoxStatusService : Service() {
 
     /** Redraws the notification only when its content changes. */
     private fun show(state: ServiceState?) {
-        val key = listOf(state?.running, state?.core, state?.mode, state?.pid)
+        // The in-app language is part of the key: a change shows up at the next poll.
+        val key = listOf(state?.running, state?.core, state?.mode, state?.pid, com.skofqq.boxy.data.Prefs.storedLanguage(this))
         if (key == shown) return
         shown = key
         notify(build(state))
@@ -134,7 +135,9 @@ class BoxStatusService : Service() {
     }
 
     private fun build(state: ServiceState?): Notification {
-        val title = getString(
+        // The language may have changed in the app since the service started.
+        val res = withAppLocale()
+        val title = res.getString(
             busyText ?: when {
                 state == null -> R.string.service_status_checking
                 state.running -> R.string.service_status_running
@@ -161,10 +164,10 @@ class BoxStatusService : Service() {
         }
         if (busyText == null && state != null) {
             if (state.running) {
-                b.addAction(0, getString(R.string.service_action_stop), action(ACTION_STOP))
-                b.addAction(0, getString(R.string.service_action_restart), action(ACTION_RESTART))
+                b.addAction(0, res.getString(R.string.service_action_stop), action(ACTION_STOP))
+                b.addAction(0, res.getString(R.string.service_action_restart), action(ACTION_RESTART))
             } else {
-                b.addAction(0, getString(R.string.action_start), action(ACTION_START))
+                b.addAction(0, res.getString(R.string.action_start), action(ACTION_START))
             }
         }
         return b.build()
