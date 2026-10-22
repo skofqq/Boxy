@@ -786,4 +786,20 @@
     <string name="net_saved_empty">保存済みネットワークはありません</string>
     <string name="net_saved_added">追加済み</string>
     <string name="net_saved_add">追加（%1$d）</string>
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_start">はじめる</string>
+    <string name="story_welcome_title">こんにちは、Boxy です</string>
+    <string name="story_welcome_body">Boxy は Box for Root モジュールを管理します。モジュールはスマートフォン全体の通信を mihomo、sing-box、xray などのプロキシコア経由で流します。root（Magisk、KernelSU または APatch）とモジュールのインストールが必要です。</string>
+    <string name="story_home_title">ホーム</string>
+    <string name="story_home_body">ボタンひとつでサービスを開始・停止できます。状態、サーバーまでの遅延、通信量もここで確認できます。サービスカードではコア、ネットワークモード、IPv6 を切り替えられます。</string>
+    <string name="story_apps_title">アプリ</string>
+    <string name="story_apps_body">どのアプリをプロキシ経由にし、どれを直接接続にするかを選べます：ブラックリストまたはホワイトリスト。</string>
+    <string name="story_panel_title">パネル</string>
+    <string name="story_panel_body">プロキシグループのサーバーを切り替え、Boxy 内またはコアの Web ダッシュボードで遅延をテストできます。</string>
+    <string name="story_tools_title">ツール</string>
+    <string name="story_tools_body">設定エディター、サブスクリプション、コアとデータベースの更新、DNSCrypt、Wi-Fi ネットワークのルール、アプリ別の通信量、ログ。</string>
+    <string name="story_quick_title">いつでもすぐに</string>
+    <string name="story_quick_body">クイック設定のタイル、ホーム画面のウィジェット、状態の通知。バックアップでモジュールとアプリの設定を保存できます。</string>
+    <string name="settings_welcome">ようこそガイド</string>
+    <string name="settings_welcome_sub">アプリの使い方をもう一度見る</string>
 </resources>

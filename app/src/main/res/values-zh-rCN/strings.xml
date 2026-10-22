@@ -757,4 +757,20 @@
     <string name="net_saved_empty">没有已保存的网络</string>
     <string name="net_saved_added">已添加</string>
     <string name="net_saved_add">添加（%1$d）</string>
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_start">开始使用</string>
+    <string name="story_welcome_title">你好，这是 Boxy</string>
+    <string name="story_welcome_body">Boxy 用来管理 Box for Root 模块。该模块让整部手机的流量经过代理核心：mihomo、sing-box、xray 等。需要 root（Magisk、KernelSU 或 APatch）并已安装模块。</string>
+    <string name="story_home_title">主页</string>
+    <string name="story_home_body">一键启动或停止服务。这里还能看到服务状态、到服务器的延迟和流量。在服务卡片中可以切换核心、网络模式和 IPv6。</string>
+    <string name="story_apps_title">应用</string>
+    <string name="story_apps_body">选择哪些应用走代理、哪些直连：黑名单或白名单。</string>
+    <string name="story_panel_title">面板</string>
+    <string name="story_panel_body">在代理组中切换服务器，并直接在 Boxy 或核心的网页面板中测试延迟。</string>
+    <string name="story_tools_title">工具</string>
+    <string name="story_tools_body">配置编辑器、订阅、核心与数据库更新、DNSCrypt、Wi-Fi 网络规则、按应用统计的流量以及日志。</string>
+    <string name="story_quick_title">随手可用</string>
+    <string name="story_quick_body">快捷设置磁贴、桌面小部件和状态通知。备份会保存模块和应用的设置。</string>
+    <string name="settings_welcome">欢迎导览</string>
+    <string name="settings_welcome_sub">再看一遍应用的使用方式</string>
 </resources>

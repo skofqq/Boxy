@@ -786,4 +786,20 @@
     <string name="net_saved_empty">Aucun réseau enregistré</string>
     <string name="net_saved_added">ajouté</string>
     <string name="net_saved_add">Ajouter (%1$d)</string>
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_start">Commencer</string>
+    <string name="story_welcome_title">Bonjour, voici Boxy</string>
+    <string name="story_welcome_body">Boxy gère le module Box for Root. Le module fait passer le trafic de tout le téléphone par des cœurs proxy : mihomo, sing-box, xray et d\'autres. Il faut le root (Magisk, KernelSU ou APatch) et le module installé.</string>
+    <string name="story_home_title">Accueil</string>
+    <string name="story_home_body">Démarrez et arrêtez le service d\'un seul bouton. Vous y voyez aussi son état, la latence vers les serveurs et le trafic. La carte du service change le cœur, le mode réseau et l\'IPv6.</string>
+    <string name="story_apps_title">Applis</string>
+    <string name="story_apps_body">Choisissez les applis qui passent par le proxy et celles qui vont en direct : liste noire ou liste blanche.</string>
+    <string name="story_panel_title">Panneau</string>
+    <string name="story_panel_body">Changez de serveur dans les groupes proxy et testez leur latence directement dans Boxy ou dans le tableau de bord web du cœur.</string>
+    <string name="story_tools_title">Outils</string>
+    <string name="story_tools_body">Éditeur de configurations, abonnements, mise à jour des cœurs et des bases, DNSCrypt, règles pour les réseaux Wi-Fi, trafic par appli et journaux.</string>
+    <string name="story_quick_title">Toujours à portée de main</string>
+    <string name="story_quick_body">Une tuile dans les réglages rapides, des widgets sur l\'écran d\'accueil et une notification d\'état. La sauvegarde conserve les réglages du module et de l\'appli.</string>
+    <string name="settings_welcome">Bienvenue</string>
+    <string name="settings_welcome_sub">Revoir le fonctionnement de l\'appli</string>
 </resources>

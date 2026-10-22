@@ -786,4 +786,20 @@
     <string name="net_saved_empty">Сақталған желі жоқ</string>
     <string name="net_saved_added">қосылған</string>
     <string name="net_saved_add">Қосу (%1$d)</string>
+    <string name="onboarding_skip">Өткізу</string>
+    <string name="onboarding_start">Бастау</string>
+    <string name="story_welcome_title">Сәлем, бұл Boxy</string>
+    <string name="story_welcome_body">Boxy Box for Root модулін басқарады. Модуль бүкіл телефонның трафигін прокси ядролары арқылы өткізеді: mihomo, sing-box, xray және басқалар. Root (Magisk, KernelSU немесе APatch) және орнатылған модуль қажет.</string>
+    <string name="story_home_title">Басты бет</string>
+    <string name="story_home_body">Сервисті бір түймемен іске қосып, тоқтатыңыз. Мұнда оның күйі, серверлерге дейінгі кідіріс және трафик көрінеді. Сервис картасында ядро, желі режимі және IPv6 ауыстырылады.</string>
+    <string name="story_apps_title">Қолданбалар</string>
+    <string name="story_apps_body">Қай қолданбалар прокси арқылы, қайсысы тікелей жұмыс істейтінін таңдаңыз: қара немесе ақ тізім.</string>
+    <string name="story_panel_title">Панель</string>
+    <string name="story_panel_body">Прокси топтарындағы серверлерді ауыстырып, олардың кідірісін Boxy ішінде немесе ядроның веб-панелінде тексеріңіз.</string>
+    <string name="story_tools_title">Утилиталар</string>
+    <string name="story_tools_body">Конфигурация редакторы, жазылымдар, ядролар мен базаларды жаңарту, DNSCrypt, Wi-Fi желілеріне арналған ережелер, қолданбалар бойынша трафик және журналдар.</string>
+    <string name="story_quick_title">Әрқашан қол астында</string>
+    <string name="story_quick_body">Шторкадағы тақта, жұмыс үстеліндегі виджеттер және күй хабарландыруы. Сақтық көшірме модуль мен қолданба баптауларын сақтайды.</string>
+    <string name="settings_welcome">Сәлемдесу</string>
+    <string name="settings_welcome_sub">Қолданбаның қалай жұмыс істейтінін қайта көру</string>
 </resources>

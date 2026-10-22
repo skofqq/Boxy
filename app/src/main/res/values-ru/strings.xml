@@ -798,4 +798,20 @@
     <string name="net_saved_empty">Сохранённых сетей нет</string>
     <string name="net_saved_added">добавлена</string>
     <string name="net_saved_add">Добавить (%1$d)</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_start">Начать</string>
+    <string name="story_welcome_title">Привет, это Boxy</string>
+    <string name="story_welcome_body">Boxy управляет модулем Box for Root. Модуль пропускает трафик всего телефона через прокси-ядра: mihomo, sing-box, xray и другие. Нужны root (Magisk, KernelSU или APatch) и установленный модуль.</string>
+    <string name="story_home_title">Главная</string>
+    <string name="story_home_body">Запускайте и останавливайте сервис одной кнопкой. Здесь же видно его состояние, задержку до серверов и трафик. В карточке сервиса меняются ядро, режим сети и IPv6.</string>
+    <string name="story_apps_title">Приложения</string>
+    <string name="story_apps_body">Выберите, какие приложения идут через прокси, а какие напрямую: чёрный или белый список.</string>
+    <string name="story_panel_title">Панель</string>
+    <string name="story_panel_body">Переключайте серверы в группах прокси и проверяйте их задержку прямо в Boxy или в веб-панели ядра.</string>
+    <string name="story_tools_title">Утилиты</string>
+    <string name="story_tools_body">Редактор конфигураций, подписки, обновление ядер и баз, DNSCrypt, правила для сетей Wi-Fi, трафик по приложениям и журналы.</string>
+    <string name="story_quick_title">Всегда под рукой</string>
+    <string name="story_quick_body">Плитка в шторке, виджеты на рабочем столе и уведомление со статусом. Резервная копия сохранит настройки модуля и приложения.</string>
+    <string name="settings_welcome">Приветствие</string>
+    <string name="settings_welcome_sub">Ещё раз посмотреть, как устроено приложение</string>
 </resources>

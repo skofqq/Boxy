@@ -108,6 +108,7 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
     var sourceDialog by remember { mutableStateOf(false) }
     var chainsDialog by remember { mutableStateOf(false) }
     var infoSheet by remember { mutableStateOf(false) }
+    var welcome by remember { mutableStateOf(false) }
     var updateDialog by remember { mutableStateOf(false) }
     // Update notifications need the permission; the check is scheduled either way.
     val notifyPermission = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -311,10 +312,21 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                         else -> moduleVersion ?: stringResource(R.string.common_dash)
                     },
                 ) { moduleSheet = true }
+                SettingsRow(BoxyIcons.AutoAwesome, stringResource(R.string.settings_welcome), stringResource(R.string.settings_welcome_sub)) { welcome = true }
                 SettingsRow(BoxyIcons.Code, stringResource(R.string.settings_licenses), stringResource(R.string.settings_licenses_sub), showDivider = false) {
                     push(ROUTE_LICENSES)
                 }
             }
+        }
+    }
+
+    if (welcome) {
+        // The welcome stories again, without the agreement and permissions of the first run.
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { welcome = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.skofqq.boxy.ui.onboarding.OnboardingScreen(onFinish = { welcome = false }, introOnly = true)
         }
     }
 

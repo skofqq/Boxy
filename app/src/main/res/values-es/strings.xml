@@ -786,4 +786,20 @@
     <string name="net_saved_empty">No hay redes guardadas</string>
     <string name="net_saved_added">añadida</string>
     <string name="net_saved_add">Añadir (%1$d)</string>
+    <string name="onboarding_skip">Omitir</string>
+    <string name="onboarding_start">Empezar</string>
+    <string name="story_welcome_title">Hola, esto es Boxy</string>
+    <string name="story_welcome_body">Boxy gestiona el módulo Box for Root. El módulo envía el tráfico de todo el teléfono a través de núcleos proxy: mihomo, sing-box, xray y otros. Necesitas root (Magisk, KernelSU o APatch) y el módulo instalado.</string>
+    <string name="story_home_title">Inicio</string>
+    <string name="story_home_body">Inicia y detén el servicio con un botón. Aquí también ves su estado, la latencia a los servidores y el tráfico. La tarjeta del servicio cambia el núcleo, el modo de red e IPv6.</string>
+    <string name="story_apps_title">Apps</string>
+    <string name="story_apps_body">Elige qué apps van por el proxy y cuáles van directas: lista negra o lista blanca.</string>
+    <string name="story_panel_title">Panel</string>
+    <string name="story_panel_body">Cambia de servidor en los grupos proxy y prueba su latencia en Boxy o en el panel web del núcleo.</string>
+    <string name="story_tools_title">Utilidades</string>
+    <string name="story_tools_body">Editor de configuraciones, suscripciones, actualización de núcleos y bases de datos, DNSCrypt, reglas para redes Wi-Fi, tráfico por app y registros.</string>
+    <string name="story_quick_title">Siempre a mano</string>
+    <string name="story_quick_body">Un mosaico en los ajustes rápidos, widgets en la pantalla de inicio y una notificación de estado. La copia de seguridad guarda los ajustes del módulo y de la app.</string>
+    <string name="settings_welcome">Bienvenida</string>
+    <string name="settings_welcome_sub">Ver de nuevo cómo funciona la app</string>
 </resources>

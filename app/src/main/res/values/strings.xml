@@ -810,4 +810,20 @@
     <string name="net_saved_empty">No saved networks</string>
     <string name="net_saved_added">added</string>
     <string name="net_saved_add">Add (%1$d)</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="story_welcome_title">Hi, this is Boxy</string>
+    <string name="story_welcome_body">Boxy manages the Box for Root module. The module sends the whole phone\'s traffic through proxy cores: mihomo, sing-box, xray and others. You need root (Magisk, KernelSU or APatch) and the module installed.</string>
+    <string name="story_home_title">Home</string>
+    <string name="story_home_body">Start and stop the service with one button. Here you also see its state, latency to servers and traffic. The service card switches the core, network mode and IPv6.</string>
+    <string name="story_apps_title">Apps</string>
+    <string name="story_apps_body">Choose which apps go through the proxy and which go direct: a blacklist or a whitelist.</string>
+    <string name="story_panel_title">Panel</string>
+    <string name="story_panel_body">Switch servers in proxy groups and test their latency right in Boxy or in the core\'s web dashboard.</string>
+    <string name="story_tools_title">Tools</string>
+    <string name="story_tools_body">Config editor, subscriptions, core and database updates, DNSCrypt, Wi-Fi network rules, traffic per app and logs.</string>
+    <string name="story_quick_title">Always at hand</string>
+    <string name="story_quick_body">A Quick Settings tile, home screen widgets and a status notification. A backup keeps the module and app settings.</string>
+    <string name="settings_welcome">Welcome tour</string>
+    <string name="settings_welcome_sub">See again how the app works</string>
 </resources>

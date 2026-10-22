@@ -786,4 +786,20 @@
     <string name="net_saved_empty">Keine gespeicherten Netze</string>
     <string name="net_saved_added">hinzugefügt</string>
     <string name="net_saved_add">Hinzufügen (%1$d)</string>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_start">Los geht\'s</string>
+    <string name="story_welcome_title">Hallo, das ist Boxy</string>
+    <string name="story_welcome_body">Boxy verwaltet das Modul Box for Root. Das Modul leitet den Datenverkehr des ganzen Telefons über Proxy-Kerne: mihomo, sing-box, xray und andere. Du brauchst Root (Magisk, KernelSU oder APatch) und das installierte Modul.</string>
+    <string name="story_home_title">Startseite</string>
+    <string name="story_home_body">Starte und stoppe den Dienst mit einer Taste. Hier siehst du auch seinen Status, die Latenz zu den Servern und den Traffic. Auf der Dienstkarte wechselst du Kern, Netzwerkmodus und IPv6.</string>
+    <string name="story_apps_title">Apps</string>
+    <string name="story_apps_body">Lege fest, welche Apps über den Proxy laufen und welche direkt: per Blacklist oder Whitelist.</string>
+    <string name="story_panel_title">Panel</string>
+    <string name="story_panel_body">Wechsle Server in Proxy-Gruppen und teste ihre Latenz direkt in Boxy oder im Web-Dashboard des Kerns.</string>
+    <string name="story_tools_title">Werkzeuge</string>
+    <string name="story_tools_body">Konfigurationseditor, Abonnements, Updates für Kerne und Datenbanken, DNSCrypt, Regeln für WLAN-Netze, Traffic pro App und Protokolle.</string>
+    <string name="story_quick_title">Immer griffbereit</string>
+    <string name="story_quick_body">Eine Kachel in den Schnelleinstellungen, Widgets auf dem Startbildschirm und eine Statusbenachrichtigung. Eine Sicherung bewahrt Modul- und App-Einstellungen.</string>
+    <string name="settings_welcome">Einführung</string>
+    <string name="settings_welcome_sub">Noch einmal ansehen, wie die App funktioniert</string>
 </resources>

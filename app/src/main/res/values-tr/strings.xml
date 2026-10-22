@@ -786,4 +786,20 @@
     <string name="net_saved_empty">Kayıtlı ağ yok</string>
     <string name="net_saved_added">eklendi</string>
     <string name="net_saved_add">Ekle (%1$d)</string>
+    <string name="onboarding_skip">Atla</string>
+    <string name="onboarding_start">Başla</string>
+    <string name="story_welcome_title">Merhaba, bu Boxy</string>
+    <string name="story_welcome_body">Boxy, Box for Root modülünü yönetir. Modül tüm telefonun trafiğini mihomo, sing-box, xray gibi proxy çekirdeklerinden geçirir. Root (Magisk, KernelSU veya APatch) ve kurulu modül gerekir.</string>
+    <string name="story_home_title">Ana sayfa</string>
+    <string name="story_home_body">Hizmeti tek düğmeyle başlatıp durdurun. Durumunu, sunuculara gecikmeyi ve trafiği de burada görürsünüz. Hizmet kartı çekirdeği, ağ modunu ve IPv6\'yı değiştirir.</string>
+    <string name="story_apps_title">Uygulamalar</string>
+    <string name="story_apps_body">Hangi uygulamaların proxy üzerinden, hangilerinin doğrudan gideceğini seçin: kara liste veya beyaz liste.</string>
+    <string name="story_panel_title">Panel</string>
+    <string name="story_panel_body">Proxy gruplarında sunucu değiştirin ve gecikmelerini doğrudan Boxy\'de veya çekirdeğin web panelinde test edin.</string>
+    <string name="story_tools_title">Araçlar</string>
+    <string name="story_tools_body">Yapılandırma düzenleyici, abonelikler, çekirdek ve veritabanı güncellemeleri, DNSCrypt, Wi-Fi ağları için kurallar, uygulama başına trafik ve günlükler.</string>
+    <string name="story_quick_title">Her zaman elinizin altında</string>
+    <string name="story_quick_body">Hızlı ayarlarda bir kutucuk, ana ekranda widget\'lar ve durum bildirimi. Yedek, modül ve uygulama ayarlarını saklar.</string>
+    <string name="settings_welcome">Tanıtım</string>
+    <string name="settings_welcome_sub">Uygulamanın nasıl çalıştığını yeniden görün</string>
 </resources>

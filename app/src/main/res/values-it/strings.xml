@@ -786,4 +786,20 @@
     <string name="net_saved_empty">Nessuna rete salvata</string>
     <string name="net_saved_added">aggiunta</string>
     <string name="net_saved_add">Aggiungi (%1$d)</string>
+    <string name="onboarding_skip">Salta</string>
+    <string name="onboarding_start">Inizia</string>
+    <string name="story_welcome_title">Ciao, questo è Boxy</string>
+    <string name="story_welcome_body">Boxy gestisce il modulo Box for Root. Il modulo fa passare il traffico di tutto il telefono attraverso core proxy: mihomo, sing-box, xray e altri. Servono il root (Magisk, KernelSU o APatch) e il modulo installato.</string>
+    <string name="story_home_title">Home</string>
+    <string name="story_home_body">Avvia e ferma il servizio con un solo pulsante. Qui vedi anche il suo stato, la latenza verso i server e il traffico. La scheda del servizio cambia core, modalità di rete e IPv6.</string>
+    <string name="story_apps_title">App</string>
+    <string name="story_apps_body">Scegli quali app passano dal proxy e quali vanno dirette: lista nera o lista bianca.</string>
+    <string name="story_panel_title">Pannello</string>
+    <string name="story_panel_body">Cambia server nei gruppi proxy e prova la loro latenza direttamente in Boxy o nel pannello web del core.</string>
+    <string name="story_tools_title">Strumenti</string>
+    <string name="story_tools_body">Editor delle configurazioni, abbonamenti, aggiornamento di core e database, DNSCrypt, regole per le reti Wi-Fi, traffico per app e log.</string>
+    <string name="story_quick_title">Sempre a portata di mano</string>
+    <string name="story_quick_body">Un riquadro nelle impostazioni rapide, widget nella schermata Home e una notifica di stato. Il backup conserva le impostazioni del modulo e dell\'app.</string>
+    <string name="settings_welcome">Benvenuto</string>
+    <string name="settings_welcome_sub">Rivedi come funziona l\'app</string>
 </resources>
