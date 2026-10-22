@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Өз мекенжайы</string>
     <string name="settings_latency_hint">Картаны қосу не өшіру үшін түртіңіз. Дәл %1$d пайдаланылады; нөмір — басты экрандағы реті. %1$d таңдалғанда сақталады.</string>
     <string name="settings_latency_pick_more">Тағы %1$d таңдаңыз — дәл үшеуі керек</string>
+    <string name="net_saved_title">Сақталған желілерден</string>
+    <string name="net_saved_sub">Телефон қосылған желілер</string>
+    <string name="net_saved_sheet_sub">Біреуін немесе бірнешеуін таңдаңыз</string>
+    <string name="net_saved_empty">Сақталған желі жоқ</string>
+    <string name="net_saved_added">қосылған</string>
+    <string name="net_saved_add">Қосу (%1$d)</string>
 </resources>

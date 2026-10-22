@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Свой адрас</string>
     <string name="settings_latency_hint">Націсніце на картку, каб уключыць або выключыць яе. Выкарыстоўваецца роўна %1$d; нумар — парадак на галоўнай. Змены захоўваюцца, калі выбрана %1$d.</string>
     <string name="settings_latency_pick_more">Выберыце яшчэ %1$d — патрэбна роўна тры</string>
+    <string name="net_saved_title">З захаваных сетак</string>
+    <string name="net_saved_sub">Сеткі, да якіх падключаўся тэлефон</string>
+    <string name="net_saved_sheet_sub">Выберыце адну або некалькі</string>
+    <string name="net_saved_empty">Захаваных сетак няма</string>
+    <string name="net_saved_added">дададзена</string>
+    <string name="net_saved_add">Дадаць (%1$d)</string>
 </resources>

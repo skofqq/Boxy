@@ -148,6 +148,9 @@ fun StringListEditor(
     onPick: ((Int) -> Unit)? = null,
     pickIcon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     icon: androidx.compose.ui.graphics.vector.ImageVector = pickIcon ?: BoxyIcons.Router,
+    /** Extra row under "Add": (title, subtitle, icon) and what it does, e.g. picking from saved networks. */
+    extra: Triple<String, String, androidx.compose.ui.graphics.vector.ImageVector>? = null,
+    onExtra: () -> Unit = {},
 ) {
     val colors = Boxy.colors
     Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp)) {
@@ -199,6 +202,21 @@ fun StringListEditor(
             Column {
                 Text(stringResource(R.string.action_add), style = MaterialTheme.typography.titleMedium, color = colors.text)
                 Text(stringResource(R.string.list_append_item), style = MaterialTheme.typography.bodyMedium, color = colors.text2)
+            }
+        }
+        if (extra != null) {
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable(onClick = onExtra).padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(colors.accent.copy(alpha = 0.14f)), contentAlignment = Alignment.Center) {
+                    Icon(extra.third, null, Modifier.size(22.dp), tint = colors.accent)
+                }
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(extra.first, style = MaterialTheme.typography.titleMedium, color = colors.text)
+                    Text(extra.second, style = MaterialTheme.typography.bodyMedium, color = colors.text2)
+                }
             }
         }
     }

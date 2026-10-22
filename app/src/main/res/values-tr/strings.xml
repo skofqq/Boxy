@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Kendi adresin</string>
     <string name="settings_latency_hint">Açmak veya kapatmak için karta dokunun. Tam %1$d kullanılır; numara ana ekrandaki sıradır. %1$d seçildiğinde kaydedilir.</string>
     <string name="settings_latency_pick_more">%1$d tane daha seçin — tam üç gerekir</string>
+    <string name="net_saved_title">Kayıtlı ağlardan</string>
+    <string name="net_saved_sub">Telefonun bağlandığı ağlar</string>
+    <string name="net_saved_sheet_sub">Bir veya birkaçını seçin</string>
+    <string name="net_saved_empty">Kayıtlı ağ yok</string>
+    <string name="net_saved_added">eklendi</string>
+    <string name="net_saved_add">Ekle (%1$d)</string>
 </resources>

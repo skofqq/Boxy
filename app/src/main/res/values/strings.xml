@@ -804,4 +804,10 @@
     <string name="settings_latency_add">Own address</string>
     <string name="settings_latency_hint">Tap a card to turn it on or off. Exactly %1$d are used; the number is their order on Home. Changes are saved once %1$d are picked.</string>
     <string name="settings_latency_pick_more">Pick %1$d more — exactly three are used</string>
+    <string name="net_saved_title">From saved networks</string>
+    <string name="net_saved_sub">Networks this phone has connected to</string>
+    <string name="net_saved_sheet_sub">Pick one or several</string>
+    <string name="net_saved_empty">No saved networks</string>
+    <string name="net_saved_added">added</string>
+    <string name="net_saved_add">Add (%1$d)</string>
 </resources>

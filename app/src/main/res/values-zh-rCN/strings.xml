@@ -751,4 +751,10 @@
     <string name="settings_latency_add">自定义地址</string>
     <string name="settings_latency_hint">点按卡片即可启用或停用。正好使用 %1$d 个；数字为其在主页上的顺序。选满 %1$d 个后自动保存。</string>
     <string name="settings_latency_pick_more">再选择 %1$d 个——需要正好三个</string>
+    <string name="net_saved_title">从已保存的网络添加</string>
+    <string name="net_saved_sub">此手机连接过的网络</string>
+    <string name="net_saved_sheet_sub">选择一个或多个</string>
+    <string name="net_saved_empty">没有已保存的网络</string>
+    <string name="net_saved_added">已添加</string>
+    <string name="net_saved_add">添加（%1$d）</string>
 </resources>

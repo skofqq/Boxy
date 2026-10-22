@@ -94,6 +94,7 @@ fun NetworkControlScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     var modeSheet by remember { mutableStateOf(false) }
     var macModeSheet by remember { mutableStateOf(false) }
     var wifiPickFor by remember { mutableStateOf<Pair<Boolean, Int>?>(null) } // (isBssid, index)
+    var savedSheet by remember { mutableStateOf(false) }
     var macPickFor by remember { mutableStateOf<Int?>(null) }
     var simModeSheet by remember { mutableStateOf(false) }
     var simPickFor by remember { mutableStateOf<Int?>(null) }
@@ -183,6 +184,8 @@ SubPageHeader(stringResource(R.string.tools_network), stringResource(R.string.to
                         stringResource(R.string.net_hint_ssid),
                         onPick = { wifiPickFor = false to it },
                         pickIcon = BoxyIcons.Wifi,
+                        extra = Triple(stringResource(R.string.net_saved_title), stringResource(R.string.net_saved_sub), BoxyIcons.Wifi),
+                        onExtra = { savedSheet = true },
                     )
                 }
             }
@@ -317,6 +320,15 @@ SubPageHeader(stringResource(R.string.tools_network), stringResource(R.string.to
             wifiPickFor = null
         }
     }
+    if (savedSheet) {
+        val cur = state
+        SavedWifiSheet(cur?.ssids.orEmpty(), onDismiss = { savedSheet = false }) { picked ->
+            val s = state ?: return@SavedWifiSheet
+            val kept = s.ssids.filter { it.isNotBlank() }
+            state = s.copy(ssids = kept + picked.filter { it !in kept })
+            savedSheet = false
+        }
+    }
     macPickFor?.let { index ->
         HotspotPickerSheet(onDismiss = { macPickFor = null }) { client ->
             val cur = state ?: return@HotspotPickerSheet
@@ -370,6 +382,68 @@ private fun WifiPickerSheet(onDismiss: () -> Unit, onPick: (WifiNetwork) -> Unit
             l.isEmpty() -> Text(stringResource(R.string.net_wifi_picker_empty), color = Boxy.colors.text2)
             else -> l.forEach { n ->
                 PickRow(n.ssid, "${n.bssid} · ${n.rssi} dBm") { onPick(n) }
+            }
+        }
+    }
+}
+
+/**
+ * Wi-Fi networks saved on the phone (the ones it has connected to), several at once. Only the network names
+ * are read from the system Wi-Fi store with root; passwords are never read.
+ */
+@Composable
+private fun SavedWifiSheet(current: List<String>, onDismiss: () -> Unit, onAdd: (List<String>) -> Unit) {
+    var list by remember { mutableStateOf<List<String>?>(null) }
+    val picked = remember { androidx.compose.runtime.mutableStateListOf<String>() }
+    LaunchedEffect(Unit) {
+        list = withContext(Dispatchers.IO) {
+            val (_, out) = BoxModule.exec(
+                "for f in /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml /data/misc/wifi/WifiConfigStore.xml; do " +
+                    "[ -f \"\$f\" ] && grep -o '<string name=\"SSID\">[^<]*' \"\$f\" && break; done",
+            )
+            out.mapNotNull { line ->
+                val raw = line.substringAfter(">", "")
+                val name = raw.replace("&quot;", "\"").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&apos;", "'")
+                    .trim().removeSurrounding("\"")
+                name.takeIf { it.isNotBlank() }
+            }.distinct().sortedBy { it.lowercase() }
+        }
+    }
+    BoxySheet(stringResource(R.string.net_saved_title), stringResource(R.string.net_saved_sheet_sub), onDismiss) {
+        val l = list
+        when {
+            l == null -> Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(Modifier.size(22.dp))
+                Spacer(Modifier.width(12.dp))
+                Text(stringResource(R.string.net_wifi_picker_loading), color = Boxy.colors.text2)
+            }
+            l.isEmpty() -> Text(stringResource(R.string.net_saved_empty), color = Boxy.colors.text2)
+            else -> {
+                l.forEach { ssid ->
+                    val already = ssid in current
+                    val on = already || ssid in picked
+                    Row(
+                        Modifier.fillMaxWidth().padding(vertical = 3.dp).clip(RoundedCornerShape(16.dp))
+                            .background(if (on) Boxy.colors.accent.copy(alpha = 0.14f) else Boxy.colors.card)
+                            .then(if (already) Modifier else Modifier.clickable { if (ssid in picked) picked.remove(ssid) else picked.add(ssid) })
+                            .padding(horizontal = 16.dp, vertical = 13.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(BoxyIcons.Wifi, null, Modifier.size(20.dp), tint = if (on) Boxy.colors.accent else Boxy.colors.text2)
+                        Spacer(Modifier.width(12.dp))
+                        Text(ssid, Modifier.weight(1f), color = Boxy.colors.text, maxLines = 1)
+                        if (already) {
+                            Text(stringResource(R.string.net_saved_added), style = MaterialTheme.typography.labelMedium, color = Boxy.colors.text2)
+                        } else if (on) {
+                            Icon(BoxyIcons.Check, null, Modifier.size(20.dp), tint = Boxy.colors.accent)
+                        }
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                com.skofqq.boxy.ui.components.SheetButtons(
+                    if (picked.isEmpty()) stringResource(R.string.action_cancel) else stringResource(R.string.net_saved_add, picked.size),
+                    { if (picked.isEmpty()) onDismiss() else onAdd(picked.toList()) },
+                )
             }
         }
     }

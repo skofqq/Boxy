@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Eigene Adresse</string>
     <string name="settings_latency_hint">Tippe auf eine Karte, um sie ein- oder auszuschalten. Genau %1$d werden genutzt; die Zahl ist ihre Reihenfolge auf der Startseite. Gespeichert wird, sobald %1$d gewählt sind.</string>
     <string name="settings_latency_pick_more">Noch %1$d wählen — genau drei werden genutzt</string>
+    <string name="net_saved_title">Aus gespeicherten Netzen</string>
+    <string name="net_saved_sub">Netze, mit denen das Telefon verbunden war</string>
+    <string name="net_saved_sheet_sub">Eines oder mehrere wählen</string>
+    <string name="net_saved_empty">Keine gespeicherten Netze</string>
+    <string name="net_saved_added">hinzugefügt</string>
+    <string name="net_saved_add">Hinzufügen (%1$d)</string>
 </resources>

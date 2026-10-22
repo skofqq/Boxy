@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Adresse perso</string>
     <string name="settings_latency_hint">Touchez une carte pour l’activer ou la désactiver. Exactement %1$d sont utilisées ; le numéro est leur ordre sur l’accueil. L’enregistrement se fait quand %1$d sont choisies.</string>
     <string name="settings_latency_pick_more">Choisissez-en encore %1$d — il en faut exactement trois</string>
+    <string name="net_saved_title">Depuis les réseaux enregistrés</string>
+    <string name="net_saved_sub">Réseaux auxquels le téléphone s’est connecté</string>
+    <string name="net_saved_sheet_sub">Choisissez-en un ou plusieurs</string>
+    <string name="net_saved_empty">Aucun réseau enregistré</string>
+    <string name="net_saved_added">ajouté</string>
+    <string name="net_saved_add">Ajouter (%1$d)</string>
 </resources>

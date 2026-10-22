@@ -792,4 +792,10 @@
     <string name="settings_latency_add">Свой адрес</string>
     <string name="settings_latency_hint">Нажмите на карточку, чтобы включить или выключить её. Используется ровно %1$d; номер — порядок на главной. Изменения сохраняются, когда выбрано %1$d.</string>
     <string name="settings_latency_pick_more">Выберите ещё %1$d — нужно ровно три</string>
+    <string name="net_saved_title">Из сохранённых сетей</string>
+    <string name="net_saved_sub">Сети, к которым подключался телефон</string>
+    <string name="net_saved_sheet_sub">Выберите одну или несколько</string>
+    <string name="net_saved_empty">Сохранённых сетей нет</string>
+    <string name="net_saved_added">добавлена</string>
+    <string name="net_saved_add">Добавить (%1$d)</string>
 </resources>

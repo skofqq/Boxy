@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Dirección propia</string>
     <string name="settings_latency_hint">Toca una tarjeta para activarla o desactivarla. Se usan exactamente %1$d; el número es su orden en el inicio. Se guarda cuando hay %1$d elegidas.</string>
     <string name="settings_latency_pick_more">Elige %1$d más — se usan exactamente tres</string>
+    <string name="net_saved_title">De redes guardadas</string>
+    <string name="net_saved_sub">Redes a las que se ha conectado el teléfono</string>
+    <string name="net_saved_sheet_sub">Elige una o varias</string>
+    <string name="net_saved_empty">No hay redes guardadas</string>
+    <string name="net_saved_added">añadida</string>
+    <string name="net_saved_add">Añadir (%1$d)</string>
 </resources>

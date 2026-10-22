@@ -780,4 +780,10 @@
     <string name="settings_latency_add">Indirizzo personale</string>
     <string name="settings_latency_hint">Tocca una scheda per attivarla o disattivarla. Ne servono esattamente %1$d; il numero è il loro ordine nella home. Si salva quando ne sono scelte %1$d.</string>
     <string name="settings_latency_pick_more">Scegline ancora %1$d — ne servono esattamente tre</string>
+    <string name="net_saved_title">Dalle reti salvate</string>
+    <string name="net_saved_sub">Reti a cui il telefono si è connesso</string>
+    <string name="net_saved_sheet_sub">Scegline una o più</string>
+    <string name="net_saved_empty">Nessuna rete salvata</string>
+    <string name="net_saved_added">aggiunta</string>
+    <string name="net_saved_add">Aggiungi (%1$d)</string>
 </resources>
