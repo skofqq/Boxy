@@ -23,6 +23,12 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.graphics.shapes.toPath
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -93,44 +99,46 @@ private class Story(
     val kind: StoryKind,
     val icon: ImageVector,
     val shape: RoundedPolygon,
+    /** The illustration morphs between [shape] and this one. */
+    val morphTo: RoundedPolygon,
     val title: Int,
     val body: Int?,
-    /** Screen recording shown instead of the art: (Russian, English) clip. */
-    val video: Pair<Int, Int>? = null,
-    /** How long the story stays before the next one opens by itself (a clip loops meanwhile). */
-    val ms: Int = 7000,
     val tint: @Composable () -> Color,
 )
 
+/** How long an info story stays before the next one opens by itself. */
+private const val STORY_MS = 7000
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private fun stories(introOnly: Boolean): List<Story> = buildList {
-    add(Story(StoryKind.INFO, BoxyIcons.Shield, MaterialShapes.Cookie12Sided, R.string.story_welcome_title, R.string.story_welcome_body) { Tints.blue.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Power, MaterialShapes.Sunny, R.string.story_home_title, R.string.story_home_body, R.raw.story_home_ru to R.raw.story_home_en, 9000) { Tints.green.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Apps, MaterialShapes.Clover8Leaf, R.string.story_apps_title, R.string.story_apps_body, R.raw.story_apps_ru to R.raw.story_apps_en, 9000) { Tints.purple.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Dashboard, MaterialShapes.SoftBurst, R.string.story_panel_title, R.string.story_panel_body, R.raw.story_panel_ru to R.raw.story_panel_en, 9000) { Tints.teal.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Build, MaterialShapes.Cookie9Sided, R.string.story_tools_title, R.string.story_tools_body, R.raw.story_tools_ru to R.raw.story_tools_en, 10000) { Tints.orange.fg })
-    add(Story(StoryKind.INFO, BoxyIcons.Bolt, MaterialShapes.Flower, R.string.story_quick_title, R.string.story_quick_body, R.raw.story_quick_ru to R.raw.story_quick_en, 11000) { Tints.amber.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Shield, MaterialShapes.Cookie12Sided, MaterialShapes.SoftBurst, R.string.story_welcome_title, R.string.story_welcome_body) { Tints.blue.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Power, MaterialShapes.Sunny, MaterialShapes.Cookie9Sided, R.string.story_home_title, R.string.story_home_body) { Tints.green.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Apps, MaterialShapes.Clover8Leaf, MaterialShapes.Flower, R.string.story_apps_title, R.string.story_apps_body) { Tints.purple.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Dashboard, MaterialShapes.SoftBurst, MaterialShapes.Cookie6Sided, R.string.story_panel_title, R.string.story_panel_body) { Tints.teal.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Build, MaterialShapes.Cookie9Sided, MaterialShapes.Clover4Leaf, R.string.story_tools_title, R.string.story_tools_body) { Tints.orange.fg })
+    add(Story(StoryKind.INFO, BoxyIcons.Bolt, MaterialShapes.Flower, MaterialShapes.Sunny, R.string.story_quick_title, R.string.story_quick_body) { Tints.amber.fg })
     if (!introOnly) {
-        add(Story(StoryKind.AGREEMENT, BoxyIcons.Description, MaterialShapes.Cookie7Sided, R.string.onboarding_agreement_title, null) { Tints.gray.fg })
-        add(Story(StoryKind.PERMISSIONS, BoxyIcons.Memory, MaterialShapes.Cookie6Sided, R.string.onboarding_permissions, null) { Boxy.colors.accent })
+        add(Story(StoryKind.AGREEMENT, BoxyIcons.Description, MaterialShapes.Cookie7Sided, MaterialShapes.Cookie7Sided, R.string.onboarding_agreement_title, null) { Tints.gray.fg })
+        add(Story(StoryKind.PERMISSIONS, BoxyIcons.Memory, MaterialShapes.Cookie6Sided, MaterialShapes.Cookie6Sided, R.string.onboarding_permissions, null) { Boxy.colors.accent })
     }
 }
 
 /**
- * Welcome as stories: what Boxy is for and where things are, then the agreement and permissions (first run
- * only; [introOnly] replays just the stories from Settings). Info stories move on by themselves; a tap on the
- * right goes forward, on the left back, holding pauses.
+ * Welcome as stories, laid out like Musixmatch's first run: the app logo with one segment per story at the
+ * top, a large headline and a line of text, then the illustration. Info stories move on by themselves; a tap
+ * on the right goes forward, on the left back, holding pauses. On the first run the agreement and the
+ * permissions follow as setup pages without segments ([introOnly] replays just the stories from Settings).
  */
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit, introOnly: Boolean = false) {
     val list = remember(introOnly) { stories(introOnly) }
+    val infoCount = list.count { it.kind == StoryKind.INFO }
     var index by rememberSaveable { mutableIntStateOf(0) }
     var forward by remember { mutableStateOf(true) }
     var agreed by rememberSaveable { mutableStateOf(false) }
     var paused by remember { mutableStateOf(false) }
     val progress = remember { Animatable(0f) }
     val story = list[index]
-    val firstStep = list.indexOfFirst { it.kind != StoryKind.INFO }.takeIf { it >= 0 }
 
     fun next() {
         if (index < list.lastIndex) {
@@ -153,201 +161,223 @@ fun OnboardingScreen(onFinish: () -> Unit, introOnly: Boolean = false) {
         if (story.kind != StoryKind.INFO) return@LaunchedEffect
         snapshotFlow { paused }.collectLatest { p ->
             if (!p) {
-                progress.animateTo(1f, tween(((1f - progress.value) * story.ms).toInt(), easing = LinearEasing))
+                progress.animateTo(1f, tween(((1f - progress.value) * STORY_MS).toInt(), easing = LinearEasing))
                 next()
             }
         }
     }
     BackHandler(enabled = index > 0) { prev() }
 
-    val tint = story.tint()
-    Box(
-        Modifier.fillMaxSize().background(Boxy.colors.page)
-            .background(Brush.verticalGradient(0f to tint.copy(alpha = 0.30f), 0.65f to Boxy.colors.page)),
-    ) {
-        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            // Segments: done, current (filling up), still to come.
-            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                list.forEachIndexed { i, s ->
-                    val fill = when {
-                        i < index -> 1f
-                        i > index -> 0f
-                        s.kind == StoryKind.INFO -> progress.value
-                        else -> 1f
-                    }
-                    Box(Modifier.weight(1f).height(3.dp).clip(RoundedCornerShape(50)).background(Boxy.colors.text.copy(alpha = 0.18f))) {
-                        Box(Modifier.fillMaxHeight().fillMaxWidth(fill).background(Boxy.colors.text.copy(alpha = 0.85f)))
+    Column(Modifier.fillMaxSize().background(Boxy.colors.page).statusBarsPadding().navigationBarsPadding()) {
+        androidx.compose.animation.AnimatedVisibility(story.kind == StoryKind.INFO) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                AppLogo(40.dp)
+                Spacer(Modifier.width(16.dp))
+                // One segment per story: done ones full, the current one filling up, the rest dim.
+                Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    repeat(infoCount) { i ->
+                        val fill = when {
+                            i < index -> 1f
+                            i > index -> 0f
+                            else -> progress.value
+                        }
+                        Box(Modifier.weight(1f).height(4.dp).clip(RoundedCornerShape(50)).background(Boxy.colors.accent.copy(alpha = 0.22f))) {
+                            Box(Modifier.fillMaxHeight().fillMaxWidth(fill).clip(RoundedCornerShape(50)).background(Boxy.colors.accent))
+                        }
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.app_name),
-                    Modifier.padding(start = 12.dp).weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Boxy.colors.text,
+        }
+
+        AnimatedContent(
+            index,
+            Modifier.weight(1f).fillMaxWidth().pointerInput(story.kind) {
+                // Setup pages have their own controls; only info stories react to taps.
+                if (story.kind != StoryKind.INFO) return@pointerInput
+                detectTapGestures(
+                    onPress = {
+                        paused = true
+                        tryAwaitRelease()
+                        paused = false
+                    },
+                    onTap = { if (it.x < size.width / 3f) prev() else next() },
                 )
-                if (story.kind == StoryKind.INFO) {
-                    Text(
-                        stringResource(R.string.onboarding_skip),
-                        Modifier.clip(RoundedCornerShape(50)).clickable {
-                            if (firstStep == null) {
-                                onFinish()
-                            } else {
-                                forward = true
-                                index = firstStep
-                            }
-                        }.padding(horizontal = 14.dp, vertical = 8.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Boxy.colors.text2,
-                    )
+            },
+            transitionSpec = {
+                val dir = if (forward) 1 else -1
+                (fadeIn(tween(260)) + slideInHorizontally(tween(320)) { dir * it / 5 }) togetherWith
+                    (fadeOut(tween(180)) + slideOutHorizontally(tween(320)) { -dir * it / 5 })
+            },
+            label = "story",
+        ) { i ->
+            val s = list[i]
+            if (s.kind == StoryKind.INFO) {
+                InfoStory(s)
+            } else {
+                SetupPage(s, isLast = i == list.lastIndex, enabled = s.kind != StoryKind.AGREEMENT || agreed, onNext = ::next) {
+                    if (s.kind == StoryKind.AGREEMENT) AgreementStory(agreed) { agreed = it } else PermissionsStory()
                 }
             }
-
-            AnimatedContent(
-                index,
-                Modifier.weight(1f).fillMaxWidth().pointerInput(story.kind) {
-                    // Agreement and permissions have their own controls; only info stories react to taps.
-                    if (story.kind != StoryKind.INFO) return@pointerInput
-                    detectTapGestures(
-                        onPress = {
-                            paused = true
-                            tryAwaitRelease()
-                            paused = false
-                        },
-                        onTap = { if (it.x < size.width / 3f) prev() else next() },
-                    )
-                },
-                transitionSpec = {
-                    val dir = if (forward) 1 else -1
-                    (fadeIn(tween(260)) + slideInHorizontally(tween(320)) { dir * it / 5 }) togetherWith
-                        (fadeOut(tween(180)) + slideOutHorizontally(tween(320)) { -dir * it / 5 })
-                },
-                label = "story",
-            ) { i ->
-                val s = list[i]
-                Column(
-                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = if (s.kind == StoryKind.INFO) Arrangement.Center else Arrangement.Top,
-                ) {
-                    Spacer(Modifier.height(if (s.kind == StoryKind.INFO) 0.dp else 12.dp))
-                    if (s.video != null) {
-                        StoryVideo(s.video, paused && i == index, s.tint())
-                    } else {
-                        StoryArt(s, if (s.kind == StoryKind.INFO) 210.dp else 120.dp)
-                    }
-                    Spacer(Modifier.height(if (s.video != null) 20.dp else if (s.kind == StoryKind.INFO) 36.dp else 20.dp))
-                    Text(
-                        stringResource(s.title),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Boxy.colors.text,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    when (s.kind) {
-                        StoryKind.INFO -> Text(
-                            stringResource(s.body!!),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Boxy.colors.text2,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        )
-                        StoryKind.AGREEMENT -> AgreementStory(agreed) { agreed = it }
-                        StoryKind.PERMISSIONS -> PermissionsStory()
-                    }
-                    Spacer(Modifier.height(12.dp))
-                }
-            }
-
-            val enabled = story.kind != StoryKind.AGREEMENT || agreed
-            Text(
-                stringResource(if (index == list.lastIndex) R.string.onboarding_start else R.string.onboarding_next),
-                Modifier.padding(horizontal = 24.dp, vertical = 16.dp).fillMaxWidth().clip(RoundedCornerShape(50))
-                    .background(if (enabled) Boxy.colors.accent else Boxy.colors.outline)
-                    .clickable(enabled = enabled) { next() }
-                    .padding(vertical = 16.dp),
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            )
         }
     }
 }
 
-/** Expressive art: a slowly turning shape in the story colour with the symbol on a second shape. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** Info story: large headline and text on the left, the illustration in a tinted card below. */
 @Composable
-private fun StoryArt(s: Story, size: Dp) {
-    val tint = s.tint()
-    val turn by rememberInfiniteTransition(label = "art").animateFloat(
-        0f,
-        360f,
-        infiniteRepeatable(tween(30_000, easing = LinearEasing)),
-        label = "turn",
-    )
-    val appear = remember { Animatable(0.6f) }
-    LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = 260f)) }
-    Box(Modifier.size(size).graphicsLayer { scaleX = appear.value; scaleY = appear.value }, contentAlignment = Alignment.Center) {
-        Box(Modifier.size(size).graphicsLayer { rotationZ = turn }.clip(s.shape.toShape()).background(tint.copy(alpha = 0.22f)))
+private fun InfoStory(s: Story) {
+    // Headline, text and card come in one after another with a spring.
+    val enter = remember { List(3) { Animatable(0f) } }
+    LaunchedEffect(Unit) {
+        enter.forEachIndexed { k, a ->
+            launch {
+                kotlinx.coroutines.delay(70L * k)
+                a.animateTo(1f, spring(dampingRatio = 0.62f, stiffness = 380f))
+            }
+        }
+    }
+    fun Modifier.rise(k: Int) = graphicsLayer {
+        alpha = enter[k].value.coerceIn(0f, 1f)
+        translationY = (1f - enter[k].value) * 36.dp.toPx()
+    }
+    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+        Spacer(Modifier.height(24.dp))
+        Text(
+            stringResource(s.title),
+            Modifier.rise(0),
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = Boxy.colors.text,
+        )
+        Spacer(Modifier.height(14.dp))
+        Text(stringResource(s.body!!), Modifier.rise(1), style = MaterialTheme.typography.bodyLarge, color = Boxy.colors.text2)
+        Spacer(Modifier.height(28.dp))
         Box(
-            Modifier.size(size * 0.5f).graphicsLayer { rotationZ = -turn / 2 }.clip(MaterialShapes.Cookie4Sided.toShape()).background(tint),
+            Modifier.fillMaxWidth().weight(1f).padding(bottom = 20.dp).rise(2).clip(RoundedCornerShape(32.dp))
+                .background(s.tint().copy(alpha = 0.13f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(s.icon, null, Modifier.size(size * 0.24f).graphicsLayer { rotationZ = turn / 2 }, tint = Color.White)
+            StoryArt(s, 250.dp)
         }
+    }
+}
+
+/** Setup page after the stories (agreement, permissions): centred logo and title, its controls, a button. */
+@Composable
+private fun SetupPage(s: Story, isLast: Boolean, enabled: Boolean, onNext: () -> Unit, content: @Composable () -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(Modifier.height(36.dp))
+            AppLogo(72.dp)
+            Spacer(Modifier.height(20.dp))
+            Text(
+                stringResource(s.title),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = Boxy.colors.text,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+            Spacer(Modifier.height(20.dp))
+            content()
+        }
+        Text(
+            stringResource(if (isLast) R.string.onboarding_start else R.string.onboarding_next),
+            Modifier.padding(horizontal = 20.dp, vertical = 16.dp).fillMaxWidth().clip(RoundedCornerShape(50))
+                .background(if (enabled) Boxy.colors.accent else Boxy.colors.outline)
+                .clickable(enabled = enabled, onClick = onNext)
+                .padding(vertical = 16.dp),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun AppLogo(size: Dp) {
+    Box(Modifier.size(size).clip(androidx.compose.foundation.shape.CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(R.drawable.ic_launcher_foreground), null, Modifier.size(size * 1.5f))
     }
 }
 
 /**
- * A short screen recording in a phone-like frame, muted and looping; paused while the story is held.
- * Russian clips for Russian, Ukrainian, Belarusian and Kazakh, English ones for the other languages.
+ * Material 3 Expressive art: a large shape that keeps morphing between two shapes while it turns, small
+ * shapes orbiting around it, and the symbol on a gently breathing cookie in the middle. Everything springs in.
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun StoryVideo(clips: Pair<Int, Int>, paused: Boolean, tint: Color) {
-    val context = LocalContext.current
-    val lang = context.resources.configuration.locales[0].language
-    val res = if (lang in setOf("ru", "uk", "be", "kk")) clips.first else clips.second
-    val player = remember(res) { android.media.MediaPlayer() }
-    var ready by remember(res) { mutableStateOf(false) }
-    androidx.compose.runtime.DisposableEffect(res) { onDispose { runCatching { player.release() } } }
-    LaunchedEffect(paused, ready) {
-        if (!ready) return@LaunchedEffect
-        runCatching { if (paused) player.pause() else player.start() }
+private fun StoryArt(s: Story, size: Dp) {
+    val tint = s.tint()
+    val loop = rememberInfiniteTransition(label = "art")
+    val turn by loop.animateFloat(0f, 360f, infiniteRepeatable(tween(26_000, easing = LinearEasing)), label = "turn")
+    val morph by loop.animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(tween(2400, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse),
+        label = "morph",
+    )
+    val breathe by loop.animateFloat(
+        0.94f,
+        1.06f,
+        infiniteRepeatable(tween(1700, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse),
+        label = "breathe",
+    )
+    val shapes = remember(s) { androidx.graphics.shapes.Morph(s.shape, s.morphTo) }
+    val path = remember { android.graphics.Path() }
+    // The big shape, then each orbiting one, spring in one after another.
+    val appear = remember { List(4) { Animatable(0f) } }
+    LaunchedEffect(Unit) {
+        appear.forEachIndexed { k, a ->
+            launch {
+                kotlinx.coroutines.delay(90L * k)
+                a.animateTo(1f, spring(dampingRatio = 0.45f, stiffness = 240f))
+            }
+        }
     }
-    val shape = RoundedCornerShape(26.dp)
-    Box(
-        Modifier.height(androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp.dp * 0.52f)
-            .aspectRatio(480f / 1072f)
-            .clip(shape)
-            .background(Boxy.colors.card)
-            .border(3.dp, tint.copy(alpha = 0.55f), shape),
-    ) {
-        androidx.compose.ui.viewinterop.AndroidView(
-            factory = { ctx ->
-                android.view.TextureView(ctx).apply {
-                    surfaceTextureListener = object : android.view.TextureView.SurfaceTextureListener {
-                        override fun onSurfaceTextureAvailable(st: android.graphics.SurfaceTexture, w: Int, h: Int) {
-                            runCatching {
-                                ctx.resources.openRawResourceFd(res).use { afd -> player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length) }
-                                player.setSurface(android.view.Surface(st))
-                                player.isLooping = true
-                                player.setVolume(0f, 0f)
-                                player.setOnPreparedListener { ready = true }
-                                player.prepareAsync()
-                            }
-                        }
-
-                        override fun onSurfaceTextureSizeChanged(st: android.graphics.SurfaceTexture, w: Int, h: Int) {}
-                        override fun onSurfaceTextureDestroyed(st: android.graphics.SurfaceTexture): Boolean = true
-                        override fun onSurfaceTextureUpdated(st: android.graphics.SurfaceTexture) {}
-                    }
-                }
+    val satellites = remember { listOf(MaterialShapes.Pill, MaterialShapes.Gem, MaterialShapes.Sunny) }
+    Box(Modifier.size(size * 1.35f), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(
+            Modifier.size(size).graphicsLayer {
+                rotationZ = turn
+                scaleX = appear[0].value
+                scaleY = appear[0].value
             },
-            modifier = Modifier.fillMaxSize().padding(3.dp).clip(RoundedCornerShape(23.dp)),
-        )
+        ) {
+            path.rewind()
+            shapes.toPath(morph, path)
+            val p = path.asComposePath()
+            scale(this.size.width, this.size.height, pivot = androidx.compose.ui.geometry.Offset.Zero) {
+                drawPath(p, tint.copy(alpha = 0.24f))
+            }
+        }
+        satellites.forEachIndexed { k, shape ->
+            val angle = Math.toRadians((turn * 1.6f + k * 120f).toDouble())
+            val r = size.value * 0.6f
+            val dot = size * (0.13f + 0.03f * k)
+            Box(
+                Modifier.size(dot).graphicsLayer {
+                    translationX = (kotlin.math.cos(angle) * r).toFloat() * density
+                    translationY = (kotlin.math.sin(angle) * r).toFloat() * density
+                    rotationZ = -turn * 2
+                    scaleX = appear[k + 1].value
+                    scaleY = appear[k + 1].value
+                }.clip(shape.toShape()).background(tint.copy(alpha = 0.45f + 0.2f * k)),
+            )
+        }
+        Box(
+            Modifier.size(size * 0.5f).graphicsLayer {
+                val sc = appear[0].value * breathe
+                scaleX = sc
+                scaleY = sc
+                rotationZ = -turn / 2
+            }.clip(MaterialShapes.Cookie4Sided.toShape()).background(tint),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(s.icon, null, Modifier.size(size * 0.24f).graphicsLayer { rotationZ = turn / 2 }, tint = Color.White)
+        }
     }
 }
 
