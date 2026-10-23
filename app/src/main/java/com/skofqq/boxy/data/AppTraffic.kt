@@ -121,9 +121,18 @@ object AppTraffic {
             when {
                 uid % 100_000 == 0 -> null
                 uid % 100_000 == Process.SYSTEM_UID -> "android"
-                else -> pm.getPackagesForUid(uid)?.firstOrNull() ?: pm.getPackagesForUid(uid % 100_000)?.firstOrNull()
+                else -> packageFor(pm, uid)
             }
         }
+    }
+
+    /**
+     * First package of [uid]. A uid of another user (work profile, private space, a second user) throws
+     * SecurityException without INTERACT_ACROSS_USERS, so those fall back to the same app id in this user.
+     */
+    private fun packageFor(pm: android.content.pm.PackageManager, uid: Int): String? {
+        fun lookup(u: Int) = runCatching { pm.getPackagesForUid(u)?.firstOrNull() }.getOrNull()
+        return lookup(uid) ?: lookup(uid % 100_000)
     }
 
     private fun parse(v: String?): LongArray {
@@ -177,7 +186,7 @@ object AppTraffic {
                 val pkg = when {
                     uid < 0 -> "@uid$uid"
                     appId == Process.SYSTEM_UID -> "android"
-                    else -> pm.getPackagesForUid(uid)?.firstOrNull() ?: pm.getPackagesForUid(appId)?.firstOrNull() ?: "@uid$appId"
+                    else -> packageFor(pm, uid) ?: "@uid$appId"
                 }
                 val acc = byPkg.getOrPut(pkg) { LongArray(4) }
                 acc[2] += rxTx.first
