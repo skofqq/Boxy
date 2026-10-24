@@ -65,6 +65,7 @@ import com.skofqq.boxy.net.ProxyGroup
 import com.skofqq.boxy.net.ProxySnapshot
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.ui.components.HeaderAction
+import com.skofqq.boxy.ui.components.backdropSourceOf
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.ui.components.SubPageHeader
 import com.skofqq.boxy.ui.theme.Boxy
@@ -240,7 +241,18 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         )
     }
 
-    PinnedLazyPage(contentPadding, header = {
+    val ready = state == LoadState.READY && snapshot != null
+    // Room under the last tiles for the floating search.
+    val listPadding = if (!ready) contentPadding else PaddingValues(
+        top = contentPadding.calculateTopPadding(),
+        bottom = contentPadding.calculateBottomPadding() + 72.dp,
+    )
+    // The list is recorded on its own for the floating search: sampling the panel's backdrop, which holds
+    // the search itself, would draw the glass into itself without end.
+    val listBackdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
+    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().backdropSourceOf(listBackdrop)) {
+    PinnedLazyPage(listPadding, header = {
         header()
         if (!embedded) SubPageHeader(
             stringResource(R.string.proxies_title),
@@ -256,13 +268,8 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
                 groups = snap.groups.size,
                 providers = providers.size,
                 mode = mode,
-                query = query,
-                busy = bulk || (!providersTab && testing.values.any { it }),
                 onTab = { providersTab = it },
                 onMode = ::setMode,
-                onQuery = { query = it },
-                onUpdateAll = { bulkAction(check = false) },
-                onTestAll = { if (providersTab) bulkAction(check = true) else testAllGroups() },
             )
         }
     }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -331,6 +338,23 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
                 }
             }
         }
+    }
+    }
+    if (ready) androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides listBackdrop) {
+        FloatingSearch(
+            query,
+            { query = it },
+            stringResource(if (providersTab) R.string.proxies_search_providers else R.string.proxies_search_groups),
+            bottom = contentPadding.calculateBottomPadding(),
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            val busy = bulk || (!providersTab && testing.values.any { it })
+            if (providersTab) GlassAction(BoxyIcons.Refresh, stringResource(R.string.proxies_update_all), enabled = !busy) { bulkAction(check = false) }
+            GlassAction(BoxyIcons.Bolt, stringResource(R.string.proxies_test_all), busy = busy, enabled = !busy) {
+                if (providersTab) bulkAction(check = true) else testAllGroups()
+            }
+        }
+    }
     }
 }
 

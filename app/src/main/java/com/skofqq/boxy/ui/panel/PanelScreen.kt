@@ -178,12 +178,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
             contentAlignment = Alignment.Center,
         ) {
             when {
-                native -> com.skofqq.boxy.ui.proxies.ProxiesScreen(
-                    PaddingValues(bottom = 12.dp),
-                    header = {},
-                    embedded = true,
-                    reloadKey = nativeReload,
-                )
+                native -> com.skofqq.boxy.ui.proxies.CorePanel(nativeReload)
                 current == null && !localChecked -> CircularProgressIndicator()
                 current == null -> Text(
                     stringResource(if (kind == PanelKind.CORE) R.string.panel_unavailable else R.string.substore_unavailable),

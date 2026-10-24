@@ -17,6 +17,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -30,6 +37,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,7 +50,6 @@ import com.skofqq.boxy.R
 import com.skofqq.boxy.net.ProxyProvider
 import com.skofqq.boxy.net.ProxySnapshot
 import com.skofqq.boxy.ui.components.BoxyTextField
-import com.skofqq.boxy.ui.components.GlassChip
 import com.skofqq.boxy.ui.components.GlassMenu
 import com.skofqq.boxy.ui.components.GlassMenuItem
 import com.skofqq.boxy.ui.components.SmallIconButton
@@ -54,7 +62,7 @@ internal val PROXY_MODES = listOf("rule", "global", "direct")
 
 /**
  * Zashboard's bar above the groups, in Boxy's style: Proxies / Providers with their counts, the core's routing
- * mode, a search over the page and the page's actions (test every group; update / test every provider).
+ * mode held to the right edge. The search and the page's actions float at the bottom ([FloatingSearch]).
  */
 @Composable
 internal fun ProxyToolbar(
@@ -62,72 +70,136 @@ internal fun ProxyToolbar(
     groups: Int,
     providers: Int,
     mode: String?,
-    query: String,
-    busy: Boolean,
     onTab: (Boolean) -> Unit,
     onMode: (String) -> Unit,
-    onQuery: (String) -> Unit,
-    onUpdateAll: () -> Unit,
-    onTestAll: () -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+    PageBar(
+        listOf(stringResource(R.string.proxies_tab_groups) to groups, stringResource(R.string.proxies_tab_providers) to providers),
+        if (providersTab) 1 else 0,
+        { onTab(it == 1) },
+    ) {
+        if (mode != null) MenuChip(modeLabel(mode), mode != "rule", PROXY_MODES.map { it to modeLabel(it) }, mode, onMode)
+    }
+}
+
+/**
+ * The bar on top of a panel tab: a switch between the tab's lists (with their counts) on the left and
+ * [end] (a [MenuChip]) held to the right edge.
+ */
+@Composable
+internal fun PageBar(segments: List<Pair<String, Int?>>, selected: Int, onSelect: (Int) -> Unit, end: @Composable () -> Unit = {}) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Row(
             Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.card).padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Segment(stringResource(R.string.proxies_tab_groups), groups, !providersTab) { onTab(false) }
-            Segment(stringResource(R.string.proxies_tab_providers), providers, providersTab) { onTab(true) }
+            segments.forEachIndexed { i, (text, count) -> Segment(text, count, i == selected) { onSelect(i) } }
         }
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (mode != null) {
-                ModeChip(mode, onMode)
-                Spacer(Modifier.width(8.dp))
-            }
+        Spacer(Modifier.weight(1f).widthIn(min = 8.dp))
+        end()
+    }
+}
+
+/**
+ * The page's search as a glass pill floating over the bottom of the list, with the page's [actions] beside it
+ * as [GlassAction]s. It rises with the keyboard.
+ */
+@Composable
+internal fun FloatingSearch(
+    query: String,
+    onQuery: (String) -> Unit,
+    hint: String,
+    /** Room under the bar (the app's bottom padding); the fade runs through it to the screen edge. */
+    bottom: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier,
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit,
+) {
+    // The list fades into the page under the bar, so the pills stand apart from the cards behind them.
+    val page = Boxy.colors.page
+    Box(
+        modifier
+            .fillMaxWidth()
+            .background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to page.copy(alpha = 0f), 0.45f to page.copy(alpha = 0.85f), 1f to page))
+            .padding(top = 24.dp, bottom = bottom),
+    ) {
+    Row(
+        Modifier
+            .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .fillMaxWidth()
+            .height(52.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        com.skofqq.boxy.ui.components.GlassSurface(RoundedCornerShape(50), Boxy.colors.card, 26.dp, Modifier.weight(1f).fillMaxHeight().floating(), element = true) {
             BoxyTextField(
                 query,
                 onQuery,
-                stringResource(if (providersTab) R.string.proxies_search_providers else R.string.proxies_search_groups),
-                Modifier.weight(1f),
-                leading = { Icon(BoxyIcons.Search, null, Modifier.size(18.dp), tint = Boxy.colors.text2) },
+                hint,
+                Modifier.fillMaxSize(),
+                leading = { Icon(BoxyIcons.Search, null, Modifier.size(20.dp), tint = Boxy.colors.text2) },
                 trailing = if (query.isEmpty()) null else ({
-                    Icon(BoxyIcons.Close, null, Modifier.size(18.dp).clickable { onQuery("") }, tint = Boxy.colors.text2)
+                    Icon(BoxyIcons.Close, null, Modifier.size(20.dp).clickable { onQuery("") }, tint = Boxy.colors.text2)
                 }),
-                container = Boxy.colors.card,
+                container = Color.Transparent,
             )
-            if (providersTab) {
-                Spacer(Modifier.width(8.dp))
-                SmallIconButton(BoxyIcons.Refresh, stringResource(R.string.proxies_update_all), enabled = !busy, container = Boxy.colors.card, onClick = onUpdateAll)
-            }
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
-                if (busy) {
-                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                } else {
-                    SmallIconButton(BoxyIcons.Bolt, stringResource(R.string.proxies_test_all), container = Boxy.colors.card, onClick = onTestAll)
-                }
+        }
+        actions()
+    }
+    }
+}
+
+/** Lifts a pill off the list like the bottom navigation bar: a soft shadow and a thin outline. */
+@Composable
+private fun Modifier.floating(): Modifier {
+    val pill = RoundedCornerShape(50)
+    return shadow(10.dp, pill, clip = false).border(1.dp, Boxy.colors.outline, pill)
+}
+
+/** A round glass button the height of the floating search; shows a spinner while its work runs. */
+@Composable
+internal fun GlassAction(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, busy: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
+    com.skofqq.boxy.ui.components.GlassSurface(
+        RoundedCornerShape(50),
+        Boxy.colors.card,
+        26.dp,
+        Modifier.size(52.dp).floating().clip(RoundedCornerShape(50)).clickable(enabled = enabled, onClick = onClick),
+        element = true,
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            if (busy) {
+                CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+            } else {
+                Icon(icon, description, Modifier.size(22.dp), tint = Boxy.colors.text.copy(alpha = if (enabled) 1f else 0.3f))
             }
         }
     }
 }
 
+/** One small size for the whole top row, so the switch, the mode and the buttons fit on a phone. */
 @Composable
-private fun Segment(text: String, count: Int, selected: Boolean, onClick: () -> Unit) {
+private fun barText() = MaterialTheme.typography.labelMedium.copy(fontSize = 13.sp)
+
+@Composable
+private fun Segment(text: String, count: Int?, selected: Boolean, onClick: () -> Unit) {
     Row(
         Modifier.clip(RoundedCornerShape(50))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 7.dp),
+            .padding(horizontal = 10.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text,
-            style = MaterialTheme.typography.labelLarge,
+            style = barText(),
             color = if (selected) Boxy.colors.accent else Boxy.colors.text2,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            maxLines = 1,
         )
-        Spacer(Modifier.width(6.dp))
-        Text(count.toString(), style = MaterialTheme.typography.labelLarge, color = if (selected) Boxy.colors.accent.copy(alpha = 0.7f) else Boxy.colors.text2.copy(alpha = 0.7f))
+        if (count != null) {
+            Spacer(Modifier.width(6.dp))
+            Text(count.toString(), style = barText(), color = if (selected) Boxy.colors.accent.copy(alpha = 0.7f) else Boxy.colors.text2.copy(alpha = 0.7f))
+        }
     }
 }
 
@@ -140,13 +212,24 @@ private fun modeLabel(mode: String): String = stringResource(
     },
 )
 
+/** A pill showing [label] that opens a menu of [options] (key to label); tinted when [highlighted]. */
 @Composable
-private fun ModeChip(mode: String, onMode: (String) -> Unit) {
+internal fun MenuChip(label: String, highlighted: Boolean, options: List<Pair<String, String>>, selected: String, onPick: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
-        GlassChip(modeLabel(mode), mode != "rule", Boxy.colors.accent, BoxyIcons.ExpandMore) { open = true }
+        Row(
+            Modifier.clip(RoundedCornerShape(50))
+                .background(if (highlighted) Boxy.colors.accent.copy(alpha = 0.16f) else Boxy.colors.card)
+                .clickable { open = true }
+                .padding(start = 12.dp, end = 8.dp, top = 9.dp, bottom = 9.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(label, Modifier.widthIn(max = 110.dp), style = barText(), color = if (highlighted) Boxy.colors.accent else Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.width(2.dp))
+            Icon(BoxyIcons.ExpandMore, null, Modifier.size(18.dp), tint = Boxy.colors.text2)
+        }
         GlassMenu(open, { open = false }) {
-            PROXY_MODES.forEach { m -> GlassMenuItem(modeLabel(m), { open = false; onMode(m) }, selected = m == mode) }
+            options.forEach { (key, text) -> GlassMenuItem(text, { open = false; onPick(key) }, selected = key == selected) }
         }
     }
 }
@@ -298,7 +381,7 @@ internal fun ProviderCard(
 private const val DOTS_MAX = 40
 
 /** "6 hours ago" in the app's language (DateUtils would use the system one). */
-private fun timeAgo(at: Long, locale: java.util.Locale): String {
+internal fun timeAgo(at: Long, locale: java.util.Locale): String {
     val f = android.icu.text.RelativeDateTimeFormatter.getInstance(locale)
     val min = ((System.currentTimeMillis() - at) / 60_000).coerceAtLeast(0)
     val (n, unit) = when {
@@ -314,7 +397,7 @@ private fun timeAgo(at: Long, locale: java.util.Locale): String {
 private fun Color.takeOrElse(): Color = if (this == Color.Unspecified) Boxy.colors.text2.copy(alpha = 0.55f) else this
 
 @Composable
-private fun ProgressButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, busy: Boolean, onClick: () -> Unit) {
+internal fun ProgressButton(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, busy: Boolean, onClick: () -> Unit) {
     Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
         if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
         else SmallIconButton(icon, description, onClick = onClick)

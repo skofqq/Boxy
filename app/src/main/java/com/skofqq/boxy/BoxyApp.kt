@@ -16,6 +16,8 @@ class BoxyApp : Application() {
         com.skofqq.boxy.data.TrafficStats.schedule(this)
         com.skofqq.boxy.automation.Automation.reschedule(this)
         com.skofqq.boxy.net.Mirrors.current = prefs.githubMirror
+        com.skofqq.boxy.net.Net.delayUrl = prefs.delayUrl
+        com.skofqq.boxy.net.Net.delayTimeout = prefs.delayTimeout
         com.skofqq.boxy.service.BoxStatusService.createChannel(this)
         com.skofqq.boxy.notify.ModuleEventReceiver.createChannel(this)
         com.skofqq.boxy.notify.UpdateCheckJob.createChannel(this)
@@ -26,6 +28,8 @@ class BoxyApp : Application() {
     fun reloadPrefs() {
         prefs = Prefs(this)
         com.skofqq.boxy.ui.components.Haptics.enabled = prefs.haptics
+        com.skofqq.boxy.net.Net.delayUrl = prefs.delayUrl
+        com.skofqq.boxy.net.Net.delayTimeout = prefs.delayTimeout
     }
 
     companion object {

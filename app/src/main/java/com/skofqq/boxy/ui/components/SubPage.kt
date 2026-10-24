@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -108,8 +109,17 @@ fun BoxyTextField(
     trailing: (@Composable () -> Unit)? = null,
     container: androidx.compose.ui.graphics.Color = Boxy.colors.surface2,
 ) {
+    // The text itself is only a line high: a tap anywhere on the field (padding, icon, empty space) focuses it,
+    // instead of falling through to whatever lies under a floating field.
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+    val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     Row(
-        modifier.clip(RoundedCornerShape(16.dp)).background(container).padding(horizontal = 14.dp, vertical = 12.dp),
+        modifier.clip(RoundedCornerShape(16.dp)).background(container)
+            .clickable(interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }, indication = null) {
+                focus.requestFocus()
+                keyboard?.show()
+            }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (leading != null) {
@@ -125,7 +135,7 @@ fun BoxyTextField(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Boxy.colors.text),
                 cursorBrush = SolidColor(Boxy.colors.accent),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().focusRequester(focus),
             )
         }
         if (trailing != null) {

@@ -307,6 +307,11 @@ object BoxyIcons {
     /** Arrow in a circle: the node a group goes through. */
     val ArrowCircle = strokeIcon("ArrowCircle", "M12,3a9,9 0 1 0 0.01,0zM8,12h8M13,9l3,3 -3,3")
 
+    /** Two bars: pause a live list. */
+    val Pause = strokeIcon("Pause", "M8,5v14M16,5v14")
+
+    /** Triangle: resume a paused list. */
+    val Play = strokeIcon("Play", "M7,4.5l12,7.5 -12,7.5z")
     /** Power symbol: start the service. */
     val Power = strokeIcon("Power", "M12,3v8M7.05,6.05a7,7 0 1 0 9.9,0")
 

@@ -245,7 +245,7 @@ object Net {
     private fun yamlValue(text: String, key: String): String? =
         Regex("^$key:\\s*['\"]?([^'\"#\\n]*)['\"]?", RegexOption.MULTILINE).find(text)?.groupValues?.get(1)?.trim()
 
-    private fun openApi(api: ClashApi, path: String, method: String = "GET", timeout: Int = TIMEOUT): HttpURLConnection =
+    internal fun openApi(api: ClashApi, path: String, method: String = "GET", timeout: Int = TIMEOUT): HttpURLConnection =
         open(api.base + path, method).apply {
             readTimeout = timeout
             api.secret?.let { setRequestProperty("Authorization", "Bearer $it") }
@@ -358,7 +358,7 @@ object Net {
 
     // ---- Proxy groups ----
 
-    private fun enc(name: String) = java.net.URLEncoder.encode(name, "UTF-8").replace("+", "%20")
+    internal fun enc(name: String) = java.net.URLEncoder.encode(name, "UTF-8").replace("+", "%20")
 
     /**
      * Proxy groups (in the config's order, taken from GLOBAL) and every proxy with its last delay.
@@ -438,7 +438,7 @@ object Net {
     /** Delay test of every member of [group] at once (mihomo); null when the core has no group test. */
     suspend fun clashGroupDelay(api: ClashApi, group: String): Map<String, Int>? = withContext(Dispatchers.IO) {
         runCatching {
-            val c = openApi(api, "/group/${enc(group)}/delay?url=${enc(DELAY_URL)}&timeout=$DELAY_TIMEOUT", timeout = DELAY_TIMEOUT + 4000)
+            val c = openApi(api, "/group/${enc(group)}/delay?url=${enc(delayUrl)}&timeout=$delayTimeout", timeout = delayTimeout + 4000)
             try {
                 if (c.responseCode !in 200..299) return@runCatching null
                 val j = JSONObject(c.inputStream.bufferedReader().readText())
@@ -452,7 +452,7 @@ object Net {
     /** Delay of one proxy in ms; 0 when it timed out, null when the request failed. */
     suspend fun clashProxyDelay(api: ClashApi, name: String): Int? = withContext(Dispatchers.IO) {
         runCatching {
-            val c = openApi(api, "/proxies/${enc(name)}/delay?url=${enc(DELAY_URL)}&timeout=$DELAY_TIMEOUT", timeout = DELAY_TIMEOUT + 2000)
+            val c = openApi(api, "/proxies/${enc(name)}/delay?url=${enc(delayUrl)}&timeout=$delayTimeout", timeout = delayTimeout + 2000)
             try {
                 if (c.responseCode !in 200..299) 0 else JSONObject(c.inputStream.bufferedReader().readText()).optInt("delay")
             } finally {
@@ -509,7 +509,7 @@ object Net {
     /** Delay test of every node of the provider [name]; the results land in the nodes' history. */
     suspend fun clashCheckProvider(api: ClashApi, name: String): Boolean = withContext(Dispatchers.IO) {
         runCatching {
-            val c = openApi(api, "/providers/proxies/${enc(name)}/healthcheck", timeout = DELAY_TIMEOUT + 25_000)
+            val c = openApi(api, "/providers/proxies/${enc(name)}/healthcheck", timeout = delayTimeout + 25_000)
             try {
                 c.responseCode in 200..299
             } finally {
@@ -530,14 +530,17 @@ object Net {
         }.getOrNull()
     }
 
+    /** Switches the routing mode. */
+    suspend fun clashSetMode(api: ClashApi, mode: String): Boolean = clashPatchConfigs(api, JSONObject().put("mode", mode))
+
     /**
-     * Switches the routing mode (PATCH /configs). HttpURLConnection has no PATCH, so the request goes over a
-     * plain socket; the API listens on loopback without TLS.
+     * Changes settings of the running core (PATCH /configs); they last until the core restarts. HttpURLConnection
+     * has no PATCH, so the request goes over a plain socket; the API listens on loopback without TLS.
      */
-    suspend fun clashSetMode(api: ClashApi, mode: String): Boolean = withContext(Dispatchers.IO) {
+    suspend fun clashPatchConfigs(api: ClashApi, changes: JSONObject): Boolean = withContext(Dispatchers.IO) {
         runCatching {
             val url = URL(api.base)
-            val body = JSONObject().put("mode", mode).toString().toByteArray()
+            val body = changes.toString().toByteArray()
             java.net.Socket().use { s ->
                 s.connect(java.net.InetSocketAddress(url.host, if (url.port > 0) url.port else 80), TIMEOUT)
                 s.soTimeout = TIMEOUT
@@ -557,8 +560,12 @@ object Net {
     }
 
     private val GROUP_TYPES = setOf("Selector", "URLTest", "Fallback", "LoadBalance", "Relay", "Smart")
-    private const val DELAY_URL = "https://www.gstatic.com/generate_204"
-    private const val DELAY_TIMEOUT = 5000
+    const val DEFAULT_DELAY_URL = "https://www.gstatic.com/generate_204"
+    const val DEFAULT_DELAY_TIMEOUT = 5000
+
+    /** URL and timeout of delay tests (the panel's settings; set from [com.skofqq.boxy.data.Prefs] at start). */
+    @Volatile var delayUrl = DEFAULT_DELAY_URL
+    @Volatile var delayTimeout = DEFAULT_DELAY_TIMEOUT
 
     /** Names and URLs of proxy-providers declared in the active Clash config. */
     suspend fun providerUrls(): List<Pair<String, String>> {

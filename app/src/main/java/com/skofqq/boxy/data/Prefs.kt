@@ -133,6 +133,8 @@ class Prefs(context: Context) {
     var filterChains by mutableStateOf(sp.getString("filter_chains", "") ?: "")
         private set
     var githubMirror by mutableStateOf(sp.getString("github_mirror", "") ?: "")
+    var delayUrl by mutableStateOf(sp.getString("delay_url", null) ?: com.skofqq.boxy.net.Net.DEFAULT_DELAY_URL)
+    var delayTimeout by mutableStateOf(sp.getInt("delay_timeout", com.skofqq.boxy.net.Net.DEFAULT_DELAY_TIMEOUT))
         private set
     /** IP card shows the public (WAN) address instead of the local one. */
     var ipWan by mutableStateOf(sp.getString("ip_mode_v1", "lan") == "wan")
@@ -141,6 +143,8 @@ class Prefs(context: Context) {
     fun updateIpWan(v: Boolean) { ipWan = v; sp.edit().putString("ip_mode_v1", if (v) "wan" else "lan").apply() }
 
     fun updateGithubMirror(v: String) { githubMirror = v; sp.edit().putString("github_mirror", v).apply() }
+    fun updateDelayUrl(v: String) { delayUrl = v; com.skofqq.boxy.net.Net.delayUrl = v; sp.edit().putString("delay_url", v).apply() }
+    fun updateDelayTimeout(v: Int) { delayTimeout = v; com.skofqq.boxy.net.Net.delayTimeout = v; sp.edit().putInt("delay_timeout", v).apply() }
 
     fun updateOpaqueStatusBar(v: Boolean) { opaqueStatusBar = v; sp.edit().putBoolean("opaque_status_bar", v).apply() }
     fun updateOpaqueNavBar(v: Boolean) { opaqueNavBar = v; sp.edit().putBoolean("opaque_nav_bar", v).apply() }
