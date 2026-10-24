@@ -100,6 +100,8 @@ const val ROUTE_DNS = "dns"
 /** Opens a Tools page from elsewhere: set [request] to a route and switch to the Tools tab. */
 object ToolsNav {
     var request by androidx.compose.runtime.mutableStateOf<String?>(null)
+    /** The config editor is open: the tab pager must not take its slanted swipes. */
+    var editorOpen by androidx.compose.runtime.mutableStateOf(false)
 }
 
 @Composable

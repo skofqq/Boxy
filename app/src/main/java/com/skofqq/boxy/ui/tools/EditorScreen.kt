@@ -1,5 +1,6 @@
 package com.skofqq.boxy.ui.tools
 
+import android.content.Context
 import android.graphics.Typeface
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -161,7 +162,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { ctx ->
-                        CodeEditor(ctx).apply {
+                        WrapEditor(ctx).apply {
                             // Proportional font and larger size read better on a phone (as in BFR).
                             typefaceText = Typeface.DEFAULT
                             typefaceLineNumber = Typeface.DEFAULT
@@ -204,7 +205,13 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
         }
     }
 
-    DisposableEffect(Unit) { onDispose { editor = null } }
+    DisposableEffect(Unit) {
+        ToolsNav.editorOpen = true
+        onDispose {
+            ToolsNav.editorOpen = false
+            editor = null
+        }
+    }
 
     if (saveAsDialog) {
         val dir = path.substringBeforeLast('/')
@@ -259,3 +266,22 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     }
 }
 
+
+/**
+ * Sora lets wrapped text still pan sideways by half the width (its max scroll X ignores word wrap), so a
+ * slanted vertical swipe shifted the page left or right. With wrap on there is nothing to the side.
+ */
+private class WrapEditor(context: Context) : CodeEditor(context) {
+    override fun getScrollMaxX(): Int = if (isWordwrap) 0 else super.getScrollMaxX()
+
+    override fun setWordwrap(wordwrap: Boolean, antiWordBreaking: Boolean, supportRtlRow: Boolean) {
+        super.setWordwrap(wordwrap, antiWordBreaking, supportRtlRow)
+        // Back to the left edge; the scroller is not there yet while the base constructor runs.
+        val s: io.github.rosemoe.sora.widget.EditorScroller? = scroller
+        if (wordwrap && s != null && s.currX != 0) {
+            s.forceFinished(true)
+            s.startScroll(s.currX, s.currY, -s.currX, 0, 0)
+            invalidate()
+        }
+    }
+}

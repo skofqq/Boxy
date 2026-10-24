@@ -286,7 +286,18 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     Box(Modifier.fillMaxSize().background(Boxy.colors.page).blur(sheetBlur)) {
         Box(Modifier.fillMaxSize().backdropSource(backdrop)) {
           CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalScreenBackdrop provides backdrop) {
-            HorizontalPager(pager, Modifier.fillMaxSize(), beyondViewportPageCount = 1, key = { tabs[it] }) { index ->
+            // Where you read logs or edit text a slanted scroll would flip the tab, so swiping is off there
+            // (the bar still switches tabs): the Logs tab, the config editor, and pages opened on top.
+            val onTab = tabs.getOrNull(pager.currentPage)
+            val swipeLocked = subPage != null || onTab == Tab.LOGS ||
+                (onTab == Tab.TOOLS && com.skofqq.boxy.ui.tools.ToolsNav.editorOpen)
+            HorizontalPager(
+                pager,
+                Modifier.fillMaxSize(),
+                beyondViewportPageCount = 1,
+                key = { tabs[it] },
+                userScrollEnabled = !swipeLocked,
+            ) { index ->
                 when (tabs[index]) {
                     Tab.HOME -> HomeScreen(
                         padding,
