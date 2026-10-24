@@ -66,6 +66,17 @@ data class ProxyGroup(
     val selectable: Boolean get() = type == "Selector"
 }
 
+/** A proxy-provider of the config (subscription): its nodes, quota and last update. */
+data class ProxyProvider(
+    val name: String,
+    /** HTTP, File, Inline. */
+    val vehicle: String,
+    /** Epoch ms of the last pull, null when unknown. */
+    val updatedAt: Long?,
+    val nodes: List<ProxyNode>,
+    val sub: SubscriptionInfo?,
+)
+
 data class ProxySnapshot(val all: List<ProxyGroup>, val nodes: Map<String, ProxyNode>) {
     private val byName = all.associateBy { it.name }
 
@@ -448,6 +459,101 @@ object Net {
                 c.disconnect()
             }
         }.getOrNull()
+    }
+
+    /**
+     * Proxy-providers declared in the config, in the core's order. The core also lists every group as a
+     * "Compatible" provider (and "default"); those are left out, as in Zashboard.
+     */
+    suspend fun clashProviderList(api: ClashApi): List<ProxyProvider>? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/providers/proxies")
+            try {
+                val providers = JSONObject(c.inputStream.bufferedReader().readText()).optJSONObject("providers") ?: return@runCatching emptyList()
+                providers.keys().asSequence().mapNotNull { key ->
+                    val p = providers.optJSONObject(key) ?: return@mapNotNull null
+                    val vehicle = p.optString("vehicleType")
+                    if (vehicle == "Compatible") return@mapNotNull null
+                    val list = p.optJSONArray("proxies")
+                    val nodes = (0 until (list?.length() ?: 0)).mapNotNull { i ->
+                        val n = list!!.optJSONObject(i) ?: return@mapNotNull null
+                        val history = n.optJSONArray("history")
+                        val delay = history?.takeIf { it.length() > 0 }?.optJSONObject(history.length() - 1)?.optInt("delay")
+                        ProxyNode(n.optString("name"), n.optString("type"), delay, n.optBoolean("udp"), n.optBoolean("xudp"))
+                    }
+                    val updated = runCatching { java.time.Instant.parse(p.optString("updatedAt")).toEpochMilli() }.getOrNull()
+                        ?.takeIf { it > 0 }
+                    val sub = p.optJSONObject("subscriptionInfo")?.let { s ->
+                        SubscriptionInfo(p.optString("name", key), s.optLong("Upload"), s.optLong("Download"), s.optLong("Total"), s.optLong("Expire"))
+                    }
+                    ProxyProvider(p.optString("name", key), vehicle, updated, nodes, sub)
+                }.toList()
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    /** Pulls the provider [name] again (PUT /providers/proxies/{name}). */
+    suspend fun clashUpdateProvider(api: ClashApi, name: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/providers/proxies/${enc(name)}", "PUT", timeout = 30_000)
+            try {
+                c.responseCode in 200..299
+            } finally {
+                c.disconnect()
+            }
+        }.getOrDefault(false)
+    }
+
+    /** Delay test of every node of the provider [name]; the results land in the nodes' history. */
+    suspend fun clashCheckProvider(api: ClashApi, name: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/providers/proxies/${enc(name)}/healthcheck", timeout = DELAY_TIMEOUT + 25_000)
+            try {
+                c.responseCode in 200..299
+            } finally {
+                c.disconnect()
+            }
+        }.getOrDefault(false)
+    }
+
+    /** Routing mode of the core: rule, global or direct; null when it cannot be read. */
+    suspend fun clashMode(api: ClashApi): String? = withContext(Dispatchers.IO) {
+        runCatching {
+            val c = openApi(api, "/configs")
+            try {
+                JSONObject(c.inputStream.bufferedReader().readText()).optString("mode").lowercase().ifBlank { null }
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
+    /**
+     * Switches the routing mode (PATCH /configs). HttpURLConnection has no PATCH, so the request goes over a
+     * plain socket; the API listens on loopback without TLS.
+     */
+    suspend fun clashSetMode(api: ClashApi, mode: String): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val url = URL(api.base)
+            val body = JSONObject().put("mode", mode).toString().toByteArray()
+            java.net.Socket().use { s ->
+                s.connect(java.net.InetSocketAddress(url.host, if (url.port > 0) url.port else 80), TIMEOUT)
+                s.soTimeout = TIMEOUT
+                val head = buildString {
+                    append("PATCH /configs HTTP/1.1\r\n")
+                    append("Host: ${url.host}\r\n")
+                    api.secret?.let { append("Authorization: Bearer $it\r\n") }
+                    append("Content-Type: application/json\r\n")
+                    append("Content-Length: ${body.size}\r\n")
+                    append("Connection: close\r\n\r\n")
+                }
+                s.getOutputStream().apply { write(head.toByteArray()); write(body); flush() }
+                val status = s.getInputStream().bufferedReader().readLine().orEmpty()
+                status.split(' ').getOrNull(1)?.toIntOrNull() in 200..299
+            }
+        }.getOrDefault(false)
     }
 
     private val GROUP_TYPES = setOf("Selector", "URLTest", "Fallback", "LoadBalance", "Relay", "Smart")

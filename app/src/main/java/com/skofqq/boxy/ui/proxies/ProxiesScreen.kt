@@ -93,6 +93,15 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
     var reload by remember { mutableStateOf(0) }
     var starting by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var providersTab by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+    var query by remember { mutableStateOf("") }
+    var mode by remember { mutableStateOf<String?>(null) }
+    var providers by remember { mutableStateOf<List<com.skofqq.boxy.net.ProxyProvider>>(emptyList()) }
+    val updating = remember { mutableStateMapOf<String, Boolean>() }
+    val checking = remember { mutableStateMapOf<String, Boolean>() }
+    // Providers with their nodes shown; small ones start open, big ones as dots (as in Zashboard).
+    val opened = remember { mutableStateMapOf<String, Boolean>() }
+    var bulk by remember { mutableStateOf(false) }
 
     suspend fun refresh() {
         val s = runCatching { BoxModule.state() }.getOrNull()
@@ -104,6 +113,10 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         val snap = a?.let { Net.clashProxies(it) }
         snapshot = snap
         state = if (snap == null) LoadState.NO_API else LoadState.READY
+        if (a != null && snap != null) {
+            mode = Net.clashMode(a)
+            providers = Net.clashProviderList(a).orEmpty()
+        }
     }
     LaunchedEffect(reload, reloadKey) { refresh() }
 
@@ -155,6 +168,60 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         scope.launch { if (Net.clashSelect(a, group.name, name)) refresh() }
     }
 
+    fun setMode(m: String) {
+        val a = api ?: return
+        scope.launch {
+            if (Net.clashSetMode(a, m)) mode = m
+            else android.widget.Toast.makeText(context, R.string.op_failed, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    suspend fun checkProvider(a: ClashApi, p: com.skofqq.boxy.net.ProxyProvider) {
+        checking[p.name] = true
+        Net.clashCheckProvider(a, p.name)
+        // Fresh results are in the nodes' history; drop the older ones taken here.
+        p.nodes.forEach { delays.remove(it.name) }
+        checking[p.name] = false
+    }
+
+    suspend fun updateProvider(a: ClashApi, p: com.skofqq.boxy.net.ProxyProvider) {
+        updating[p.name] = true
+        if (!Net.clashUpdateProvider(a, p.name)) {
+            android.widget.Toast.makeText(context, context.getString(R.string.provider_update_failed, p.name), android.widget.Toast.LENGTH_SHORT).show()
+        }
+        updating[p.name] = false
+    }
+
+    fun providerAction(p: com.skofqq.boxy.net.ProxyProvider, check: Boolean) {
+        val a = api ?: return
+        if (updating[p.name] == true || checking[p.name] == true) return
+        scope.launch {
+            if (check) checkProvider(a, p) else updateProvider(a, p)
+            refresh()
+        }
+    }
+
+    fun bulkAction(check: Boolean) {
+        val a = api ?: return
+        if (bulk) return
+        bulk = true
+        scope.launch {
+            coroutineScope {
+                providers.map { p -> async { if (check) checkProvider(a, p) else updateProvider(a, p) } }.awaitAll()
+            }
+            refresh()
+            bulk = false
+        }
+    }
+
+    fun testAllGroups() {
+        snapshot?.groups?.forEach { test(it) }
+    }
+
+    val q = query.trim()
+    fun ProxyGroup.matches() = q.isEmpty() || name.contains(q, true) || all.any { it.contains(q, true) }
+    fun com.skofqq.boxy.net.ProxyProvider.matches() = q.isEmpty() || name.contains(q, true) || nodes.any { it.name.contains(q, true) }
+
     val openGroup = snapshot?.group(expanded ?: "")
     if (openGroup != null) {
         val snap = snapshot!!
@@ -182,6 +249,22 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         ) {
             HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh)) { reload++ }
         }
+        val snap = snapshot
+        if (state == LoadState.READY && snap != null) {
+            ProxyToolbar(
+                providersTab = providersTab,
+                groups = snap.groups.size,
+                providers = providers.size,
+                mode = mode,
+                query = query,
+                busy = bulk || (!providersTab && testing.values.any { it }),
+                onTab = { providersTab = it },
+                onMode = ::setMode,
+                onQuery = { query = it },
+                onUpdateAll = { bulkAction(check = false) },
+                onTestAll = { if (providersTab) bulkAction(check = true) else testAllGroups() },
+            )
+        }
     }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         when (state) {
             LoadState.LOADING -> item {
@@ -201,8 +284,31 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
             }
             LoadState.READY -> {
                 val snap = snapshot ?: return@PinnedLazyPage
+                if (providersTab) {
+                    val shown = providers.filter { it.matches() }
+                    if (shown.isEmpty()) item { NothingFound() }
+                    shown.forEach { p ->
+                        item(key = "provider|${p.name}") {
+                            ProviderCard(
+                                p, snap, delays, testing,
+                                updating = updating[p.name] == true,
+                                checking = checking[p.name] == true,
+                                expanded = opened[p.name] ?: (p.nodes.size <= OPEN_NODES_MAX),
+                                filter = q,
+                                modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                                onToggle = { opened[p.name] = !(opened[p.name] ?: (p.nodes.size <= OPEN_NODES_MAX)) },
+                                onUpdate = { providerAction(p, check = false) },
+                                onCheck = { providerAction(p, check = true) },
+                                onTestNode = ::testNode,
+                            )
+                        }
+                    }
+                    return@PinnedLazyPage
+                }
                 // Zashboard layout in Boxy's style: group tiles two per row; an opened group pops up over the page.
-                val rows = snap.groups.chunked(2)
+                val shownGroups = snap.groups.filter { it.matches() }
+                if (shownGroups.isEmpty()) item { NothingFound() }
+                val rows = shownGroups.chunked(2)
                 rows.forEach { row ->
                     item(key = row.joinToString("|") { it.name }) {
                         run {
@@ -229,6 +335,20 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
 }
 
 private enum class LoadState { LOADING, STOPPED, NO_API, READY }
+
+/** Providers with up to this many nodes show them as tiles at first, bigger ones as dots. */
+private const val OPEN_NODES_MAX = 8
+
+@Composable
+private fun NothingFound() {
+    Text(
+        stringResource(R.string.proxies_nothing_found),
+        Modifier.fillMaxWidth().padding(32.dp),
+        style = MaterialTheme.typography.bodyMedium,
+        color = Boxy.colors.text2,
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+    )
+}
 
 /**
  * Material 3 Expressive empty state: a slowly turning cookie shape with the symbol, a title, a line of help
@@ -335,7 +455,7 @@ private fun GroupDialog(content: @Composable (Modifier) -> Unit, onClose: () -> 
     }
 }
 
-private fun delayOf(name: String, snap: ProxySnapshot, delays: Map<String, Int>): Int? =
+internal fun delayOf(name: String, snap: ProxySnapshot, delays: Map<String, Int>): Int? =
     delays[name] ?: snap.nodes[name]?.delay?.takeIf { snap.group(name) == null } ?: snap.leaf(name)?.let { delays[it] ?: snap.nodes[it]?.delay }
 
 private fun aliveText(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String, Int>): String {
@@ -454,7 +574,7 @@ private fun OpenGroup(
 }
 
 @Composable
-private fun NodeTile(
+internal fun NodeTile(
     name: String,
     snap: ProxySnapshot,
     delays: Map<String, Int>,
@@ -498,7 +618,7 @@ private fun NodeTile(
 
 /** Delay pill: the number in its colour, a bolt before the first test, a cross on timeout; tap to test. */
 @Composable
-private fun DelayPill(delay: Int?, busy: Boolean, onTest: () -> Unit) {
+internal fun DelayPill(delay: Int?, busy: Boolean, onTest: () -> Unit) {
     Box(
         Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.page).clickable(enabled = !busy, onClick = onTest)
             .padding(horizontal = 9.dp, vertical = 3.dp),
