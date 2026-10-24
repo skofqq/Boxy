@@ -11,19 +11,19 @@
 
 <table>
 <tr>
-  <td align="center"><img src="docs/screenshots/en/01-home.png" width="200"><br><sub>Главная</sub></td>
-  <td align="center"><img src="docs/screenshots/en/02-proxies.png" width="200"><br><sub>Встроенная панель: прокси</sub></td>
-  <td align="center"><img src="docs/screenshots/en/03-providers.png" width="200"><br><sub>Провайдеры</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/01-home.png" width="200"><br><sub>Главная</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/02-proxies.png" width="200"><br><sub>Встроенная панель: прокси</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/03-providers.png" width="200"><br><sub>Провайдеры</sub></td>
 </tr>
 <tr>
-  <td align="center"><img src="docs/screenshots/en/04-connections.png" width="200"><br><sub>Соединения</sub></td>
-  <td align="center"><img src="docs/screenshots/en/05-rules.png" width="200"><br><sub>Правила</sub></td>
-  <td align="center"><img src="docs/screenshots/en/06-logs.png" width="200"><br><sub>Журнал ядра</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/04-connections.png" width="200"><br><sub>Соединения</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/05-rules.png" width="200"><br><sub>Правила</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/06-logs.png" width="200"><br><sub>Журнал ядра</sub></td>
 </tr>
 <tr>
-  <td align="center"><img src="docs/screenshots/en/07-settings.png" width="200"><br><sub>Настройки ядра</sub></td>
-  <td align="center"><img src="docs/screenshots/en/08-apps.png" width="200"><br><sub>Приложения</sub></td>
-  <td align="center"><img src="docs/screenshots/en/09-tools.png" width="200"><br><sub>Утилиты</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/07-settings.png" width="200"><br><sub>Настройки ядра</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/08-apps.png" width="200"><br><sub>Приложения</sub></td>
+  <td align="center"><img src="docs/screenshots/ru/09-tools.png" width="200"><br><sub>Утилиты</sub></td>
 </tr>
 </table>
 
