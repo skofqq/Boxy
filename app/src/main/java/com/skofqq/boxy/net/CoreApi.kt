@@ -31,7 +31,19 @@ data class CoreConn(
 /** A line of the core's own log (/logs). */
 data class CoreLogLine(val time: Long, val level: String, val text: String)
 
-data class CoreRule(val type: String, val payload: String, val proxy: String)
+data class CoreRule(
+    /** Position in the core's list; what /rules/disable takes. */
+    val index: Int,
+    val type: String,
+    val payload: String,
+    val proxy: String,
+    val disabled: Boolean = false,
+    /** Matches and misses since the core started, with the last of each (epoch ms, null when never). */
+    val hits: Long = 0,
+    val hitAt: Long? = null,
+    val misses: Long = 0,
+    val missAt: Long? = null,
+)
 
 /** A rule-provider of the config: a rule set the core downloads. */
 data class RuleProvider(val name: String, val behavior: String, val vehicle: String, val count: Int, val updatedAt: Long?)
@@ -105,13 +117,29 @@ object CoreApi {
                 val arr = JSONObject(c.inputStream.bufferedReader().readText()).optJSONArray("rules") ?: return@runCatching emptyList()
                 (0 until arr.length()).map { i ->
                     val r = arr.getJSONObject(i)
-                    CoreRule(r.optString("type"), r.optString("payload"), r.optString("proxy"))
+                    val extra = r.optJSONObject("extra")
+                    fun time(key: String) = runCatching { java.time.Instant.parse(extra?.optString(key)).toEpochMilli() }.getOrNull()?.takeIf { it > 0 }
+                    CoreRule(
+                        r.optInt("index", i),
+                        r.optString("type"),
+                        r.optString("payload"),
+                        r.optString("proxy"),
+                        disabled = extra?.optBoolean("disabled") == true,
+                        hits = extra?.optLong("hitCount") ?: 0,
+                        hitAt = time("hitAt"),
+                        misses = extra?.optLong("missCount") ?: 0,
+                        missAt = time("missAt"),
+                    )
                 }
             } finally {
                 c.disconnect()
             }
         }.getOrNull()
     }
+
+    /** Turns the rule at [index] off or back on until the core restarts (mihomo's PATCH /rules/disable). */
+    suspend fun setRuleDisabled(api: ClashApi, index: Int, disabled: Boolean): Boolean =
+        Net.clashPatch(api, "/rules/disable", JSONObject().put(index.toString(), disabled))
 
     suspend fun ruleProviders(api: ClashApi): List<RuleProvider> = withContext(Dispatchers.IO) {
         runCatching {

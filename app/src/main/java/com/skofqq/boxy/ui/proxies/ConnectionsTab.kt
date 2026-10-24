@@ -44,6 +44,7 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
 import com.skofqq.boxy.util.Format
 import kotlinx.coroutines.delay
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 
 private val SORTS = listOf("time", "download", "upload", "speed", "host")
@@ -70,8 +71,11 @@ internal fun ConnectionsTab(bottom: Dp, reloadKey: Int) {
     var query by remember { mutableStateOf("") }
     val opened = remember { mutableStateMapOf<String, Boolean>() }
 
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     LaunchedEffect(api, paused) {
         if (api == null || paused) return@LaunchedEffect
+        // Polls only while Boxy is on screen.
+        owner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
         var last = active.associateBy { it.id }
         while (true) {
             val now = CoreApi.connections(api)
@@ -88,6 +92,7 @@ internal fun ConnectionsTab(bottom: Dp, reloadKey: Int) {
                 last = now.associateBy { it.id }
             }
             delay(1000)
+        }
         }
     }
 

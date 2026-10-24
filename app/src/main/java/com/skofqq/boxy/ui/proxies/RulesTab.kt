@@ -2,6 +2,7 @@ package com.skofqq.boxy.ui.proxies
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.skofqq.boxy.R
 import com.skofqq.boxy.net.CoreApi
+import com.skofqq.boxy.net.Net
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.clickable
 import com.skofqq.boxy.net.CoreRule
 import com.skofqq.boxy.net.RuleProvider
 import com.skofqq.boxy.ui.theme.Boxy
@@ -61,10 +67,73 @@ internal fun RulesTab(bottom: Dp, reloadKey: Int) {
     val updating = remember { mutableStateMapOf<String, Boolean>() }
     var reload by remember { mutableIntStateOf(0) }
 
+    // Groups the rules send to, for the group → node chip and picking a node, as on the Proxies tab.
+    var snapshot by remember { mutableStateOf<com.skofqq.boxy.net.ProxySnapshot?>(null) }
+    val delays = remember { mutableStateMapOf<String, Int>() }
+    val testing = remember { mutableStateMapOf<String, Boolean>() }
+    var openGroup by remember { mutableStateOf<String?>(null) }
+    val info = remember { mutableStateMapOf<Int, Boolean>() }
+
     LaunchedEffect(api, reload) {
         if (api == null) return@LaunchedEffect
         rules = CoreApi.rules(api).orEmpty()
         providers = CoreApi.ruleProviders(api)
+        snapshot = Net.clashProxies(api)
+    }
+
+    fun toggle(r: CoreRule) {
+        val a = api ?: return
+        // Shown at once; the core's answer comes with the reload.
+        rules = rules?.map { if (it.index == r.index) it.copy(disabled = !r.disabled) else it }
+        scope.launch {
+            if (!CoreApi.setRuleDisabled(a, r.index, !r.disabled)) {
+                android.widget.Toast.makeText(context, R.string.op_failed, android.widget.Toast.LENGTH_SHORT).show()
+            }
+            reload++
+        }
+    }
+
+    fun testGroup(g: com.skofqq.boxy.net.ProxyGroup) {
+        val a = api ?: return
+        if (testing[g.name] == true) return
+        testing[g.name] = true
+        scope.launch {
+            val result = Net.clashGroupDelay(a, g.name).orEmpty()
+            g.all.forEach { n -> delays[n] = result[n] ?: 0 }
+            testing[g.name] = false
+            snapshot = Net.clashProxies(a)
+        }
+    }
+
+    fun testNode(name: String) {
+        val a = api ?: return
+        if (testing[name] == true) return
+        testing[name] = true
+        scope.launch {
+            delays[name] = Net.clashProxyDelay(a, name) ?: 0
+            testing[name] = false
+        }
+    }
+
+    val snap = snapshot
+    val group = snap?.group(openGroup ?: "")
+    if (snap != null && group != null) {
+        GroupDialog(
+            content = { m ->
+                OpenGroup(
+                    group, snap, delays, testing,
+                    onClose = { openGroup = null },
+                    onTestGroup = { testGroup(group) },
+                    onTestNode = ::testNode,
+                    onSelect = { name ->
+                        val a = api
+                        if (a != null) scope.launch { if (Net.clashSelect(a, group.name, name)) snapshot = Net.clashProxies(a) }
+                    },
+                    modifier = m,
+                )
+            },
+            onClose = { openGroup = null },
+        )
     }
 
     suspend fun update(p: RuleProvider) {
@@ -114,24 +183,132 @@ internal fun RulesTab(bottom: Dp, reloadKey: Int) {
             // Numbers stay those of the full list, so a rule found by search keeps its place in the config.
             val shown = all.withIndex().filter { (_, r) -> q.isEmpty() || r.payload.contains(q, true) || r.type.contains(q, true) || r.proxy.contains(q, true) }
             if (shown.isEmpty()) item { EmptyLine(stringResource(R.string.proxies_nothing_found)) }
-            itemsIndexed(shown) { _, (i, r) -> RuleCard(i + 1, r, Modifier.padding(horizontal = 16.dp).fillMaxWidth()) }
+            val byName = providers.associateBy { it.name }
+            itemsIndexed(shown) { _, (i, r) ->
+                val set = byName[r.payload].takeIf { r.type == "RuleSet" }
+                RuleCard(
+                    i + 1, r, set, snap,
+                    delays,
+                    updating = set != null && updating[set.name] == true,
+                    showInfo = info[r.index] == true,
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                    onToggle = { toggle(r) },
+                    onInfo = { info[r.index] = info[r.index] != true },
+                    onUpdate = { if (set != null) scope.launch { update(set); reload++ } },
+                    onGroup = { openGroup = it },
+                )
+            }
         }
     }
 }
 
+/**
+ * A rule as Zashboard shows it: number, type and payload, the size of its rule set with ⟳ for one that is
+ * downloaded, ⓘ for how often it matched; a switch that turns it off until the core restarts, and where it sends
+ * traffic: the group and the node it uses now with its delay (a tap opens the group to pick another node).
+ */
 @Composable
-private fun RuleCard(number: Int, r: CoreRule, modifier: Modifier) {
+private fun RuleCard(
+    number: Int,
+    r: CoreRule,
+    set: RuleProvider?,
+    snap: com.skofqq.boxy.net.ProxySnapshot?,
+    delays: Map<String, Int>,
+    updating: Boolean,
+    showInfo: Boolean,
+    modifier: Modifier,
+    onToggle: () -> Unit,
+    onInfo: () -> Unit,
+    onUpdate: () -> Unit,
+    onGroup: (String) -> Unit,
+) {
     val small = MaterialTheme.typography.bodySmall
-    Row(modifier.clip(RoundedCornerShape(16.dp)).background(Boxy.colors.card).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(number.toString(), Modifier.width(36.dp), style = small, color = Boxy.colors.text2)
-        Column(Modifier.weight(1f)) {
-            Text(r.payload.ifBlank { r.type }, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(r.type, style = small, color = Boxy.colors.text2, maxLines = 1)
+    val locale = LocalConfiguration.current.locales[0]
+    val dim = if (r.disabled) 0.45f else 1f
+    Column(
+        modifier.clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(number.toString(), style = small, color = Boxy.colors.text2)
+            Spacer(Modifier.width(10.dp))
+            Text("${r.type}:", style = small, color = Boxy.colors.text2.copy(alpha = dim), maxLines = 1)
+            Spacer(Modifier.width(6.dp))
+            Text(
+                r.payload.ifBlank { r.type },
+                Modifier.weight(1f, fill = false),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Boxy.colors.text.copy(alpha = dim),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (set != null) {
+                Spacer(Modifier.width(4.dp))
+                Text("(${set.count})", style = small, color = Boxy.colors.text2)
+            }
+            Spacer(Modifier.weight(0.001f).width(4.dp))
+            if (set != null && set.vehicle == "HTTP") {
+                if (updating) {
+                    Box(Modifier.size(30.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) }
+                } else {
+                    QuietIcon(BoxyIcons.Refresh, stringResource(R.string.provider_update), onUpdate)
+                }
+            }
+            QuietIcon(BoxyIcons.Info, stringResource(R.string.rules_info), onInfo)
         }
-        Spacer(Modifier.width(8.dp))
-        Icon(BoxyIcons.ArrowCircle, null, Modifier.size(14.dp), tint = Boxy.colors.text2)
-        Spacer(Modifier.width(4.dp))
-        Text(r.proxy, Modifier.fillMaxWidth(0.4f), style = small, color = Boxy.colors.text, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // A compact switch: without the 48 dp touch frame the card stays as low as Zashboard's.
+            CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+                androidx.compose.material3.Switch(
+                    !r.disabled,
+                    { onToggle() },
+                    Modifier.graphicsLayer { scaleX = 0.8f; scaleY = 0.8f },
+                    colors = androidx.compose.material3.SwitchDefaults.colors(checkedTrackColor = Boxy.colors.accent),
+                )
+            }
+            Spacer(Modifier.width(6.dp))
+            val group = snap?.group(r.proxy)
+            Row(
+                Modifier.weight(1f, fill = false).clip(RoundedCornerShape(50)).background(Boxy.colors.surface2)
+                    .then(if (group != null) Modifier.clickable { onGroup(group.name) } else Modifier)
+                    .padding(horizontal = 12.dp, vertical = 7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(r.proxy, style = MaterialTheme.typography.labelLarge, color = Boxy.colors.text.copy(alpha = dim), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (group != null) {
+                    val leaf = snap.leaf(group.name)
+                    if (leaf != null && leaf != group.name) {
+                        Icon(BoxyIcons.ChevronRight, null, Modifier.padding(horizontal = 2.dp).size(16.dp), tint = Boxy.colors.text2)
+                        Text(leaf, Modifier.weight(1f, fill = false), style = MaterialTheme.typography.labelLarge, color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        val delay = delays[leaf] ?: snap.nodes[leaf]?.delay
+                        if (delay != null) {
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                if (delay > 0) delay.toString() else "×",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = delayColor(delay).let { if (it == androidx.compose.ui.graphics.Color.Unspecified) Boxy.colors.text2 else it },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        if (showInfo) {
+            val last = r.hitAt?.let { " · " + stringResource(R.string.rules_last_hit, timeAgo(it, locale)) }.orEmpty()
+            Text(
+                stringResource(R.string.rules_hits, r.hits, r.misses) + last,
+                style = small,
+                color = Boxy.colors.text2,
+            )
+        }
+    }
+}
+
+/** A small grey icon button for the rule's title line. */
+@Composable
+private fun QuietIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, description: String, onClick: () -> Unit) {
+    Box(Modifier.size(30.dp).clip(RoundedCornerShape(50)).clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+        Icon(icon, description, Modifier.size(17.dp), tint = Boxy.colors.text2)
     }
 }
 

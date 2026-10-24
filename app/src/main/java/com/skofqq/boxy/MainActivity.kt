@@ -325,11 +325,11 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
           }
         }
         val labels = mapOf(
-            Tab.HOME to BarItem(stringResource(R.string.tab_home), BoxyIcons.Home),
+            Tab.HOME to BarItem(stringResource(R.string.tab_home), BoxyIcons.Home, com.skofqq.boxy.ui.components.TapMotion.JUMP),
             Tab.APPS to BarItem(stringResource(R.string.tab_apps), BoxyIcons.Apps),
-            Tab.LOGS to BarItem(stringResource(R.string.tab_logs), BoxyIcons.Description),
-            Tab.TOOLS to BarItem(stringResource(R.string.tab_tools), BoxyIcons.Build),
-            Tab.SETTINGS to BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings),
+            Tab.LOGS to BarItem(stringResource(R.string.tab_logs), BoxyIcons.Description, com.skofqq.boxy.ui.components.TapMotion.FLIP),
+            Tab.TOOLS to BarItem(stringResource(R.string.tab_tools), BoxyIcons.Build, com.skofqq.boxy.ui.components.TapMotion.WIGGLE),
+            Tab.SETTINGS to BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings, com.skofqq.boxy.ui.components.TapMotion.GEAR),
         )
         CompositionLocalProvider(LocalBackdrop provides backdrop) {
             BottomBar(

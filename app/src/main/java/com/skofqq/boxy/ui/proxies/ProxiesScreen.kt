@@ -448,7 +448,7 @@ private fun EmptyState(
  * screen is dimmed (and blurred with liquid glass); a tap outside or Back closes it.
  */
 @Composable
-private fun GroupDialog(content: @Composable (Modifier) -> Unit, onClose: () -> Unit) {
+internal fun GroupDialog(content: @Composable (Modifier) -> Unit, onClose: () -> Unit) {
     androidx.compose.ui.window.Dialog(onClose, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
         val frosted = com.skofqq.boxy.ui.components.rememberFrostedDialog()
         val appear = remember { androidx.compose.animation.core.Animatable(0f) }
@@ -553,7 +553,7 @@ private fun GroupTile(
 }
 
 @Composable
-private fun OpenGroup(
+internal fun OpenGroup(
     group: ProxyGroup,
     snap: ProxySnapshot,
     delays: Map<String, Int>,

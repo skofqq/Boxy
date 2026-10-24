@@ -29,6 +29,7 @@ import com.skofqq.boxy.net.Net
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.ui.components.BarItem
 import com.skofqq.boxy.ui.components.BottomBar
+import com.skofqq.boxy.ui.components.TapMotion
 import com.skofqq.boxy.ui.components.LocalBackdrop
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.ui.components.backdropSourceOf
@@ -61,11 +62,11 @@ fun CorePanel(reloadKey: Int) {
         CompositionLocalProvider(LocalBackdrop provides barBackdrop) {
             BottomBar(
                 listOf(
-                    BarItem(stringResource(R.string.proxies_tab_groups), BoxyIcons.Language),
-                    BarItem(stringResource(R.string.panel_tab_connections), BoxyIcons.Link),
-                    BarItem(stringResource(R.string.panel_tab_logs), BoxyIcons.Description),
-                    BarItem(stringResource(R.string.panel_tab_rules), BoxyIcons.FilterList),
-                    BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings),
+                    BarItem(stringResource(R.string.proxies_tab_groups), BoxyIcons.Language, TapMotion.SPIN),
+                    BarItem(stringResource(R.string.panel_tab_connections), BoxyIcons.Link, TapMotion.SHAKE),
+                    BarItem(stringResource(R.string.panel_tab_logs), BoxyIcons.Description, TapMotion.FLIP),
+                    BarItem(stringResource(R.string.panel_tab_rules), BoxyIcons.FilterList, TapMotion.DROP),
+                    BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings, TapMotion.GEAR),
                 ),
                 tab.toFloat(),
                 { tab = it },

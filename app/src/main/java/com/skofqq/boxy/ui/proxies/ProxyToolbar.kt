@@ -38,6 +38,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -116,15 +118,24 @@ internal fun FloatingSearch(
 ) {
     // The list fades into the page under the bar, so the pills stand apart from the cards behind them.
     val page = Boxy.colors.page
+    // With the keyboard open the bar sits right on it: the keyboard covers the room kept for the bottom bar, so
+    // the larger of the two is used rather than their sum.
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val root = androidx.compose.ui.platform.LocalView.current.rootView
+    // How far the bar's bottom edge is from the bottom of the window (the system bar and the page's own margins).
+    var below by remember { mutableStateOf(0) }
+    val keyboard = with(density) { (WindowInsets.ime.getBottom(density) - below).coerceAtLeast(0).toDp() }
     Box(
         modifier
+            .onGloballyPositioned { c ->
+                below = (root.height - (c.positionInWindow().y + c.size.height)).toInt().coerceAtLeast(0)
+            }
             .fillMaxWidth()
             .background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to page.copy(alpha = 0f), 0.45f to page.copy(alpha = 0.85f), 1f to page))
-            .padding(top = 24.dp, bottom = bottom),
+            .padding(top = 24.dp, bottom = maxOf(bottom, keyboard)),
     ) {
     Row(
         Modifier
-            .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
             .padding(horizontal = 16.dp, vertical = 10.dp)
             .fillMaxWidth()
             .height(52.dp),
@@ -235,7 +246,7 @@ internal fun MenuChip(label: String, highlighted: Boolean, options: List<Pair<St
 }
 
 @Composable
-private fun delayColor(delay: Int?): Color = when {
+internal fun delayColor(delay: Int?): Color = when {
     delay == null -> Color.Unspecified
     delay <= 0 -> Tints.red.fg
     delay < 300 -> Tints.green.fg

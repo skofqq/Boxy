@@ -37,6 +37,8 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tint
 import com.skofqq.boxy.ui.theme.Tints
 import kotlinx.coroutines.delay
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 
 private val LEVELS = listOf("debug", "info", "warning", "error")
 
@@ -57,17 +59,28 @@ internal fun CoreLogsTab(bottom: Dp, reloadKey: Int) {
     var query by remember { mutableStateOf("") }
     val lines = remember { mutableStateListOf<CoreLogLine>() }
 
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     LaunchedEffect(api, level, paused) {
         if (api == null || paused) return@LaunchedEffect
-        // The stream ends when the core restarts; follow it again.
-        while (true) {
-            runCatching {
-                CoreApi.logs(api, level).collect { line ->
-                    lines.add(0, line)
-                    if (lines.size > LINES_MAX) lines.removeRange(LINES_MAX, lines.size)
+        // At debug level the core writes hundreds of lines a second: they are gathered off the screen and shown a
+        // few times a second in one go, so the list is not rebuilt for every line.
+        val pending = java.util.concurrent.ConcurrentLinkedQueue<CoreLogLine>()
+        // Follows the log only while Boxy is on screen.
+        owner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            launch {
+                // The stream ends when the core restarts; follow it again.
+                while (true) {
+                    runCatching { CoreApi.logs(api, level).collect { pending.add(it) } }
+                    delay(2000)
                 }
             }
-            delay(2000)
+            while (true) {
+                delay(300)
+                if (pending.isEmpty()) continue
+                val batch = generateSequence { pending.poll() }.toMutableList().apply { reverse() }
+                lines.addAll(0, if (batch.size > LINES_MAX) batch.subList(0, LINES_MAX) else batch)
+                if (lines.size > LINES_MAX) lines.removeRange(LINES_MAX, lines.size)
+            }
         }
     }
 

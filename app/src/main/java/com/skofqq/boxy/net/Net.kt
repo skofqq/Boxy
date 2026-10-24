@@ -537,7 +537,10 @@ object Net {
      * Changes settings of the running core (PATCH /configs); they last until the core restarts. HttpURLConnection
      * has no PATCH, so the request goes over a plain socket; the API listens on loopback without TLS.
      */
-    suspend fun clashPatchConfigs(api: ClashApi, changes: JSONObject): Boolean = withContext(Dispatchers.IO) {
+    suspend fun clashPatchConfigs(api: ClashApi, changes: JSONObject): Boolean = clashPatch(api, "/configs", changes)
+
+    /** PATCH [path] with a JSON body over a plain socket (see [clashPatchConfigs]). */
+    suspend fun clashPatch(api: ClashApi, path: String, changes: JSONObject): Boolean = withContext(Dispatchers.IO) {
         runCatching {
             val url = URL(api.base)
             val body = changes.toString().toByteArray()
@@ -545,7 +548,7 @@ object Net {
                 s.connect(java.net.InetSocketAddress(url.host, if (url.port > 0) url.port else 80), TIMEOUT)
                 s.soTimeout = TIMEOUT
                 val head = buildString {
-                    append("PATCH /configs HTTP/1.1\r\n")
+                    append("PATCH $path HTTP/1.1\r\n")
                     append("Host: ${url.host}\r\n")
                     api.secret?.let { append("Authorization: Bearer $it\r\n") }
                     append("Content-Type: application/json\r\n")

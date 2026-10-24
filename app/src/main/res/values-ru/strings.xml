@@ -894,4 +894,8 @@
     <string name="panel_settings_update_core_sub">Последняя версия ядра, выбранного в модуле; сервис перезапустится</string>
     <string name="panel_settings_update_subs">Обновить подписки</string>
     <string name="panel_settings_update_webui">Обновить веб-панель</string>
-    <string name="panel_settings_update_webui_sub">Установлена: %1$s</string></resources>
+    <string name="panel_settings_update_webui_sub">Установлена: %1$s</string>
+    <string name="rules_info">Статистика правила</string>
+    <string name="rules_hits">Сработало: %1$d · не подошло: %2$d</string>
+    <string name="rules_last_hit">последний раз %1$s</string>
+</resources>

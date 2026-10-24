@@ -906,4 +906,8 @@
     <string name="panel_settings_update_core_sub">Latest version of the core chosen in the module; the service restarts</string>
     <string name="panel_settings_update_subs">Update subscriptions</string>
     <string name="panel_settings_update_webui">Update web panel</string>
-    <string name="panel_settings_update_webui_sub">Installed: %1$s</string></resources>
+    <string name="panel_settings_update_webui_sub">Installed: %1$s</string>
+    <string name="rules_info">Rule statistics</string>
+    <string name="rules_hits">Matched: %1$d · not matched: %2$d</string>
+    <string name="rules_last_hit">last %1$s</string>
+</resources>
