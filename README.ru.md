@@ -7,6 +7,26 @@
 
 Языки: English, Русский, Українська, Беларуская, Қазақша, Deutsch, Español, Français, Italiano, Türkçe, 中文, 日本語.
 
+## Скриншоты
+
+<table>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/01-home.png" width="200"><br><sub>Главная</sub></td>
+  <td align="center"><img src="docs/screenshots/en/02-proxies.png" width="200"><br><sub>Встроенная панель: прокси</sub></td>
+  <td align="center"><img src="docs/screenshots/en/03-providers.png" width="200"><br><sub>Провайдеры</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/04-connections.png" width="200"><br><sub>Соединения</sub></td>
+  <td align="center"><img src="docs/screenshots/en/05-rules.png" width="200"><br><sub>Правила</sub></td>
+  <td align="center"><img src="docs/screenshots/en/06-logs.png" width="200"><br><sub>Журнал ядра</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/07-settings.png" width="200"><br><sub>Настройки ядра</sub></td>
+  <td align="center"><img src="docs/screenshots/en/08-apps.png" width="200"><br><sub>Приложения</sub></td>
+  <td align="center"><img src="docs/screenshots/en/09-tools.png" width="200"><br><sub>Утилиты</sub></td>
+</tr>
+</table>
+
 ## Возможности
 
 **Главная**
@@ -41,6 +61,7 @@
 
 **Панель**
 - Веб-интерфейс ядра (Zashboard или MetaCubeXD, можно переключать), свои панели, SubStore, очистка кэша
+- Встроенная нативная панель в стиле Zashboard: группы прокси и провайдеры с проверкой задержки и режимом ядра, соединения в реальном времени, журнал ядра, правила с переключателями и наборами, настройки и обновления ядра
 
 **Настройки**
 - Тема (светлая, тёмная, как в системе, Material You), чисто чёрный фон, выбор языка с флагами

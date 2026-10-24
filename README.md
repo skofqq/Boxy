@@ -7,6 +7,26 @@ Open-source Android app for managing the [Box for Root](https://github.com/taama
 
 Languages: English, Русский, Українська, Беларуская, Қазақша, Deutsch, Español, Français, Italiano, Türkçe, 中文, 日本語.
 
+## Screenshots
+
+<table>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/01-home.png" width="200"><br><sub>Home</sub></td>
+  <td align="center"><img src="docs/screenshots/en/02-proxies.png" width="200"><br><sub>Built-in panel: proxies</sub></td>
+  <td align="center"><img src="docs/screenshots/en/03-providers.png" width="200"><br><sub>Providers</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/04-connections.png" width="200"><br><sub>Connections</sub></td>
+  <td align="center"><img src="docs/screenshots/en/05-rules.png" width="200"><br><sub>Rules</sub></td>
+  <td align="center"><img src="docs/screenshots/en/06-logs.png" width="200"><br><sub>Core log</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/screenshots/en/07-settings.png" width="200"><br><sub>Core settings</sub></td>
+  <td align="center"><img src="docs/screenshots/en/08-apps.png" width="200"><br><sub>Apps</sub></td>
+  <td align="center"><img src="docs/screenshots/en/09-tools.png" width="200"><br><sub>Tools</sub></td>
+</tr>
+</table>
+
 ## Features
 
 **Home**
@@ -40,6 +60,7 @@ Languages: English, Русский, Українська, Беларуская, 
 
 **Panel**
 - Core web UI (Zashboard or MetaCubeXD, switchable), custom panels, SubStore, cache cleaning
+- Built-in native panel in the style of Zashboard: proxy groups and providers with delay tests and routing mode, live connections, the core log, rules with switches and rule sets, core settings and updates
 
 **Settings**
 - Theme (light, dark, system, Material You), true black, language picker with flags
