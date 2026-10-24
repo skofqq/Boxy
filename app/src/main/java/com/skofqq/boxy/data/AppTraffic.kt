@@ -7,9 +7,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Process
 import android.os.SystemClock
+import android.util.Log
 import com.skofqq.boxy.net.ClashApi
 import com.skofqq.boxy.net.Net
 import com.skofqq.boxy.root.BoxModule
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -41,6 +43,8 @@ object AppTraffic {
     private const val PREFS = "app_traffic"
     private const val KEEP_DAYS = 62L
     private const val MIN_INTERVAL_MS = 8000L
+    private const val PACKAGES_TTL_MS = 10 * 60_000L
+    private const val TAG = "Boxy"
     /** Package key of traffic the core moved for itself or could not tie to an app. */
     const val CORE = "@core"
 
@@ -53,7 +57,21 @@ object AppTraffic {
     var coreKnowsApps: Boolean? = null
         private set
 
-    suspend fun sample(context: Context) = withContext(Dispatchers.IO) {
+    /**
+     * Never throws: it runs in loops of the status service and the home screen, where an exception would
+     * take the whole process down (widget and tile included).
+     */
+    suspend fun sample(context: Context) {
+        try {
+            sampleOnce(context)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "traffic sample failed", e)
+        }
+    }
+
+    private suspend fun sampleOnce(context: Context) = withContext(Dispatchers.IO) {
         val now = SystemClock.elapsedRealtime()
         synchronized(lock) {
             if (now - lastAt < MIN_INTERVAL_MS) return@withContext
@@ -68,6 +86,7 @@ object AppTraffic {
         val a = Net.clashApi(core) ?: return@withContext
         val conns = Net.clashConnections(a) ?: return@withContext
         if (conns.isNotEmpty()) coreKnowsApps = conns.any { it.app != null || it.uid != null }
+        loadOtherUsers(conns.mapNotNull { it.uid })
         val add = HashMap<String, LongArray>()
         synchronized(lock) {
             val first = last.isEmpty()
@@ -113,8 +132,49 @@ object AppTraffic {
     }
 
     private val packages = HashMap<Int, String?>()
+    /** uid -> package of other users (work profile, second user), read with root: their uids throw in [packageFor]. */
+    private val otherUsers = HashMap<Int, String>()
+    private val loadedUsers = HashSet<Int>()
+    private var packagesAt = 0L
 
-    /** Package of an app uid (any user); cached, uids do not change while installed. */
+    /**
+     * Both caches are dropped every [PACKAGES_TTL_MS]: a removed app's uid can go to a new app, and an app
+     * installed later would stay "UID …" (a miss is cached too).
+     */
+    private fun expirePackages() = synchronized(packages) {
+        val now = SystemClock.elapsedRealtime()
+        if (now - packagesAt < PACKAGES_TTL_MS) return
+        packagesAt = now
+        packages.clear()
+        otherUsers.clear()
+        loadedUsers.clear()
+    }
+
+    /** Lists the packages of each other user among [uids] once (until the caches expire). */
+    private suspend fun loadOtherUsers(uids: Collection<Int>) {
+        expirePackages()
+        val users = uids.map { it / 100_000 }.filter { it != 0 }.toSet()
+        val missing = synchronized(packages) { users - loadedUsers }
+        missing.forEach { user ->
+            // Format: package:com.example uid:1010219 (shared uids may list several, comma separated).
+            val (_, lines) = BoxModule.exec("pm list packages -U --user $user")
+            val found = HashMap<Int, String>()
+            lines.forEach { l ->
+                if (!l.startsWith("package:")) return@forEach
+                val pkg = l.substringAfter("package:").substringBefore(' ')
+                l.substringAfter("uid:", "").split(',').mapNotNull { it.trim().toIntOrNull() }
+                    .forEach { found.putIfAbsent(it, pkg) }
+            }
+            synchronized(packages) {
+                otherUsers.putAll(found)
+                // Also on failure (no root): tried again when the caches expire, not on every sample.
+                loadedUsers += user
+                packages.keys.removeAll { it / 100_000 == user && packages[it] == null }
+            }
+        }
+    }
+
+    /** Package of an app uid (any user); cached for [PACKAGES_TTL_MS]. */
     private fun packageOf(context: Context, uid: Int): String? = synchronized(packages) {
         packages.getOrPut(uid) {
             val pm = context.packageManager
@@ -128,11 +188,12 @@ object AppTraffic {
 
     /**
      * First package of [uid]. A uid of another user (work profile, private space, a second user) throws
-     * SecurityException without INTERACT_ACROSS_USERS, so those fall back to the same app id in this user.
+     * SecurityException without INTERACT_ACROSS_USERS, so those come from the root listing of that user
+     * ([loadOtherUsers]), then from the same app id in this user.
      */
     private fun packageFor(pm: android.content.pm.PackageManager, uid: Int): String? {
         fun lookup(u: Int) = runCatching { pm.getPackagesForUid(u)?.firstOrNull() }.getOrNull()
-        return lookup(uid) ?: lookup(uid % 100_000)
+        return lookup(uid) ?: synchronized(packages) { otherUsers[uid] } ?: lookup(uid % 100_000)
     }
 
     private fun parse(v: String?): LongArray {
@@ -174,6 +235,7 @@ object AppTraffic {
         if (system) {
             val start = from.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             val counters = systemCounters(context, start, System.currentTimeMillis())
+            loadOtherUsers(counters.keys.filter { it >= 0 })
             var coreSystem = 0L to 0L
             val pm = context.packageManager
             counters.forEach { (uid, rxTx) ->
