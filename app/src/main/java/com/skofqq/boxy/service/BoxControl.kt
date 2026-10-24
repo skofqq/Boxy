@@ -12,7 +12,7 @@ import com.skofqq.boxy.widget.BoxWidget
  * Traffic is sampled before the core goes away, and the widget and tile are refreshed afterwards.
  */
 object BoxControl {
-    suspend fun start(context: Context): Boolean = act(context) { BoxModule.start() }
+    suspend fun start(context: Context): Boolean = act(context) { BoxModule.start() }.also { com.skofqq.boxy.notify.StartFailedNotice.check(context) }
 
     suspend fun stop(context: Context): Boolean = act(context) {
         TrafficStats.sample(context)
@@ -22,7 +22,7 @@ object BoxControl {
     suspend fun restart(context: Context): Boolean = act(context) {
         TrafficStats.sample(context)
         BoxModule.restart()
-    }
+    }.also { com.skofqq.boxy.notify.StartFailedNotice.check(context) }
 
     suspend fun toggle(context: Context): Boolean =
         if (runCatching { BoxModule.state().running }.getOrDefault(false)) stop(context) else start(context)
@@ -48,6 +48,7 @@ object BoxControl {
         val ok = settings.all { (k, v) -> BoxModule.writeSetting(k, v) }
         val started = if (running) runCatching { BoxModule.start() }.getOrDefault(false) else true
         changed(context)
+        if (running) com.skofqq.boxy.notify.StartFailedNotice.check(context)
         return ok && started
     }
 

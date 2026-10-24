@@ -267,11 +267,25 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
         viewModelScope.launch { systemEnv = BoxModule.systemEnvironment() }
     }
 
-    fun start() = act(Busy.STARTING) { BoxControl.start(BoxyApp.instance) }
+    /** The module's reason when Start or Restart left the service stopped; shown until dismissed. */
+    var startError by mutableStateOf<String?>(null)
+
+    fun start() = act(Busy.STARTING) {
+        BoxControl.start(BoxyApp.instance)
+        checkStarted()
+    }
 
     fun stop() = act(Busy.STOPPING) { BoxControl.stop(BoxyApp.instance) }
 
-    fun restart() = act(Busy.RESTARTING) { BoxControl.restart(BoxyApp.instance) }
+    fun restart() = act(Busy.RESTARTING) {
+        BoxControl.restart(BoxyApp.instance)
+        checkStarted()
+    }
+
+    private suspend fun checkStarted() {
+        if (runCatching { BoxModule.state().running }.getOrDefault(true)) return
+        startError = BoxModule.startFailure() ?: ""
+    }
 
     fun reloadConfig() {
         viewModelScope.launch {

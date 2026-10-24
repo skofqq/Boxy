@@ -57,7 +57,7 @@ import kotlinx.coroutines.launch
 internal fun RulesTab(bottom: Dp, reloadKey: Int) {
     val core = rememberCoreApi(reloadKey)
     val api = core.api
-    if (core.checked && api == null) return NoCore(bottom)
+    if (core.checked && api == null) return NoCore(bottom, core.running)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var rules by remember { mutableStateOf<List<CoreRule>?>(null) }
@@ -187,7 +187,7 @@ internal fun RulesTab(bottom: Dp, reloadKey: Int) {
             itemsIndexed(shown) { _, (i, r) ->
                 val set = byName[r.payload].takeIf { r.type == "RuleSet" }
                 RuleCard(
-                    i + 1, r, set, snap,
+                    i + 1, r, set, snap, core.mihomo,
                     delays,
                     updating = set != null && updating[set.name] == true,
                     showInfo = info[r.index] == true,
@@ -213,6 +213,8 @@ private fun RuleCard(
     r: CoreRule,
     set: RuleProvider?,
     snap: com.skofqq.boxy.net.ProxySnapshot?,
+    /** mihomo: rules can be switched off and count their matches; sing-box has neither. */
+    full: Boolean,
     delays: Map<String, Int>,
     updating: Boolean,
     showInfo: Boolean,
@@ -254,11 +256,11 @@ private fun RuleCard(
                     QuietIcon(BoxyIcons.Refresh, stringResource(R.string.provider_update), onUpdate)
                 }
             }
-            QuietIcon(BoxyIcons.Info, stringResource(R.string.rules_info), onInfo)
+            if (full) QuietIcon(BoxyIcons.Info, stringResource(R.string.rules_info), onInfo)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             // A compact switch: without the 48 dp touch frame the card stays as low as Zashboard's.
-            CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
+            if (full) CompositionLocalProvider(androidx.compose.material3.LocalMinimumInteractiveComponentSize provides 0.dp) {
                 androidx.compose.material3.Switch(
                     !r.disabled,
                     { onToggle() },
@@ -266,7 +268,7 @@ private fun RuleCard(
                     colors = androidx.compose.material3.SwitchDefaults.colors(checkedTrackColor = Boxy.colors.accent),
                 )
             }
-            Spacer(Modifier.width(6.dp))
+            if (full) Spacer(Modifier.width(6.dp))
             val group = snap?.group(r.proxy)
             Row(
                 Modifier.weight(1f, fill = false).clip(RoundedCornerShape(50)).background(Boxy.colors.surface2)

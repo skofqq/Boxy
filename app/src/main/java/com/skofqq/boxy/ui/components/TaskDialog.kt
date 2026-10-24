@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.skofqq.boxy.R
+import kotlinx.coroutines.launch
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
@@ -132,55 +133,7 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
         if (visual == TaskVisual.OK || visual == TaskVisual.FAILED) Haptics.result(view, visual == TaskVisual.OK)
     }
 
-    Dialog(
-        onDismissRequest = { if (done) onDismiss() },
-        properties = DialogProperties(dismissOnBackPress = done, dismissOnClickOutside = done, usePlatformDefaultWidth = false),
-    ) {
-        // Liquid glass: a translucent card with a light rim over the blurred app.
-        val frosted = rememberFrostedDialog()
-        val translucent = LocalGlass.current.translucent
-        // Springy entrance: the card grows from 85 % with a little overshoot.
-        val appear = remember { Animatable(0f) }
-        LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.62f, stiffness = 420f)) }
-        val cardShape = RoundedCornerShape(32.dp)
-        // The window fills the screen and the card is centred inside it, so a taller card grows smoothly
-        // (animateContentSize) instead of the dialog window being re-centred with a jump.
-        Box(
-            Modifier.fillMaxSize().clickable(remember { MutableInteractionSource() }, indication = null) { if (done) onDismiss() },
-            contentAlignment = Alignment.Center,
-        ) {
-        Column(
-            Modifier
-                .clickable(remember { MutableInteractionSource() }, indication = null) {}
-                .padding(horizontal = 28.dp)
-                .widthIn(max = 440.dp)
-                .fillMaxWidth()
-                .graphicsLayer {
-                    val v = appear.value
-                    scaleX = 0.85f + 0.15f * v
-                    scaleY = 0.85f + 0.15f * v
-                    alpha = v.coerceIn(0f, 1f)
-                }
-                .clip(cardShape)
-                .then(
-                    if (frosted) {
-                        Modifier
-                            .background(Boxy.colors.page.copy(alpha = if (translucent) 0.72f else 0.88f))
-                            .border(
-                                1.dp,
-                                androidx.compose.ui.graphics.Brush.verticalGradient(
-                                    listOf(Color.White.copy(alpha = if (Boxy.colors.isDark) 0.22f else 0.7f), Color.White.copy(alpha = 0.06f)),
-                                ),
-                                cardShape,
-                            )
-                    } else {
-                        Modifier.background(Boxy.colors.page)
-                    },
-                )
-                .animateContentSize(spring(dampingRatio = 0.85f, stiffness = 380f))
-                .padding(horizontal = 24.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    ExpressiveDialogFrame(done, onDismiss) {
             Box(Modifier.size(128.dp), contentAlignment = Alignment.Center) {
                 AnimatedContent(
                     targetState = visual,
@@ -288,6 +241,140 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                 }
             }
         }
+}
+
+/**
+ * The Material 3 Expressive card the task and problem windows share: liquid glass over the blurred app, a springy
+ * entrance, centred content that grows smoothly. [dismissable] lets a tap outside or Back close it.
+ */
+@Composable
+fun ExpressiveDialogFrame(dismissable: Boolean, onDismiss: () -> Unit, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
+    Dialog(
+        onDismissRequest = { if (dismissable) onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = dismissable, dismissOnClickOutside = dismissable, usePlatformDefaultWidth = false),
+    ) {
+        // Liquid glass: a translucent card with a light rim over the blurred app.
+        val frosted = rememberFrostedDialog()
+        val translucent = LocalGlass.current.translucent
+        // Springy entrance: the card grows from 85 % with a little overshoot.
+        val appear = remember { Animatable(0f) }
+        LaunchedEffect(Unit) { appear.animateTo(1f, spring(dampingRatio = 0.62f, stiffness = 420f)) }
+        val cardShape = RoundedCornerShape(32.dp)
+        // The window fills the screen and the card is centred inside it, so a taller card grows smoothly
+        // (animateContentSize) instead of the dialog window being re-centred with a jump.
+        Box(
+            Modifier.fillMaxSize().clickable(remember { MutableInteractionSource() }, indication = null) { if (dismissable) onDismiss() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                Modifier
+                    .clickable(remember { MutableInteractionSource() }, indication = null) {}
+                    .padding(horizontal = 28.dp)
+                    .widthIn(max = 440.dp)
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        val v = appear.value
+                        scaleX = 0.85f + 0.15f * v
+                        scaleY = 0.85f + 0.15f * v
+                        alpha = v.coerceIn(0f, 1f)
+                    }
+                    .clip(cardShape)
+                    .then(
+                        if (frosted) {
+                            Modifier
+                                .background(Boxy.colors.page.copy(alpha = if (translucent) 0.72f else 0.88f))
+                                .border(
+                                    1.dp,
+                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        listOf(Color.White.copy(alpha = if (Boxy.colors.isDark) 0.22f else 0.7f), Color.White.copy(alpha = 0.06f)),
+                                    ),
+                                    cardShape,
+                                )
+                        } else {
+                            Modifier.background(Boxy.colors.page)
+                        },
+                    )
+                    .animateContentSize(spring(dampingRatio = 0.85f, stiffness = 380f))
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                content = content,
+            )
+        }
+    }
+}
+
+/**
+ * Something went wrong, said the Material 3 Expressive way: a red cookie with the symbol that pops in, a title,
+ * a line of what to do, the raw [details] on demand, and one main action next to Done.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ProblemDialog(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    message: String,
+    details: String,
+    action: String?,
+    onAction: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val view = androidx.compose.ui.platform.LocalView.current
+    var showDetails by rememberSaveable { mutableStateOf(false) }
+    val pop = remember { Animatable(0.4f) }
+    val turn = remember { Animatable(-30f) }
+    LaunchedEffect(Unit) {
+        Haptics.result(view, false)
+        kotlinx.coroutines.coroutineScope {
+            launch { pop.animateTo(1f, spring(dampingRatio = 0.45f, stiffness = 380f)) }
+            launch { turn.animateTo(0f, spring(dampingRatio = 0.5f, stiffness = 200f)) }
+        }
+    }
+    ExpressiveDialogFrame(true, onDismiss) {
+        Box(
+            Modifier.size(112.dp).graphicsLayer {
+                scaleX = pop.value
+                scaleY = pop.value
+                rotationZ = turn.value
+            }.clip(MaterialShapes.Cookie9Sided.toShape()).background(Tints.red.bg),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, Modifier.size(48.dp).graphicsLayer { rotationZ = -turn.value }, tint = Tints.red.fg)
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(6.dp))
+        Text(message, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2, textAlign = TextAlign.Center)
+        if (details.isNotBlank()) {
+            Spacer(Modifier.height(12.dp))
+            Row(
+                Modifier.clip(RoundedCornerShape(50)).clickable { showDetails = !showDetails }.padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    stringResource(if (showDetails) R.string.task_hide_details else R.string.task_show_details),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Boxy.colors.accent,
+                )
+                Icon(if (showDetails) BoxyIcons.ExpandLess else BoxyIcons.ExpandMore, null, Modifier.size(18.dp), tint = Boxy.colors.accent)
+            }
+            AnimatedVisibility(showDetails, enter = fadeIn(), exit = fadeOut()) {
+                Text(
+                    details,
+                    Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 220.dp)
+                        .clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card)
+                        .verticalScroll(rememberScrollState()).padding(12.dp),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = Tints.red.fg,
+                )
+            }
+        }
+        // Stacked: the main action on top, Done under it.
+        Column(Modifier.padding(top = 24.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (action != null) SheetButton(action, Boxy.colors.accent, Color.White, Modifier.fillMaxWidth(), onAction)
+            SheetButton(stringResource(R.string.action_done), Boxy.colors.card, Boxy.colors.text, Modifier.fillMaxWidth(), onDismiss)
         }
     }
 }

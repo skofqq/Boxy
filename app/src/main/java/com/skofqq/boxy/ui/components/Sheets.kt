@@ -222,7 +222,7 @@ fun SheetButtons(
 }
 
 @Composable
-private fun SheetButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
+internal fun SheetButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
     Box(
         modifier.height(50.dp).clip(RoundedCornerShape(18.dp)).background(bg).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,

@@ -275,6 +275,8 @@ internal fun ProviderCard(
     onUpdate: () -> Unit,
     onCheck: () -> Unit,
     onTestNode: (String) -> Unit,
+    /** Why the core could not load this subscription, in words a user can act on; null when it loaded. */
+    error: String? = null,
 ) {
     val context = LocalContext.current
     val nodeDelays = provider.nodes.map { n -> delays[n.name] ?: n.delay }
@@ -353,6 +355,15 @@ internal fun ProviderCard(
                 stringResource(R.string.provider_updated, timeAgo(at, androidx.compose.ui.platform.LocalConfiguration.current.locales[0])),
                 style = MaterialTheme.typography.bodySmall,
                 color = Boxy.colors.text2,
+            )
+        }
+        if (error != null) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                error,
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Tints.red.bg).padding(horizontal = 12.dp, vertical = 9.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = Tints.red.fg,
             )
         }
         if (shown.isEmpty()) return@Column

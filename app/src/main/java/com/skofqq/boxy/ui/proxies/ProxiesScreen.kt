@@ -103,6 +103,9 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
     // Providers with their nodes shown; small ones start open, big ones as dots (as in Zashboard).
     val opened = remember { mutableStateMapOf<String, Boolean>() }
     var bulk by remember { mutableStateOf(false) }
+    // Why a subscription did not load (from an update here, or from the core's log for one that failed at start).
+    val providerErrors = remember { mutableStateMapOf<String, String>() }
+    var core by remember { mutableStateOf("clash") }
 
     suspend fun refresh() {
         val s = runCatching { BoxModule.state() }.getOrNull()
@@ -110,6 +113,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
             state = LoadState.STOPPED
             return
         }
+        core = s.core ?: "clash"
         val a = api ?: Net.clashApi(s.core).also { api = it }
         val snap = a?.let { Net.clashProxies(it) }
         snapshot = snap
@@ -117,6 +121,14 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         if (a != null && snap != null) {
             mode = Net.clashMode(a)
             providers = Net.clashProviderList(a).orEmpty()
+            // An empty subscription failed to load: the core only says why in its log.
+            val empty = providers.filter { it.nodes.isEmpty() && it.name !in providerErrors }
+            if (empty.isNotEmpty()) {
+                val logged = com.skofqq.boxy.net.CoreApi.providerLogErrors(core)
+                empty.forEach { p ->
+                    logged[p.name]?.let { providerErrors[p.name] = com.skofqq.boxy.net.CoreApi.explainProviderError(context, core, it) }
+                }
+            }
         }
     }
     LaunchedEffect(reload, reloadKey) { refresh() }
@@ -187,7 +199,11 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
 
     suspend fun updateProvider(a: ClashApi, p: com.skofqq.boxy.net.ProxyProvider) {
         updating[p.name] = true
-        if (!Net.clashUpdateProvider(a, p.name)) {
+        val error = Net.clashUpdateProvider(a, p.name)
+        if (error == null) {
+            providerErrors.remove(p.name)
+        } else {
+            providerErrors[p.name] = com.skofqq.boxy.net.CoreApi.explainProviderError(context, core, error)
             android.widget.Toast.makeText(context, context.getString(R.string.provider_update_failed, p.name), android.widget.Toast.LENGTH_SHORT).show()
         }
         updating[p.name] = false
@@ -307,10 +323,23 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
                                 onUpdate = { providerAction(p, check = false) },
                                 onCheck = { providerAction(p, check = true) },
                                 onTestNode = ::testNode,
+                                error = providerErrors[p.name],
                             )
                         }
                     }
                     return@PinnedLazyPage
+                }
+                // A subscription that did not load leaves groups short of nodes: say so above them.
+                providerErrors.entries.firstOrNull()?.let { (name, error) ->
+                    item(key = "provider-error") {
+                        Column(
+                            Modifier.padding(horizontal = 16.dp).fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Tints.red.bg)
+                                .clickable { providersTab = true }.padding(horizontal = 14.dp, vertical = 12.dp),
+                        ) {
+                            Text(stringResource(R.string.provider_error_title, name), style = MaterialTheme.typography.titleSmall, color = Tints.red.fg, fontWeight = FontWeight.SemiBold)
+                            Text(error, style = MaterialTheme.typography.bodySmall, color = Tints.red.fg)
+                        }
+                    }
                 }
                 // Zashboard layout in Boxy's style: group tiles two per row; an opened group pops up over the page.
                 val shownGroups = snap.groups.filter { it.matches() }

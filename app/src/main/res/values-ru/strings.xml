@@ -889,7 +889,8 @@
     <string name="panel_settings_delay_url">Адрес проверки</string>
     <string name="panel_settings_delay_timeout">Таймаут</string>
     <string name="panel_settings_delay_timeout_field">Миллисекунды</string>
-    <string name="panel_settings_delay_timeout_invalid">От 500 до 30000 мс</string>    <string name="panel_settings_updates">Обновления</string>
+    <string name="panel_settings_delay_timeout_invalid">От 500 до 30000 мс</string>
+    <string name="panel_settings_updates">Обновления</string>
     <string name="panel_settings_update_core">Обновить ядро</string>
     <string name="panel_settings_update_core_sub">Последняя версия ядра, выбранного в модуле; сервис перезапустится</string>
     <string name="panel_settings_update_subs">Обновить подписки</string>
@@ -898,4 +899,11 @@
     <string name="rules_info">Статистика правила</string>
     <string name="rules_hits">Сработало: %1$d · не подошло: %2$d</string>
     <string name="rules_last_hit">последний раз %1$s</string>
+    <string name="provider_error_title">Подписка %1$s не загрузилась</string>
+    <string name="provider_error_protocol">Ядро (%2$s) не поддерживает протокол %1$s из этой подписки. Обновите ядро в «Утилиты → Обновление → Ядро» или выберите ядро, которое его поддерживает.</string>
+    <string name="provider_error_generic">Ядро не смогло её загрузить: %1$s</string>
+    <string name="start_failed_title">Сервис не запустился</string>
+    <string name="start_failed_body">Модуль прервал запуск из-за ошибки. Подробности ниже или в журнале.</string>
+    <string name="start_failed_core_missing">Выбранное ядро не установлено. Скачайте его в «Утилиты → Обновление → Ядро» или выберите другое ядро.</string>
+    <string name="start_failed_logs">Открыть журнал</string>    <string name="start_failed_notify">Модуль прервал запуск из-за ошибки.</string>
 </resources>

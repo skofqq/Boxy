@@ -76,14 +76,21 @@ fun CorePanel(reloadKey: Int) {
     }
 }
 
-/** The running core's API for a tab; [checked] turns true once it has been looked up. */
-internal class CoreApiState(val checked: Boolean, val api: ClashApi?)
+/**
+ * The running core's API for a tab; [checked] turns true once it has been looked up. [running] tells a stopped
+ * service from a core without the API (xray, v2fly, hysteria); [mihomo] marks the core with the full API
+ * (rule switches, GEO databases, run-time settings), which sing-box's clash_api only partly has.
+ */
+internal class CoreApiState(val checked: Boolean, val api: ClashApi?, val running: Boolean = false, val core: String = "clash") {
+    val mihomo: Boolean get() = core == "clash"
+}
 
 @Composable
 internal fun rememberCoreApi(reloadKey: Int): CoreApiState {
     val state by produceState(CoreApiState(false, null), reloadKey) {
         val s = runCatching { BoxModule.state() }.getOrNull()
-        value = CoreApiState(true, if (s?.running == true) Net.clashApi(s.core) else null)
+        val running = s?.running == true
+        value = CoreApiState(true, if (running) Net.clashApi(s?.core) else null, running, s?.core ?: "clash")
     }
     return state
 }
@@ -115,16 +122,17 @@ internal fun PanelTabPage(
 }
 
 /** What a tab shows while the core is off or its API is out of reach. */
+/** [running]: the service runs but its core has no Clash API (xray, v2fly, hysteria, or no external-controller). */
 @Composable
-internal fun NoCore(bottom: Dp) {
+internal fun NoCore(bottom: Dp, running: Boolean = false) {
     Column(
         Modifier.fillMaxSize().padding(start = 32.dp, end = 32.dp, bottom = bottom),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(stringResource(R.string.proxies_stopped_title), style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, textAlign = TextAlign.Center)
+        Text(stringResource(if (running) R.string.proxies_no_api_title else R.string.proxies_stopped_title), style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, textAlign = TextAlign.Center)
         Text(
-            stringResource(R.string.panel_core_needed),
+            stringResource(if (running) R.string.proxies_no_api else R.string.panel_core_needed),
             Modifier.padding(top = 8.dp),
             style = MaterialTheme.typography.bodyMedium,
             color = Boxy.colors.text2,

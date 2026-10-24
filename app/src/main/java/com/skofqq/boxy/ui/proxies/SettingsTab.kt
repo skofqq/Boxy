@@ -72,7 +72,7 @@ private val CORE_NAMES = mapOf("clash" to "Mihomo", "sing-box" to "Sing-box", "x
 internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
     val core = rememberCoreApi(reloadKey)
     val api = core.api
-    if (core.checked && api == null) return NoCore(bottom)
+    if (core.checked && api == null) return NoCore(bottom, core.running)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val prefs = BoxyApp.instance.prefs
@@ -170,24 +170,31 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
         item {
             SectionCard(stringResource(R.string.panel_settings_maintenance)) {
                 val a = api
+                // sing-box's clash_api has no reload, restart, GEO databases or DNS cache: the module reloads and
+                // restarts it, and the rest is left out.
                 ActionRow(BoxyIcons.Refresh, stringResource(R.string.panel_settings_reload), stringResource(R.string.panel_settings_reload_sub), busy["reload"] == true) {
-                    if (a != null) run("reload") { Net.clashReload(a) }
+                    run("reload") { (a != null && core.mihomo && Net.clashReload(a)) || BoxModule.reloadConfig() }
                 }
                 ActionRow(BoxyIcons.Power, stringResource(R.string.panel_settings_restart), stringResource(R.string.panel_settings_restart_sub), busy["restart"] == true) {
                     confirmRestart = true
                 }
-                ActionRow(BoxyIcons.Download, stringResource(R.string.panel_settings_geo), stringResource(R.string.panel_settings_geo_sub), busy["geo"] == true) {
-                    if (a != null) run("geo") { CoreApi.maintain(a, CoreApi.Maintenance.UPDATE_GEO) }
+                if (core.mihomo) {
+                    ActionRow(BoxyIcons.Download, stringResource(R.string.panel_settings_geo), stringResource(R.string.panel_settings_geo_sub), busy["geo"] == true) {
+                        if (a != null) run("geo") { CoreApi.maintain(a, CoreApi.Maintenance.UPDATE_GEO) }
+                    }
                 }
-                ActionRow(BoxyIcons.Delete, stringResource(R.string.panel_settings_fakeip), null, busy["fakeip"] == true) {
+                ActionRow(BoxyIcons.Delete, stringResource(R.string.panel_settings_fakeip), null, busy["fakeip"] == true, divider = core.mihomo) {
                     if (a != null) run("fakeip") { CoreApi.maintain(a, CoreApi.Maintenance.FLUSH_FAKEIP) }
                 }
-                ActionRow(BoxyIcons.Dns, stringResource(R.string.panel_settings_dns), null, busy["dns"] == true, divider = false) {
-                    if (a != null) run("dns") { CoreApi.maintain(a, CoreApi.Maintenance.FLUSH_DNS) }
+                if (core.mihomo) {
+                    ActionRow(BoxyIcons.Dns, stringResource(R.string.panel_settings_dns), null, busy["dns"] == true, divider = false) {
+                        if (a != null) run("dns") { CoreApi.maintain(a, CoreApi.Maintenance.FLUSH_DNS) }
+                    }
                 }
             }
         }
-        if (c != null) item {
+        // These switches are mihomo's run-time settings; sing-box only takes the mode (on the Proxies tab).
+        if (c != null && core.mihomo) item {
             SectionCard(stringResource(R.string.panel_settings_runtime), stringResource(R.string.panel_settings_runtime_sub)) {
                 SwitchRow(BoxyIcons.Wifi, stringResource(R.string.panel_settings_allow_lan), stringResource(R.string.panel_settings_allow_lan_sub), c.optBoolean("allow-lan")) {
                     patch("allow-lan", it)
@@ -240,7 +247,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
             onConfirm = {
                 confirmRestart = false
                 val a = api
-                if (a != null) run("restart") { CoreApi.maintain(a, CoreApi.Maintenance.RESTART) }
+                run("restart") { if (a != null && core.mihomo) CoreApi.maintain(a, CoreApi.Maintenance.RESTART) else com.skofqq.boxy.service.BoxControl.restart(context.applicationContext) }
             },
             onDismiss = { confirmRestart = false },
         )

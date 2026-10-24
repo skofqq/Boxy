@@ -901,7 +901,8 @@
     <string name="panel_settings_delay_url">Test URL</string>
     <string name="panel_settings_delay_timeout">Timeout</string>
     <string name="panel_settings_delay_timeout_field">Milliseconds</string>
-    <string name="panel_settings_delay_timeout_invalid">From 500 to 30000 ms</string>    <string name="panel_settings_updates">Updates</string>
+    <string name="panel_settings_delay_timeout_invalid">From 500 to 30000 ms</string>
+    <string name="panel_settings_updates">Updates</string>
     <string name="panel_settings_update_core">Update core</string>
     <string name="panel_settings_update_core_sub">Latest version of the core chosen in the module; the service restarts</string>
     <string name="panel_settings_update_subs">Update subscriptions</string>
@@ -910,4 +911,11 @@
     <string name="rules_info">Rule statistics</string>
     <string name="rules_hits">Matched: %1$d · not matched: %2$d</string>
     <string name="rules_last_hit">last %1$s</string>
+    <string name="provider_error_title">Subscription %1$s did not load</string>
+    <string name="provider_error_protocol">The core (%2$s) does not support the %1$s protocol used in this subscription. Update the core in Tools → Update → Core, or pick a core that supports it.</string>
+    <string name="provider_error_generic">The core could not load it: %1$s</string>
+    <string name="start_failed_title">The service did not start</string>
+    <string name="start_failed_body">The module stopped the start because of an error. See the details below or the log.</string>
+    <string name="start_failed_core_missing">The selected core is not installed. Download it in Tools → Update → Core, or pick another core.</string>
+    <string name="start_failed_logs">Open the log</string>    <string name="start_failed_notify">The module stopped the start because of an error.</string>
 </resources>

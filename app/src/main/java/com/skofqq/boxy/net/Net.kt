@@ -494,16 +494,25 @@ object Net {
         }.getOrNull()
     }
 
-    /** Pulls the provider [name] again (PUT /providers/proxies/{name}). */
-    suspend fun clashUpdateProvider(api: ClashApi, name: String): Boolean = withContext(Dispatchers.IO) {
+    /**
+     * Pulls the provider [name] again (PUT /providers/proxies/{name}). Null when it loaded; otherwise the core's
+     * reason (a download error, or a node it cannot parse: "proxy 3 error: unsupport proxy type: anytls").
+     */
+    suspend fun clashUpdateProvider(api: ClashApi, name: String): String? = withContext(Dispatchers.IO) {
         runCatching {
             val c = openApi(api, "/providers/proxies/${enc(name)}", "PUT", timeout = 30_000)
             try {
-                c.responseCode in 200..299
+                if (c.responseCode in 200..299) {
+                    null
+                } else {
+                    val body = c.errorStream?.bufferedReader()?.readText().orEmpty()
+                    runCatching { JSONObject(body).optString("message") }.getOrNull()?.ifBlank { null }
+                        ?: body.ifBlank { "HTTP ${c.responseCode}" }
+                }
             } finally {
                 c.disconnect()
             }
-        }.getOrDefault(false)
+        }.getOrElse { it.message ?: it.javaClass.simpleName }
     }
 
     /** Delay test of every node of the provider [name]; the results land in the nodes' history. */

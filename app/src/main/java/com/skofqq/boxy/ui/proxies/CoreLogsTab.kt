@@ -53,7 +53,7 @@ private const val LINES_MAX = 1000
 internal fun CoreLogsTab(bottom: Dp, reloadKey: Int) {
     val core = rememberCoreApi(reloadKey)
     val api = core.api
-    if (core.checked && api == null) return NoCore(bottom)
+    if (core.checked && api == null) return NoCore(bottom, core.running)
     var level by rememberSaveable { mutableStateOf("info") }
     var paused by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }

@@ -60,7 +60,7 @@ private const val CLOSED_MAX = 300
 internal fun ConnectionsTab(bottom: Dp, reloadKey: Int) {
     val core = rememberCoreApi(reloadKey)
     val api = core.api
-    if (core.checked && api == null) return NoCore(bottom)
+    if (core.checked && api == null) return NoCore(bottom, core.running)
     val scope = rememberCoroutineScope()
     var active by remember { mutableStateOf<List<CoreConn>>(emptyList()) }
     val closed = remember { mutableStateListOf<CoreConn>() }

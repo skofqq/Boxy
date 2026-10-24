@@ -139,6 +139,19 @@ object BoxModule {
 
     suspend fun restart(): Boolean = run("$SCRIPTS/box.service restart")
 
+    /**
+     * Why the last start failed: the module's [Error] lines of runs.log (the log is cleared on each start, and the
+     * module copies the core's own complaint into it). Null when it logged none.
+     */
+    suspend fun startFailure(): String? {
+        val (_, out) = exec("grep -a '\\[Error\\]' $BOX_DIR/run/runs.log 2>/dev/null | tail -n 8")
+        return out.map { RootTask.stripAnsi(it).substringAfter("[Error]:").trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .joinToString("\n")
+            .ifBlank { null }
+    }
+
     /** Asks the running core to re-read its config (box.tool reload). */
     suspend fun reloadConfig(): Boolean = run("$SCRIPTS/box.tool reload")
 

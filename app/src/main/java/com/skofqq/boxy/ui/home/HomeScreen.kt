@@ -29,6 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.verticalScroll
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -71,6 +76,10 @@ fun HomeScreen(
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             vm.message = null
         }
+    }
+
+    vm.startError?.let { error ->
+        StartFailedDialog(error, onLogs = { vm.startError = null; onOpenLogs() }, onDismiss = { vm.startError = null })
     }
 
     val state = vm.state
@@ -171,4 +180,26 @@ private fun EnvironmentCard(env: Environment, onRetry: () -> Unit) {
             TextButton(onClick = withTap(onRetry)) { Text(stringResource(R.string.action_retry)) }
         }
     }
+}
+
+/**
+ * The service did not come up: the module's reason in its own words (a missing core, a config the core rejects,
+ * a subscription it cannot read), with a hint when the core itself is not installed.
+ */
+@Composable
+private fun StartFailedDialog(error: String, onLogs: () -> Unit, onDismiss: () -> Unit) {
+    val missingCore = Regex("kernel .* is missing", RegexOption.IGNORE_CASE).containsMatchIn(error) ||
+        Regex("not executable|file not found|No such file", RegexOption.IGNORE_CASE).containsMatchIn(error) &&
+        error.contains("/bin/")
+    com.skofqq.boxy.ui.components.ProblemDialog(
+        icon = com.skofqq.boxy.ui.theme.BoxyIcons.Power,
+        title = androidx.compose.ui.res.stringResource(com.skofqq.boxy.R.string.start_failed_title),
+        message = androidx.compose.ui.res.stringResource(
+            if (missingCore) com.skofqq.boxy.R.string.start_failed_core_missing else com.skofqq.boxy.R.string.start_failed_body,
+        ),
+        details = error,
+        action = androidx.compose.ui.res.stringResource(com.skofqq.boxy.R.string.start_failed_logs),
+        onAction = onLogs,
+        onDismiss = onDismiss,
+    )
 }

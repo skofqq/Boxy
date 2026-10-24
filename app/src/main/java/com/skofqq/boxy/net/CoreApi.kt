@@ -208,6 +208,41 @@ object CoreApi {
         FLUSH_DNS("/cache/dns/flush"),
     }
 
+    /**
+     * The last load error the core logged for each provider (subscriptions and rule sets), from the core's log
+     * file: a subscription that failed at start never reaches the API, only the log. [core] is bin_name.
+     */
+    suspend fun providerLogErrors(core: String): Map<String, String> {
+        val (_, out) = com.skofqq.boxy.root.BoxModule.exec(
+            "grep -aE '\\[Provider\\].* (pull|parse|update|initial).*error|initial (proxy|rule) provider .* error' " +
+                "${com.skofqq.boxy.root.BoxModule.BOX_DIR}/run/$core.log 2>/dev/null | tail -n 200",
+        )
+        val result = linkedMapOf<String, String>()
+        out.forEach { line ->
+            val msg = Regex("msg=\"(.*)\"\\s*$").find(line)?.groupValues?.get(1)?.replace("\\\"", "\"") ?: line
+            val m = Regex("\\[Provider\\] (.+?) (?:pull|parse|update|initial)[^:]*error: (.*)").find(msg)
+                ?: Regex("initial (?:proxy|rule) provider (.+?) error: (.*)").find(msg)
+                ?: return@forEach
+            result[m.groupValues[1]] = m.groupValues[2]
+        }
+        return result
+    }
+
+    /**
+     * A core error about a subscription put in words a user can act on: an unknown protocol means the core is
+     * too old or the wrong one for it.
+     */
+    fun explainProviderError(context: android.content.Context, core: String, error: String): String {
+        val type = Regex("unsupport(?:ed)? proxy type: ?([\\w-]+)", RegexOption.IGNORE_CASE).find(error)?.groupValues?.get(1)
+        return if (type != null) {
+            context.getString(com.skofqq.boxy.R.string.provider_error_protocol, type, CORE_TITLES[core] ?: core)
+        } else {
+            context.getString(com.skofqq.boxy.R.string.provider_error_generic, error)
+        }
+    }
+
+    private val CORE_TITLES = mapOf("clash" to "Mihomo", "sing-box" to "Sing-box", "xray" to "Xray", "v2fly" to "V2Ray", "hysteria" to "Hysteria")
+
     /** Downloads the rule-provider [name] again. */
     suspend fun updateRuleProvider(api: ClashApi, name: String): Boolean = withContext(Dispatchers.IO) {
         runCatching {
