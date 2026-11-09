@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Apri il log</string>
     <string name="start_failed_title">Il servizio non si è avviato</string>
     <string name="start_failed_notify">Il modulo ha interrotto l\'avvio a causa di un errore.</string>
+    <string name="core_logs_empty_hint">Qui il core scrive cosa fa. Al livello Info le righe arrivano con il traffico; scegli Debug per vederne di più.</string>
+    <string name="core_logs_empty_debug">Al livello Debug le righe compariranno appena qualcosa passerà dal core.</string>
+    <string name="conn_empty_hint">Le connessioni compariranno qui quando le app andranno online tramite il core.</string>
+    <string name="conn_closed_empty">Nessuna chiusa per ora</string>
+    <string name="conn_closed_empty_hint">Qui restano le connessioni terminate mentre questa scheda è aperta.</string>
+    <string name="editor_undo">Annulla</string>
+    <string name="editor_redo">Ripeti</string>
+    <string name="editor_replace_hint">Sostituisci con</string>
+    <string name="editor_replace_one">Sostituisci</string>
+    <string name="editor_replace_all">Tutti</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Sezioni</string>
+    <string name="editor_no_sections">Nessuna sezione in questo file</string>
+    <string name="editor_goto_error">Vai all’errore</string>
+    <string name="editor_error_line">Riga %1$d: %2$s</string>
 </resources>

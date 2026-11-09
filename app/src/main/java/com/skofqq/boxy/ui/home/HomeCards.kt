@@ -21,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -306,8 +309,16 @@ fun IpCard(lan: LanAddress?, wan: GeoIp?, wanMode: Boolean, modifier: Modifier, 
     HomeCard(modifier, onToggle) {
         CardTitle(stringResource(R.string.card_ip), if (wanMode && wan == null) stringResource(R.string.badge_wan) else badge, Tints.green, if (wanMode) onClick else onToggle)
         Spacer(Modifier.height(16.dp))
+        // The address is hidden until tapped (screenshots, people looking over a shoulder); a second tap hides it.
+        var shown by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+        val ip = (if (showWan) wan.ip else if (wanMode) null else lan?.ip)
         Text(
-            (if (showWan) wan.ip else if (wanMode) null else lan?.ip) ?: stringResource(R.string.common_dash),
+            when {
+                ip == null -> stringResource(R.string.common_dash)
+                shown -> ip
+                else -> maskIp(ip)
+            },
+            Modifier.clip(RoundedCornerShape(8.dp)).clickable(enabled = ip != null) { shown = !shown },
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 21.sp),
             color = Boxy.colors.text,
             maxLines = 1,
@@ -458,4 +469,11 @@ private fun MeterLine(label: String, value: String, fraction: Float?, color: Col
             }
         }
     }
+}
+
+/** An address with its digits hidden, the same for every address so nothing leaks: "•••.•••.•••.•••" or "••••:••••:••••:••••:…". */
+private fun maskIp(ip: String): String = if (':' in ip) {
+    ip.split(':').take(4).joinToString(":") { "••••" } + ":…"
+} else {
+    "•••.•••.•••.•••"
 }

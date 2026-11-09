@@ -147,7 +147,18 @@ internal fun ConnectionsTab(bottom: Dp, reloadKey: Int) {
             }
         },
     ) {
-        if (list.isEmpty()) item { EmptyLine(stringResource(if (q.isEmpty()) R.string.conn_empty else R.string.proxies_nothing_found)) }
+        if (list.isEmpty()) item {
+            if (q.isEmpty()) {
+                ExpressiveEmpty(
+                    BoxyIcons.Link,
+                    stringResource(if (closedTab) R.string.conn_closed_empty else R.string.conn_empty),
+                    stringResource(if (closedTab) R.string.conn_closed_empty_hint else R.string.conn_empty_hint),
+                    Modifier.fillParentMaxHeight(0.75f),
+                )
+            } else {
+                EmptyLine(stringResource(R.string.proxies_nothing_found))
+            }
+        }
         items(list, key = { it.id }) { c ->
             ConnectionCard(
                 c,

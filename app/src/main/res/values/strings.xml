@@ -864,7 +864,7 @@
     <string name="core_logs_title">Core log</string>
     <string name="core_logs_search">Search the log</string>
     <string name="core_logs_clear">Clear</string>
-    <string name="core_logs_empty">Waiting for new lines…</string>
+    <string name="core_logs_empty">The log is quiet</string>
     <string name="core_logs_debug">Debug</string>
     <string name="core_logs_info">Info</string>
     <string name="core_logs_warning">Warnings</string>
@@ -918,4 +918,19 @@
     <string name="start_failed_body">The module stopped the start because of an error. See the details below or the log.</string>
     <string name="start_failed_core_missing">The selected core is not installed. Download it in Tools → Update → Core, or pick another core.</string>
     <string name="start_failed_logs">Open the log</string>    <string name="start_failed_notify">The module stopped the start because of an error.</string>
+    <string name="core_logs_empty_hint">The core writes here what it does. At the Info level lines come with traffic; pick Debug to see more.</string>
+    <string name="core_logs_empty_debug">At the Debug level lines come as soon as anything goes through the core.</string>
+    <string name="conn_empty_hint">Connections show up here as apps go online through the core.</string>
+    <string name="conn_closed_empty">Nothing closed yet</string>
+    <string name="conn_closed_empty_hint">Connections that end while this tab is open are kept here.</string>
+    <string name="editor_undo">Undo</string>
+    <string name="editor_redo">Redo</string>
+    <string name="editor_replace_hint">Replace with</string>
+    <string name="editor_replace_one">Replace</string>
+    <string name="editor_replace_all">All</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Sections</string>
+    <string name="editor_no_sections">No sections in this file</string>
+    <string name="editor_goto_error">Go to the error</string>
+    <string name="editor_error_line">Line %1$d: %2$s</string>
 </resources>

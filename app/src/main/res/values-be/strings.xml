@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Адкрыць журнал</string>
     <string name="start_failed_title">Сервіс не запусціўся</string>
     <string name="start_failed_notify">Модуль спыніў запуск з-за памылкі.</string>
+    <string name="core_logs_empty_hint">Сюды ядро піша, што робіць. На ўзроўні «Інфа» радкі з\'яўляюцца разам з трафікам; выберыце «Адладка», каб бачыць больш.</string>
+    <string name="core_logs_empty_debug">На ўзроўні «Адладка» радкі з\'явяцца, як толькі праз ядро нешта пойдзе.</string>
+    <string name="conn_empty_hint">Злучэнні з\'явяцца тут, калі праграмы выйдуць у сетку праз ядро.</string>
+    <string name="conn_closed_empty">Закрытых пакуль няма</string>
+    <string name="conn_closed_empty_hint">Тут збіраюцца злучэнні, якія завяршыліся, пакуль адкрыта гэтая ўкладка.</string>
+    <string name="editor_undo">Адмяніць</string>
+    <string name="editor_redo">Паўтарыць</string>
+    <string name="editor_replace_hint">Замяніць на</string>
+    <string name="editor_replace_one">Замяніць</string>
+    <string name="editor_replace_all">Усе</string>
+    <string name="editor_mono">Мона</string>
+    <string name="editor_sections">Раздзелы</string>
+    <string name="editor_no_sections">У гэтым файле няма раздзелаў</string>
+    <string name="editor_goto_error">Перайсці да памылкі</string>
+    <string name="editor_error_line">Радок %1$d: %2$s</string>
 </resources>

@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Günlüğü aç</string>
     <string name="start_failed_title">Hizmet başlamadı</string>
     <string name="start_failed_notify">Modül bir hata nedeniyle başlatmayı durdurdu.</string>
+    <string name="core_logs_empty_hint">Çekirdek burada ne yaptığını yazar. Bilgi düzeyinde satırlar trafikle gelir; daha fazlası için Hata ayıklama seçin.</string>
+    <string name="core_logs_empty_debug">Hata ayıklama düzeyinde çekirdekten bir şey geçer geçmez satırlar görünür.</string>
+    <string name="conn_empty_hint">Uygulamalar çekirdek üzerinden ağa çıktığında bağlantılar burada görünür.</string>
+    <string name="conn_closed_empty">Henüz kapanan yok</string>
+    <string name="conn_closed_empty_hint">Bu sekme açıkken biten bağlantılar burada tutulur.</string>
+    <string name="editor_undo">Geri al</string>
+    <string name="editor_redo">Yinele</string>
+    <string name="editor_replace_hint">Şununla değiştir</string>
+    <string name="editor_replace_one">Değiştir</string>
+    <string name="editor_replace_all">Tümü</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Bölümler</string>
+    <string name="editor_no_sections">Bu dosyada bölüm yok</string>
+    <string name="editor_goto_error">Hataya git</string>
+    <string name="editor_error_line">Satır %1$d: %2$s</string>
 </resources>

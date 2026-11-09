@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Ouvrir le journal</string>
     <string name="start_failed_title">Le service n\'a pas démarré</string>
     <string name="start_failed_notify">Le module a interrompu le démarrage à cause d\'une erreur.</string>
+    <string name="core_logs_empty_hint">Le cœur écrit ici ce qu\'il fait. Au niveau Info, les lignes arrivent avec le trafic ; choisissez Débogage pour en voir plus.</string>
+    <string name="core_logs_empty_debug">Au niveau Débogage, les lignes apparaîtront dès que quelque chose passera par le cœur.</string>
+    <string name="conn_empty_hint">Les connexions apparaîtront ici quand les applis passeront par le cœur.</string>
+    <string name="conn_closed_empty">Rien de fermé pour l\'instant</string>
+    <string name="conn_closed_empty_hint">Les connexions qui se terminent pendant que cet onglet est ouvert sont gardées ici.</string>
+    <string name="editor_undo">Annuler</string>
+    <string name="editor_redo">Rétablir</string>
+    <string name="editor_replace_hint">Remplacer par</string>
+    <string name="editor_replace_one">Remplacer</string>
+    <string name="editor_replace_all">Tout</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Sections</string>
+    <string name="editor_no_sections">Aucune section dans ce fichier</string>
+    <string name="editor_goto_error">Aller à l’erreur</string>
+    <string name="editor_error_line">Ligne %1$d : %2$s</string>
 </resources>

@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Відкрити журнал</string>
     <string name="start_failed_title">Сервіс не запустився</string>
     <string name="start_failed_notify">Модуль перервав запуск через помилку.</string>
+    <string name="core_logs_empty_hint">Сюди ядро пише, що робить. На рівні «Інфо» рядки з\'являються разом із трафіком; оберіть «Налагодження», щоб бачити більше.</string>
+    <string name="core_logs_empty_debug">На рівні «Налагодження» рядки з\'являться, щойно через ядро щось піде.</string>
+    <string name="conn_empty_hint">З\'єднання з\'являться тут, коли застосунки вийдуть у мережу через ядро.</string>
+    <string name="conn_closed_empty">Закритих поки немає</string>
+    <string name="conn_closed_empty_hint">Тут збираються з\'єднання, що завершилися, поки відкрита ця вкладка.</string>
+    <string name="editor_undo">Скасувати</string>
+    <string name="editor_redo">Повторити</string>
+    <string name="editor_replace_hint">Замінити на</string>
+    <string name="editor_replace_one">Замінити</string>
+    <string name="editor_replace_all">Усі</string>
+    <string name="editor_mono">Моно</string>
+    <string name="editor_sections">Розділи</string>
+    <string name="editor_no_sections">У цьому файлі немає розділів</string>
+    <string name="editor_goto_error">Перейти до помилки</string>
+    <string name="editor_error_line">Рядок %1$d: %2$s</string>
 </resources>

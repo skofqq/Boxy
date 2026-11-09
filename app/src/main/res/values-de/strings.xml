@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Log öffnen</string>
     <string name="start_failed_title">Der Dienst wurde nicht gestartet</string>
     <string name="start_failed_notify">Das Modul hat den Start wegen eines Fehlers abgebrochen.</string>
+    <string name="core_logs_empty_hint">Hier schreibt der Kern, was er tut. Auf der Stufe Info kommen Zeilen mit dem Datenverkehr; wähle Debug, um mehr zu sehen.</string>
+    <string name="core_logs_empty_debug">Auf der Stufe Debug erscheinen Zeilen, sobald etwas durch den Kern geht.</string>
+    <string name="conn_empty_hint">Verbindungen erscheinen hier, sobald Apps über den Kern online gehen.</string>
+    <string name="conn_closed_empty">Noch nichts geschlossen</string>
+    <string name="conn_closed_empty_hint">Hier landen Verbindungen, die enden, während dieser Tab offen ist.</string>
+    <string name="editor_undo">Rückgängig</string>
+    <string name="editor_redo">Wiederholen</string>
+    <string name="editor_replace_hint">Ersetzen durch</string>
+    <string name="editor_replace_one">Ersetzen</string>
+    <string name="editor_replace_all">Alle</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Abschnitte</string>
+    <string name="editor_no_sections">Keine Abschnitte in dieser Datei</string>
+    <string name="editor_goto_error">Zum Fehler</string>
+    <string name="editor_error_line">Zeile %1$d: %2$s</string>
 </resources>

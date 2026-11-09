@@ -895,4 +895,19 @@
     <string name="start_failed_logs">ログを開く</string>
     <string name="start_failed_title">サービスを起動できませんでした</string>
     <string name="start_failed_notify">エラーのため、モジュールが起動を中止しました。</string>
+    <string name="core_logs_empty_hint">ここにはコアの動作が書き込まれます。「情報」レベルでは通信があると行が届きます。もっと見るには「デバッグ」を選んでください。</string>
+    <string name="core_logs_empty_debug">「デバッグ」レベルでは、コアを何かが通るとすぐに行が表示されます。</string>
+    <string name="conn_empty_hint">アプリがコア経由で通信を始めると、ここに接続が表示されます。</string>
+    <string name="conn_closed_empty">閉じた接続はまだありません</string>
+    <string name="conn_closed_empty_hint">このタブを開いている間に終了した接続がここに残ります。</string>
+    <string name="editor_undo">元に戻す</string>
+    <string name="editor_redo">やり直す</string>
+    <string name="editor_replace_hint">置換後の文字列</string>
+    <string name="editor_replace_one">置換</string>
+    <string name="editor_replace_all">すべて</string>
+    <string name="editor_mono">等幅</string>
+    <string name="editor_sections">セクション</string>
+    <string name="editor_no_sections">このファイルにセクションはありません</string>
+    <string name="editor_goto_error">エラーへ移動</string>
+    <string name="editor_error_line">%1$d 行目: %2$s</string>
 </resources>

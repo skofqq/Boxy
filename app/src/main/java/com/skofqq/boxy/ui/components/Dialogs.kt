@@ -74,6 +74,7 @@ fun ConfigErrorDialog(
     onProceed: () -> Unit,
     onDismiss: () -> Unit,
     onEdit: (() -> Unit)? = null,
+    editLabel: String? = null,
 ) {
     GlassAlertDialog(
         onDismissRequest = onDismiss,
@@ -97,7 +98,7 @@ fun ConfigErrorDialog(
         },
         confirmButton = {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (onEdit != null) DialogButton(stringResource(R.string.config_edit), Boxy.colors.accent, androidx.compose.ui.graphics.Color.White, onEdit)
+                if (onEdit != null) DialogButton(editLabel ?: stringResource(R.string.config_edit), Boxy.colors.accent, androidx.compose.ui.graphics.Color.White, onEdit)
                 DialogButton(proceed, Tints.red.bg, Tints.red.fg, onProceed)
                 DialogButton(stringResource(R.string.action_cancel), Boxy.colors.surface2, Boxy.colors.text, onDismiss)
             }

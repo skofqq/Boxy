@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Abrir registro</string>
     <string name="start_failed_title">El servicio no se inició</string>
     <string name="start_failed_notify">El módulo detuvo el inicio por un error.</string>
+    <string name="core_logs_empty_hint">Aquí el núcleo escribe lo que hace. En el nivel Info las líneas llegan con el tráfico; elige Depuración para ver más.</string>
+    <string name="core_logs_empty_debug">En el nivel Depuración las líneas aparecerán en cuanto algo pase por el núcleo.</string>
+    <string name="conn_empty_hint">Las conexiones aparecerán aquí cuando las apps salgan a la red a través del núcleo.</string>
+    <string name="conn_closed_empty">Aún no hay cerradas</string>
+    <string name="conn_closed_empty_hint">Aquí se guardan las conexiones que terminan mientras esta pestaña está abierta.</string>
+    <string name="editor_undo">Deshacer</string>
+    <string name="editor_redo">Rehacer</string>
+    <string name="editor_replace_hint">Reemplazar por</string>
+    <string name="editor_replace_one">Reemplazar</string>
+    <string name="editor_replace_all">Todo</string>
+    <string name="editor_mono">Mono</string>
+    <string name="editor_sections">Secciones</string>
+    <string name="editor_no_sections">Este archivo no tiene secciones</string>
+    <string name="editor_goto_error">Ir al error</string>
+    <string name="editor_error_line">Línea %1$d: %2$s</string>
 </resources>

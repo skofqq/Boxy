@@ -852,7 +852,7 @@
     <string name="core_logs_title">Журнал ядра</string>
     <string name="core_logs_search">Поиск по журналу</string>
     <string name="core_logs_clear">Очистить</string>
-    <string name="core_logs_empty">Ждём новых строк…</string>
+    <string name="core_logs_empty">Журнал пока пуст</string>
     <string name="core_logs_debug">Отладка</string>
     <string name="core_logs_info">Инфо</string>
     <string name="core_logs_warning">Предупреждения</string>
@@ -906,4 +906,19 @@
     <string name="start_failed_body">Модуль прервал запуск из-за ошибки. Подробности ниже или в журнале.</string>
     <string name="start_failed_core_missing">Выбранное ядро не установлено. Скачайте его в «Утилиты → Обновление → Ядро» или выберите другое ядро.</string>
     <string name="start_failed_logs">Открыть журнал</string>    <string name="start_failed_notify">Модуль прервал запуск из-за ошибки.</string>
+    <string name="core_logs_empty_hint">Сюда ядро пишет, что делает. На уровне «Инфо» строки появляются вместе с трафиком; выберите «Отладка», чтобы видеть больше.</string>
+    <string name="core_logs_empty_debug">На уровне «Отладка» строки появятся, как только через ядро что-нибудь пойдёт.</string>
+    <string name="conn_empty_hint">Соединения появятся здесь, когда приложения выйдут в сеть через ядро.</string>
+    <string name="conn_closed_empty">Закрытых пока нет</string>
+    <string name="conn_closed_empty_hint">Здесь собираются соединения, которые завершились, пока открыта эта вкладка.</string>
+    <string name="editor_undo">Отменить</string>
+    <string name="editor_redo">Повторить</string>
+    <string name="editor_replace_hint">Заменить на</string>
+    <string name="editor_replace_one">Заменить</string>
+    <string name="editor_replace_all">Все</string>
+    <string name="editor_mono">Моно</string>
+    <string name="editor_sections">Разделы</string>
+    <string name="editor_no_sections">В этом файле нет разделов</string>
+    <string name="editor_goto_error">Перейти к ошибке</string>
+    <string name="editor_error_line">Строка %1$d: %2$s</string>
 </resources>

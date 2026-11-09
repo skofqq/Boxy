@@ -5,20 +5,26 @@ import android.graphics.Typeface
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,6 +48,8 @@ import com.skofqq.boxy.R
 import com.skofqq.boxy.root.CheckResult
 import com.skofqq.boxy.root.ConfigCheck
 import com.skofqq.boxy.root.RootFiles
+import com.skofqq.boxy.ui.components.Choice
+import com.skofqq.boxy.ui.components.ChoiceDialog
 import com.skofqq.boxy.ui.components.ConfigErrorDialog
 import com.skofqq.boxy.ui.components.PageSearchField
 import com.skofqq.boxy.ui.components.BackPill
@@ -51,11 +60,19 @@ import com.skofqq.boxy.ui.components.SmallIconButton
 import com.skofqq.boxy.ui.components.SubPageHeader
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
+import com.skofqq.boxy.ui.theme.Tints
 import io.github.rosemoe.sora.event.ContentChangeEvent
+import io.github.rosemoe.sora.lang.diagnostic.DiagnosticDetail
+import io.github.rosemoe.sora.lang.diagnostic.DiagnosticRegion
+import io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Text editor for config files (sora-editor: line numbers, search, large files). */
 @Composable
@@ -71,7 +88,16 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     var saveAsDialog by remember { mutableStateOf(false) }
     val sp = remember { context.getSharedPreferences("boxy", android.content.Context.MODE_PRIVATE) }
     var wrap by remember { mutableStateOf(sp.getBoolean("editor_wrap", true)) }
+    var mono by remember { mutableStateOf(sp.getBoolean("editor_mono", false)) }
+    var replacing by remember { mutableStateOf(false) }
+    var replacement by remember { mutableStateOf("") }
+    var canUndo by remember { mutableStateOf(false) }
+    var canRedo by remember { mutableStateOf(false) }
+    var sections by remember { mutableStateOf<List<ConfigAssist.Section>?>(null) }
+    var problem by remember { mutableStateOf<ConfigDiagnostics.Problem?>(null) }
+    val language = remember(path) { ConfigLanguage.forPath(path) }
     val colors = Boxy.colors
+    val errorColor = Tints.red.fg
 
     LaunchedEffect(path) { text = RootFiles.read(path) ?: "" }
 
@@ -80,6 +106,44 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
 
     var checkError by remember { mutableStateOf<String?>(null) }
     var checking by remember { mutableStateOf(false) }
+
+    var liveJob by remember { mutableStateOf<Job?>(null) }
+
+    /** Underlines from [column] to the end of [line] and shows the message on tap. */
+    fun underline(e: CodeEditor, line: Int, column: Int, message: String) {
+        val text = e.text
+        val l = line.coerceIn(0, text.lineCount - 1)
+        val c = column.coerceIn(0, text.getColumnCount(l))
+        var start = text.getCharIndex(l, c)
+        var end = text.getCharIndex(l, text.getColumnCount(l))
+        if (start >= end) {
+            // Nothing after the mark (end of line or file): underline the character before it.
+            if (start > 0) start-- else end = minOf(1, text.length)
+        }
+        e.diagnostics = DiagnosticsContainer().apply {
+            if (start < end) {
+                addDiagnostic(DiagnosticRegion(start, end, DiagnosticRegion.SEVERITY_ERROR, 1L, DiagnosticDetail(message, null, emptyList(), null)))
+            }
+        }
+    }
+
+    fun goTo(line: Int, column: Int = 0) {
+        val e = editor ?: return
+        val l = line.coerceIn(0, e.lineCount - 1)
+        e.setSelection(l, column.coerceIn(0, e.text.getColumnCount(l)))
+    }
+
+    fun scheduleLiveCheck(e: CodeEditor) {
+        val kind = language?.kind ?: return
+        liveJob?.cancel()
+        liveJob = scope.launch {
+            delay(LIVE_CHECK_DELAY_MS)
+            val snapshot = e.text.toString()
+            val found = withContext(Dispatchers.Default) { ConfigDiagnostics.check(kind, snapshot) }
+            problem = found
+            if (found == null) e.diagnostics = DiagnosticsContainer() else underline(e, found.line, found.column, found.message)
+        }
+    }
 
     fun write(content: String, checked: Boolean) {
         scope.launch {
@@ -107,7 +171,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
         }
     }
 
-    Column(Modifier.fillMaxSize().padding(contentPadding).imePadding()) {
+    Column(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding).imePadding()) {
         // Compact bar like BFR: back on the left, search / wrap / save on the right.
         Row(Modifier.fillMaxWidth().padding(start = 0.dp, end = 16.dp, top = 0.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             BackPill(tryBack)
@@ -115,12 +179,15 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 HeaderAction(BoxyIcons.Search, stringResource(R.string.action_search)) {
                     searching = !searching
-                    if (!searching) editor?.searcher?.stopSearch()
+                    if (!searching) {
+                        replacing = false
+                        editor?.searcher?.stopSearch()
+                    }
                 }
-                HeaderAction(BoxyIcons.WrapText, stringResource(R.string.editor_wrap), tint = if (wrap) colors.accent else colors.text) {
-                    wrap = !wrap
-                    sp.edit().putBoolean("editor_wrap", wrap).apply()
-                    editor?.isWordwrap = wrap
+                HeaderAction(BoxyIcons.Toc, stringResource(R.string.editor_sections)) {
+                    val e = editor
+                    val l = language
+                    if (e != null && l != null) sections = ConfigAssist.sections(l.kind, e.text.toString())
                 }
                 HeaderAction(BoxyIcons.SaveAs, stringResource(R.string.editor_save_as)) { if (editor != null) saveAsDialog = true }
                 HeaderAction(BoxyIcons.Save, stringResource(R.string.action_save), tint = if (modified) colors.accent else colors.text) { save() }
@@ -133,6 +200,15 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
             color = colors.text2,
             maxLines = 1,
         )
+        problem?.let { p ->
+            Text(
+                stringResource(R.string.editor_error_line, p.line + 1, p.message),
+                Modifier.fillMaxWidth().clickable { goTo(p.line, p.column) }.padding(horizontal = 20.dp, vertical = 2.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = Tints.red.fg,
+                maxLines = 2,
+            )
+        }
         if (searching) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 PageSearchField(
@@ -149,10 +225,29 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                 SmallIconButton(BoxyIcons.ExpandLess, null, container = Boxy.colors.card) { runCatching { editor?.searcher?.gotoPrevious() } }
                 Spacer(Modifier.width(6.dp))
                 SmallIconButton(BoxyIcons.ExpandMore, null, container = Boxy.colors.card) { runCatching { editor?.searcher?.gotoNext() } }
+                Spacer(Modifier.width(6.dp))
+                SmallIconButton(BoxyIcons.FindReplace, stringResource(R.string.editor_replace_hint), container = if (replacing) Boxy.colors.accent.copy(alpha = 0.25f) else Boxy.colors.card) { replacing = !replacing }
+            }
+            if (replacing) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PageSearchField(replacement, { replacement = it }, stringResource(R.string.editor_replace_hint), Modifier.weight(1f))
+                    Spacer(Modifier.width(8.dp))
+                    BarChip(stringResource(R.string.editor_replace_one)) {
+                        val s = editor?.searcher
+                        if (s != null && s.hasQuery()) runCatching {
+                            if (!s.isMatchedPositionSelected) s.gotoNext() else s.replaceCurrentMatch(replacement)
+                        }
+                    }
+                    Spacer(Modifier.width(6.dp))
+                    BarChip(stringResource(R.string.editor_replace_all)) {
+                        val s = editor?.searcher
+                        if (s != null && s.hasQuery()) runCatching { s.replaceAll(replacement) }
+                    }
+                }
             }
         }
         Box(
-            Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 6.dp).clip(RoundedCornerShape(20.dp)).background(colors.card),
+            Modifier.weight(1f).fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp).clip(RoundedCornerShape(20.dp)).background(colors.card),
             contentAlignment = Alignment.Center,
         ) {
             val content = text
@@ -164,8 +259,10 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                     factory = { ctx ->
                         WrapEditor(ctx).apply {
                             // Proportional font and larger size read better on a phone (as in BFR).
-                            typefaceText = Typeface.DEFAULT
+                            // Monospace is optional: it makes YAML indents line up.
+                            typefaceText = if (mono) Typeface.MONOSPACE else Typeface.DEFAULT
                             typefaceLineNumber = Typeface.DEFAULT
+                            tabWidth = 2
                             setTextSize(16f)
                             isWordwrap = wrap
                             setLineSpacing(2f, 1.1f)
@@ -192,16 +289,79 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                                 setColor(EditorColorScheme.FUNCTION_NAME, if (dark) 0xFF8BD68F.toInt() else 0xFF2E7D32.toInt())
                                 setColor(EditorColorScheme.COMMENT, if (dark) 0xFF8B949E.toInt() else 0xFF8A8F98.toInt())
                                 setColor(EditorColorScheme.LINE_DIVIDER, colors.outline.copy(alpha = 0.4f).toArgb())
+                                setColor(EditorColorScheme.BLOCK_LINE, colors.text2.copy(alpha = 0.35f).toArgb())
+                                setColor(EditorColorScheme.BLOCK_LINE_CURRENT, colors.accent.copy(alpha = 0.6f).toArgb())
+                                setColor(EditorColorScheme.SIDE_BLOCK_LINE, colors.accent.copy(alpha = 0.6f).toArgb())
+                                setColor(EditorColorScheme.PROBLEM_ERROR, errorColor.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_BACKGROUND, colors.surface2.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_CORNER, colors.outline.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_TEXT_PRIMARY, colors.text.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_TEXT_SECONDARY, colors.text2.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_TEXT_MATCHED, colors.accent.toArgb())
+                                setColor(EditorColorScheme.COMPLETION_WND_ITEM_CURRENT, colors.accent.copy(alpha = 0.2f).toArgb())
                             }
-                            ConfigLanguage.forPath(path)?.let { setEditorLanguage(it) }
+                            language?.let { setEditorLanguage(it) }
                             setText(content)
-                            subscribeEvent(ContentChangeEvent::class.java) { _, _ -> modified = true }
+                            subscribeEvent(ContentChangeEvent::class.java) { _, _ ->
+                                modified = true
+                                canUndo = canUndo()
+                                canRedo = canRedo()
+                                scheduleLiveCheck(this)
+                            }
                             editor = this
+                            scheduleLiveCheck(this)
                         }
                     },
                     onRelease = { it.release() },
                 )
             }
+        }
+        // Stays visible without the keyboard too: undo and the toggles are useful while reading.
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(start = 8.dp, end = 8.dp, bottom = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SmallIconButton(BoxyIcons.Undo, stringResource(R.string.editor_undo), enabled = canUndo, container = colors.card) { editor?.undo() }
+            SmallIconButton(BoxyIcons.Redo, stringResource(R.string.editor_redo), enabled = canRedo, container = colors.card) { editor?.redo() }
+            BarChip("Tab") { editor?.indentOrCommitTab() }
+            BarChip("\u21E4") { editor?.unindentSelection() }
+            for ((label, insert, offset) in SYMBOLS) BarChip(label) { editor?.insertText(insert, offset) }
+            BarToggle(stringResource(R.string.editor_mono), mono) {
+                mono = !mono
+                sp.edit().putBoolean("editor_mono", mono).apply()
+                editor?.typefaceText = if (mono) Typeface.MONOSPACE else Typeface.DEFAULT
+            }
+            Box(
+                Modifier.size(36.dp).clip(RoundedCornerShape(50)).background(if (wrap) colors.accent.copy(alpha = 0.25f) else colors.card).clickable {
+                    wrap = !wrap
+                    sp.edit().putBoolean("editor_wrap", wrap).apply()
+                    editor?.isWordwrap = wrap
+                },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(BoxyIcons.WrapText, stringResource(R.string.editor_wrap), Modifier.size(20.dp), tint = if (wrap) colors.accent else colors.text)
+            }
+        }
+    }
+
+    sections?.let { list ->
+        if (list.isEmpty()) {
+            LaunchedEffect(Unit) {
+                Toast.makeText(context, R.string.editor_no_sections, Toast.LENGTH_SHORT).show()
+                sections = null
+            }
+        } else {
+            ChoiceDialog(
+                title = stringResource(R.string.editor_sections),
+                choices = list.map { Choice(it.line, it.title) },
+                selected = -1,
+                onSelect = { line ->
+                    sections = null
+                    goTo(line)
+                },
+                onDismiss = { sections = null },
+            )
         }
     }
 
@@ -246,11 +406,20 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     }
 
     checkError?.let { output ->
+        val at = remember(output) { ConfigDiagnostics.lineInCoreOutput(output) }
         ConfigErrorDialog(
             output,
             stringResource(R.string.check_save_anyway),
             onProceed = { checkError = null; editor?.let { write(it.text.toString(), false) } },
             onDismiss = { checkError = null },
+            onEdit = at?.let { (line, column) ->
+                {
+                    checkError = null
+                    editor?.let { underline(it, line, column, output) }
+                    goTo(line, column)
+                }
+            },
+            editLabel = stringResource(R.string.editor_goto_error),
         )
     }
 
@@ -266,6 +435,39 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     }
 }
 
+private const val LIVE_CHECK_DELAY_MS = 700L
+
+/** Label, text to insert, and where the cursor lands inside that text. */
+private val SYMBOLS = listOf(
+    Triple("-", "- ", 2),
+    Triple(":", ": ", 2),
+    Triple("#", "# ", 2),
+    Triple("\"", "\"\"", 1),
+    Triple("'", "''", 1),
+    Triple("[ ]", "[]", 1),
+    Triple("{ }", "{}", 1),
+    Triple(",", ",", 1),
+    Triple("/", "/", 1),
+    Triple("|", "|", 1),
+    Triple("&", "&", 1),
+    Triple("*", "*", 1),
+)
+
+@Composable
+private fun BarChip(label: String, background: Color = Boxy.colors.card, tint: Color = Boxy.colors.text, onClick: () -> Unit) {
+    Box(
+        Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(background).clickable(onClick = onClick).padding(horizontal = 13.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = tint, maxLines = 1)
+    }
+}
+
+@Composable
+private fun BarToggle(label: String, on: Boolean, onClick: () -> Unit) {
+    val c = Boxy.colors
+    BarChip(label, if (on) c.accent.copy(alpha = 0.25f) else c.card, if (on) c.accent else c.text, onClick)
+}
 
 /**
  * Sora lets wrapped text still pan sideways by half the width (its max scroll X ignores word wrap), so a

@@ -895,4 +895,19 @@
     <string name="start_failed_logs">Журналды ашу</string>
     <string name="start_failed_title">Қызмет іске қосылмады</string>
     <string name="start_failed_notify">Модуль қате салдарынан іске қосуды тоқтатты.</string>
+    <string name="core_logs_empty_hint">Ядро мұнда не істеп жатқанын жазады. «Ақпарат» деңгейінде жолдар трафикпен бірге пайда болады; көбірек көру үшін «Жөндеу» таңдаңыз.</string>
+    <string name="core_logs_empty_debug">«Жөндеу» деңгейінде ядро арқылы бір нәрсе өткен бойда жолдар пайда болады.</string>
+    <string name="conn_empty_hint">Қолданбалар ядро арқылы желіге шыққанда байланыстар осында пайда болады.</string>
+    <string name="conn_closed_empty">Жабылғандар әзірге жоқ</string>
+    <string name="conn_closed_empty_hint">Бұл қойынды ашық тұрғанда аяқталған байланыстар осында жиналады.</string>
+    <string name="editor_undo">Болдырмау</string>
+    <string name="editor_redo">Қайталау</string>
+    <string name="editor_replace_hint">Мынаған ауыстыру</string>
+    <string name="editor_replace_one">Ауыстыру</string>
+    <string name="editor_replace_all">Барлығы</string>
+    <string name="editor_mono">Моно</string>
+    <string name="editor_sections">Бөлімдер</string>
+    <string name="editor_no_sections">Бұл файлда бөлімдер жоқ</string>
+    <string name="editor_goto_error">Қатеге өту</string>
+    <string name="editor_error_line">%1$d-жол: %2$s</string>
 </resources>

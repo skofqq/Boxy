@@ -105,7 +105,18 @@ internal fun CoreLogsTab(bottom: Dp, reloadKey: Int) {
             GlassAction(BoxyIcons.Delete, stringResource(R.string.core_logs_clear), enabled = lines.isNotEmpty()) { lines.clear() }
         },
     ) {
-        if (shown.isEmpty()) item { EmptyLine(stringResource(if (q.isEmpty()) R.string.core_logs_empty else R.string.proxies_nothing_found)) }
+        if (shown.isEmpty()) item {
+            if (q.isEmpty()) {
+                ExpressiveEmpty(
+                    BoxyIcons.Description,
+                    stringResource(R.string.core_logs_empty),
+                    stringResource(if (level == "debug") R.string.core_logs_empty_debug else R.string.core_logs_empty_hint),
+                    Modifier.fillParentMaxHeight(0.75f),
+                )
+            } else {
+                EmptyLine(stringResource(R.string.proxies_nothing_found))
+            }
+        }
         itemsIndexed(shown) { _, l -> LogCard(l, Modifier.padding(horizontal = 16.dp).fillMaxWidth()) }
     }
 }

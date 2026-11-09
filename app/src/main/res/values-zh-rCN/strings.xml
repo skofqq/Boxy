@@ -895,4 +895,19 @@
     <string name="unit_tb">TB</string>
     <string name="update_target_webui">WebUI</string>
     <string name="start_failed_notify">模块因错误中止了启动。</string>
+    <string name="core_logs_empty_hint">核心会在这里记录它的动作。“信息”级别下有流量时才会出现日志；选择“调试”可以看到更多。</string>
+    <string name="core_logs_empty_debug">在“调试”级别下，只要有流量经过核心就会出现日志。</string>
+    <string name="conn_empty_hint">应用通过核心联网时，连接会显示在这里。</string>
+    <string name="conn_closed_empty">暂无已关闭的连接</string>
+    <string name="conn_closed_empty_hint">此标签页打开期间结束的连接会保留在这里。</string>
+    <string name="editor_undo">撤销</string>
+    <string name="editor_redo">重做</string>
+    <string name="editor_replace_hint">替换为</string>
+    <string name="editor_replace_one">替换</string>
+    <string name="editor_replace_all">全部</string>
+    <string name="editor_mono">等宽</string>
+    <string name="editor_sections">章节</string>
+    <string name="editor_no_sections">此文件没有章节</string>
+    <string name="editor_goto_error">转到错误</string>
+    <string name="editor_error_line">第 %1$d 行：%2$s</string>
 </resources>

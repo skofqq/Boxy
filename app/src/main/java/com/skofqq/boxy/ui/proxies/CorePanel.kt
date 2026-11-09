@@ -2,6 +2,14 @@ package com.skofqq.boxy.ui.proxies
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.material3.toShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -138,6 +146,59 @@ internal fun NoCore(bottom: Dp, running: Boolean = false) {
             color = Boxy.colors.text2,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+/**
+ * Material 3 Expressive empty state for a panel tab: a slowly turning cookie that breathes, with the tab's symbol
+ * on a smaller cookie, a title and a line of help. It springs in when it appears.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun ExpressiveEmpty(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String, modifier: Modifier = Modifier) {
+    val loop = androidx.compose.animation.core.rememberInfiniteTransition(label = "empty")
+    val turn by loop.animateFloat(
+        0f, 360f,
+        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(24_000, easing = androidx.compose.animation.core.LinearEasing)),
+        label = "turn",
+    )
+    val breath by loop.animateFloat(
+        0.94f, 1.04f,
+        androidx.compose.animation.core.infiniteRepeatable(
+            androidx.compose.animation.core.tween(2_400, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+        label = "breath",
+    )
+    val appear = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(0f) }
+    androidx.compose.runtime.LaunchedEffect(Unit) { appear.animateTo(1f, androidx.compose.animation.core.spring(dampingRatio = 0.55f, stiffness = 300f)) }
+    Column(
+        modifier.fillMaxWidth().padding(horizontal = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Box(
+            Modifier.size(150.dp).graphicsLayer { scaleX = appear.value; scaleY = appear.value },
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                Modifier.size(140.dp).graphicsLayer { rotationZ = turn; scaleX = breath; scaleY = breath }
+                    .clip(androidx.compose.material3.MaterialShapes.Cookie12Sided.toShape())
+                    .background(Boxy.colors.accent.copy(alpha = 0.16f)),
+            )
+            Box(
+                Modifier.size(72.dp).graphicsLayer { rotationZ = -turn / 3 }
+                    .clip(androidx.compose.material3.MaterialShapes.Cookie4Sided.toShape())
+                    .background(Boxy.colors.accent),
+                contentAlignment = Alignment.Center,
+            ) {
+                androidx.compose.material3.Icon(icon, null, Modifier.size(34.dp).graphicsLayer { rotationZ = turn / 3 }, tint = androidx.compose.ui.graphics.Color.White)
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Boxy.colors.text, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(8.dp))
+        Text(body, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2, textAlign = TextAlign.Center)
     }
 }
 
