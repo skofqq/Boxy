@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Boxy"
 include(":app")
+include(":baselineprofile")

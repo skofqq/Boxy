@@ -1,5 +1,7 @@
 *.iml
 .gradle/
+.kotlin/
+/baselineprofile/build/
 /local.properties
 /.idea/
 .DS_Store
