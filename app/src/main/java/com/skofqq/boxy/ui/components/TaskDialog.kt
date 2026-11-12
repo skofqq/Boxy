@@ -240,7 +240,7 @@ fun TaskDialog(
                 val vScroll = rememberScrollState()
                 LaunchedEffect(lines.size) { vScroll.scrollTo(vScroll.maxValue) }
                 // A column: AnimatedVisibility stacks its children, which put the copy link over the log.
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                Column(Modifier.fillMaxWidth()) {
                 Box(
                     Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(min = 80.dp, max = 220.dp)
                         .clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(12.dp),
@@ -255,15 +255,18 @@ fun TaskDialog(
                     }
                 }
                 val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
-                Text(
-                    stringResource(R.string.task_copy_log),
-                    Modifier.padding(top = 6.dp).clip(RoundedCornerShape(50)).clickable {
-                        clipboard.setText(androidx.compose.ui.text.AnnotatedString(lines.takeLast(200).joinToString("\n")))
-                        android.widget.Toast.makeText(context, R.string.task_copied, android.widget.Toast.LENGTH_SHORT).show()
-                    }.padding(horizontal = 10.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Boxy.colors.accent,
-                )
+                // Shown with the log only, as its own button under it.
+                Box(
+                    Modifier.padding(top = 10.dp).fillMaxWidth().height(44.dp).clip(RoundedCornerShape(14.dp))
+                        .background(Boxy.colors.surface2)
+                        .clickable {
+                            clipboard.setText(androidx.compose.ui.text.AnnotatedString(lines.takeLast(200).joinToString("\n")))
+                            android.widget.Toast.makeText(context, R.string.task_copied, android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(stringResource(R.string.task_copy_log), style = MaterialTheme.typography.labelLarge, color = Boxy.colors.accent)
+                }
                 }
             }
             AnimatedVisibility(done, enter = fadeIn(), exit = fadeOut()) {
