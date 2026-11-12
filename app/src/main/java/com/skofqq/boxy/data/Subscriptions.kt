@@ -40,18 +40,25 @@ object Subscriptions {
     /** settings.ini keys holding subscription URLs, per core. */
     val SUBSCRIPTION_KEYS = listOf("subscription_url_clash", "subscription_url_singbox", "subscription_url_xray", "subscription_url_hysteria")
 
-    suspend fun fetch(prefs: Prefs, core: String? = null): List<SubscriptionInfo> = when (prefs.subscriptionSource) {
-        SubscriptionSource.CORE_API -> Net.clashApi(core ?: BoxModule.readSetting("bin_name"))?.let { Net.clashProviders(it) }.orEmpty()
-        SubscriptionSource.PROVIDERS -> {
-            val urls = Net.providerUrls()
-            coroutineScope { urls.map { (name, url) -> async { Net.subscription(url)?.copy(name = name) } }.awaitAll() }.filterNotNull()
+    suspend fun fetch(prefs: Prefs, core: String? = null): List<SubscriptionInfo> {
+        val c = core ?: BoxModule.unquote(BoxModule.readSetting("bin_name"))
+        // Providers and the core's provider API are mihomo's: the other cores' subscriptions are read by URL.
+        val source = if (c != null && c != "clash") SubscriptionSource.URL else prefs.subscriptionSource
+        return when (source) {
+            SubscriptionSource.CORE_API -> Net.clashApi(c)?.let { Net.clashProviders(it) }.orEmpty()
+            SubscriptionSource.PROVIDERS -> {
+                val urls = Net.providerUrls()
+                coroutineScope { urls.map { (name, url) -> async { Net.subscription(url)?.copy(name = name) } }.awaitAll() }.filterNotNull()
+            }
+            SubscriptionSource.URL -> fetchUrls()
         }
-        SubscriptionSource.URL -> {
-            // Every core's subscription URLs (clash is an array, sing-box a single URL or an array), each once.
-            val raw = BoxModule.readSettingsRaw(SUBSCRIPTION_KEYS)
-            val urls = SUBSCRIPTION_KEYS.flatMap { BoxModule.parseArray(raw[it]) }.filter { it.startsWith("http") }.distinct()
-            coroutineScope { urls.map { url -> async { Net.subscription(url) } }.awaitAll() }.filterNotNull()
-        }
+    }
+
+    /** Every core's subscription URLs (clash is an array, sing-box a single URL or an array), each once. */
+    private suspend fun fetchUrls(): List<SubscriptionInfo> {
+        val raw = BoxModule.readSettingsRaw(SUBSCRIPTION_KEYS)
+        val urls = SUBSCRIPTION_KEYS.flatMap { BoxModule.parseArray(raw[it]) }.filter { it.startsWith("http") }.distinct()
+        return coroutineScope { urls.map { url -> async { Net.subscription(url) } }.awaitAll() }.filterNotNull()
     }
 
     fun cached(prefs: Prefs): List<SubscriptionInfo> = runCatching {

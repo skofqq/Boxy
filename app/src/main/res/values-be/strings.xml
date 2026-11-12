@@ -959,4 +959,27 @@
     <string name="geo_source_hysteria">У Hysteria няма геаправіл: для яе нічога не спампоўваецца.</string>
     <string name="geo_rule_mihomo_hint">mihomo чытае адзін GeoSite.dat: Boxy дадае ў яго %1$s з прэфіксам і перазбірае пасля кожнага абнаўлення геабаз.</string>
     <string name="geo_rule_build_failed">Не ўдалося падрыхтаваць катэгорыю: спачатку абнавіце геабазы ў «Утыліты → Абнаўленне».</string>
+    <string name="singbox_overrides_title">Свае налады па-над канфігам</string>
+    <string name="singbox_overrides_sub">Захоўваюцца пры абнаўленні падпіскі. Значэнні адсюль галоўнейшыя; inbound, outbound, DNS-серверы і наборы правіл з тым жа тэгам замяняюць зыходныя.</string>
+    <string name="singbox_overrides_on">Уключаны · націсніце, каб змяніць</string>
+    <string name="singbox_overrides_create">Не створаны · націсніце, каб стварыць</string>
+    <string name="sb_lint_title">Састарэлыя параметры sing-box</string>
+    <string name="sb_lint_sub">Захавана. Гэтыя параметры састарэлі або ўжо не працуюць у новых версіях sing-box; націсніце, каб перайсці да радка.</string>
+    <string name="sb_lint_line">Радок %1$d · з версіі %2$s</string>
+    <string name="sb_lint_core">Сам sing-box папярэджвае:</string>
+    <string name="sb_lint_geo">geosite / geoip выдалены ў sing-box 1.12. Выкарыстоўвайце наборы правіл: іх стварае «Правіла з геабазы» ў рэдактары.</string>
+    <string name="sb_lint_inbound_sniff">Палі inbound sniff / domain_strategy перанесены ў дзеянні правіл маршрутызацыі («action»: «sniff» / «resolve») і выдалены ў 1.13.</string>
+    <string name="sb_lint_special_outbound">Outbound тыпу block / dns заменены дзеяннямі правіл («action»: «reject» / «hijack-dns») і выдалены ў 1.13.</string>
+    <string name="sb_lint_dns_out">Накіраванне DNS у outbound dns: выкарыстоўвайце ў правіле «action»: «hijack-dns».</string>
+    <string name="sb_lint_legacy_dns">DNS-сервер з «address» — стары фармат, састарэў у 1.12 і выдалены ў 1.14. Выкарыстоўвайце «type» + «server» (напрыклад «type»: «https», «server»: «1.1.1.1»).</string>
+    <string name="sb_lint_legacy_fakeip">dns.fakeip у 1.12 перанесены ў DNS-сервер тыпу fakeip.</string>
+    <string name="sb_lint_wireguard_outbound">Outbound wireguard састарэў з 1.11: выкарыстоўвайце endpoint wireguard («endpoints»).</string>
+    <string name="editor_sb_format">Фармат</string>
+    <string name="editor_sb_compile">→ .srs</string>
+    <string name="editor_sb_compiled">Сабрана: %1$s</string>
+    <string name="sb_cache_title">sing-box забывае выбраны вузел</string>
+    <string name="sb_cache_body">experimental.cache_file выключаны, таму пасля кожнага перазапуску ў селектарах зноў вузел па змаўчанні.</string>
+    <string name="sb_cache_enable">Запамінаць выбар</string>
+    <string name="sb_cache_enable_sub">Уключае cache_file у сваіх наладах — абнаўленне падпіскі яго не скіне</string>
+    <string name="sb_lint_sub_failed">Не захавана: sing-box не прымае канфігурацыю. Гэтыя параметры выдалены або зменены; націсніце, каб перайсці да радка.</string>
 </resources>

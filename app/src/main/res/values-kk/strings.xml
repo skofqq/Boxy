@@ -959,4 +959,27 @@
     <string name="geo_source_hysteria">Hysteria-да гео ережелер жоқ: ол үшін ештеңе жүктелмейді.</string>
     <string name="geo_rule_mihomo_hint">mihomo бір GeoSite.dat оқиды: Boxy оған %1$s префикспен қосады және әр геобаза жаңартуынан кейін қайта жинайды.</string>
     <string name="geo_rule_build_failed">Санатты дайындау мүмкін болмады: алдымен геобазаларды «Құралдар → Жаңарту» ішінде жаңартыңыз.</string>
+    <string name="singbox_overrides_title">Конфиг үстіндегі өз баптауларыңыз</string>
+    <string name="singbox_overrides_sub">Жазылым жаңартылғанда сақталады. Мұндағы мәндер басым; тегі бірдей inbound, outbound, DNS-серверлер мен ереже жинақтары бастапқысын алмастырады.</string>
+    <string name="singbox_overrides_on">Қосулы · өзгерту үшін түртіңіз</string>
+    <string name="singbox_overrides_create">Жасалмаған · жасау үшін түртіңіз</string>
+    <string name="sb_lint_title">sing-box-тың ескірген параметрлері</string>
+    <string name="sb_lint_sub">Сақталды. Бұл параметрлер ескірген немесе sing-box-тың жаңа нұсқаларында жұмыс істемейді; жолға өту үшін түртіңіз.</string>
+    <string name="sb_lint_line">%1$d-жол · %2$s нұсқасынан</string>
+    <string name="sb_lint_core">sing-box өзі ескертеді:</string>
+    <string name="sb_lint_geo">geosite / geoip sing-box 1.12-де жойылды. Ережелер жинағын пайдаланыңыз: оларды редактордағы «Геобазадан ереже» жасайды.</string>
+    <string name="sb_lint_inbound_sniff">Inbound sniff / domain_strategy өрістері маршрут ережелерінің әрекеттеріне («action»: «sniff» / «resolve») көшірілді және 1.13-те жойылды.</string>
+    <string name="sb_lint_special_outbound">block / dns типті outbound ереже әрекеттерімен («action»: «reject» / «hijack-dns») ауыстырылды және 1.13-те жойылды.</string>
+    <string name="sb_lint_dns_out">DNS-ті dns outbound-қа бағыттау: ережеде «action»: «hijack-dns» пайдаланыңыз.</string>
+    <string name="sb_lint_legacy_dns">«address» бар DNS-сервер — ескі формат, 1.12-де ескірген, 1.14-те жойылған. «type» + «server» пайдаланыңыз (мысалы «type»: «https», «server»: «1.1.1.1»).</string>
+    <string name="sb_lint_legacy_fakeip">dns.fakeip 1.12-де fakeip типті DNS-серверге көшірілді.</string>
+    <string name="sb_lint_wireguard_outbound">wireguard outbound 1.11-ден бері ескірген: wireguard endpoint («endpoints») пайдаланыңыз.</string>
+    <string name="editor_sb_format">Пішімдеу</string>
+    <string name="editor_sb_compile">→ .srs</string>
+    <string name="editor_sb_compiled">Жиналды: %1$s</string>
+    <string name="sb_cache_title">sing-box таңдалған түйінді ұмытады</string>
+    <string name="sb_cache_body">experimental.cache_file өшірулі, сондықтан әр қайта іске қосудан кейін селекторларда қайтадан әдепкі түйін.</string>
+    <string name="sb_cache_enable">Таңдауды есте сақтау</string>
+    <string name="sb_cache_enable_sub">cache_file-ді өз баптауларыңызда қосады — жазылым жаңартуы оны өшірмейді</string>
+    <string name="sb_lint_sub_failed">Сақталмады: sing-box конфигурацияны қабылдамайды. Бұл параметрлер жойылған не өзгерген; жолға өту үшін түртіңіз.</string>
 </resources>

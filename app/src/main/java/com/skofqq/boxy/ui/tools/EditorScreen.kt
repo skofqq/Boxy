@@ -99,6 +99,12 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     // Cores whose rules can take a GeoSite / GeoIP category (not hysteria).
     val geoCore = remember(path) { ConfigCheck.coreFor(path)?.takeIf { com.skofqq.boxy.configs.GeoRules.syntaxCore(it) } }
     var geoSheet by remember { mutableStateOf(false) }
+    // sing-box JSON (config, overrides, rule-set sources anywhere under sing-box/): Format and compile to .srs.
+    val singBoxJson = remember(path) { path.startsWith("${com.skofqq.boxy.root.BoxModule.BOX_DIR}/sing-box/") && path.endsWith(".json") }
+    /** Outdated sing-box settings: found lines, sing-box's own warnings, and the check error when it failed. */
+    data class Deprecated(val found: List<com.skofqq.boxy.configs.SingBoxLint.Finding>, val warns: List<String>, val error: String?)
+    var deprecated by remember { mutableStateOf<Deprecated?>(null) }
+    var toolBusy by remember { mutableStateOf(false) }
     val colors = Boxy.colors
     val errorColor = Tints.red.fg
 
@@ -170,7 +176,18 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
         scope.launch {
             val r = ConfigCheck.checkText(core, path, content)
             checking = false
-            if (r is CheckResult.Failed) checkError = r.output else write(content, r == CheckResult.Ok)
+            val found = if (core == "sing-box") com.skofqq.boxy.configs.SingBoxLint.lint(content) else emptyList()
+            if (r is CheckResult.Failed) {
+                // sing-box rejects removed settings without naming the line: the lint finds them.
+                if (found.isNotEmpty()) deprecated = Deprecated(found, emptyList(), r.output) else checkError = r.output
+            } else {
+                write(content, r == CheckResult.Ok)
+                // Saved, but sing-box settings that are deprecated or already gone are worth fixing.
+                if (core == "sing-box") {
+                    val warns = ConfigCheck.lastWarnings
+                    if (found.isNotEmpty() || warns.isNotEmpty()) deprecated = Deprecated(found, warns, null)
+                }
+            }
         }
     }
 
@@ -330,6 +347,40 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
             SmallIconButton(BoxyIcons.Redo, stringResource(R.string.editor_redo), enabled = canRedo, container = colors.card) { editor?.redo() }
             BarChip("Tab") { editor?.indentOrCommitTab() }
             BarChip("\u21E4") { editor?.unindentSelection() }
+            if (singBoxJson) {
+                BarChip(stringResource(R.string.editor_sb_format)) {
+                    val e = editor
+                    if (e != null && !toolBusy) {
+                        toolBusy = true
+                        scope.launch {
+                            val r = com.skofqq.boxy.configs.SingBoxTools.format(path, e.text.toString())
+                            toolBusy = false
+                            if (r.isSuccess) {
+                                val c = e.text
+                                val last = c.lineCount - 1
+                                c.replace(0, 0, last, c.getColumnCount(last), r.getOrThrow())
+                            } else {
+                                checkError = r.exceptionOrNull()?.message.orEmpty()
+                            }
+                        }
+                    }
+                }
+                BarChip(stringResource(R.string.editor_sb_compile)) {
+                    val e = editor
+                    if (e != null && !toolBusy) {
+                        toolBusy = true
+                        scope.launch {
+                            val r = com.skofqq.boxy.configs.SingBoxTools.compile(path, e.text.toString())
+                            toolBusy = false
+                            if (r.isSuccess) {
+                                Toast.makeText(context, context.getString(R.string.editor_sb_compiled, r.getOrThrow().substringAfterLast('/')), Toast.LENGTH_LONG).show()
+                            } else {
+                                checkError = r.exceptionOrNull()?.message.orEmpty()
+                            }
+                        }
+                    }
+                }
+            }
             for ((label, insert, offset) in SYMBOLS) BarChip(label) { editor?.insertText(insert, offset) }
             BarToggle(stringResource(R.string.editor_mono), mono) {
                 mono = !mono
@@ -395,6 +446,51 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
             onError = { msg -> Toast.makeText(context, context.getString(R.string.geo_rule_parse_failed, msg), Toast.LENGTH_LONG).show() },
             onDismiss = { geoSheet = false },
         )
+    }
+
+    deprecated?.let { d ->
+        val found = d.found
+        val warns = d.warns
+        com.skofqq.boxy.ui.components.BoxySheet(
+            stringResource(R.string.sb_lint_title),
+            stringResource(if (d.error != null) R.string.sb_lint_sub_failed else R.string.sb_lint_sub),
+            { deprecated = null },
+        ) {
+            found.forEach { f ->
+                Column(
+                    Modifier.fillMaxWidth().padding(vertical = 3.dp).clip(RoundedCornerShape(14.dp)).background(colors.card)
+                        .clickable { deprecated = null; goTo(f.line) }.padding(horizontal = 14.dp, vertical = 10.dp),
+                ) {
+                    Text(stringResource(R.string.sb_lint_line, f.line + 1, f.since), style = MaterialTheme.typography.labelLarge, color = colors.accent)
+                    Text(stringResource(f.message), style = MaterialTheme.typography.bodyMedium, color = colors.text)
+                }
+            }
+            if (warns.isNotEmpty()) {
+                Text(
+                    stringResource(R.string.sb_lint_core),
+                    Modifier.padding(top = 10.dp, bottom = 4.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colors.text2,
+                )
+                warns.forEach { w ->
+                    Text(w, Modifier.padding(vertical = 3.dp), style = MaterialTheme.typography.bodySmall, color = colors.text)
+                }
+            }
+            d.error?.let { err ->
+                Text(
+                    err,
+                    Modifier.padding(top = 10.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(colors.surface2).padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Tints.red.fg,
+                )
+                com.skofqq.boxy.ui.components.SheetButtons(
+                    stringResource(R.string.check_save_anyway),
+                    { deprecated = null; editor?.let { write(it.text.toString(), false) } },
+                    stringResource(R.string.action_cancel),
+                    { deprecated = null },
+                )
+            }
+        }
     }
 
     if (saveAsDialog) {

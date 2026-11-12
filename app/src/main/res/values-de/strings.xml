@@ -959,4 +959,27 @@
     <string name="geo_source_hysteria">Hysteria hat keine Geo-Regeln: dafür wird nichts geladen.</string>
     <string name="geo_rule_mihomo_hint">mihomo liest eine GeoSite.dat: Boxy führt %1$s mit Präfix darin zusammen und baut sie nach jedem Geo-Update neu.</string>
     <string name="geo_rule_build_failed">Kategorie konnte nicht vorbereitet werden: aktualisiere zuerst die Geo-Datenbanken unter Tools → Aktualisierung.</string>
+    <string name="singbox_overrides_title">Eigene Einstellungen über der Konfiguration</string>
+    <string name="singbox_overrides_sub">Bleiben bei Abo-Updates erhalten. Werte von hier gewinnen; Inbounds, Outbounds, DNS-Server und Regelsätze mit gleichem Tag ersetzen die der Konfiguration.</string>
+    <string name="singbox_overrides_on">Aktiv · zum Bearbeiten tippen</string>
+    <string name="singbox_overrides_create">Nicht angelegt · zum Anlegen tippen</string>
+    <string name="sb_lint_title">Veraltete sing-box-Einstellungen</string>
+    <string name="sb_lint_sub">Gespeichert. Diese Einstellungen sind veraltet oder in neueren sing-box-Versionen schon entfernt; tippe, um zur Zeile zu springen.</string>
+    <string name="sb_lint_line">Zeile %1$d · seit %2$s</string>
+    <string name="sb_lint_core">sing-box selbst warnt:</string>
+    <string name="sb_lint_geo">geosite / geoip wurden in sing-box 1.12 entfernt. Nutze Regelsätze: „Regel aus der Geo-Datenbank“ im Editor legt sie an.</string>
+    <string name="sb_lint_inbound_sniff">Die Inbound-Felder sniff / domain_strategy sind jetzt Routenregel-Aktionen („action“: „sniff“ / „resolve“) und wurden in 1.13 entfernt.</string>
+    <string name="sb_lint_special_outbound">block-/dns-Outbounds werden durch Regelaktionen („action“: „reject“ / „hijack-dns“) ersetzt und wurden in 1.13 entfernt.</string>
+    <string name="sb_lint_dns_out">DNS an ein dns-Outbound leiten: nutze stattdessen „action“: „hijack-dns“ in der Regel.</string>
+    <string name="sb_lint_legacy_dns">DNS-Server mit „address“: altes Format, seit 1.12 veraltet, in 1.14 entfernt. Nutze „type“ + „server“ (z. B. „type“: „https“, „server“: „1.1.1.1“).</string>
+    <string name="sb_lint_legacy_fakeip">dns.fakeip ist seit 1.12 ein DNS-Server vom Typ fakeip.</string>
+    <string name="sb_lint_wireguard_outbound">Das wireguard-Outbound ist seit 1.11 veraltet: nutze einen wireguard-Endpoint („endpoints“).</string>
+    <string name="editor_sb_format">Formatieren</string>
+    <string name="editor_sb_compile">→ .srs</string>
+    <string name="editor_sb_compiled">Kompiliert: %1$s</string>
+    <string name="sb_cache_title">sing-box vergisst den gewählten Knoten</string>
+    <string name="sb_cache_body">experimental.cache_file ist aus, daher steht nach jedem Neustart wieder der Standardknoten in den Selektoren.</string>
+    <string name="sb_cache_enable">Auswahl merken</string>
+    <string name="sb_cache_enable_sub">Schaltet cache_file in deinen Overrides ein, ein Abo-Update setzt es nicht zurück</string>
+    <string name="sb_lint_sub_failed">Nicht gespeichert: sing-box lehnt die Konfiguration ab. Diese Einstellungen wurden entfernt oder geändert; tippe, um zur Zeile zu springen.</string>
 </resources>

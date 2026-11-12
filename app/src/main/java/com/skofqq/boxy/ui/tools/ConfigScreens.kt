@@ -65,6 +65,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import com.skofqq.boxy.ui.components.GlassMenu
 import com.skofqq.boxy.ui.components.GlassMenuItem
+import com.skofqq.boxy.configs.SingBoxOverrides
 
 /** Config folder and settings key of each core. */
 fun coreConfig(core: String): Pair<String, String> = when (core) {
@@ -91,6 +92,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
     var downloadDialog by remember { mutableStateOf(false) }
     var checking by remember { mutableStateOf<String?>(null) }
     var checkError by remember { mutableStateOf<Pair<RootFile, String>?>(null) }
+    var overrides by remember { mutableStateOf<Boolean?>(null) }
 
     fun select(f: RootFile) {
         scope.launch {
@@ -121,6 +123,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
         val all = RootFiles.list("${BoxModule.BOX_DIR}/$dir")
         folders = all.filter { it.isDir && !it.name.startsWith(".") }
         files = all.filter { !it.isDir && !it.name.startsWith(".") && it.extension in CONFIG_EXTENSIONS }
+        overrides = if (c == "sing-box") RootFiles.exists(SingBoxOverrides.FILE) else null
     }
     val dir = "${BoxModule.BOX_DIR}/${coreConfig(core ?: "clash").first}"
 
@@ -191,6 +194,28 @@ SubPageHeader(
                             )
                         }
                     }
+                }
+            }
+        }
+        // sing-box: the user's own settings over the config, kept through subscription updates.
+        overrides?.let { present ->
+            item {
+                SectionCard(stringResource(R.string.singbox_overrides_title), stringResource(R.string.singbox_overrides_sub)) {
+                    ConfigRow(
+                        icon = BoxyIcons.Tune,
+                        iconTint = Tints.purple.fg,
+                        iconBg = Tints.purple.bg,
+                        title = SingBoxOverrides.FILE.substringAfterLast('/'),
+                        subtitle = stringResource(if (present) R.string.singbox_overrides_on else R.string.singbox_overrides_create),
+                        badge = null,
+                        divider = false,
+                        onClick = {
+                            scope.launch {
+                                if (SingBoxOverrides.ensure()) onEdit(SingBoxOverrides.FILE)
+                            }
+                        },
+                        onLongClick = {},
+                    )
                 }
             }
         }

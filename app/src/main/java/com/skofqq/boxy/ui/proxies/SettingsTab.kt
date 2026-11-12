@@ -92,6 +92,8 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
     val taskLines = remember { androidx.compose.runtime.mutableStateListOf<String>() }
     var taskDone by remember { mutableStateOf(false) }
     var taskOk by remember { mutableStateOf(false) }
+    // sing-box without cache_file forgets the selected node at every restart.
+    var cacheFileOff by remember { mutableStateOf(false) }
 
     LaunchedEffect(api, reload) {
         if (api == null) return@LaunchedEffect
@@ -100,6 +102,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
         val bin = BoxModule.readSetting("bin_name") ?: "clash"
         webUi = com.skofqq.boxy.net.Dashboards.installed(bin)
         coreName = CORE_NAMES[bin] ?: bin
+        cacheFileOff = bin == "sing-box" && com.skofqq.boxy.configs.SingBoxOverrides.cacheFileOn() == false
     }
 
     fun launchTask(title: String, cmd: String) {
@@ -140,6 +143,14 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
             Text(api?.base?.removePrefix("http://").orEmpty(), style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (cacheFileOff) item {
+            SectionCard(null) {
+                com.skofqq.boxy.ui.components.NoticeCard(stringResource(R.string.sb_cache_title), stringResource(R.string.sb_cache_body))
+                ActionRow(BoxyIcons.Save, stringResource(R.string.sb_cache_enable), stringResource(R.string.sb_cache_enable_sub), busy["cache"] == true, divider = false) {
+                    run("cache") { com.skofqq.boxy.configs.SingBoxOverrides.enableCacheFile() }
+                }
+            }
+        }
         item {
             SectionCard(stringResource(R.string.panel_settings_core)) {
                 IconInfoRow(BoxyIcons.Core, stringResource(R.string.panel_settings_version), version ?: "-")

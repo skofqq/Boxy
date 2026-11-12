@@ -226,9 +226,16 @@ object Net {
             "sing-box" -> {
                 val name = BoxModule.readSetting("name_sing_config") ?: "config.json"
                 val text = BoxModule.readFile("${BoxModule.BOX_DIR}/sing-box/$name") ?: return null
+                // The user's overrides win over the config (see SingBoxOverrides).
+                val ov = com.skofqq.boxy.configs.SingBoxOverrides.read()?.let { o ->
+                    runCatching { JSONObject(o).optJSONObject("experimental")?.optJSONObject("clash_api") }.getOrNull()
+                }
                 runCatching {
-                    val api = JSONObject(text).optJSONObject("experimental")?.optJSONObject("clash_api") ?: return null
-                    api.optString("external_controller") to api.optString("secret")
+                    val api = JSONObject(text).optJSONObject("experimental")?.optJSONObject("clash_api")
+                    if (api == null && ov == null) return null
+                    val addr = ov?.optString("external_controller")?.takeIf { it.isNotBlank() } ?: api?.optString("external_controller").orEmpty()
+                    val secret = ov?.optString("secret")?.takeIf { it.isNotBlank() } ?: api?.optString("secret").orEmpty()
+                    addr to secret
                 }.getOrNull() ?: return null
             }
             else -> {

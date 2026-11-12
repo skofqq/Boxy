@@ -959,4 +959,27 @@
     <string name="geo_source_hysteria">Hysteria 没有地理规则，不会为其下载任何内容。</string>
     <string name="geo_rule_mihomo_hint">mihomo 只读取一个 GeoSite.dat：Boxy 会将 %1$s 加前缀合并进去，并在每次地理库更新后重建。</string>
     <string name="geo_rule_build_failed">无法准备该分类：请先在 工具 → 更新 中更新地理数据库。</string>
+    <string name="singbox_overrides_title">覆盖配置的自定义设置</string>
+    <string name="singbox_overrides_sub">订阅更新后仍保留。此处的值优先；标签相同的入站、出站、DNS 服务器和规则集会替换配置中的原项。</string>
+    <string name="singbox_overrides_on">已启用 · 点按编辑</string>
+    <string name="singbox_overrides_create">未创建 · 点按创建</string>
+    <string name="sb_lint_title">过时的 sing-box 设置</string>
+    <string name="sb_lint_sub">已保存。以下设置已过时或在新版 sing-box 中已移除；点按可跳到对应行。</string>
+    <string name="sb_lint_line">第 %1$d 行 · 自 %2$s 起</string>
+    <string name="sb_lint_core">sing-box 自身的警告：</string>
+    <string name="sb_lint_geo">geosite / geoip 已在 sing-box 1.12 中移除。请改用规则集：编辑器中的“从地理库添加规则”可生成。</string>
+    <string name="sb_lint_inbound_sniff">入站的 sniff / domain_strategy 字段已改为路由规则动作（\"action\": \"sniff\" / \"resolve\"），并在 1.13 中移除。</string>
+    <string name="sb_lint_special_outbound">block / dns 出站已由规则动作（\"action\": \"reject\" / \"hijack-dns\"）取代，并在 1.13 中移除。</string>
+    <string name="sb_lint_dns_out">将 DNS 路由到 dns 出站：请在规则中改用 \"action\": \"hijack-dns\"。</string>
+    <string name="sb_lint_legacy_dns">使用 \"address\" 的 DNS 服务器是旧格式，1.12 起弃用，1.14 移除。请改用 \"type\" + \"server\"（如 \"type\": \"https\", \"server\": \"1.1.1.1\"）。</string>
+    <string name="sb_lint_legacy_fakeip">dns.fakeip 在 1.12 中改为 fakeip 类型的 DNS 服务器。</string>
+    <string name="sb_lint_wireguard_outbound">wireguard 出站自 1.11 起弃用：请使用 wireguard 端点（\"endpoints\"）。</string>
+    <string name="editor_sb_format">格式化</string>
+    <string name="editor_sb_compile">→ .srs</string>
+    <string name="editor_sb_compiled">已编译：%1$s</string>
+    <string name="sb_cache_title">sing-box 会忘记所选节点</string>
+    <string name="sb_cache_body">experimental.cache_file 已关闭，因此每次重启后选择器都会回到默认节点。</string>
+    <string name="sb_cache_enable">记住选择</string>
+    <string name="sb_cache_enable_sub">在自定义设置中开启 cache_file，订阅更新不会重置</string>
+    <string name="sb_lint_sub_failed">未保存：sing-box 拒绝了该配置。以下设置已被移除或更改；点按可跳到对应行。</string>
 </resources>

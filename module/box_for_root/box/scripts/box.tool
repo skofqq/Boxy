@@ -84,6 +84,11 @@ restart_box() {
   fi
 }
 
+# sing-box user overrides (sing-box/.overrides/*.json, see box.service): checked together with the config.
+sb_overrides() {
+  ls "${box_dir}/sing-box/.overrides"/*.json >/dev/null 2>&1 && echo "-C ${box_dir}/sing-box/.overrides"
+}
+
 # Check Configuration
 check() {
   # su -c /data/adb/box/scripts/box.tool rconf
@@ -91,7 +96,7 @@ check() {
 
   case "${bin_name}" in
     sing-box)
-      if ${bin_path} check -D "${box_dir}/${bin_name}" -c "${sing_config}" >/dev/null; then
+      if ${bin_path} check -D "${box_dir}/${bin_name}" -c "${sing_config}" $(sb_overrides) >/dev/null; then
         log Info "${sing_config} passed"
       else
         log Error "Configuration check failed for sing-box"
@@ -145,7 +150,7 @@ reload_singbox() {
     return 1
   fi
   "${scripts_dir}/box.service" prepare >/dev/null 2>&1
-  if ! timeout 60 "${bin_path}" check -D "${box_dir}/sing-box" -c "${sing_config}" > "${box_run}/check.log" 2>&1; then
+  if ! timeout 60 "${bin_path}" check -D "${box_dir}/sing-box" -c "${sing_config}" $(sb_overrides) > "${box_run}/check.log" 2>&1; then
     log Error "$(tail -n 5 "${box_run}/check.log" 2>/dev/null)"
     log Error "Configuration check failed, sing-box keeps the previous config"
     return 1
@@ -518,7 +523,7 @@ check_config() {
   [ -x "${bin}" ] || return 0
   case "${bin_name}" in
     clash) timeout 60 "${bin}" -t -d "${box_dir}/${bin_name}" -f "${file}" > "${box_run}/check.log" 2>&1 ;;
-    sing-box) timeout 60 "${bin}" check -D "${box_dir}/${bin_name}" -c "${file}" > "${box_run}/check.log" 2>&1 ;;
+    sing-box) timeout 60 "${bin}" check -D "${box_dir}/${bin_name}" -c "${file}" $(sb_overrides) > "${box_run}/check.log" 2>&1 ;;
     *) return 0 ;;
   esac
 }
@@ -983,7 +988,7 @@ kernel_test_config() {
   [ -f "${cfg}" ] || return 2
   case "${bin_name}" in
     clash) timeout 60 "${b}" -t -d "${box_dir}/clash" -f "${cfg}" > "${out}" 2>&1 ;;
-    sing-box) timeout 60 "${b}" check -D "${box_dir}/sing-box" -c "${cfg}" > "${out}" 2>&1 ;;
+    sing-box) timeout 60 "${b}" check -D "${box_dir}/sing-box" -c "${cfg}" $(sb_overrides) > "${out}" 2>&1 ;;
     xray) XRAY_LOCATION_ASSET="${box_dir}/xray" timeout 60 "${b}" -test -confdir "${box_dir}/xray" > "${out}" 2>&1 ;;
     v2fly) V2RAY_LOCATION_ASSET="${box_dir}/v2fly" timeout 60 "${b}" test -d "${box_dir}/v2fly" > "${out}" 2>&1 ;;
   esac || return 1

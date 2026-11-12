@@ -46,7 +46,7 @@ object CoreTools {
         Shell.cmd(
             // A subshell: "exit" in the shared root shell would close it.
             "(p=\$(cat $BOX/run/box.pid 2>/dev/null); [ -n \"\$p\" ] && kill -0 \"\$p\" 2>/dev/null || exit 1; " +
-                "timeout 60 $BOX/bin/sing-box check -D $BOX/sing-box -c ${q(cfg)} >/dev/null 2>&1 || exit 1; " +
+                "timeout 60 $BOX/bin/sing-box check -D $BOX/sing-box -c ${q(cfg)} ${ConfigCheck.OVERRIDES_ARG} >/dev/null 2>&1 || exit 1; " +
                 "kill -HUP \"\$p\" && sleep 1 && kill -0 \"\$p\")",
         ).exec().isSuccess
     }
@@ -64,7 +64,7 @@ object CoreTools {
         }
         val cmd = when (core) {
             "clash" -> "timeout 30 $BOX/bin/${choice.binary} -t -d $BOX/clash -f ${q(cfg)}"
-            "sing-box" -> "timeout 30 $BOX/bin/sing-box check -D $BOX/sing-box -c ${q(cfg)}"
+            "sing-box" -> "timeout 30 $BOX/bin/sing-box check -D $BOX/sing-box -c ${q(cfg)} ${ConfigCheck.OVERRIDES_ARG}"
             "xray" -> "XRAY_LOCATION_ASSET=$BOX/xray timeout 30 $BOX/bin/xray -test -confdir $BOX/xray"
             else -> "V2RAY_LOCATION_ASSET=$BOX/v2fly timeout 30 $BOX/bin/v2fly test -d $BOX/v2fly"
         }

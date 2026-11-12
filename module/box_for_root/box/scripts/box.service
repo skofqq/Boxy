@@ -190,6 +190,53 @@ box_check_bin() {
   # fi
 # }
 
+# sing-box user overrides: sing-box/.overrides/*.json, passed with -C. sing-box merges the files sorted by path and
+# the first one wins for plain values, so ".overrides" (sorted before config.json) wins over the subscription's
+# config; arrays are joined, so the config's items with a tag the overrides define are dropped (no duplicate tags).
+singbox_overrides="${box_dir}/sing-box/.overrides"
+singbox_extra_args() {
+  ls "${singbox_overrides}"/*.json >/dev/null 2>&1 && echo "-C ${singbox_overrides}"
+}
+
+singbox_dedupe() {
+  local f path t
+  ls "${singbox_overrides}"/*.json >/dev/null 2>&1 || return 0
+  for f in "${singbox_overrides}"/*.json; do
+    for path in .inbounds .outbounds .endpoints .dns.servers .route.rule_set; do
+      # yq does not read comments, which sing-box allows: whole-line // comments are dropped first.
+      sed -E 's#^[[:space:]]*//.*$##' "${f}" | ${yq} -p=json -r "(${path} // [])[] | .tag | select(. != null)" 2>/dev/null | while read -r t; do
+        [ -n "${t}" ] || continue
+        ${yq} -i -o=json "del(${path}[] | select(.tag == \"${t}\"))" "${sing_config}" 2>/dev/null \
+          && log Debug "[Overrides] ${t} from ${f##*/} replaces the config's own"
+      done
+    done
+  done
+}
+
+# An override's tproxy / redirect inbound must listen where iptables send the traffic: its port follows
+# settings.ini. yq cannot read comments, so a file that needs the change is rewritten without them.
+singbox_sync_override_port() {
+  local type="$1" port="$2" f tmp
+  ls "${singbox_overrides}"/*.json >/dev/null 2>&1 || return 0
+  for f in "${singbox_overrides}"/*.json; do
+    busybox grep -qE "\"type\" *: *\"${type}\"" "${f}" || continue
+    tmp="${f}.port.tmp"
+    sed -E 's#^[[:space:]]*//.*$##' "${f}" | ${yq} -p=json -o=json       "(.inbounds[] | select(.type == \"${type}\") | .listen_port) = ${port}" > "${tmp}" 2>/dev/null || { rm -f "${tmp}"; continue; }
+    if [ -s "${tmp}" ] && [ "$(sed -E 's#^[[:space:]]*//.*$##' "${f}" | ${yq} -p=json -o=json '.' 2>/dev/null)" != "$(cat "${tmp}")" ]; then
+      mv -f "${tmp}" "${f}"
+      log Warning "[Overrides] ${type} port in ${f##*/} set to ${port} (settings.ini)"
+    else
+      rm -f "${tmp}"
+    fi
+  done
+}
+
+# True when the config or an override already has an inbound of this type.
+singbox_has_inbound() {
+  busybox grep -q "\"type\": \"$1\"" "${sing_config}" && return 0
+  ls "${singbox_overrides}"/*.json >/dev/null 2>&1 && busybox grep -qE "\"type\" *: *\"$1\"" "${singbox_overrides}"/*.json
+}
+
 prepare_singbox() {
   dnscrypt_singbox
   # Check configuration file
@@ -218,6 +265,7 @@ prepare_singbox() {
   # On a reload the core still writes its own log, so the format output goes elsewhere (prep_log).
   local fmt_log="${prep_log:-${box_run}/${bin_name}.log}"
   if ${bin_path} format -w -D "${box_dir}/${bin_name}" -c "${sing_config}" > "${fmt_log}" 2>&1; then
+    singbox_dedupe
     # Set auto_route based on network_mode
     if [[ "${network_mode}" == @(mixed|tun) ]]; then
       # Check if "type" is "tun" in configuration
@@ -246,7 +294,7 @@ prepare_singbox() {
       sed -i 's/"auto_detect_interface": true/"auto_detect_interface": false/g' "${box_dir}/sing-box/"*.json
 
       # Check if "type" is "tproxy" in configuration
-      if ! busybox grep -q '"type": "tproxy"' "${sing_config}"; then
+      if ! singbox_has_inbound tproxy; then
         # Add "tproxy" configuration if missing
         ${yq} '.inbounds += [{
           "type": "tproxy",
@@ -262,10 +310,12 @@ prepare_singbox() {
 
       # Sync tproxy port in sing-box configuration
       for file in "${box_dir}/sing-box/"*.json; do
-        if busybox grep -q '"type": "tproxy"' "${file}"; then
+        [ -f "${file}" ] || continue
+        if busybox grep -qE '"type" *: *"tproxy"' "${file}"; then
           ${yq} '(.inbounds[] | select(.type == "tproxy") | .listen_port) = '"${tproxy_port}" -i --output-format=json "${file}"
         fi
       done
+      singbox_sync_override_port tproxy "${tproxy_port}"
     fi
 
     # add exclude_package/include_package for tun
@@ -281,7 +331,7 @@ prepare_singbox() {
 
     # Add "redirect" configuration based on network_mode
     if [[ "${network_mode}" == @(mixed|enhance|redirect) ]]; then
-      if ! busybox grep -q '"type": "redirect"' "${sing_config}"; then
+      if ! singbox_has_inbound redirect; then
         # Add "redirect" configuration if missing
         ${yq} '.inbounds += [{
           "type": "redirect",
@@ -294,10 +344,12 @@ prepare_singbox() {
 
       # Sync redir_port port in sing-box configuration
       for file in "${box_dir}/sing-box/"*.json; do
-        if busybox grep -q '"type": "redirect"' "${file}"; then
+        [ -f "${file}" ] || continue
+        if busybox grep -qE '"type" *: *"redirect"' "${file}"; then
           ${yq} '(.inbounds[] | select(.type == "redirect") | .listen_port) = '"${redir_port}" -i --output-format=json "${file}"
         fi
       done
+      singbox_sync_override_port redirect "${redir_port}"
     fi
   else
     log Error "$(<"${fmt_log}")"
@@ -596,8 +648,8 @@ box_run_bin() {
       ;;
     sing-box)
       prepare_singbox
-      if ${bin_path} check -D "${box_dir}/${bin_name}" -c "${sing_config}" > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -D "${box_dir}/${bin_name}" -c "${sing_config}" > "${bin_log}" 2>&1 &
+      if ${bin_path} check -D "${box_dir}/${bin_name}" -c "${sing_config}" $(singbox_extra_args) > "${box_run}/${bin_name}.log" 2>&1; then
+        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -D "${box_dir}/${bin_name}" -c "${sing_config}" $(singbox_extra_args) > "${bin_log}" 2>&1 &
         PID=$!
         echo -n $PID > "${box_pid}"
         sleep 0.2

@@ -959,4 +959,27 @@
     <string name="geo_source_hysteria">Hysteria\'nın coğrafi kuralı yok: onun için hiçbir şey indirilmez.</string>
     <string name="geo_rule_mihomo_hint">mihomo tek bir GeoSite.dat okur: Boxy %1$s kaynağını önekle birleştirir ve her coğrafi güncellemeden sonra yeniden oluşturur.</string>
     <string name="geo_rule_build_failed">Kategori hazırlanamadı: önce coğrafi veritabanlarını Araçlar → Güncelleme\'den güncelleyin.</string>
+    <string name="singbox_overrides_title">Yapılandırmanın üstüne kendi ayarlarınız</string>
+    <string name="singbox_overrides_sub">Abonelik güncellemelerinde korunur. Buradaki değerler geçerlidir; aynı etiketli inbound, outbound, DNS sunucuları ve kural setleri yapılandırmadakilerin yerine geçer.</string>
+    <string name="singbox_overrides_on">Açık · düzenlemek için dokunun</string>
+    <string name="singbox_overrides_create">Oluşturulmadı · oluşturmak için dokunun</string>
+    <string name="sb_lint_title">Eskimiş sing-box ayarları</string>
+    <string name="sb_lint_sub">Kaydedildi. Bu ayarlar eskimiş ya da yeni sing-box sürümlerinde kaldırılmış; satıra gitmek için dokunun.</string>
+    <string name="sb_lint_line">Satır %1$d · %2$s sürümünden beri</string>
+    <string name="sb_lint_core">sing-box\'ın kendi uyarısı:</string>
+    <string name="sb_lint_geo">geosite / geoip sing-box 1.12\'de kaldırıldı. Kural setleri kullanın: düzenleyicideki «Coğrafi veritabanından kural» bunları oluşturur.</string>
+    <string name="sb_lint_inbound_sniff">Inbound sniff / domain_strategy alanları rota kuralı eylemlerine («action»: «sniff» / «resolve») taşındı ve 1.13\'te kaldırıldı.</string>
+    <string name="sb_lint_special_outbound">block / dns outbound\'ları kural eylemleriyle («action»: «reject» / «hijack-dns») değiştirildi ve 1.13\'te kaldırıldı.</string>
+    <string name="sb_lint_dns_out">DNS\'i dns outbound\'una yönlendirme: kuralda «action»: «hijack-dns» kullanın.</string>
+    <string name="sb_lint_legacy_dns">«address» içeren DNS sunucusu: eski biçim, 1.12\'de eskidi ve 1.14\'te kaldırıldı. «type» + «server» kullanın (ör. «type»: «https», «server»: «1.1.1.1»).</string>
+    <string name="sb_lint_legacy_fakeip">dns.fakeip 1.12\'de fakeip türünde bir DNS sunucusuna taşındı.</string>
+    <string name="sb_lint_wireguard_outbound">wireguard outbound\'u 1.11\'den beri eskidi: wireguard endpoint («endpoints») kullanın.</string>
+    <string name="editor_sb_format">Biçimlendir</string>
+    <string name="editor_sb_compile">→ .srs</string>
+    <string name="editor_sb_compiled">Derlendi: %1$s</string>
+    <string name="sb_cache_title">sing-box seçilen düğümü unutuyor</string>
+    <string name="sb_cache_body">experimental.cache_file kapalı, bu yüzden her yeniden başlatmada seçicilerde varsayılan düğüme dönülüyor.</string>
+    <string name="sb_cache_enable">Seçimi hatırla</string>
+    <string name="sb_cache_enable_sub">cache_file\'ı kendi ayarlarınızda açar; abonelik güncellemesi bunu geri almaz</string>
+    <string name="sb_lint_sub_failed">Kaydedilmedi: sing-box yapılandırmayı reddediyor. Bu ayarlar kaldırıldı veya değişti; satıra gitmek için dokunun.</string>
 </resources>
