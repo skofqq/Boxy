@@ -31,7 +31,9 @@ Languages: English, Русский, Українська, Беларуская, 
 
 **Home**
 - Service status with Start / Stop / Restart, uptime, service details (PID, core version, memory, CPU, affinity) and config reload; DNSCrypt status
-- Switch core (incl. Clash Mihomo / Premium), network mode and IPv6 on Home and in Settings → Module; a running service is restarted automatically
+- Switch core (Mihomo, Sing-box, Xray, Hysteria), network mode and IPv6 on Home and in Settings → Module; the core and its config are checked before the switch, a running service is restarted automatically
+- Clear start-failure reasons for every core (port in use, auth error, server unreachable, TLS / REALITY, missing geo file, config error) with the core's own output
+- V2Ray and Clash Premium are retired: a device still running one gets a card with the way out (Move to Xray, switch to Mihomo)
 - Panel and Logs shortcuts, SubStore shortcut when the `sub_store` module is installed
 - Latency to three configurable targets
 - IP card (LAN or public WAN with country flag), public IPv4/IPv6 details
@@ -48,11 +50,24 @@ Languages: English, Русский, Українська, Беларуская, 
 **Tools**
 - Config: choose the active config of the current core, file manager for `/data/adb/box`
   (search, create, rename, delete, download by URL) and a code editor with search
+- Editor: key completion for mihomo, sing-box and Xray; "Rule from the geo base" picker (search or A–Z list of GeoSite / GeoIP
+  categories from the local files, source badges, inserted in the core's syntax); outdated / removed settings of sing-box and Xray
+  listed with go-to-line; sing-box Format and rule-set compile to `.srs`
+- Geo databases: several sources at once (MetaCubeX, runetfreedom, Loyalsoldier, v2fly, itdoginfo) with their download size; one is
+  primary, the others are prefixed (`rf-ru-blocked`): mihomo gets one merged `GeoSite.dat`, Xray reads `ext:` files, sing-box gets
+  local rule sets compiled from the categories it uses
+- sing-box: reload without restart (SIGHUP), subscription quota, "Your settings over the config" (an overrides file that survives
+  subscription updates), cache_file hint, "Detect apps" switch (also for mihomo)
+- Xray: subscriptions from share links (vless, vmess, trojan, ss, hysteria2) into outbounds with a leastPing balancer, checked before
+  they apply; TLS / REALITY check (`xray tls ping`); Move to Xray for V2Ray users
+- Hysteria: profiles from `hysteria2://` links or QR codes with quick switch, a form editor (server, port hopping, auth, Salamander,
+  SNI, pinSHA256, bandwidth), speed test into bandwidth, config check
+- Core updates check the current config with the new core first and keep the old one if it does not accept it
 - Config check: the core tests a file (`mihomo -t`, `sing-box check`, …) before it is selected or saved, and shows the error line
 - Subscription import: QR code (camera or picture), pasted link, `clash://install-config` and `sing-box://import-remote-profile` links
 - DNS: DNS hijack switch; optional DNSCrypt with dnscrypt-proxy as the core's upstream DNS, download, on / off, server list with filters and latency sorting, config editor and a check of which resolver websites see
 - Network control: Wi‑Fi rules, SSID / BSSID lists with nearby Wi‑Fi scan, proxy on/off for hotspot clients, hotspot client MAC filter, SIM operator rules
-- Update: cores (Mihomo, Sing-box, Xray, V2Ray, Hysteria), subscription, web UI with live output
+- Update: cores (Mihomo, Sing-box, Xray, Hysteria), subscription, geo databases, web UI with live output
 - Subscription settings: URLs, provider files, interval, crontab
 - Logs: module log files with auto refresh, colour highlighting, search, level filter and sharing
 - Traffic statistics: proxy traffic by day and by month (Clash API)
@@ -61,6 +76,7 @@ Languages: English, Русский, Українська, Беларуская, 
 **Panel**
 - Core web UI (Zashboard or MetaCubeXD, switchable), custom panels, SubStore, cache cleaning
 - Built-in native panel in the style of Zashboard: proxy groups and providers with delay tests and routing mode, live connections, the core log, rules with switches and rule sets, core settings and updates
+- Xray panel (from Xray's metrics): outbounds with alive / delay and traffic, speed, balancer switch without restart (`xray api bo`), access log viewer; the needed blocks go into a file of their own
 
 **Settings**
 - Theme (light, dark, system, Material You), true black, language picker with flags
