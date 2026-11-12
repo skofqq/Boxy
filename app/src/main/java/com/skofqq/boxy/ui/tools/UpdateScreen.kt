@@ -44,6 +44,7 @@ import com.skofqq.boxy.R
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.root.RootTask
+import com.skofqq.boxy.root.CoreTools
 import com.skofqq.boxy.ui.components.addTaskLine
 import com.skofqq.boxy.ui.components.BoxySheet
 import com.skofqq.boxy.ui.components.SectionCard
@@ -71,6 +72,8 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     var coreSheet by remember { mutableStateOf(false) }
     var dashboardSheet by remember { mutableStateOf(false) }
+    var geoSheet by remember { mutableStateOf(false) }
+    var geoLabel by remember { mutableStateOf("MetaCubeX") }
     var smartSupported by remember { mutableStateOf(false) }
     var taskTitle by remember { mutableStateOf<String?>(null) }
     val taskLines = remember { mutableStateListOf<String>() }
@@ -79,14 +82,23 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
 
     LaunchedEffect(Unit) {
         smartSupported = BoxModule.exec("grep -q 'smart' ${BoxModule.SCRIPTS}/box.tool").first
+        CoreTools.geoSources().let { (p, e) -> geoLabel = geoSourcesLabel(p, e) }
     }
 
+    val keptOld = stringResource(R.string.update_core_kept_old)
     fun launchTask(title: String, cmd: String) {
         taskTitle = title
         taskLines.clear()
         taskDone = false
         scope.launch {
             val ok = RootTask.run(cmd) { line -> taskLines.addTaskLine(line) }
+            // box.tool upkernel tested the current config with the new core and kept the old one.
+            val i = taskLines.indexOfFirst { "KERNEL_CHECK_FAILED" in it }
+            if (i >= 0) {
+                val reason = taskLines.getOrNull(i + 1)?.substringAfter("]:")?.trim().orEmpty()
+                taskLines.add("⚠ $keptOld")
+                if (reason.isNotEmpty()) taskLines.add(reason)
+            }
             taskOk = ok
             taskDone = true
         }
@@ -94,6 +106,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
 
     val subsTitle = stringResource(R.string.update_target_subscription)
     val webuiTitle = stringResource(R.string.update_target_webui)
+    val geoTitle = stringResource(R.string.update_target_geo)
 
     PinnedLazyPage(contentPadding, header = {
 SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.tools_update_sub), onBack)
@@ -107,6 +120,7 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
                     launchTask(subsTitle, "${BoxModule.SCRIPTS}/box.tool subs")
                 }
                 UpdateRow(BoxyIcons.Language, webuiTitle, stringResource(R.string.update_webui_sub)) { dashboardSheet = true }
+                UpdateRow(BoxyIcons.Shield, geoTitle, stringResource(R.string.update_geo_sub, geoLabel)) { geoSheet = true }
             }
         }
     }
@@ -135,6 +149,17 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
 
     if (dashboardSheet) com.skofqq.boxy.ui.panel.DashboardSheet(onDismiss = { dashboardSheet = false })
 
+    if (geoSheet) {
+        GeoSourcesSheet(
+            onChanged = { p, e -> geoLabel = geoSourcesLabel(p, e) },
+            onUpdate = {
+                geoSheet = false
+                launchTask(geoTitle, geoUpdateScript())
+            },
+            onDismiss = { geoSheet = false },
+        )
+    }
+
     taskTitle?.let { title ->
         com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null }
     }
@@ -153,6 +178,18 @@ private fun coreUpdateScript(t: CoreTarget): String {
         ${BoxModule.SCRIPTS}/box.tool upkernel; rc=${'$'}?
         [ -n "${'$'}ob" ] && sed -i "s/^bin_name=.*/${'$'}ob/" $s
         [ -n "${'$'}ox" ] && sed -i "s/^xclash_option=.*/${'$'}ox/" $s
+        (exit ${'$'}rc)
+    """.trimIndent()
+}
+
+/** box.tool geox only downloads with update_geo="true": it is set for this run and put back afterwards. */
+private fun geoUpdateScript(): String {
+    val s = BoxModule.SETTINGS
+    return """
+        og=${'$'}(grep -m1 '^update_geo=' $s)
+        sed -i 's/^update_geo=.*/update_geo="true"/' $s
+        ${BoxModule.SCRIPTS}/box.tool geox; rc=${'$'}?
+        [ -n "${'$'}og" ] && sed -i "s/^update_geo=.*/${'$'}og/" $s
         (exit ${'$'}rc)
     """.trimIndent()
 }

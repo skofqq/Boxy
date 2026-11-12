@@ -173,7 +173,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
                 // sing-box's clash_api has no reload, restart, GEO databases or DNS cache: the module reloads and
                 // restarts it, and the rest is left out.
                 ActionRow(BoxyIcons.Refresh, stringResource(R.string.panel_settings_reload), stringResource(R.string.panel_settings_reload_sub), busy["reload"] == true) {
-                    run("reload") { (a != null && core.mihomo && Net.clashReload(a)) || BoxModule.reloadConfig() }
+                    run("reload") { (a != null && core.mihomo && Net.clashReload(a)) || BoxModule.reloadConfig(core.core) }
                 }
                 ActionRow(BoxyIcons.Power, stringResource(R.string.panel_settings_restart), stringResource(R.string.panel_settings_restart_sub), busy["restart"] == true) {
                     confirmRestart = true

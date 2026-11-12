@@ -188,15 +188,13 @@ private fun EnvironmentCard(env: Environment, onRetry: () -> Unit) {
  */
 @Composable
 private fun StartFailedDialog(error: String, onLogs: () -> Unit, onDismiss: () -> Unit) {
-    val missingCore = Regex("kernel .* is missing", RegexOption.IGNORE_CASE).containsMatchIn(error) ||
-        Regex("not executable|file not found|No such file", RegexOption.IGNORE_CASE).containsMatchIn(error) &&
+    val missingCore = Regex("not executable|file not found|No such file", RegexOption.IGNORE_CASE).containsMatchIn(error) &&
         error.contains("/bin/")
+    val reason = if (missingCore) com.skofqq.boxy.root.StartFailure.NO_KERNEL else com.skofqq.boxy.root.StartFailure.of(error)
     com.skofqq.boxy.ui.components.ProblemDialog(
         icon = com.skofqq.boxy.ui.theme.BoxyIcons.Power,
         title = androidx.compose.ui.res.stringResource(com.skofqq.boxy.R.string.start_failed_title),
-        message = androidx.compose.ui.res.stringResource(
-            if (missingCore) com.skofqq.boxy.R.string.start_failed_core_missing else com.skofqq.boxy.R.string.start_failed_body,
-        ),
+        message = androidx.compose.ui.res.stringResource(reason.message),
         details = error,
         action = androidx.compose.ui.res.stringResource(com.skofqq.boxy.R.string.start_failed_logs),
         onAction = onLogs,

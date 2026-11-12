@@ -215,7 +215,9 @@ prepare_singbox() {
   ${yq} '(.inbounds[] | select(.type == "tun") | .auto_route) |= true' -i --output-format=json "${sing_config}"
 
   # Format sing-box configuration
-  if ${bin_path} format -w -D "${box_dir}/${bin_name}" -c "${sing_config}" > "${box_run}/${bin_name}.log" 2>&1; then
+  # On a reload the core still writes its own log, so the format output goes elsewhere (prep_log).
+  local fmt_log="${prep_log:-${box_run}/${bin_name}.log}"
+  if ${bin_path} format -w -D "${box_dir}/${bin_name}" -c "${sing_config}" > "${fmt_log}" 2>&1; then
     # Set auto_route based on network_mode
     if [[ "${network_mode}" == @(mixed|tun) ]]; then
       # Check if "type" is "tun" in configuration
@@ -298,8 +300,8 @@ prepare_singbox() {
       done
     fi
   else
-    log Error "$(<"${box_run}/${bin_name}.log")"
-    log Error "Configuration failed. Please check the ${box_run}/${bin_name}.log file."
+    log Error "$(<"${fmt_log}")"
+    log Error "Configuration failed. Please check the ${fmt_log} file."
     exit 1
   fi
 }
@@ -1025,6 +1027,14 @@ case "$1" in
     "${scripts_dir}/box.iptables" disable && stop_box
     start_box && "${scripts_dir}/box.iptables" renew
     notify_state
+    ;;
+  prepare)
+    # The module's edits that start applies to the config (sing-box: inbounds, ports, dnscrypt), without
+    # starting anything. box.tool reload runs it before the running core re-reads the config.
+    if [ "${bin_name}" = "sing-box" ]; then
+      prep_log="${box_run}/check.log"
+      prepare_singbox
+    fi
     ;;
   status)
     if busybox pidof "${bin_name}" >/dev/null; then

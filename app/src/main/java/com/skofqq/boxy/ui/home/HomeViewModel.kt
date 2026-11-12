@@ -289,8 +289,10 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
 
     fun reloadConfig() {
         viewModelScope.launch {
-            val api = Net.clashApi(state?.core)
-            val ok = (api != null && Net.clashReload(api)) || BoxModule.reloadConfig()
+            val core = state?.core
+            // Only mihomo reloads through the API: sing-box answers the same call without doing anything.
+            val api = if (core == "clash") Net.clashApi(core) else null
+            val ok = (api != null && Net.clashReload(api)) || BoxModule.reloadConfig(core)
             message = if (ok) com.skofqq.boxy.R.string.home_reload_success else com.skofqq.boxy.R.string.home_reload_failed
         }
     }

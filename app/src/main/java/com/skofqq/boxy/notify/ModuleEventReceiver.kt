@@ -15,6 +15,7 @@ import com.skofqq.boxy.BoxyApp
 import com.skofqq.boxy.MainActivity
 import com.skofqq.boxy.R
 import com.skofqq.boxy.util.withAppLocale
+import kotlinx.coroutines.launch
 
 /**
  * Events sent by the module with `am broadcast` as root (box.service notify_state, box.tool
@@ -25,6 +26,24 @@ class ModuleEventReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_STATE_CHANGED) {
             // The service started or stopped: notification, tile and widgets follow at once.
             com.skofqq.boxy.service.BoxControl.changed(context)
+            return
+        }
+        if (intent.action == ACTION_GEO_UPDATED) {
+            // box.tool geox downloaded new geo files: rebuild mihomo's merged GeoSite.dat / GeoIP.dat or sing-box's
+            // rule sets from them, then let the running core re-read them. Only on this event, no polling.
+            val core = intent.getStringExtra("core") ?: return
+            val pending = goAsync()
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                try {
+                    val changed = com.skofqq.boxy.configs.GeoRuleSets.rebuild(core)
+                    val state = runCatching { com.skofqq.boxy.root.BoxModule.state() }.getOrNull()
+                    if (changed && state?.running == true && com.skofqq.boxy.root.BoxModule.unquote(state.core) == core) {
+                        com.skofqq.boxy.root.BoxModule.reloadConfig(core)
+                    }
+                } finally {
+                    pending.finish()
+                }
+            }
             return
         }
         if (intent.action != ACTION_SUBS_FAILED) return
@@ -62,6 +81,7 @@ class ModuleEventReceiver : BroadcastReceiver() {
     companion object {
         const val ACTION_SUBS_FAILED = "com.skofqq.boxy.action.SUBS_FAILED"
         const val ACTION_STATE_CHANGED = "com.skofqq.boxy.action.STATE_CHANGED"
+        const val ACTION_GEO_UPDATED = "com.skofqq.boxy.action.GEO_UPDATED"
         const val CHANNEL_ID = "module_events"
         private const val NOTIFICATION_ID = 2
 

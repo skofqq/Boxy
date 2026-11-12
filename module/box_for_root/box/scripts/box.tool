@@ -134,12 +134,43 @@ check() {
   esac
 }
 
+# sing-box re-reads its config on SIGHUP (cmd run: check, then a new instance in the same process).
+# The module's own edits (tproxy / redirect inbound, ports, dnscrypt) are applied first, like at start,
+# and iptables stay as they are. A config that fails the check is not sent to the core.
+reload_singbox() {
+  local pid
+  pid="$(cat "${box_pid}" 2>/dev/null)"
+  if [ -z "${pid}" ] || ! kill -0 "${pid}" 2>/dev/null; then
+    log Error "sing-box is not running"
+    return 1
+  fi
+  "${scripts_dir}/box.service" prepare >/dev/null 2>&1
+  if ! timeout 60 "${bin_path}" check -D "${box_dir}/sing-box" -c "${sing_config}" > "${box_run}/check.log" 2>&1; then
+    log Error "$(tail -n 5 "${box_run}/check.log" 2>/dev/null)"
+    log Error "Configuration check failed, sing-box keeps the previous config"
+    return 1
+  fi
+  kill -HUP "${pid}" || { log Error "Failed to signal sing-box (PID ${pid})"; return 1; }
+  sleep 1
+  if kill -0 "${pid}" 2>/dev/null; then
+    log Info "sing-box configuration reloaded (SIGHUP, PID ${pid})"
+  else
+    log Error "sing-box exited after reload, see ${bin_log}"
+    return 1
+  fi
+}
+
 # reload base config
 reload() {
+  if [ "${bin_name}" = "sing-box" ]; then
+    reload_singbox
+    return $?
+  fi
+
   curl_command="curl"
 
   # Pastikan curl tersedia
-  if ! command -v curl >/dev/null; then
+  if [ "${bin_name}" = "clash" ] && ! command -v curl >/dev/null; then
     if [ ! -x "${bin_dir}/curl" ]; then
       log Debug "${bin_dir}/curl not found, downloading..."
       upcurl || { log Error "Failed to install curl"; return 1; }
@@ -154,8 +185,8 @@ reload() {
   fi
 
   case "${bin_name}" in
-    clash|sing-box)
-      if [ "${bin_name}" = "clash" ] && [ "${xclash_option}" = "mihomo" ]; then
+    clash)
+      if [ "${xclash_option}" = "mihomo" ]; then
         endpoint="http://${ip_port}/configs?force=true"
       else
         endpoint="http://${ip_port}/configs"
@@ -200,7 +231,7 @@ upcurl() {
     "aarch64") arch="aarch64" ;;
     "armv7l"|"armv8l") arch="armv7" ;;
     "i686")    arch="i686" ;;
-    "x86_64")  arch="amd64" ;;
+    "x86_64")  arch="x86_64" ;;
     *)
       log Warning "Unsupported architecture: $(uname -m)"
       return 1
@@ -221,7 +252,7 @@ upcurl() {
   # Fetch latest version from GitHub
   log Info "Fetching latest static-curl version..."
   local latest_version=$($rev1 "https://api.github.com/repos/stunnel/static-curl/releases" \
-    | grep "tag_name" | busybox grep -oE "[0-9.]*" | head -1)
+    | grep "tag_name" | busybox grep -oE "[0-9][0-9.]*(-[0-9]+)?" | head -1)
 
   if [ -z "$latest_version" ]; then
     log Error "Failed to retrieve latest static-curl version."
@@ -230,7 +261,7 @@ upcurl() {
   log Info "Latest curl version: ${latest_version}"
 
   # Download
-  local download_link="https://github.com/stunnel/static-curl/releases/download/${latest_version}/curl-linux-${arch}-glibc-${latest_version}.tar.xz"
+  local download_link="https://github.com/stunnel/static-curl/releases/download/${latest_version}/curl-linux-${arch}-musl-${latest_version}.tar.xz"
   log Info "Downloading from: ${download_link}"
   if ! upfile "${bin_dir}/curl.tar.xz" "${download_link}"; then
     log Error "Failed to download curl binary."
@@ -316,66 +347,156 @@ upyq() {
   log Info "yq update process completed."
 }
 
+# GeoIP / GeoSite sources. Each source is a geosite.dat + geoip.dat pair (some publish only geosite).
+# settings.ini: geo_source = the primary source, which fills the core's own files (GEOSITE / geosite: rules);
+# geo_extra = more sources, kept next to them as geosite_<src>.dat / geoip_<src>.dat:
+#   xray / v2fly read them as ext:geosite_<src>.dat:<category>;
+#   mihomo reads one GeoSite.dat / GeoIP.dat: Boxy merges the pairs into them, extra sources' categories
+#   prefixed with the source (rf-ru-blocked);
+#   sing-box cannot read .dat at all: Boxy compiles the categories a config uses into rule sets (geo-rules/).
+# Boxy rebuilds both when the module tells it the files changed. mihomo with extra sources and sing-box 1.12+
+# keep the primary source as a pair too.
+geo_src_url() {
+  # geo_src_url <source> <geosite|geoip|mmdb> -> URL, empty when the source does not publish it
+  local mc="https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download"
+  local rf="https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download"
+  local ls="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download"
+  case "$1:$2" in
+    metacubex:geosite) echo "${mc}/geosite.dat" ;;
+    metacubex:geoip) echo "${mc}/geoip-lite.dat" ;;
+    metacubex:mmdb) echo "${mc}/country-lite.mmdb" ;;
+    runetfreedom:geosite) echo "${rf}/geosite.dat" ;;
+    runetfreedom:geoip) echo "${rf}/geoip.dat" ;;
+    runetfreedom:mmdb) echo "https://github.com/runetfreedom/russia-blocked-geoip/releases/latest/download/Country.mmdb" ;;
+    loyalsoldier:geosite) echo "${ls}/geosite.dat" ;;
+    loyalsoldier:geoip) echo "${ls}/geoip.dat" ;;
+    loyalsoldier:mmdb) echo "https://github.com/Loyalsoldier/geoip/releases/latest/download/Country.mmdb" ;;
+    v2fly:geosite) echo "https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat" ;;
+    itdoginfo:geosite) echo "https://github.com/itdoginfo/allow-domains/releases/latest/download/geosite.dat" ;;
+  esac
+}
+
+# Downloads $2 into $1 unless the published .sha256sum says the local file is already current.
+geo_fetch() {
+  local file="$1" url="$2" remote local_sum
+  if [ -s "${file}" ]; then
+    remote=$($rev1 "${url}.sha256sum" 2>/dev/null | busybox awk '{print $1}' | head -n 1)
+    local_sum=$(sha256sum "${file}" 2>/dev/null | busybox awk '{print $1}')
+    if [ -n "${remote}" ] && [ "${#remote}" -eq 64 ] && [ "${remote}" = "${local_sum}" ]; then
+      log Info "${file##*/} is up to date"
+      return 0
+    fi
+  fi
+  log Info "Downloading ${url}"
+  if upfile "${file}" "${url}" && [ -s "${file}" ]; then
+    rm -f "${file}.bak"
+    # Sources without a .sha256sum are downloaded every time: only a different file counts as a change.
+    if [ -n "${local_sum}" ] && [ "$(sha256sum "${file}" | busybox awk '{print $1}')" = "${local_sum}" ]; then
+      log Info "${file##*/} is unchanged"
+      return 0
+    fi
+    geo_changed=true
+    log Info "${file##*/} updated"
+    return 0
+  fi
+  log Error "Failed to download ${url}"
+  return 1
+}
+
+# sing-box version as "major minor" (e.g. "1 12"), empty when the binary is missing.
+singbox_version() {
+  [ -x "${bin_dir}/sing-box" ] || return 1
+  "${bin_dir}/sing-box" version 2>/dev/null | head -n 1 | busybox grep -oE '[0-9]+\.[0-9]+' | head -n 1 | tr '.' ' '
+}
+
+# Tells Boxy that geo files changed, so it rebuilds the rule sets extracted from them.
+notify_geo_updated() {
+  am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.GEO_UPDATED \
+    -n com.skofqq.boxy/.notify.ModuleEventReceiver --es core "${bin_name}" >/dev/null 2>&1 &
+}
+
 # Check and update geoip and geosite
 upgeox() {
   # su -c /data/adb/box/scripts/box.tool geox
-  geodata_mode=$(busybox awk '!/^ *#/ && /geodata-mode:*./{print $2}' "${clash_config}")
-  [ -z "${geodata_mode}" ] && geodata_mode=false
+  local primary="${geo_source:-metacubex}" dir="${box_dir}/${bin_name}" pair_primary=false failed=false src url v
+  [ -n "$(geo_src_url "${primary}" geosite)" ] || primary=metacubex
+  geo_changed=false
 
-  case "${bin_name}" in
-    clash)
-      if [[ "${xclash_option}" == "premium" || "${geodata_mode}" == "false" ]]; then
-        geoip_file="${box_dir}/clash/Country.mmdb"
-        geoip_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/country-lite.mmdb"
-      else
-        geoip_file="${box_dir}/clash/GeoIP.dat"
-        geoip_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geoip-lite.dat"
-      fi
-      geosite_file="${box_dir}/clash/GeoSite.dat"
-      geosite_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geosite.dat"
-      ;;
-    sing-box)
-      geoip_file="${box_dir}/sing-box/geoip.db"
-      geoip_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geoip-lite.db"
-      geosite_file="${box_dir}/sing-box/geosite.db"
-      geosite_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geosite.db"
-      ;;
-    *)
-      geoip_file="${box_dir}/${bin_name}/geoip.dat"
-      geoip_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geoip-lite.dat"
-      geosite_file="${box_dir}/${bin_name}/geosite.dat"
-      geosite_url="https://github.com/MetaCubeX/meta-rules-dat/raw/release/geosite.dat"
-      ;;
-  esac
-
-  if [ "${update_geo}" = "true" ]; then
-    log Info "${bin_name} daily updates GeoX → $(date)"
-
-    log Info "Downloading GeoIP file from: ${geoip_url}"
-    if upfile "${geoip_file}" "${geoip_url}"; then
-      log Info "GeoIP file updated: ${geoip_file}"
-    else
-      log Error "Failed to download GeoIP file."
-      return 1
-    fi
-
-    log Info "Downloading GeoSite file from: ${geosite_url}"
-    if upfile "${geosite_file}" "${geosite_url}"; then
-      log Info "GeoSite file updated: ${geosite_file}"
-    else
-      log Error "Failed to download GeoSite file."
-      return 1
-    fi
-
-    log Info "Cleaning old backup files..."
-    find "${box_dir}/${bin_name}" -maxdepth 1 -type f \( -name "*.db.bak" -o -name "*.dat.bak" -o -name "*.mmdb.bak" \) -delete >/dev/null
-
-    log Info "${bin_name} GeoX update completed → $(date)"
+  if [ "${bin_name}" = "hysteria" ]; then
+    # hysteria has no geo rules: nothing to download.
+    log Info "hysteria does not use GeoIP / GeoSite files, skipping."
+    geo_skipped=true
     return 0
-  else
+  fi
+  if [ "${update_geo}" != "true" ]; then
     log Info "Geo update disabled, skipping."
     return 1
   fi
+  log Info "${bin_name} GeoX update → $(date), sources: ${primary} ${geo_extra[*]}"
+
+  case "${bin_name}" in
+    sing-box)
+      v=$(singbox_version)
+      if [ -n "${v}" ] && { [ "${v% *}" -gt 1 ] || [ "${v#* }" -ge 12 ]; }; then
+        # geoip.db / geosite.db were removed in sing-box 1.12; rules come from rule sets Boxy builds.
+        pair_primary=true
+      else
+        geo_fetch "${dir}/geoip.db" "https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/geoip-lite.db" || failed=true
+        geo_fetch "${dir}/geosite.db" "https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/geosite.db" || failed=true
+      fi
+      ;;
+    clash)
+      local geodata_mode
+      geodata_mode=$(busybox awk '!/^ *#/ && /geodata-mode:*./{print $2}' "${clash_config}")
+      if [[ "${xclash_option}" == "premium" || "${geodata_mode:-false}" == "false" ]]; then
+        url=$(geo_src_url "${primary}" mmdb)
+        geo_fetch "${dir}/Country.mmdb" "${url:-$(geo_src_url metacubex mmdb)}" || failed=true
+      fi
+      if [ -n "${geo_extra[*]}" ]; then
+        # mihomo reads one GeoSite.dat / GeoIP.dat: Boxy merges the pairs into them (extra sources' categories
+        # get the source's prefix, e.g. rf-ru-blocked), so the primary source is kept as a pair as well.
+        pair_primary=true
+      else
+        if [[ "${xclash_option}" != "premium" && "${geodata_mode:-false}" != "false" ]]; then
+          url=$(geo_src_url "${primary}" geoip)
+          geo_fetch "${dir}/GeoIP.dat" "${url:-$(geo_src_url metacubex geoip)}" || failed=true
+        fi
+        geo_fetch "${dir}/GeoSite.dat" "$(geo_src_url "${primary}" geosite)" || failed=true
+      fi
+      ;;
+    *)
+      url=$(geo_src_url "${primary}" geoip)
+      geo_fetch "${dir}/geoip.dat" "${url:-$(geo_src_url metacubex geoip)}" || failed=true
+      geo_fetch "${dir}/geosite.dat" "$(geo_src_url "${primary}" geosite)" || failed=true
+      ;;
+  esac
+
+  # The pairs: extra sources, plus the primary one for sing-box 1.12+.
+  local pairs="${geo_extra[*]}"
+  [ "${pair_primary}" = "true" ] && pairs="${primary} ${pairs}"
+  for src in $(echo ${pairs} | tr ' ' '\n' | busybox awk '!seen[$0]++'); do
+    [ "${src}" = "${primary}" ] && [ "${pair_primary}" != "true" ] && continue
+    url=$(geo_src_url "${src}" geosite)
+    if [ -z "${url}" ]; then
+      log Warning "Unknown geo source: ${src}"
+      continue
+    fi
+    geo_fetch "${dir}/geosite_${src}.dat" "${url}" || failed=true
+    url=$(geo_src_url "${src}" geoip)
+    # A primary source without GeoIP (v2fly, itdoginfo) gets MetaCubeX's, as the core's own file would.
+    [ -z "${url}" ] && [ "${src}" = "${primary}" ] && url=$(geo_src_url metacubex geoip)
+    [ -n "${url}" ] && { geo_fetch "${dir}/geoip_${src}.dat" "${url}" || failed=true; }
+  done
+
+  find "${dir}" -maxdepth 1 -type f \( -name "*.db.bak" -o -name "*.dat.bak" -o -name "*.mmdb.bak" \) -delete >/dev/null 2>&1
+  [ "${geo_changed}" = "true" ] && notify_geo_updated
+  if [ "${failed}" = "true" ]; then
+    log Error "${bin_name} GeoX update finished with errors → $(date)"
+    return 1
+  fi
+  [ "${geo_changed}" = "true" ] || geo_skipped=true
+  log Info "${bin_name} GeoX update completed → $(date)"
+  return 0
 }
 
 # Tells Boxy that a subscription update failed, so it can show a notification (it can be turned off in the app).
@@ -550,12 +671,10 @@ upsubs() {
               rollback_config "${update_file_name}"
               return 1
             fi
-            if [ -f "${box_pid}" ]; then
-              kill -0 "$(<"${box_pid}" 2>/dev/null)" && \
-              $scripts_dir/box.service restart 2>/dev/null
-            fi
+            rm -f "${update_file_name}.bak"
+            # The caller (box.tool subs) reloads the running core with SIGHUP, no restart needed.
             log Info "${bin_name} subscription update completed → $(date)"
-            exit 0
+            return 0
           else
             log Error "update subscription failed"
             notify_subs_failed download ""
@@ -656,6 +775,8 @@ upkernel() {
     "sing-box")
       api_url="https://api.github.com/repos/SagerNet/sing-box/releases"
       url_down="https://github.com/SagerNet/sing-box/releases"
+      # sing-box publishes Android builds for every arch; its linux amd64 / 386 builds do not start on Android.
+      platform="android"
     
       if [ "${singbox_stable}" = "disable" ]; then
         log Info "Fetching ${bin_name} pre-release version info..."
@@ -847,6 +968,52 @@ upkernel() {
   esac
 }
 
+# Tests the current config of ${bin_name} with core binary $1 (output in run/kernel_check.log).
+# 0 = accepted, 1 = rejected, 2 = this core has no config check (hysteria) or no config yet.
+kernel_test_config() {
+  local b="$1" out="${box_run}/kernel_check.log" cfg
+  chmod 0755 "${b}" 2>/dev/null
+  case "${bin_name}" in
+    clash) cfg="${clash_config}" ;;
+    sing-box) cfg="${sing_config}" ;;
+    xray) cfg="${xray_config}" ;;
+    v2fly) cfg="${v2fly_config}" ;;
+    *) return 2 ;;
+  esac
+  [ -f "${cfg}" ] || return 2
+  case "${bin_name}" in
+    clash) timeout 60 "${b}" -t -d "${box_dir}/clash" -f "${cfg}" > "${out}" 2>&1 ;;
+    sing-box) timeout 60 "${b}" check -D "${box_dir}/sing-box" -c "${cfg}" > "${out}" 2>&1 ;;
+    xray) XRAY_LOCATION_ASSET="${box_dir}/xray" timeout 60 "${b}" -test -confdir "${box_dir}/xray" > "${out}" 2>&1 ;;
+    v2fly) V2RAY_LOCATION_ASSET="${box_dir}/v2fly" timeout 60 "${b}" test -d "${box_dir}/v2fly" > "${out}" 2>&1 ;;
+  esac || return 1
+  return 0
+}
+
+# Before the new core replaces the old one: when the installed core accepts the current config and the new
+# one does not, the update is refused (the old core stays) and the reason is logged. When the old core is
+# missing or rejects the config too, there is nothing to lose and the new core is installed.
+kernel_keeps_config() {
+  local new="$1" old="$2"
+  kernel_test_config "${new}"
+  case $? in
+    0) log Info "The new ${bin_name} accepts the current config"; return 0 ;;
+    2) return 0 ;;
+  esac
+  local reason
+  reason=$(grep -m1 -aiE 'fatal|error|failed|unknown|invalid' "${box_run}/kernel_check.log" | cut -c1-300)
+  [ -z "${reason}" ] && reason=$(tail -n 1 "${box_run}/kernel_check.log" | cut -c1-300)
+  if [ -x "${old}" ] && cp "${box_run}/kernel_check.log" "${box_run}/kernel_check.new.log" && kernel_test_config "${old}"; then
+    log Error "KERNEL_CHECK_FAILED: the new ${bin_name} rejects the current config, the installed core is kept"
+    log Error "${reason}"
+    mv -f "${box_run}/kernel_check.new.log" "${box_run}/kernel_check.log"
+    return 1
+  fi
+  rm -f "${box_run}/kernel_check.new.log"
+  log Warning "The current config fails the check (old core too), installing the new ${bin_name} anyway: ${reason}"
+  return 0
+}
+
 # Check and update kernel
 # True when the service is running with this very core. Updating another core (Boxy sets bin_name for the
 # update only) must not restart the service with it.
@@ -855,6 +1022,7 @@ box_runs_core() {
 }
 
 xkernel() {
+  xkernel_rc=0
   case "${bin_name}" in
     "clash")
       gunzip_command="gunzip"
@@ -872,6 +1040,10 @@ xkernel() {
       if ${gunzip_command} "${box_dir}/${file_kernel}.gz" >/dev/null; then
         log Info "Extraction successful: ${box_dir}/${file_kernel}"
       
+        if ! kernel_keeps_config "${box_dir}/${file_kernel}" "${bin_dir}/xclash/${xclash_option}"; then
+          rm -f "${box_dir}/${file_kernel}"
+          xkernel_rc=1
+        else
         log Info "Moving kernel to ${bin_dir}/xclash/${xclash_option}"
         if mv "${box_dir}/${file_kernel}" "${bin_dir}/xclash/${xclash_option}"; then
           log Info "Kernel moved successfully."
@@ -887,6 +1059,8 @@ xkernel() {
           fi
         else
           log Error "Failed to move the extracted kernel."
+          xkernel_rc=1
+        fi
         fi
       else
         log Error "Failed to extract kernel: ${box_dir}/${file_kernel}.gz"
@@ -906,6 +1080,9 @@ xkernel() {
         log Info "Extraction successful."
       
         src_dir="${bin_dir}/sing-box-${latest_version#v}-${platform}-${arch}"
+        if ! kernel_keeps_config "${src_dir}/sing-box" "${bin_dir}/${bin_name}"; then
+          xkernel_rc=1
+        else
         log Info "Moving binary from ${src_dir}/sing-box to ${bin_dir}/${bin_name}"
         if mv "${src_dir}/sing-box" "${bin_dir}/${bin_name}"; then
           log Info "Kernel binary moved successfully."
@@ -921,6 +1098,8 @@ xkernel() {
           fi
         else
           log Error "Failed to move binary from ${src_dir}."
+          xkernel_rc=1
+        fi
         fi
       else
         log Error "Failed to extract ${box_dir}/${file_kernel}.tar.gz."
@@ -953,6 +1132,9 @@ xkernel() {
       if ${unzip_command} -o "${box_dir}/${file_kernel}.zip" "${bin}" -d "${bin_dir}/update" >/dev/null; then
         log Info "Extraction successful."
       
+        if ! kernel_keeps_config "${bin_dir}/update/${bin}" "${bin_dir}/${bin_name}"; then
+          xkernel_rc=1
+        else
         log Info "Moving ${bin} binary to ${bin_dir}/${bin_name}"
         if mv "${bin_dir}/update/${bin}" "${bin_dir}/${bin_name}"; then
           log Info "Kernel binary moved successfully."
@@ -965,6 +1147,8 @@ xkernel() {
           fi
         else
           log Error "Failed to move the kernel binary from ${bin_dir}/update/${bin}."
+          xkernel_rc=1
+        fi
         fi
       else
         log Error "Failed to extract ${box_dir}/${file_kernel}.zip."
@@ -989,6 +1173,7 @@ xkernel() {
   find "${box_dir}" -maxdepth 1 -type f -name "${file_kernel}.*" -delete >/dev/null
   chown ${box_user_group} ${bin_path}
   chmod 6755 ${bin_path}
+  return ${xkernel_rc}
 }
 
 # Check and update yacd
@@ -1325,11 +1510,16 @@ case "$1" in
   geox|subs)
     if [ "$1" = "geox" ]; then
       upgeox
+      rc=$?
+      [ $rc -ne 0 ] && exit $rc
+      # Nothing was downloaded (hysteria, sing-box 1.12+): no reload.
+      [ "${geo_skipped}" = "true" ] && exit 0
     else
       upsubs
       rc=$?
-      [ "${bin_name}" != "clash" ] && exit $rc
       [ $rc -ne 0 ] && exit $rc
+      # clash and sing-box re-read the new config; the other cores have no subscriptions here.
+      case "${bin_name}" in clash|sing-box) ;; *) exit 0 ;; esac
     fi
     if [ -f "${box_pid}" ]; then
       kill -0 "$(<"${box_pid}" 2>/dev/null)" && reload
@@ -1370,7 +1560,7 @@ case "$1" in
     echo "  bond0|bond1 - Run bonding configuration functions"
     echo "  geosub      - Update both subscription and GeoX files, then reload if running"
     echo "  geox        - Update GeoX database, then reload if running"
-    echo "  subs        - Update subscription (only for clash), then reload if running"
+    echo "  subs        - Update subscription (clash, sing-box), then reload if running"
     echo "  upkernel    - Update kernel-related components"
     echo "  upxui       - Update XUI panel"
     echo "  upyq        - Update yq binary"

@@ -96,6 +96,9 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     var sections by remember { mutableStateOf<List<ConfigAssist.Section>?>(null) }
     var problem by remember { mutableStateOf<ConfigDiagnostics.Problem?>(null) }
     val language = remember(path) { ConfigLanguage.forPath(path) }
+    // Cores whose rules can take a GeoSite / GeoIP category (not hysteria).
+    val geoCore = remember(path) { ConfigCheck.coreFor(path)?.takeIf { com.skofqq.boxy.configs.GeoRules.syntaxCore(it) } }
+    var geoSheet by remember { mutableStateOf(false) }
     val colors = Boxy.colors
     val errorColor = Tints.red.fg
 
@@ -189,6 +192,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                     val l = language
                     if (e != null && l != null) sections = ConfigAssist.sections(l.kind, e.text.toString())
                 }
+                if (geoCore != null) HeaderAction(BoxyIcons.Shield, stringResource(R.string.geo_rule_title)) { if (editor != null) geoSheet = true }
                 HeaderAction(BoxyIcons.SaveAs, stringResource(R.string.editor_save_as)) { if (editor != null) saveAsDialog = true }
                 HeaderAction(BoxyIcons.Save, stringResource(R.string.action_save), tint = if (modified) colors.accent else colors.text) { save() }
             }
@@ -371,6 +375,26 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
             ToolsNav.editorOpen = false
             editor = null
         }
+    }
+
+    if (geoSheet && geoCore != null) {
+        GeoRuleSheet(
+            geoCore,
+            configText = { editor?.text?.toString().orEmpty() },
+            onInsert = { edit ->
+                geoSheet = false
+                editor?.let { e ->
+                    // One undoable replace of the whole text, then the cursor on the new rule.
+                    val c = e.text
+                    val last = c.lineCount - 1
+                    c.replace(0, 0, last, c.getColumnCount(last), edit.text)
+                    goTo(edit.line.coerceAtLeast(0))
+                }
+                Toast.makeText(context, R.string.geo_rule_inserted, Toast.LENGTH_SHORT).show()
+            },
+            onError = { msg -> Toast.makeText(context, context.getString(R.string.geo_rule_parse_failed, msg), Toast.LENGTH_LONG).show() },
+            onDismiss = { geoSheet = false },
+        )
     }
 
     if (saveAsDialog) {

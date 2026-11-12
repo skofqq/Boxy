@@ -203,6 +203,7 @@
             <intent-filter>
                 <action android:name="com.skofqq.boxy.action.SUBS_FAILED" />
                 <action android:name="com.skofqq.boxy.action.STATE_CHANGED" />
+                <action android:name="com.skofqq.boxy.action.GEO_UPDATED" />
             </intent-filter>
         </receiver>
     </application>

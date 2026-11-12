@@ -5,7 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skofqq.boxy.R
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import com.skofqq.boxy.root.CORE_CHOICES
+import com.skofqq.boxy.root.CoreChoice
+import com.skofqq.boxy.root.CorePrecheck
+import com.skofqq.boxy.root.CoreTools
+import kotlinx.coroutines.launch
 import com.skofqq.boxy.root.ModuleSetup
 import com.skofqq.boxy.root.NETWORK_MODES
 
@@ -27,18 +36,37 @@ fun ModuleSettingSheet(
     val current = stringResource(R.string.sheet_current)
     val missing = stringResource(R.string.module_core_missing)
     val missingToast = stringResource(R.string.module_core_missing_toast)
+    val scope = rememberCoroutineScope()
+    var checking by remember { mutableStateOf<String?>(null) }
+    var problem by remember { mutableStateOf<Pair<CoreChoice, CorePrecheck>?>(null) }
+    fun apply(c: CoreChoice) {
+        onApply(listOfNotNull("bin_name" to c.binName, c.xclash?.let { "xclash_option" to it }))
+        onDismiss()
+    }
     when (setting) {
         ModuleSetting.CORE -> BoxySheet(stringResource(R.string.sheet_core_title), stringResource(R.string.sheet_core_subtitle), onDismiss) {
             CORE_CHOICES.forEach { c ->
                 val selected = setup?.core?.id == c.id
                 val installed = setup == null || c.id in setup.installed
-                OptionRow(c.title, if (selected) current else if (!installed) missing else null, selected) {
+                val sub = when {
+                    selected -> current
+                    !installed -> missing
+                    checking == c.id -> stringResource(R.string.core_switch_checking)
+                    else -> null
+                }
+                OptionRow(c.title, sub, selected) {
                     when {
                         selected -> onDismiss()
                         !installed -> Toast.makeText(context, missingToast, Toast.LENGTH_LONG).show()
+                        checking != null -> Unit
                         else -> {
-                            onApply(listOfNotNull("bin_name" to c.binName, c.xclash?.let { "xclash_option" to it }))
-                            onDismiss()
+                            // The core, its config and the core's own check of it, before the switch is written.
+                            checking = c.id
+                            scope.launch {
+                                val r = runCatching { CoreTools.precheck(c) }.getOrDefault(CorePrecheck.Ok)
+                                checking = null
+                                if (r == CorePrecheck.Ok) apply(c) else problem = c to r
+                            }
                         }
                     }
                 }
@@ -65,6 +93,27 @@ fun ModuleSettingSheet(
             }
         }
     }
+    problem?.let { (c, p) ->
+        CoreProblemDialog(c, p, onSwitch = { problem = null; apply(c) }, onDismiss = { problem = null })
+    }
+}
+
+@Composable
+private fun CoreProblemDialog(c: CoreChoice, p: CorePrecheck, onSwitch: () -> Unit, onDismiss: () -> Unit) {
+    val message = when (p) {
+        CorePrecheck.NoKernel -> stringResource(R.string.module_core_missing_toast)
+        is CorePrecheck.NoConfig -> stringResource(R.string.core_switch_no_config, p.path)
+        is CorePrecheck.BadConfig -> stringResource(R.string.core_switch_bad_config, p.path) + "\n\n" + p.output
+        CorePrecheck.Ok -> ""
+    }
+    ConfirmDialog(
+        title = stringResource(R.string.core_switch_problem_title, c.title),
+        message = message,
+        confirm = stringResource(R.string.core_switch_anyway),
+        danger = true,
+        onConfirm = onSwitch,
+        onDismiss = onDismiss,
+    )
 }
 
 fun modeTitle(mode: String): String = when (mode) {

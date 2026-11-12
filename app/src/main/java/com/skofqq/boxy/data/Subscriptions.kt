@@ -37,6 +37,9 @@ object Subscriptions {
     private const val CHANNEL_ID = "subscription"
     private const val DAY_MS = 24 * 60 * 60 * 1000L
 
+    /** settings.ini keys holding subscription URLs, per core. */
+    val SUBSCRIPTION_KEYS = listOf("subscription_url_clash", "subscription_url_singbox", "subscription_url_xray", "subscription_url_hysteria")
+
     suspend fun fetch(prefs: Prefs, core: String? = null): List<SubscriptionInfo> = when (prefs.subscriptionSource) {
         SubscriptionSource.CORE_API -> Net.clashApi(core ?: BoxModule.readSetting("bin_name"))?.let { Net.clashProviders(it) }.orEmpty()
         SubscriptionSource.PROVIDERS -> {
@@ -44,7 +47,9 @@ object Subscriptions {
             coroutineScope { urls.map { (name, url) -> async { Net.subscription(url)?.copy(name = name) } }.awaitAll() }.filterNotNull()
         }
         SubscriptionSource.URL -> {
-            val urls = BoxModule.parseArray(BoxModule.readSettingRaw("subscription_url_clash"))
+            // Every core's subscription URLs (clash is an array, sing-box a single URL or an array), each once.
+            val raw = BoxModule.readSettingsRaw(SUBSCRIPTION_KEYS)
+            val urls = SUBSCRIPTION_KEYS.flatMap { BoxModule.parseArray(raw[it]) }.filter { it.startsWith("http") }.distinct()
             coroutineScope { urls.map { url -> async { Net.subscription(url) } }.awaitAll() }.filterNotNull()
         }
     }

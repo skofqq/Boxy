@@ -45,6 +45,11 @@ import com.skofqq.boxy.data.AppTraffic
 import com.skofqq.boxy.data.AppUsage
 import com.skofqq.boxy.ui.components.GlassChip
 import com.skofqq.boxy.ui.components.SectionCard
+import com.skofqq.boxy.ui.components.SwitchRow
+import com.skofqq.boxy.root.BoxModule
+import com.skofqq.boxy.root.CoreTools
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import com.skofqq.boxy.ui.theme.Boxy
 import com.skofqq.boxy.ui.theme.BoxyIcons
 import com.skofqq.boxy.ui.theme.Tints
@@ -63,6 +68,16 @@ fun AppTrafficSection(reload: Int) {
     var list by remember { mutableStateOf<List<AppUsage>?>(null) }
     var system by remember { mutableStateOf(true) }
     var all by remember { mutableStateOf(false) }
+    // mihomo / sing-box tie connections to apps only with find-process on; the other cores cannot do it.
+    var fpCore by remember { mutableStateOf<String?>(null) }
+    var findProcess by remember { mutableStateOf<Boolean?>(null) }
+    var fpBusy by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(reload) {
+        val core = runCatching { BoxModule.state().core }.getOrNull()?.let { BoxModule.unquote(it) }
+        fpCore = core?.takeIf { it == "clash" || it == "sing-box" }
+        findProcess = fpCore?.let { runCatching { CoreTools.findProcess(it) }.getOrNull() }
+    }
     LaunchedEffect(days, reload) {
         system = AppTraffic.ensureUsageAccess(context)
         while (true) {
@@ -81,9 +96,30 @@ fun AppTrafficSection(reload: Int) {
                 GlassChip(stringResource(label), days == d) { days = d }
             }
         }
+        val core = fpCore
+        val fp = findProcess
+        if (core != null && fp != null) {
+            SwitchRow(
+                BoxyIcons.Apps,
+                stringResource(R.string.find_process_title),
+                stringResource(R.string.find_process_sub),
+                fp,
+                enabled = !fpBusy,
+                showDivider = false,
+            ) { on ->
+                fpBusy = true
+                scope.launch {
+                    val ok = runCatching { CoreTools.setFindProcess(core, on) }.getOrDefault(false)
+                    if (ok) findProcess = on
+                    else android.widget.Toast.makeText(context, R.string.find_process_failed, android.widget.Toast.LENGTH_LONG).show()
+                    fpBusy = false
+                }
+            }
+        }
         val hint = when {
             !system -> R.string.traffic_apps_hint_system
-            AppTraffic.coreKnowsApps == false -> R.string.traffic_apps_hint_process
+            // With the switch right above, the hint only says why the list has no apps.
+            AppTraffic.coreKnowsApps == false && fp != true -> R.string.traffic_apps_hint_process
             else -> null
         }
         if (hint != null) {

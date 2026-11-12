@@ -145,15 +145,30 @@ object BoxModule {
      */
     suspend fun startFailure(): String? {
         val (_, out) = exec("grep -a '\\[Error\\]' $BOX_DIR/run/runs.log 2>/dev/null | tail -n 8")
-        return out.map { RootTask.stripAnsi(it).substringAfter("[Error]:").trim() }
+        // The module copies only the first line of a multi-line core message into runs.log, and a core that dies
+        // after the start (hysteria, xray) says why in its own log: its error lines are added.
+        val core = unquote(readSetting("bin_name"))?.takeIf { it in CORES }
+        val coreLines = if (core == null) emptyList() else exec(
+            "grep -aiE 'fatal|panic|error|failed' $BOX_DIR/run/$core.log 2>/dev/null | tail -n 4",
+        ).second
+        return (out.map { RootTask.stripAnsi(it).substringAfter("[Error]:").trim() } + coreLines.map { RootTask.stripAnsi(it).trim() })
             .filter { it.isNotEmpty() }
             .distinct()
             .joinToString("\n")
             .ifBlank { null }
     }
 
-    /** Asks the running core to re-read its config (box.tool reload). */
-    suspend fun reloadConfig(): Boolean = run("$SCRIPTS/box.tool reload")
+    /**
+     * Asks the running core to re-read its config. mihomo reloads through its API ([core] "clash" with an API is
+     * tried by the callers first); sing-box's clash_api accepts the same call but ignores it, so sing-box gets
+     * SIGHUP (it checks the config and starts a new instance in the same process, iptables stay). Modules that
+     * still send it the API call get the signal from here instead.
+     */
+    suspend fun reloadConfig(core: String? = null): Boolean {
+        val c = core ?: unquote(readSetting("bin_name"))
+        if (c == "sing-box" && !run("grep -q reload_singbox $SCRIPTS/box.tool")) return CoreTools.reloadSingBox()
+        return run("$SCRIPTS/box.tool reload")
+    }
 
     suspend fun readSetting(key: String): String? = withContext(Dispatchers.IO) {
         parseKv(sh("grep -m1 '^$key=' $SETTINGS 2>/dev/null"))[key]
