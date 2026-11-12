@@ -122,7 +122,8 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
         active = BoxModule.readSetting(key)
         val all = RootFiles.list("${BoxModule.BOX_DIR}/$dir")
         folders = all.filter { it.isDir && !it.name.startsWith(".") }
-        files = all.filter { !it.isDir && !it.name.startsWith(".") && it.extension in CONFIG_EXTENSIONS }
+        // Boxy's own Xray files (panel, subscription) are not configs to pick.
+        files = all.filter { !it.isDir && !it.name.startsWith(".") && !it.name.startsWith("zz-boxy-") && it.extension in CONFIG_EXTENSIONS }
         overrides = if (c == "sing-box") RootFiles.exists(SingBoxOverrides.FILE) else null
     }
     val dir = "${BoxModule.BOX_DIR}/${coreConfig(core ?: "clash").first}"
@@ -196,6 +197,10 @@ SubPageHeader(
                     }
                 }
             }
+        }
+        // Xray / V2Ray: subscription of share links, and moving V2Ray's config to Xray.
+        core?.takeIf { it == "xray" || it == "v2fly" }?.let { c ->
+            item(key = "xsub-$c") { XraySubscriptionSection(c) { reload++ } }
         }
         // sing-box: the user's own settings over the config, kept through subscription updates.
         overrides?.let { present ->

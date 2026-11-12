@@ -54,6 +54,10 @@ private val BAR_ROOM = 12.dp + 68.dp
  */
 @Composable
 fun CorePanel(reloadKey: Int) {
+    // Xray has no clash-style API: its own panel works from the metrics endpoint.
+    val state by produceState<com.skofqq.boxy.root.ServiceState?>(null, reloadKey) { value = runCatching { BoxModule.state() }.getOrNull() }
+    val s = state ?: return
+    if (BoxModule.unquote(s.core) == "xray") return XrayPanel(16.dp, reloadKey, s.running)
     var tab by rememberSaveable { mutableIntStateOf(0) }
     // The tabs are recorded on their own for the bar: the panel's backdrop holds the bar and would draw it into itself.
     val barBackdrop = rememberBackdrop()

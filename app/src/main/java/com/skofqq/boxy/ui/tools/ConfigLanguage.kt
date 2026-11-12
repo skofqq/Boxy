@@ -118,7 +118,14 @@ class ConfigLanguage(val kind: Kind, private val schema: ConfigAssist.Schema? = 
         fun forPath(path: String): ConfigLanguage? {
             val name = path.substringAfterLast('/').lowercase()
             return when (name.substringAfterLast('.', "")) {
-                "json" -> ConfigLanguage(Kind.JSON, if ("/sing-box/" in path) ConfigAssist.Schema.SINGBOX else null)
+                "json" -> ConfigLanguage(
+                    Kind.JSON,
+                    when {
+                        "/sing-box/" in path -> ConfigAssist.Schema.SINGBOX
+                        "/xray/" in path || "/v2fly/" in path -> ConfigAssist.Schema.XRAY
+                        else -> null
+                    },
+                )
                 "yaml", "yml" -> ConfigLanguage(Kind.YAML, if ("/hysteria/" in path) null else ConfigAssist.Schema.MIHOMO)
                 "toml", "ini", "cfg", "conf", "prop" -> ConfigLanguage(Kind.TOML)
                 else -> null

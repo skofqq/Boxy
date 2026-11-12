@@ -607,6 +607,10 @@ prop_description() {
   sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ $current_time | $(t "⚠️ Your $bin_name configuration has an error, check the log for more details" "⚠️ В конфигурации $bin_name ошибка, подробности в логе") ] /g" "$PROPFILE"
 }
 
+# Go cores built for Linux do not know Android's CA store: TLS checks (xray tls ping, observatory probes over
+# https, certificate verification) fail with "unknown authority" without it.
+go_cert_dirs="/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts"
+
 box_run_bin() {
   log Info "client-list: [ ${bin_list[*]} ]"
   log Info "choose: ${bin_name}, start the service."
@@ -631,7 +635,7 @@ box_run_bin() {
           ;;
       esac
 
-      nohup busybox setuidgid "${box_user_group}" "${bin_path}" -c "${hysteria_config}" > "${bin_log}" 2>&1 &
+      SSL_CERT_DIR="${go_cert_dirs}" nohup busybox setuidgid "${box_user_group}" "${bin_path}" -c "${hysteria_config}" > "${bin_log}" 2>&1 &
       PID=$!
 
       sleep 1
@@ -696,6 +700,9 @@ box_run_bin() {
 
       # run xray
       export XRAY_LOCATION_ASSET="${box_dir}/${bin_name}"
+      export SSL_CERT_DIR="${go_cert_dirs}"
+      # The access log (when Boxy turned it on) starts empty with every run.
+      [ -f "${box_run}/xray-access.log" ] && : > "${box_run}/xray-access.log"
       if ${bin_path} -test -confdir "${box_dir}/${bin_name}" > "${box_run}/${bin_name}.log" 2>&1; then
         nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -confdir "${box_dir}/${bin_name}" > "${bin_log}" 2>&1 &
         PID=$!
@@ -730,6 +737,7 @@ box_run_bin() {
 
       # run v2ray
       export V2RAY_LOCATION_ASSET="${box_dir}/${bin_name}"
+      export SSL_CERT_DIR="${go_cert_dirs}"
       if ${bin_path} test -d "${box_dir}/${bin_name}" > "${box_run}/${bin_name}.log" 2>&1; then
         nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -d "${box_dir}/${bin_name}" > "${bin_log}" 2>&1 &
         PID=$!

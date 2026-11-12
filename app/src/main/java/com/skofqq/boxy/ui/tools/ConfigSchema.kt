@@ -262,4 +262,80 @@ internal object ConfigSchema {
         }
         return SINGBOX_VALUES[key] ?: if (key in SINGBOX_BOOLS) BOOL else null
     }
+
+    // ---- Xray (and V2Ray's v4 JSON) ----
+
+    private val XRAY_STREAM = w(
+        """network security tlsSettings realitySettings rawSettings tcpSettings xhttpSettings kcpSettings grpcSettings
+        wsSettings httpupgradeSettings hysteriaSettings sockopt""",
+    )
+    private val XRAY_RULE = w(
+        "type domain ip port sourcePort network source user inboundTag protocol attrs outboundTag balancerTag ruleTag localIP localPort process",
+    )
+
+    private val XRAY_KEYS: Map<String, List<String>> = mapOf(
+        "" to w("log api dns routing policy inbounds outbounds transport stats reverse fakedns metrics observatory burstObservatory"),
+        "log" to w("access error loglevel dnsLog maskAddress"),
+        "api" to w("tag listen services"),
+        "dns" to w("servers hosts clientIp queryStrategy disableCache disableFallback disableFallbackIfMatch tag"),
+        "servers" to w("address port domains expectIPs skipFallback clientIP queryStrategy timeoutMs"),
+        "routing" to w("domainStrategy rules balancers"),
+        "rules" to XRAY_RULE,
+        "balancers" to w("tag selector fallbackTag strategy"),
+        "strategy" to w("type settings"),
+        "policy" to w("levels system"),
+        "system" to w("statsInboundUplink statsInboundDownlink statsOutboundUplink statsOutboundDownlink"),
+        "inbounds" to w("listen port protocol settings streamSettings tag sniffing allocate"),
+        "sniffing" to w("enabled destOverride metadataOnly domainsExcluded routeOnly"),
+        "outbounds" to w("sendThrough protocol settings tag streamSettings proxySettings mux"),
+        "settings" to w(
+            "vnext servers clients decryption fallbacks network followRedirect domainStrategy redirect address port users id flow encryption password method level email udp version",
+        ),
+        "vnext" to w("address port users"),
+        "users" to w("id flow encryption security level email alterId"),
+        "streamSettings" to XRAY_STREAM,
+        "tlsSettings" to w("serverName alpn fingerprint minVersion maxVersion certificates pinnedPeerCertSha256 verifyPeerCertByName rejectUnknownSni enableSessionResumption echConfigList"),
+        "realitySettings" to w("show target dest serverNames privateKey shortIds fingerprint serverName publicKey password shortId spiderX mldsa65Verify"),
+        "wsSettings" to w("path host headers heartbeatPeriod"),
+        "grpcSettings" to w("serviceName multiMode idle_timeout health_check_timeout permit_without_stream"),
+        "xhttpSettings" to w("host path mode extra"),
+        "httpupgradeSettings" to w("path host headers"),
+        "sockopt" to w("mark tcpFastOpen tproxy domainStrategy dialerProxy tcpKeepAliveInterval tcpcongestion interface"),
+        "mux" to w("enabled concurrency xudpConcurrency xudpProxyUDP443"),
+        "observatory" to w("subjectSelector probeUrl probeInterval enableConcurrency"),
+        "metrics" to w("tag listen"),
+    )
+
+    private val XRAY_VALUES: Map<String, List<String>> = mapOf(
+        "loglevel" to w("debug info warning error none"),
+        "protocol" to w("vless vmess trojan shadowsocks socks http freedom blackhole dns dokodemo-door hysteria wireguard loopback"),
+        "network" to w("raw tcp xhttp kcp grpc ws httpupgrade hysteria"),
+        "security" to w("none tls reality"),
+        "fingerprint" to w("chrome firefox safari ios android edge 360 qq random randomized"),
+        "flow" to w("xtls-rprx-vision xtls-rprx-vision-udp443"),
+        "domainStrategy" to w("AsIs IPIfNonMatch IPOnDemand UseIP UseIPv4 UseIPv6"),
+        "queryStrategy" to w("UseIP UseIPv4 UseIPv6"),
+        "mode" to w("auto packet-up stream-up stream-one"),
+        "services" to w("HandlerService LoggerService StatsService RoutingService ObservatoryService ReflectionService"),
+        "destOverride" to w("http tls quic fakedns"),
+    )
+
+    private val XRAY_BOOLS = w(
+        """enabled udp metadataOnly routeOnly multiMode tcpFastOpen statsInboundUplink statsInboundDownlink
+        statsOutboundUplink statsOutboundDownlink disableCache disableFallback enableConcurrency show
+        rejectUnknownSni followRedirect""",
+    ).toSet()
+
+    fun xrayKeys(chain: List<String>): List<String>? = XRAY_KEYS[chain.lastOrNull() ?: ""]
+
+    fun xrayValues(chain: List<String>, key: String): List<String>? {
+        if (key == "type") {
+            return when (chain.lastOrNull()) {
+                "rules" -> w("field")
+                "strategy" -> w("random roundRobin leastPing leastLoad")
+                else -> null
+            }
+        }
+        return XRAY_VALUES[key] ?: if (key in XRAY_BOOLS) BOOL else null
+    }
 }

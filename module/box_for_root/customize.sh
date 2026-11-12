@@ -262,7 +262,7 @@ restore_ini() {
   target_ini="/data/adb/box/settings.ini"
 
   # List of keys to restore (separate with spaces)
-  keys="network_mode bin_name ipv6 xclash_option renew update_subscription run_crontab interva_update update_geo subscription_url_clash subscription_url_singbox name_clash_config clash_config name_provide_clash_config clash_provide_path custom_rules_subs name_provide_clash_rules name_sing_config name_xray_config name_v2fly_config name_hysteria_config tproxy_port redir_port box_user_group cgroup_memcg memcg_limit cgroup_cpuset allow_cpu cgroup_blkio weight enable_network_service_control use_module_on_wifi_disconnect use_module_on_wifi use_ssid_matching use_wifi_list_mode wifi_ssids_list wifi_bssids_list use_sim_matching use_sim_list_mode sim_operators_list dns_hijack quic user_agent dnscrypt dnscrypt_port mac_filter mac_mode macs_list inotify_log_enabled geo_source geo_extra"
+  keys="network_mode bin_name ipv6 xclash_option renew update_subscription run_crontab interva_update update_geo subscription_url_clash subscription_url_singbox name_clash_config clash_config name_provide_clash_config clash_provide_path custom_rules_subs name_provide_clash_rules name_sing_config name_xray_config name_v2fly_config name_hysteria_config tproxy_port redir_port box_user_group cgroup_memcg memcg_limit cgroup_cpuset allow_cpu cgroup_blkio weight enable_network_service_control use_module_on_wifi_disconnect use_module_on_wifi use_ssid_matching use_wifi_list_mode wifi_ssids_list wifi_bssids_list use_sim_matching use_sim_list_mode sim_operators_list dns_hijack quic user_agent dnscrypt dnscrypt_port mac_filter mac_mode macs_list inotify_log_enabled geo_source geo_extra subscription_url_xray"
 
   for key in $keys; do
       value=$(grep "^$key=" "$backup_ini")

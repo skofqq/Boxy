@@ -46,6 +46,19 @@ class ModuleEventReceiver : BroadcastReceiver() {
             }
             return
         }
+        if (intent.action == ACTION_SUBS_LINKS) {
+            // box.tool subs downloaded an Xray / V2Ray subscription: make outbounds of it, check, restart.
+            val core = intent.getStringExtra("core") ?: return
+            val pending = goAsync()
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                try {
+                    com.skofqq.boxy.configs.XraySubscription.apply(core)
+                } finally {
+                    pending.finish()
+                }
+            }
+            return
+        }
         if (intent.action != ACTION_SUBS_FAILED) return
         val app = BoxyApp.instance
         // Off in Settings → Notifications, or the user is looking at the app (the update page shows the error).
@@ -82,6 +95,7 @@ class ModuleEventReceiver : BroadcastReceiver() {
         const val ACTION_SUBS_FAILED = "com.skofqq.boxy.action.SUBS_FAILED"
         const val ACTION_STATE_CHANGED = "com.skofqq.boxy.action.STATE_CHANGED"
         const val ACTION_GEO_UPDATED = "com.skofqq.boxy.action.GEO_UPDATED"
+        const val ACTION_SUBS_LINKS = "com.skofqq.boxy.action.SUBS_LINKS"
         const val CHANNEL_ID = "module_events"
         private const val NOTIFICATION_ID = 2
 

@@ -694,7 +694,31 @@ upsubs() {
         return 1
       fi
       ;;
-    "xray"|"v2fly"|"hysteria")
+    "xray"|"v2fly")
+      # A list of share links (base64 or plain). Boxy turns it into outbounds "sub-…" in
+      # ${bin_name}/zz-boxy-subscription.json, checks the folder with the core and restarts it.
+      if [ -z "${subscription_url_xray}" ]; then
+        log Warning "${bin_name} subscription url is empty..."
+        return 1
+      fi
+      if [ "${update_subscription}" != "true" ]; then
+        log Warning "update subscription: $update_subscription"
+        return 1
+      fi
+      log Info "${bin_name} daily updates subscription → $(date)"
+      if upfile "${box_dir}/${bin_name}/subscription.txt" "${subscription_url_xray}"; then
+        rm -f "${box_dir}/${bin_name}/subscription.txt.bak"
+        log Info "subscription.txt saved, Boxy converts it into outbounds"
+        [ -z "${BOXY_NO_EVENT}" ] && am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.SUBS_LINKS \
+          -n com.skofqq.boxy/.notify.ModuleEventReceiver --es core "${bin_name}" >/dev/null 2>&1 &
+        return 0
+      else
+        log Error "update subscription failed"
+        notify_subs_failed download ""
+        return 1
+      fi
+      ;;
+    "hysteria")
       log Warning "${bin_name} does not support subscriptions.."
       return 1
       ;;

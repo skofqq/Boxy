@@ -2,7 +2,7 @@ package com.skofqq.boxy.ui.tools
 
 /** Text logic behind the editor's helpers. It only looks at strings, so nothing here touches the widget. */
 object ConfigAssist {
-    enum class Schema { MIHOMO, SINGBOX }
+    enum class Schema { MIHOMO, SINGBOX, XRAY }
 
     data class Section(val line: Int, val title: String)
     data class Suggestion(val label: String, val commit: String, val prefixLength: Int)
@@ -183,17 +183,18 @@ object ConfigAssist {
 
     /** [text] runs from the start of the file to the cursor, [after] is what follows the cursor on the line. */
     fun completeJson(schema: Schema, text: CharSequence, after: String): List<Suggestion> {
-        if (schema != Schema.SINGBOX) return emptyList()
+        if (schema != Schema.SINGBOX && schema != Schema.XRAY) return emptyList()
+        val xray = schema == Schema.XRAY
         val ctx = jsonContext(text) ?: return emptyList()
         val prefix = ctx.prefix
         if (prefix.isEmpty() || WORD.matchEntire(prefix) == null) return emptyList()
         val closed = after.startsWith("\"")
         if (ctx.isKey) {
-            val keys = ConfigSchema.singboxKeys(ctx.chain) ?: return emptyList()
+            val keys = (if (xray) ConfigSchema.xrayKeys(ctx.chain) else ConfigSchema.singboxKeys(ctx.chain)) ?: return emptyList()
             return match(keys, prefix) { if (closed) it else "$it\": " }
         }
         val key = ctx.key ?: return emptyList()
-        val values = ConfigSchema.singboxValues(ctx.chain, key) ?: return emptyList()
+        val values = (if (xray) ConfigSchema.xrayValues(ctx.chain, key) else ConfigSchema.singboxValues(ctx.chain, key)) ?: return emptyList()
         return match(values, prefix) { if (closed) it else "$it\"" }
     }
 

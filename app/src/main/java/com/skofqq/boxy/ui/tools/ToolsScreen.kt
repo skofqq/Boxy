@@ -107,6 +107,8 @@ object ToolsNav {
 @Composable
 private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPage: (NavExtra) -> Unit, push: (String) -> Unit) {
     var importChooser by remember { mutableStateOf(false) }
+    var tlsPing by remember { mutableStateOf(false) }
+    if (tlsPing) TlsPingSheet { tlsPing = false }
     val qr = rememberQrLaunchers()
     if (importChooser) {
         BoxySheet(stringResource(R.string.import_title), stringResource(R.string.import_chooser_sub), { importChooser = false }) {
@@ -135,7 +137,8 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
             SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
                 SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
-                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub), showDivider = false) { push(ROUTE_DNSCRYPT) }
+                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub)) { push(ROUTE_DNSCRYPT) }
+                SettingsRow(BoxyIcons.Speed, stringResource(R.string.tls_ping_title), stringResource(R.string.tls_ping_row_sub), showDivider = false) { tlsPing = true }
             }
         }
         item {

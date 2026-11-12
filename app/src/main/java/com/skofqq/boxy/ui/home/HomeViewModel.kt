@@ -194,6 +194,25 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
             } else if (api != null) {
                 Net.clashTraffic(api).catch { }.collect { (down, up) -> pushSpeed(down, up) }
                 delay(2000)
+            } else if (state?.running == true && com.skofqq.boxy.root.BoxModule.unquote(state?.core) == "xray" &&
+                com.skofqq.boxy.net.XrayApi.setup().metrics != null
+            ) {
+                // Xray with the panel's metrics: the core's own traffic (outbound stats) instead of the interfaces.
+                val listen = com.skofqq.boxy.net.XrayApi.setup().metrics!!
+                var prev: Pair<Long, Long>? = null
+                var prevTime = System.nanoTime()
+                repeat(30) {
+                    val m = com.skofqq.boxy.net.XrayApi.metrics(listen)
+                    val now = System.nanoTime()
+                    val cur = m?.let { x -> x.outbounds.sumOf { it.down } to x.outbounds.sumOf { it.up } }
+                    if (prev != null && cur != null) {
+                        val secs = (now - prevTime) / 1e9
+                        pushSpeed(((cur.first - prev!!.first) / secs).toLong(), ((cur.second - prev!!.second) / secs).toLong())
+                    }
+                    prev = cur
+                    prevTime = now
+                    delay(1000)
+                }
             } else {
                 var prev = BoxModule.netCounters()
                 var prevTime = System.nanoTime()
