@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Mihomo smart コア</string>
     <string name="update_core_singbox">Sing-box コア</string>
     <string name="update_core_xray">Xray コア</string>
-    <string name="update_core_v2ray">V2Ray コア</string>
     <string name="update_core_hysteria">Hysteria コア</string>
     <string name="update_target_core">コアの更新</string>
     <string name="update_target_subscription">サブスクリプション</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">最上位の「transport」ブロックは削除されました。設定を inbound / outbound の streamSettings に移してください。</string>
     <string name="xr_lint_dns">コアは Linux 版です。Android には /etc/resolv.conf がないため、単体ではドメインを解決できません。「dns」ブロック（例: サーバー 1.1.1.1、8.8.8.8）と freedom の「domainStrategy」:「UseIP」を追加してください。</string>
     <string name="sb_lint_http_client">リモートのルールセットが暗黙の HTTP クライアントでダウンロードできるのは sing-box 1.16 までです。「http_clients」（と route.default_http_client）を定義してください。</string>
+    <string name="core_legacy_title">%1$s はサポート終了です</string>
+    <string name="core_legacy_v2fly">Boxy は V2Ray の提供を終了しました。Xray は同じ設定を読め、開発も続いています。Xray に移行してください（設定をコピーして先に確認し、失敗時は何も変更しません）。</string>
+    <string name="core_legacy_premium">Clash Premium は作者が開発を終了し、更新されません。Mihomo はその後継で同じ設定を読めます。Mihomo に切り替えてください（なければダウンロードし、先に設定を確認します）。</string>
+    <string name="core_legacy_to_mihomo">Mihomo に切り替え</string>
+    <string name="core_legacy_mihomo_working">Mihomo に切り替え中…</string>
+    <string name="core_legacy_mihomo_ok">Mihomo に切り替えました</string>
+    <string name="core_legacy_mihomo_failed">切り替えていません：Clash Premium はそのままです</string>
 </resources>

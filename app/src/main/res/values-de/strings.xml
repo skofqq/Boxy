@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Mihomo-smart-Kern</string>
     <string name="update_core_singbox">Sing-box-Kern</string>
     <string name="update_core_xray">Xray-Kern</string>
-    <string name="update_core_v2ray">V2Ray-Kern</string>
     <string name="update_core_hysteria">Hysteria-Kern</string>
     <string name="update_target_core">Kernaktualisierung</string>
     <string name="update_target_subscription">Abo</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">Der oberste „transport“-Block wurde entfernt: verschiebe seine Einstellungen in streamSettings der Inbounds / Outbounds.</string>
     <string name="xr_lint_dns">Der Kern ist ein Linux-Build: Android hat keine /etc/resolv.conf, er kann Domains also nicht selbst auflösen. Füge einen „dns“-Block hinzu (z. B. Server 1.1.1.1, 8.8.8.8) und „domainStrategy“: „UseIP“ bei freedom.</string>
     <string name="sb_lint_http_client">Entfernte Regelsätze laden nur bis sing-box 1.16 über einen impliziten HTTP-Client: lege „http_clients“ (und route.default_http_client) an.</string>
+    <string name="core_legacy_title">%1$s wird nicht mehr unterstützt</string>
+    <string name="core_legacy_v2fly">Boxy bietet V2Ray nicht mehr an: Xray liest dieselbe Konfiguration und wird weiterentwickelt. Wechsle zu Xray: die Konfiguration wird kopiert und zuerst geprüft, bei einem Fehler ändert sich nichts.</string>
+    <string name="core_legacy_premium">Clash Premium wurde vom Autor eingestellt und bekommt keine Updates. Mihomo ist die Fortsetzung und liest dieselbe Konfiguration: wechsle dazu (wird bei Bedarf geladen, die Konfiguration wird zuerst geprüft).</string>
+    <string name="core_legacy_to_mihomo">Zu Mihomo wechseln</string>
+    <string name="core_legacy_mihomo_working">Wechsel zu Mihomo…</string>
+    <string name="core_legacy_mihomo_ok">Zu Mihomo gewechselt</string>
+    <string name="core_legacy_mihomo_failed">Nicht gewechselt: Clash Premium bleibt wie es war</string>
 </resources>

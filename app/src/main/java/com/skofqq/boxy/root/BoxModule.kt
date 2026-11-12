@@ -55,15 +55,19 @@ enum class IpsetStatus { AVAILABLE, MISSING_BINARY, NOT_SUPPORTED }
 val CORES = listOf("clash", "sing-box", "xray", "v2fly", "hysteria")
 val NETWORK_MODES = listOf("redirect", "tproxy", "mixed", "enhance", "tun")
 
-/** A core as the user picks it; clash comes as two builds (xclash_option). [binary] is relative to bin/. */
-data class CoreChoice(val id: String, val title: String, val binName: String, val xclash: String?, val binary: String)
+/**
+ * A core as the user picks it; clash comes as two builds (xclash_option). [binary] is relative to bin/.
+ * [legacy] cores are no longer offered (Clash Premium is gone, V2Ray is replaced by Xray): they stay known so a
+ * device that still runs one shows it, with the way out (Mihomo, "Move to Xray").
+ */
+data class CoreChoice(val id: String, val title: String, val binName: String, val xclash: String?, val binary: String, val legacy: Boolean = false)
 
 val CORE_CHOICES = listOf(
     CoreChoice("mihomo", "Clash Mihomo", "clash", "mihomo", "xclash/mihomo"),
-    CoreChoice("premium", "Clash Premium", "clash", "premium", "xclash/premium"),
+    CoreChoice("premium", "Clash Premium", "clash", "premium", "xclash/premium", legacy = true),
     CoreChoice("sing-box", "Sing-Box", "sing-box", null, "sing-box"),
     CoreChoice("xray", "Xray", "xray", null, "xray"),
-    CoreChoice("v2fly", "V2Ray", "v2fly", null, "v2fly"),
+    CoreChoice("v2fly", "V2Ray", "v2fly", null, "v2fly", legacy = true),
     CoreChoice("hysteria", "Hysteria", "hysteria", null, "hysteria"),
 )
 

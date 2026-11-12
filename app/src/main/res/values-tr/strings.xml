@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Mihomo smart çekirdeği</string>
     <string name="update_core_singbox">Sing-box çekirdeği</string>
     <string name="update_core_xray">Xray çekirdeği</string>
-    <string name="update_core_v2ray">V2Ray çekirdeği</string>
     <string name="update_core_hysteria">Hysteria çekirdeği</string>
     <string name="update_target_core">Çekirdek güncelleme</string>
     <string name="update_target_subscription">Abonelik</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">Üst düzey «transport» bloğu kaldırıldı: ayarlarını inbound / outbound streamSettings içine taşıyın.</string>
     <string name="xr_lint_dns">Çekirdek bir Linux derlemesi: Android\'de /etc/resolv.conf yok, bu yüzden alan adlarını kendisi çözemez. Bir «dns» bloğu (ör. 1.1.1.1, 8.8.8.8 sunucuları) ve freedom için «domainStrategy»: «UseIP» ekleyin.</string>
     <string name="sb_lint_http_client">Uzak kural setleri örtük HTTP istemcisiyle yalnızca sing-box 1.16\'ya kadar indirilir: «http_clients» (ve route.default_http_client) tanımlayın.</string>
+    <string name="core_legacy_title">%1$s artık desteklenmiyor</string>
+    <string name="core_legacy_v2fly">Boxy artık V2Ray sunmuyor: Xray aynı yapılandırmayı okur ve geliştirilmeye devam ediyor. Xray\'e taşıyın: yapılandırma kopyalanır ve önce denetlenir; hata olursa hiçbir şey değişmez.</string>
+    <string name="core_legacy_premium">Clash Premium yazarı tarafından bırakıldı ve güncellenmiyor. Mihomo onun devamıdır ve aynı yapılandırmayı okur: ona geçin (yoksa indirilir; yapılandırmanız önce denetlenir).</string>
+    <string name="core_legacy_to_mihomo">Mihomo\'ya geç</string>
+    <string name="core_legacy_mihomo_working">Mihomo\'ya geçiliyor…</string>
+    <string name="core_legacy_mihomo_ok">Mihomo\'ya geçildi</string>
+    <string name="core_legacy_mihomo_failed">Geçilmedi: Clash Premium olduğu gibi kaldı</string>
 </resources>

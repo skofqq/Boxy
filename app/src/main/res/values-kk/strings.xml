@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Mihomo smart ядросы</string>
     <string name="update_core_singbox">Sing-box ядросы</string>
     <string name="update_core_xray">Xray ядросы</string>
-    <string name="update_core_v2ray">V2Ray ядросы</string>
     <string name="update_core_hysteria">Hysteria ядросы</string>
     <string name="update_target_core">Ядроны жаңарту</string>
     <string name="update_target_subscription">Жазылым</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">Жоғарғы деңгейдегі «transport» блогы жойылды: баптауларын inbound / outbound streamSettings ішіне көшіріңіз.</string>
     <string name="xr_lint_dns">Ядро — Linux-жинағы: Android-та /etc/resolv.conf жоқ, сондықтан ол доменді өзі шеше алмайды. «dns» блогын (мысалы, 1.1.1.1, 8.8.8.8 серверлері) және freedom үшін «domainStrategy»: «UseIP» қосыңыз.</string>
     <string name="sb_lint_http_client">Қашықтағы ереже жинақтары жасырын HTTP-клиент арқылы тек sing-box 1.16-ға дейін жүктеледі: «http_clients» (және route.default_http_client) орнатыңыз.</string>
+    <string name="core_legacy_title">%1$s енді қолдау көрсетілмейді</string>
+    <string name="core_legacy_v2fly">Boxy енді V2Ray ұсынбайды: Xray сол конфигті оқиды және дамуын жалғастырады. Xray-ге көшіріңіз: конфиг көшіріліп, алдымен тексеріледі, қате болса ештеңе өзгермейді.</string>
+    <string name="core_legacy_premium">Clash Premium-ды авторы жапты, ол жаңартылмайды. Mihomo — оның жалғасы және сол конфигті оқиды: соған ауысыңыз (жоқ болса жүктеледі; конфиг алдымен тексеріледі).</string>
+    <string name="core_legacy_to_mihomo">Mihomo-ға ауысу</string>
+    <string name="core_legacy_mihomo_working">Mihomo-ға ауысуда…</string>
+    <string name="core_legacy_mihomo_ok">Mihomo-ға ауыстырылды</string>
+    <string name="core_legacy_mihomo_failed">Ауыстырылмады: Clash Premium бұрынғыдай қалды</string>
 </resources>

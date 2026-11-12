@@ -116,6 +116,8 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
         if (env == null) env = BoxModule.environment()
         if (env != Environment.READY) return@coroutineScope
         subStore = BoxModule.subStoreInstalled()
+        // Once per visit: the legacy core card needs the core and its build.
+        launch { setup = BoxModule.moduleSetup() }
         launch {
             val mirror = prefs.githubMirror
             if (mirror.isNotBlank() && com.skofqq.boxy.net.Mirrors.moduleMirror() != mirror) {

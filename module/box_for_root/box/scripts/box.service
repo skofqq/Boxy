@@ -930,6 +930,9 @@ start_box() {
   case "${bin_name}" in
     clash|xray|sing-box|v2fly|hysteria)
       log Info "Good day"
+      # Retired cores still start, so a module update does not break a working setup, but say so.
+      [ "${bin_name}" = "v2fly" ] && log Warning "V2Ray (v2fly) is retired: move to xray (Boxy: Configs → Move to Xray)"
+      [ "${bin_name}" = "clash" ] && [ "${xclash_option}" = "premium" ] && log Warning "Clash Premium is retired: switch to mihomo (xclash_option=\"mihomo\")"
       [ "${bin_name}" = "clash" ] && {
         xclash || exit 1
       }

@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Cœur Mihomo smart</string>
     <string name="update_core_singbox">Cœur Sing-box</string>
     <string name="update_core_xray">Cœur Xray</string>
-    <string name="update_core_v2ray">Cœur V2Ray</string>
     <string name="update_core_hysteria">Cœur Hysteria</string>
     <string name="update_target_core">Mise à jour du cœur</string>
     <string name="update_target_subscription">Abonnement</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">Le bloc « transport » de premier niveau a été supprimé : déplacez ses réglages dans streamSettings des inbounds / outbounds.</string>
     <string name="xr_lint_dns">Le cœur est une version Linux : Android n’a pas de /etc/resolv.conf, il ne résout donc pas les domaines seul. Ajoutez un bloc « dns » (ex. serveurs 1.1.1.1, 8.8.8.8) et « domainStrategy » : « UseIP » pour freedom.</string>
     <string name="sb_lint_http_client">Les jeux de règles distants ne passent par un client HTTP implicite que jusqu’à sing-box 1.16 : définissez « http_clients » (et route.default_http_client).</string>
+    <string name="core_legacy_title">%1$s n’est plus pris en charge</string>
+    <string name="core_legacy_v2fly">Boxy ne propose plus V2Ray : Xray lit la même configuration et continue d’évoluer. Passez à Xray : la configuration est copiée et vérifiée d’abord ; en cas d’échec, rien ne change.</string>
+    <string name="core_legacy_premium">Clash Premium a été abandonné par son auteur et n’est plus mis à jour. Mihomo en est la suite et lit la même configuration : passez-y (téléchargé s’il manque, votre configuration est vérifiée d’abord).</string>
+    <string name="core_legacy_to_mihomo">Passer à Mihomo</string>
+    <string name="core_legacy_mihomo_working">Passage à Mihomo…</string>
+    <string name="core_legacy_mihomo_ok">Passé à Mihomo</string>
+    <string name="core_legacy_mihomo_failed">Non basculé : Clash Premium reste tel quel</string>
 </resources>

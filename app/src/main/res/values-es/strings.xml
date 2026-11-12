@@ -314,7 +314,6 @@
     <string name="update_core_mihomo_smart">Núcleo Mihomo smart</string>
     <string name="update_core_singbox">Núcleo Sing-box</string>
     <string name="update_core_xray">Núcleo Xray</string>
-    <string name="update_core_v2ray">Núcleo V2Ray</string>
     <string name="update_core_hysteria">Núcleo Hysteria</string>
     <string name="update_target_core">Actualizar núcleo</string>
     <string name="update_target_subscription">Suscripción</string>
@@ -1092,4 +1091,11 @@
     <string name="xr_lint_global_transport">Se eliminó el bloque «transport» de nivel superior: mueve sus ajustes a streamSettings de los inbounds / outbounds.</string>
     <string name="xr_lint_dns">El núcleo es una compilación de Linux: Android no tiene /etc/resolv.conf, así que no resuelve dominios por sí mismo. Añade un bloque «dns» (p. ej. servidores 1.1.1.1, 8.8.8.8) y «domainStrategy»: «UseIP» en freedom.</string>
     <string name="sb_lint_http_client">Los conjuntos de reglas remotos se descargan con un cliente HTTP implícito solo hasta sing-box 1.16: define «http_clients» (y route.default_http_client).</string>
+    <string name="core_legacy_title">%1$s ya no tiene soporte</string>
+    <string name="core_legacy_v2fly">Boxy ya no ofrece V2Ray: Xray lee la misma configuración y sigue desarrollándose. Pasa a Xray: la configuración se copia y se comprueba antes; si falla, no cambia nada.</string>
+    <string name="core_legacy_premium">Su autor abandonó Clash Premium y no recibe actualizaciones. Mihomo es su continuación y lee la misma configuración: cambia a él (se descarga si falta; tu configuración se comprueba antes).</string>
+    <string name="core_legacy_to_mihomo">Cambiar a Mihomo</string>
+    <string name="core_legacy_mihomo_working">Cambiando a Mihomo…</string>
+    <string name="core_legacy_mihomo_ok">Cambiado a Mihomo</string>
+    <string name="core_legacy_mihomo_failed">No se cambió: Clash Premium sigue como estaba</string>
 </resources>

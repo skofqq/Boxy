@@ -45,7 +45,15 @@ fun ModuleSettingSheet(
     }
     when (setting) {
         ModuleSetting.CORE -> BoxySheet(stringResource(R.string.sheet_core_title), stringResource(R.string.sheet_core_subtitle), onDismiss) {
-            CORE_CHOICES.forEach { c ->
+            val currentLegacy = setup?.core?.takeIf { it.legacy }
+            if (currentLegacy != null) {
+                NoticeCard(
+                    stringResource(R.string.core_legacy_title, currentLegacy.title),
+                    stringResource(if (currentLegacy.binName == "v2fly") R.string.core_legacy_v2fly else R.string.core_legacy_premium),
+                )
+            }
+            // Retired cores are listed only while they are the active one.
+            CORE_CHOICES.filter { !it.legacy || it.id == setup?.core?.id }.forEach { c ->
                 val selected = setup?.core?.id == c.id
                 val installed = setup == null || c.id in setup.installed
                 val sub = when {

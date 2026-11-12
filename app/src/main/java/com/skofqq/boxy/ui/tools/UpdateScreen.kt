@@ -63,7 +63,6 @@ private val CORE_TARGETS = listOf(
     CoreTarget("Mihomo Smart", R.string.update_core_mihomo_smart, "clash", "smart"),
     CoreTarget("Sing-box", R.string.update_core_singbox, "sing-box", null),
     CoreTarget("Xray", R.string.update_core_xray, "xray", null),
-    CoreTarget("V2Ray", R.string.update_core_v2ray, "v2fly", null),
     CoreTarget("Hysteria", R.string.update_core_hysteria, "hysteria", null),
 )
 

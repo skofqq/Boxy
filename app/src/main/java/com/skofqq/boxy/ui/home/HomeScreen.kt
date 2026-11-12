@@ -115,6 +115,12 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                                 onStop = vm::stop,
                                 onRestart = vm::restart,
                             )
+                        }.also {
+                            // A retired core still active: the way out, right under the status. (Not above it: the
+                            // list keeps the first visible item in place, so a card added on top loads out of sight.)
+                            vm.setup?.core?.takeIf { c -> c.legacy }?.let { c ->
+                                item(key = "legacy") { LegacyCoreCard(c.binName, c.xclash) { vm.loadSetup() } }
+                            }
                         }
                         HomeSection.QUICK -> item(key = "quick") { Column {
                             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
