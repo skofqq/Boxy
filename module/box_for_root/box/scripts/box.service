@@ -611,6 +611,29 @@ prop_description() {
 # https, certificate verification) fail with "unknown authority" without it.
 go_cert_dirs="/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts"
 
+# hysteria has no config check of its own: the server line and the blocks the module sends traffic to.
+# Prints what is wrong and returns 1, or returns 0.
+hysteria_check() {
+  local f="$1" err=""
+  [ -s "${f}" ] || { echo "configuration file ${f} not found"; return 1; }
+  busybox grep -qE '^server:[[:space:]]*[^[:space:]#]' "${f}" || err="${err}server: is missing; "
+  if busybox grep -qE '^obfs:' "${f}" && busybox grep -qE '^[[:space:]]+type:[[:space:]]*salamander' "${f}"; then
+    busybox grep -qE '^[[:space:]]+password:[[:space:]]*[^[:space:]#]' "${f}" || err="${err}obfs salamander needs a password; "
+  fi
+  case "${network_mode}" in
+    redirect) busybox grep -q '^tcpRedirect:' "${f}" || err="${err}tcpRedirect: block is missing; " ;;
+    enhance)
+      busybox grep -q '^tcpRedirect:' "${f}" || err="${err}tcpRedirect: block is missing; "
+      busybox grep -q '^udpTProxy:' "${f}" || err="${err}udpTProxy: block is missing; " ;;
+    *)
+      busybox grep -q '^tcpTProxy:' "${f}" || err="${err}tcpTProxy: block is missing; "
+      busybox grep -q '^udpTProxy:' "${f}" || err="${err}udpTProxy: block is missing; " ;;
+  esac
+  [ -z "${err}" ] && return 0
+  echo "invalid config: ${err%; }"
+  return 1
+}
+
 box_run_bin() {
   log Info "client-list: [ ${bin_list[*]} ]"
   log Info "choose: ${bin_name}, start the service."
@@ -635,6 +658,12 @@ box_run_bin() {
           ;;
       esac
 
+      if ! out=$(hysteria_check "${hysteria_config}"); then
+        prop_description
+        log Error "${out}"
+        log Error "configuration failed. Please check ${hysteria_config}"
+        exit 1
+      fi
       SSL_CERT_DIR="${go_cert_dirs}" nohup busybox setuidgid "${box_user_group}" "${bin_path}" -c "${hysteria_config}" > "${bin_log}" 2>&1 &
       PID=$!
 

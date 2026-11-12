@@ -89,6 +89,29 @@ sb_overrides() {
   ls "${box_dir}/sing-box/.overrides"/*.json >/dev/null 2>&1 && echo "-C ${box_dir}/sing-box/.overrides"
 }
 
+# hysteria has no config check of its own: the server line and the blocks the module sends traffic to.
+# Prints what is wrong and returns 1, or returns 0.
+hysteria_check() {
+  local f="$1" err=""
+  [ -s "${f}" ] || { echo "configuration file ${f} not found"; return 1; }
+  busybox grep -qE '^server:[[:space:]]*[^[:space:]#]' "${f}" || err="${err}server: is missing; "
+  if busybox grep -qE '^obfs:' "${f}" && busybox grep -qE '^[[:space:]]+type:[[:space:]]*salamander' "${f}"; then
+    busybox grep -qE '^[[:space:]]+password:[[:space:]]*[^[:space:]#]' "${f}" || err="${err}obfs salamander needs a password; "
+  fi
+  case "${network_mode}" in
+    redirect) busybox grep -q '^tcpRedirect:' "${f}" || err="${err}tcpRedirect: block is missing; " ;;
+    enhance)
+      busybox grep -q '^tcpRedirect:' "${f}" || err="${err}tcpRedirect: block is missing; "
+      busybox grep -q '^udpTProxy:' "${f}" || err="${err}udpTProxy: block is missing; " ;;
+    *)
+      busybox grep -q '^tcpTProxy:' "${f}" || err="${err}tcpTProxy: block is missing; "
+      busybox grep -q '^udpTProxy:' "${f}" || err="${err}udpTProxy: block is missing; " ;;
+  esac
+  [ -z "${err}" ] && return 0
+  echo "invalid config: ${err%; }"
+  return 1
+}
+
 # Check Configuration
 check() {
   # su -c /data/adb/box/scripts/box.tool rconf
@@ -130,7 +153,13 @@ check() {
       fi
       ;;
     hysteria)
-      log Info "No configuration check implemented for hysteria, skipping."
+      if out=$(hysteria_check "${hysteria_config}"); then
+        log Info "${hysteria_config} passed"
+      else
+        log Error "${out}"
+        log Error "Configuration check failed for hysteria"
+        return 1
+      fi
       ;;
     *)
       log Error "<${bin_name}> unknown binary."
@@ -1007,6 +1036,11 @@ kernel_test_config() {
     sing-box) cfg="${sing_config}" ;;
     xray) cfg="${xray_config}" ;;
     v2fly) cfg="${v2fly_config}" ;;
+    hysteria)
+      # No check command: the config does not depend on the binary, its structure is checked instead.
+      [ -f "${hysteria_config}" ] || return 2
+      hysteria_check "${hysteria_config}" > "${out}" 2>&1 && return 0
+      return 2 ;;
     *) return 2 ;;
   esac
   [ -f "${cfg}" ] || return 2

@@ -82,6 +82,8 @@ object ImportLinks {
                 val url = uri.getQueryParameter("url") ?: return null
                 return ImportRequest(url, uri.fragment?.let { decode(it) } ?: uri.getQueryParameter("name"), "sing-box")
             }
+            // A Hysteria 2 server link (pasted or from a QR code) becomes a hysteria profile.
+            "hysteria2", "hy2" -> return ImportRequest(raw.lineSequence().first().trim(), null, "hysteria")
         }
         // Shared text or QR content: the first http(s) link in it.
         val link = Regex("https?://\\S+").find(raw)?.value ?: return null
@@ -153,6 +155,9 @@ fun rememberQrLaunchers(): QrLaunchers {
 /** Download the subscription as a config file (checked by the core) or add it to the module's subscription list. */
 @Composable
 fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
+    if (request.core == "hysteria" && com.skofqq.boxy.configs.HysteriaConfig.parseLink(request.url) != null) {
+        return HysteriaImportSheet(request.url, onDismiss)
+    }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var core by remember { mutableStateOf(request.core) }

@@ -1024,4 +1024,34 @@
     <string name="xray_move_sub">Xray lit la configuration de V2Ray et est plus activement maintenu</string>
     <string name="xray_move_confirm">Les configurations v2fly sont copiées dans xray/ (l’existant va dans un dossier de sauvegarde) et vérifiées par Xray. Le cœur ne passe à Xray que si la vérification réussit.</string>
     <string name="xray_move_go">Migrer</string>
+    <string name="hy_title">Profils Hysteria</string>
+    <string name="hy_sub">Un fichier par serveur ; toucher un fichier ci-dessus bascule dessus et redémarre Hysteria. Les blocs tproxy / redirect du module sont conservés.</string>
+    <string name="hy_add_link">Ajouter depuis un lien</string>
+    <string name="hy_add_link_sub">hysteria2:// · un QR code marche aussi : Outils → Importer un abonnement</string>
+    <string name="hy_add_link_sheet_sub">La partie serveur vient du lien, le reste du profil actif</string>
+    <string name="hy_link_invalid">Ce n’est pas un lien hysteria2://</string>
+    <string name="hy_activate_sub">Basculer tout de suite (redémarre Hysteria si elle tourne)</string>
+    <string name="hy_add">Ajouter</string>
+    <string name="hy_form">Modifier en formulaire</string>
+    <string name="hy_form_sub">La partie serveur du profil actif ; le reste reste dans le YAML</string>
+    <string name="hy_speed">Mesurer le débit</string>
+    <string name="hy_speed_sub">hysteria speedtest vers le serveur, puis remplir bandwidth up / down</string>
+    <string name="hy_speed_apply_title">Utiliser le débit mesuré ?</string>
+    <string name="hy_speed_apply">bandwidth up : %1$s, down : %2$s. Le contrôle de congestion de Hysteria fonctionne au mieux avec le débit réel de la ligne.</string>
+    <string name="hy_f_server">Serveur (hôte:port ou ports pour le hopping : 443,20000-30000)</string>
+    <string name="hy_f_auth">Mot de passe (auth)</string>
+    <string name="hy_f_obfs">Mot de passe d’obfuscation Salamander (vide = désactivé)</string>
+    <string name="hy_f_hop">Intervalle de saut de port (hopInterval)</string>
+    <string name="hy_f_up">Débit montant (up)</string>
+    <string name="hy_f_down">Débit descendant (down)</string>
+    <string name="hy_f_insecure">Ne pas vérifier le certificat (insecure)</string>
+    <string name="hy_f_insecure_sub">Uniquement pour les serveurs auto-signés ; pinSHA256 est plus sûr</string>
+    <string name="hy_check_yaml">Le YAML est illisible : %1$s</string>
+    <string name="hy_check_server">server: manquant</string>
+    <string name="hy_check_server_format">server: doit être hôte:port (ou hôte:port,ports), pas %1$s</string>
+    <string name="hy_check_auth">auth: vide : la plupart des serveurs exigent un mot de passe</string>
+    <string name="hy_check_obfs">obfs salamander exige un mot de passe d’au moins 4 caractères</string>
+    <string name="hy_check_bandwidth">Le débit doit ressembler à « 100 mbps » : %1$s</string>
+    <string name="hy_check_block">Bloc %1$s manquant : le module y envoie le trafic</string>
+    <string name="hy_check_duration">hopInterval doit avoir une unité, ex. 30s : %1$s</string>
 </resources>

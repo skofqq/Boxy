@@ -58,9 +58,8 @@ object CoreTools {
         val cfg = activeConfig(core)
         if (!Shell.cmd("[ -s ${q(cfg)} ]").exec().isSuccess) return@withContext CorePrecheck.NoConfig(cfg)
         if (core == "hysteria") {
-            val text = BoxModule.readFile(cfg).orEmpty()
-            return@withContext if (Regex("(?m)^server:\\s*\\S").containsMatchIn(text)) CorePrecheck.Ok
-            else CorePrecheck.BadConfig(cfg, "server: is missing")
+            val r = ConfigCheck.check("hysteria", cfg)
+            return@withContext if (r is CheckResult.Failed) CorePrecheck.BadConfig(cfg, r.output) else CorePrecheck.Ok
         }
         val cmd = when (core) {
             "clash" -> "timeout 30 $BOX/bin/${choice.binary} -t -d $BOX/clash -f ${q(cfg)}"

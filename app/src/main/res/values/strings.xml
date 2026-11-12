@@ -1047,4 +1047,34 @@
     <string name="xray_move_sub">Xray reads V2Ray\'s config and is maintained more actively</string>
     <string name="xray_move_confirm">The v2fly configs are copied into xray/ (what is there goes to a backup folder) and checked with Xray. Only if the check passes, the core switches to Xray.</string>
     <string name="xray_move_go">Move</string>
+    <string name="hy_title">Hysteria profiles</string>
+    <string name="hy_sub">One file per server; tapping a file above switches to it and restarts Hysteria. The module\'s tproxy / redirect blocks are kept.</string>
+    <string name="hy_add_link">Add from a link</string>
+    <string name="hy_add_link_sub">hysteria2:// · a QR code works too: Tools → Import subscription</string>
+    <string name="hy_add_link_sheet_sub">The server part comes from the link, the rest from the active profile</string>
+    <string name="hy_link_invalid">Not a hysteria2:// link</string>
+    <string name="hy_activate_sub">Switch to it now (restarts Hysteria if it runs)</string>
+    <string name="hy_add">Add</string>
+    <string name="hy_form">Edit as a form</string>
+    <string name="hy_form_sub">The active profile\'s server part; other settings stay in the YAML</string>
+    <string name="hy_speed">Measure speed</string>
+    <string name="hy_speed_sub">hysteria speedtest to the server, then fill bandwidth up / down</string>
+    <string name="hy_speed_apply_title">Use the measured speed?</string>
+    <string name="hy_speed_apply">bandwidth up: %1$s, down: %2$s. Hysteria\'s congestion control works best with the real line speed.</string>
+    <string name="hy_f_server">Server (host:port, or ports for hopping: 443,20000-30000)</string>
+    <string name="hy_f_auth">Password (auth)</string>
+    <string name="hy_f_obfs">Salamander obfuscation password (empty = off)</string>
+    <string name="hy_f_hop">Port hopping interval (hopInterval)</string>
+    <string name="hy_f_up">Upload bandwidth (up)</string>
+    <string name="hy_f_down">Download bandwidth (down)</string>
+    <string name="hy_f_insecure">Skip certificate check (insecure)</string>
+    <string name="hy_f_insecure_sub">Only for self-signed servers; pinSHA256 is the safer choice</string>
+    <string name="hy_check_yaml">The YAML cannot be read: %1$s</string>
+    <string name="hy_check_server">server: is missing</string>
+    <string name="hy_check_server_format">server: should be host:port (or host:port,ports), not %1$s</string>
+    <string name="hy_check_auth">auth: is empty: most servers need a password</string>
+    <string name="hy_check_obfs">obfs salamander needs a password of at least 4 characters</string>
+    <string name="hy_check_bandwidth">Bandwidth should look like \"100 mbps\": %1$s</string>
+    <string name="hy_check_block">%1$s: block is missing: the module sends traffic there</string>
+    <string name="hy_check_duration">hopInterval needs a unit, e.g. 30s: %1$s</string>
 </resources>

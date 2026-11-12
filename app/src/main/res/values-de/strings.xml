@@ -1024,4 +1024,34 @@
     <string name="xray_move_sub">Xray liest die V2Ray-Konfiguration und wird aktiver gepflegt</string>
     <string name="xray_move_confirm">Die v2fly-Konfigurationen werden nach xray/ kopiert (Vorhandenes kommt in einen Backup-Ordner) und mit Xray geprüft. Nur wenn die Prüfung besteht, wechselt der Kern zu Xray.</string>
     <string name="xray_move_go">Wechseln</string>
+    <string name="hy_title">Hysteria-Profile</string>
+    <string name="hy_sub">Eine Datei pro Server; ein Tipp auf eine Datei oben wechselt zu ihr und startet Hysteria neu. Die tproxy-/redirect-Blöcke des Moduls bleiben.</string>
+    <string name="hy_add_link">Aus einem Link hinzufügen</string>
+    <string name="hy_add_link_sub">hysteria2:// · ein QR-Code geht auch: Tools → Abo importieren</string>
+    <string name="hy_add_link_sheet_sub">Der Serverteil kommt aus dem Link, der Rest aus dem aktiven Profil</string>
+    <string name="hy_link_invalid">Kein hysteria2://-Link</string>
+    <string name="hy_activate_sub">Gleich wechseln (startet Hysteria neu, falls sie läuft)</string>
+    <string name="hy_add">Hinzufügen</string>
+    <string name="hy_form">Als Formular bearbeiten</string>
+    <string name="hy_form_sub">Serverteil des aktiven Profils; alles andere bleibt im YAML</string>
+    <string name="hy_speed">Geschwindigkeit messen</string>
+    <string name="hy_speed_sub">hysteria speedtest zum Server, dann bandwidth up / down füllen</string>
+    <string name="hy_speed_apply_title">Gemessene Geschwindigkeit übernehmen?</string>
+    <string name="hy_speed_apply">bandwidth up: %1$s, down: %2$s. Hysterias Staukontrolle arbeitet am besten mit der echten Leitungsgeschwindigkeit.</string>
+    <string name="hy_f_server">Server (host:port oder Ports für Hopping: 443,20000-30000)</string>
+    <string name="hy_f_auth">Passwort (auth)</string>
+    <string name="hy_f_obfs">Salamander-Passwort (leer = aus)</string>
+    <string name="hy_f_hop">Port-Hopping-Intervall (hopInterval)</string>
+    <string name="hy_f_up">Upload-Bandbreite (up)</string>
+    <string name="hy_f_down">Download-Bandbreite (down)</string>
+    <string name="hy_f_insecure">Zertifikat nicht prüfen (insecure)</string>
+    <string name="hy_f_insecure_sub">Nur für selbst signierte Server; pinSHA256 ist sicherer</string>
+    <string name="hy_check_yaml">Das YAML ist nicht lesbar: %1$s</string>
+    <string name="hy_check_server">server: fehlt</string>
+    <string name="hy_check_server_format">server: muss host:port (oder host:port,Ports) sein, nicht %1$s</string>
+    <string name="hy_check_auth">auth: ist leer: die meisten Server brauchen ein Passwort</string>
+    <string name="hy_check_obfs">obfs salamander braucht ein Passwort mit mindestens 4 Zeichen</string>
+    <string name="hy_check_bandwidth">Bandbreite sollte wie „100 mbps“ aussehen: %1$s</string>
+    <string name="hy_check_block">Block %1$s fehlt: das Modul leitet den Traffic dorthin</string>
+    <string name="hy_check_duration">hopInterval braucht eine Einheit, z. B. 30s: %1$s</string>
 </resources>

@@ -1024,4 +1024,34 @@
     <string name="xray_move_sub">Xray legge la configurazione di V2Ray ed è mantenuto più attivamente</string>
     <string name="xray_move_confirm">Le configurazioni v2fly vengono copiate in xray/ (quanto c’era va in una cartella di backup) e verificate con Xray. Il core passa a Xray solo se la verifica riesce.</string>
     <string name="xray_move_go">Migra</string>
+    <string name="hy_title">Profili Hysteria</string>
+    <string name="hy_sub">Un file per server; toccando un file qui sopra si passa a quello e Hysteria si riavvia. I blocchi tproxy / redirect del modulo restano.</string>
+    <string name="hy_add_link">Aggiungi da un link</string>
+    <string name="hy_add_link_sub">hysteria2:// · va bene anche un QR: Strumenti → Importa abbonamento</string>
+    <string name="hy_add_link_sheet_sub">La parte server viene dal link, il resto dal profilo attivo</string>
+    <string name="hy_link_invalid">Non è un link hysteria2://</string>
+    <string name="hy_activate_sub">Passa subito (riavvia Hysteria se è attiva)</string>
+    <string name="hy_add">Aggiungi</string>
+    <string name="hy_form">Modifica come modulo</string>
+    <string name="hy_form_sub">La parte server del profilo attivo; il resto resta nello YAML</string>
+    <string name="hy_speed">Misura la velocità</string>
+    <string name="hy_speed_sub">hysteria speedtest verso il server, poi compila bandwidth up / down</string>
+    <string name="hy_speed_apply_title">Usare la velocità misurata?</string>
+    <string name="hy_speed_apply">bandwidth up: %1$s, down: %2$s. Il controllo di congestione di Hysteria funziona meglio con la velocità reale della linea.</string>
+    <string name="hy_f_server">Server (host:porta o porte per l’hopping: 443,20000-30000)</string>
+    <string name="hy_f_auth">Password (auth)</string>
+    <string name="hy_f_obfs">Password di offuscamento Salamander (vuoto = disattivo)</string>
+    <string name="hy_f_hop">Intervallo di cambio porta (hopInterval)</string>
+    <string name="hy_f_up">Banda in upload (up)</string>
+    <string name="hy_f_down">Banda in download (down)</string>
+    <string name="hy_f_insecure">Non verificare il certificato (insecure)</string>
+    <string name="hy_f_insecure_sub">Solo per server autofirmati; pinSHA256 è più sicuro</string>
+    <string name="hy_check_yaml">Lo YAML non è leggibile: %1$s</string>
+    <string name="hy_check_server">Manca server:</string>
+    <string name="hy_check_server_format">server: deve essere host:porta (o host:porta,porte), non %1$s</string>
+    <string name="hy_check_auth">auth: è vuoto: la maggior parte dei server richiede una password</string>
+    <string name="hy_check_obfs">obfs salamander richiede una password di almeno 4 caratteri</string>
+    <string name="hy_check_bandwidth">La banda deve essere come «100 mbps»: %1$s</string>
+    <string name="hy_check_block">Manca il blocco %1$s: il modulo vi invia il traffico</string>
+    <string name="hy_check_duration">hopInterval richiede un’unità, es. 30s: %1$s</string>
 </resources>

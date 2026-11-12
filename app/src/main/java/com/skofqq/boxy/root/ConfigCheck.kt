@@ -1,5 +1,6 @@
 package com.skofqq.boxy.root
 
+import com.skofqq.boxy.util.withAppLocale
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,6 +51,8 @@ object ConfigCheck {
                 "XRAY_LOCATION_ASSET=${q(dir)} timeout 30 \"\$b\" run -test -c ${q(file)} 2>&1"
             "v2fly" -> "b=$BOX/bin/v2fly; [ -x \"\$b\" ] || exit 127; " +
                 "V2RAY_LOCATION_ASSET=${q(dir)} timeout 30 \"\$b\" test -c ${q(file)} 2>&1"
+            // hysteria has no check command: Boxy checks the YAML, the server part and the module's blocks itself.
+            "hysteria" -> return@withContext checkHysteria(file)
             else -> return@withContext CheckResult.Unsupported
         }
         val r = Shell.cmd(cmd).exec()
@@ -60,6 +63,15 @@ object ConfigCheck {
             r.isSuccess -> CheckResult.Ok
             else -> CheckResult.Failed(errorText(r.out + r.err))
         }
+    }
+
+    private suspend fun checkHysteria(file: String): CheckResult {
+        val text = BoxModule.readFile(file) ?: return CheckResult.Unsupported
+        val mode = BoxModule.unquote(BoxModule.readSetting("network_mode"))
+        val ctx = com.skofqq.boxy.BoxyApp.instance.withAppLocale()
+        val errors = com.skofqq.boxy.configs.HysteriaConfig.check(text, mode).filter { it.error }
+        return if (errors.isEmpty()) CheckResult.Ok
+        else CheckResult.Failed(errors.joinToString("\n") { p -> ctx.getString(p.message, p.arg) })
     }
 
     /** Checks unsaved text: writes it next to the original (relative includes still resolve), tests, deletes. */

@@ -1024,4 +1024,34 @@
     <string name="xray_move_sub">Xray, V2Ray yapılandırmasını okur ve daha etkin geliştirilir</string>
     <string name="xray_move_confirm">v2fly yapılandırmaları xray/ içine kopyalanır (oradakiler yedek klasörüne taşınır) ve Xray ile denetlenir. Çekirdek yalnızca denetim geçerse Xray\'e geçer.</string>
     <string name="xray_move_go">Taşı</string>
+    <string name="hy_title">Hysteria profilleri</string>
+    <string name="hy_sub">Sunucu başına bir dosya; yukarıdaki bir dosyaya dokunmak ona geçer ve Hysteria\'yı yeniden başlatır. Modülün tproxy / redirect blokları korunur.</string>
+    <string name="hy_add_link">Bağlantıdan ekle</string>
+    <string name="hy_add_link_sub">hysteria2:// · QR kod da olur: Araçlar → Abonelik içe aktar</string>
+    <string name="hy_add_link_sheet_sub">Sunucu kısmı bağlantıdan, gerisi etkin profilden gelir</string>
+    <string name="hy_link_invalid">hysteria2:// bağlantısı değil</string>
+    <string name="hy_activate_sub">Hemen geç (çalışıyorsa Hysteria yeniden başlar)</string>
+    <string name="hy_add">Ekle</string>
+    <string name="hy_form">Form olarak düzenle</string>
+    <string name="hy_form_sub">Etkin profilin sunucu kısmı; diğer ayarlar YAML\'da kalır</string>
+    <string name="hy_speed">Hızı ölç</string>
+    <string name="hy_speed_sub">Sunucuya hysteria speedtest, ardından bandwidth up / down doldur</string>
+    <string name="hy_speed_apply_title">Ölçülen hız kullanılsın mı?</string>
+    <string name="hy_speed_apply">bandwidth up: %1$s, down: %2$s. Hysteria\'nın tıkanıklık denetimi gerçek hat hızıyla en iyi çalışır.</string>
+    <string name="hy_f_server">Sunucu (host:port veya hopping portları: 443,20000-30000)</string>
+    <string name="hy_f_auth">Parola (auth)</string>
+    <string name="hy_f_obfs">Salamander gizleme parolası (boş = kapalı)</string>
+    <string name="hy_f_hop">Port atlama aralığı (hopInterval)</string>
+    <string name="hy_f_up">Yükleme bant genişliği (up)</string>
+    <string name="hy_f_down">İndirme bant genişliği (down)</string>
+    <string name="hy_f_insecure">Sertifikayı denetleme (insecure)</string>
+    <string name="hy_f_insecure_sub">Yalnızca kendinden imzalı sunucular için; pinSHA256 daha güvenli</string>
+    <string name="hy_check_yaml">YAML okunamıyor: %1$s</string>
+    <string name="hy_check_server">server: eksik</string>
+    <string name="hy_check_server_format">server: host:port (veya host:port,portlar) olmalı, %1$s değil</string>
+    <string name="hy_check_auth">auth: boş: çoğu sunucu parola ister</string>
+    <string name="hy_check_obfs">obfs salamander en az 4 karakterlik parola ister</string>
+    <string name="hy_check_bandwidth">Bant genişliği «100 mbps» gibi olmalı: %1$s</string>
+    <string name="hy_check_block">%1$s bloğu eksik: modül trafiği oraya gönderir</string>
+    <string name="hy_check_duration">hopInterval birim ister, ör. 30s: %1$s</string>
 </resources>

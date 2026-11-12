@@ -97,7 +97,8 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
     fun select(f: RootFile) {
         scope.launch {
             val c = core ?: return@launch
-            if (BoxModule.writeSetting(coreConfig(c).second, f.name)) {
+            // Hysteria profiles switch at once: the running core restarts with the chosen one.
+            if (if (c == "hysteria") HysteriaProfiles.activate(f.name) else BoxModule.writeSetting(coreConfig(c).second, f.name)) {
                 active = f.name
                 Toast.makeText(context, context.getString(R.string.config_selected, f.name), Toast.LENGTH_SHORT).show()
             }
@@ -198,6 +199,8 @@ SubPageHeader(
                 }
             }
         }
+        // Hysteria: profiles from hysteria2:// links, the form editor and the speed test.
+        if (core == "hysteria") item(key = "hysteria") { HysteriaSection(active) { reload++ } }
         // Xray / V2Ray: subscription of share links, and moving V2Ray's config to Xray.
         core?.takeIf { it == "xray" || it == "v2fly" }?.let { c ->
             item(key = "xsub-$c") { XraySubscriptionSection(c) { reload++ } }
