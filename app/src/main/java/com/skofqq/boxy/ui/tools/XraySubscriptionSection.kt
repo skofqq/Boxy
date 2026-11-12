@@ -94,7 +94,7 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
                 showDivider = core == "v2fly",
             ) { on ->
                 scope.launch {
-                    if (!XraySubscription.ensureBalancer(core, on)) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    if (!XraySubscription.ensureBalancer(core, on)) Toast.makeText(context, R.string.xsub_default_failed, Toast.LENGTH_LONG).show()
                     reload++
                     onChanged()
                 }
@@ -136,5 +136,10 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
             onDismiss = { confirmMove = false },
         )
     }
-    taskTitle?.let { t -> TaskDialog(t, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null } }
+    val texts = if (taskTitle == moveTitle) {
+        com.skofqq.boxy.ui.components.TaskTexts(stringResource(R.string.xray_move_working), stringResource(R.string.xray_move_ok), stringResource(R.string.xray_move_failed))
+    } else {
+        com.skofqq.boxy.ui.components.TaskTexts(stringResource(R.string.subs_task_working), stringResource(R.string.subs_task_ok), stringResource(R.string.subs_task_failed))
+    }
+    taskTitle?.let { t -> TaskDialog(t, taskLines, taskDone, taskOk, texts) { if (taskDone) taskTitle = null } }
 }

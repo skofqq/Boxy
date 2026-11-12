@@ -93,19 +93,23 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
         client = BoxModule.readFile(path)?.let { HysteriaConfig.read(it) }
     }
     val speedTitle = stringResource(R.string.hy_speed)
+    var speedFail by remember { mutableStateOf<Int?>(null) }
 
     SectionCard(stringResource(R.string.hy_title), stringResource(R.string.hy_sub)) {
         SettingsRow(BoxyIcons.QrCode, stringResource(R.string.hy_add_link), stringResource(R.string.hy_add_link_sub)) { addLink = true }
         SettingsRow(BoxyIcons.Edit, stringResource(R.string.hy_form), client?.server?.ifBlank { null } ?: active?.substringAfterLast('/')) { form = true }
         SettingsRow(BoxyIcons.Speed, speedTitle, client?.let { c -> if (c.up.isNotBlank() || c.down.isNotBlank()) "↑ ${c.up}  ↓ ${c.down}" else null } ?: stringResource(R.string.hy_speed_sub), showDivider = false) {
-            val file = active ?: return@SettingsRow
+            // The active profile's full path (activeConfig), not a name inside hysteria/.
+            val path = active ?: return@SettingsRow
             taskTitle = speedTitle
             taskLines.clear()
             taskDone = false
+            speedFail = null
             scope.launch {
-                taskOk = RootTask.run(speedScript(file)) { taskLines.addTaskLine(it) }
+                taskOk = RootTask.run(speedScript(path)) { taskLines.addTaskLine(it) }
                 val (up, down) = HysteriaConfig.parseSpeed(taskLines)
-                if (up != null || down != null) speed = up to down
+                if (taskOk && (up != null || down != null)) speed = up to down
+                if (!taskOk) speedFail = speedFailure(taskLines)
                 taskDone = true
             }
         }
@@ -129,7 +133,7 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
                         val st = BoxModule.state()
                         if (st.running && BoxModule.unquote(st.core) == "hysteria") BoxModule.restart()
                     }
-                    Toast.makeText(context, if (ok) R.string.editor_saved else R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, if (ok) R.string.hy_profile_saved else R.string.hy_save_failed, Toast.LENGTH_SHORT).show()
                     form = false
                     reload++
                     onChanged()
@@ -140,7 +144,12 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
         }
     }
 
-    taskTitle?.let { t -> TaskDialog(t, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null } }
+    val speedTexts = com.skofqq.boxy.ui.components.TaskTexts(
+        stringResource(R.string.hy_speed_working),
+        stringResource(R.string.hy_speed_ok),
+        stringResource(speedFail ?: R.string.hy_speed_failed),
+    )
+    taskTitle?.let { t -> TaskDialog(t, taskLines, taskDone, taskOk, speedTexts) { if (taskDone) taskTitle = null } }
 
     // H2: the measured speed into bandwidth (up / down), which Hysteria's congestion control uses.
     speed?.let { (up, down) ->
@@ -155,7 +164,7 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
                     val path = active ?: return@ConfirmDialog
                     scope.launch {
                         val ok = HysteriaProfiles.create(path.substringAfterLast('/'), c.copy(up = up ?: c.up, down = down ?: c.down))
-                        Toast.makeText(context, if (ok) R.string.editor_saved else R.string.op_failed, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, if (ok) R.string.hy_speed_saved else R.string.hy_save_failed, Toast.LENGTH_SHORT).show()
                         reload++
                     }
                 },
@@ -166,14 +175,28 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
 }
 
 /** hysteria speedtest with the profile, run as the core's user so it does not go through the running proxy. */
-private fun speedScript(file: String): String {
+/** Why the speed test failed, in words; the raw lines stay in the details. */
+private fun speedFailure(lines: List<String>): Int {
+    val text = lines.joinToString("\n")
+    fun has(r: String) = Regex(r, RegexOption.IGNORE_CASE).containsMatchIn(text)
+    return when {
+        has("may not support speed test") -> R.string.hy_speed_no_support
+        has("authentication error|HTTP status code: 40[13]") -> R.string.hy_speed_auth
+        has("failed to (read|parse|load) client config|invalid config") -> R.string.hy_speed_config
+        has("no recent network activity|timeout|connection refused|no route|no such host|failed to connect") -> R.string.hy_speed_unreachable
+        has("not installed") -> R.string.hy_speed_no_core
+        else -> R.string.hy_speed_failed
+    }
+}
+
+private fun speedScript(path: String): String {
     val b = BoxModule.BOX_DIR
     return """
         (
         BB=; for x in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox; do [ -x ${'$'}x ] && BB=${'$'}x && break; done
         [ -x $b/bin/hysteria ] || { echo "hysteria is not installed"; exit 1; }
         ug=${'$'}(grep -m1 '^box_user_group=' ${BoxModule.SETTINGS} | cut -d= -f2 | tr -d '"')
-        SSL_CERT_DIR=/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts ${'$'}BB timeout 60 ${'$'}BB setuidgid ${'$'}{ug:-root:net_admin} $b/bin/hysteria speedtest -c '$b/hysteria/$file' --duration 5s --disable-update-check -l info
+        SSL_CERT_DIR=/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts ${'$'}BB timeout 60 ${'$'}BB setuidgid ${'$'}{ug:-root:net_admin} $b/bin/hysteria speedtest -c '$path' --duration 5s --disable-update-check -l info
         rc=${'$'}?; exit ${'$'}rc
         )
     """.trimIndent()
@@ -232,7 +255,7 @@ fun HysteriaImportSheet(initial: String, onDismiss: () -> Unit, onDone: () -> Un
                 val file = HysteriaProfiles.fileName(name.ifBlank { parsed.first })
                 scope.launch {
                     val ok = HysteriaProfiles.create(file, c, keepBandwidth = true) && (!activate || HysteriaProfiles.activate(file))
-                    Toast.makeText(context, if (ok) context.getString(R.string.config_download_ok, file) else context.getString(R.string.op_failed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, if (ok) context.getString(R.string.hy_profile_added, file) else context.getString(R.string.hy_save_failed), Toast.LENGTH_SHORT).show()
                     if (ok) {
                         onDone()
                         onDismiss()

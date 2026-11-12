@@ -242,8 +242,12 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
     if (dashboardSheet) {
         com.skofqq.boxy.ui.panel.DashboardSheet(onDismiss = { dashboardSheet = false; reload++ }, onInstalled = { reload++ })
     }
+    val subsTitleForDialog = stringResource(R.string.panel_settings_update_subs)
     taskTitle?.let { title ->
-        com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk) {
+        val texts = if (title == subsTitleForDialog) com.skofqq.boxy.ui.components.TaskTexts(
+            stringResource(R.string.subs_task_working), stringResource(R.string.subs_task_ok), stringResource(R.string.subs_task_failed),
+        ) else null
+        com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk, texts) {
             if (taskDone) {
                 taskTitle = null
                 reload++

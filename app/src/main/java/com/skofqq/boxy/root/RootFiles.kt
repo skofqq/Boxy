@@ -82,7 +82,11 @@ object RootTask {
                 onLine(stripAnsi(e))
             }
         }
-        Shell.cmd("$cmd 2>&1").to(callback).exec().isSuccess
+        val ok = Shell.cmd("$cmd 2>&1").to(callback).exec().isSuccess
+        // libsu hands the lines to the main thread by posting them: wait until the last one arrived, so callers can
+        // read the whole output once this returns (speed test result, kernel check, TLS verdict).
+        withContext(Dispatchers.Main) { }
+        ok
     }
 
     fun stripAnsi(s: String): String = s.replace(Regex("\u001B\\[[0-9;]*[A-Za-z]"), "")

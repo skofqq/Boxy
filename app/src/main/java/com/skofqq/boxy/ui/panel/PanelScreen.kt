@@ -178,7 +178,12 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
             contentAlignment = Alignment.Center,
         ) {
             when {
-                native -> com.skofqq.boxy.ui.proxies.CorePanel(nativeReload)
+                // This box is the backdrop the header samples: glass inside it must not sample it too, or the layer
+                // draws itself without end and RenderThread dies (glass chips in the built-in panel). Its own
+                // pages provide their own backdrops where they need one.
+                native -> androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides null) {
+                    com.skofqq.boxy.ui.proxies.CorePanel(nativeReload)
+                }
                 current == null && !localChecked -> CircularProgressIndicator()
                 current == null -> Text(
                     stringResource(if (kind == PanelKind.CORE) R.string.panel_unavailable else R.string.substore_unavailable),

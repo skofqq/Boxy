@@ -111,7 +111,14 @@ private class TaskProgress(lines: List<String>) {
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, onDismiss: () -> Unit) {
+fun TaskDialog(
+    title: String,
+    lines: List<String>,
+    done: Boolean,
+    ok: Boolean,
+    texts: TaskTexts? = null,
+    onDismiss: () -> Unit,
+) {
     val context = LocalContext.current
     val p = remember(lines.size, lines.lastOrNull()) { TaskProgress(lines) }
     val visual = when {
@@ -180,7 +187,14 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
             }
             Spacer(Modifier.height(16.dp))
             Text(title, style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, textAlign = TextAlign.Center)
-            val status = when (visual) {
+            val status = when {
+                // Tasks that are not updates (checks, measurements, moves) name their own outcome.
+                texts != null -> when (visual) {
+                    TaskVisual.OK -> texts.ok
+                    TaskVisual.FAILED -> texts.failed
+                    else -> texts.working
+                }
+                else -> when (visual) {
                 TaskVisual.OK -> stringResource(
                     if (p.upToDate) R.string.task_up_to_date else R.string.update_completed,
                     listOfNotNull(title, p.version).joinToString(" "),
@@ -188,6 +202,7 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                 TaskVisual.FAILED -> stringResource(R.string.update_failed)
                 TaskVisual.PROGRESS -> stringResource(R.string.import_downloading)
                 TaskVisual.WORKING -> if (p.percent != null) stringResource(R.string.task_installing) else stringResource(R.string.update_started, title)
+                }
             }
             AnimatedContent(
                 targetState = status,
@@ -228,12 +243,25 @@ fun TaskDialog(title: String, lines: List<String>, done: Boolean, ok: Boolean, o
                     Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(min = 80.dp, max = 220.dp)
                         .clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(12.dp),
                 ) {
-                    Column(Modifier.verticalScroll(vScroll).horizontalScroll(rememberScrollState())) {
-                        lines.takeLast(200).forEach {
-                            Text(it, fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Clip)
+                    // Long lines wrap so a whole error is readable; the text can be selected and copied.
+                    androidx.compose.foundation.text.selection.SelectionContainer {
+                        Column(Modifier.verticalScroll(vScroll)) {
+                            lines.takeLast(200).forEach {
+                                Text(it, fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = Boxy.colors.text)
+                            }
                         }
                     }
                 }
+                val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
+                Text(
+                    stringResource(R.string.task_copy_log),
+                    Modifier.padding(top = 6.dp).clip(RoundedCornerShape(50)).clickable {
+                        clipboard.setText(androidx.compose.ui.text.AnnotatedString(lines.takeLast(200).joinToString("\n")))
+                        android.widget.Toast.makeText(context, R.string.task_copied, android.widget.Toast.LENGTH_SHORT).show()
+                    }.padding(horizontal = 10.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Boxy.colors.accent,
+                )
             }
             AnimatedVisibility(done, enter = fadeIn(), exit = fadeOut()) {
                 Column(Modifier.padding(top = 16.dp)) {
@@ -389,3 +417,6 @@ fun MutableList<String>.addTaskLine(line: String) {
         add(line)
     }
 }
+
+/** What a task dialog says while it runs, when it succeeded and when it failed, for tasks other than updates. */
+data class TaskTexts(val working: String, val ok: String, val failed: String)

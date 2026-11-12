@@ -74,6 +74,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     var dashboardSheet by remember { mutableStateOf(false) }
     var geoSheet by remember { mutableStateOf(false) }
     var geoLabel by remember { mutableStateOf("MetaCubeX") }
+    var core by remember { mutableStateOf<String?>(null) }
     var smartSupported by remember { mutableStateOf(false) }
     var taskTitle by remember { mutableStateOf<String?>(null) }
     val taskLines = remember { mutableStateListOf<String>() }
@@ -83,6 +84,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     LaunchedEffect(Unit) {
         smartSupported = BoxModule.exec("grep -q 'smart' ${BoxModule.SCRIPTS}/box.tool").first
         CoreTools.geoSources().let { (p, e) -> geoLabel = geoSourcesLabel(p, e) }
+        core = BoxModule.unquote(BoxModule.readSetting("bin_name"))
     }
 
     val keptOld = stringResource(R.string.update_core_kept_old)
@@ -116,7 +118,8 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
                 com.skofqq.boxy.ui.components.NoticeCard(stringResource(R.string.update_tip_title), stringResource(R.string.update_tip_body))
                 Spacer(Modifier.height(6.dp))
                 UpdateRow(BoxyIcons.Storage, stringResource(R.string.update_target_core), stringResource(R.string.update_core_sub)) { coreSheet = true }
-                UpdateRow(BoxyIcons.Link, subsTitle, stringResource(R.string.update_subscription_sub)) {
+                // Hysteria has no subscriptions in the module (its profiles come from links).
+                if (core != "hysteria") UpdateRow(BoxyIcons.Link, subsTitle, stringResource(R.string.update_subscription_sub)) {
                     launchTask(subsTitle, "${BoxModule.SCRIPTS}/box.tool subs")
                 }
                 UpdateRow(BoxyIcons.Language, webuiTitle, stringResource(R.string.update_webui_sub)) { dashboardSheet = true }
@@ -161,7 +164,20 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
     }
 
     taskTitle?.let { title ->
-        com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk) { if (taskDone) taskTitle = null }
+        // Subscriptions and geo files are not "updated: <version>": they say what happened to them.
+        val texts = when (title) {
+            subsTitle -> com.skofqq.boxy.ui.components.TaskTexts(
+                stringResource(R.string.subs_task_working), stringResource(R.string.subs_task_ok), stringResource(R.string.subs_task_failed),
+            )
+            geoTitle -> com.skofqq.boxy.ui.components.TaskTexts(
+                stringResource(R.string.geo_task_working),
+                // The module skips cores that need no geo files, and files that did not change.
+                stringResource(if (taskLines.any { "skipping" in it || "is up to date" in it || "is unchanged" in it } && taskLines.none { " updated" in it }) R.string.geo_task_nothing else R.string.geo_task_ok),
+                stringResource(R.string.geo_task_failed),
+            )
+            else -> null
+        }
+        com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk, texts) { if (taskDone) taskTitle = null }
     }
 }
 

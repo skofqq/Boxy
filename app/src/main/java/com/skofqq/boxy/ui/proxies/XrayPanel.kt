@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.skofqq.boxy.R
 import com.skofqq.boxy.net.XrayApi
+import com.skofqq.boxy.ui.components.GlassChip
 import com.skofqq.boxy.ui.components.NoticeCard
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.ui.components.SectionCard
@@ -112,7 +113,7 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
             Spacer(Modifier.weight(1f))
             if (metrics != null) {
                 Text(
-                    "↑ ${Format.bytes(context, speed.first)}/s  ↓ ${Format.bytes(context, speed.second)}/s",
+                    "↑ ${Format.speed(context, speed.first)}  ↓ ${Format.speed(context, speed.second)}",
                     style = MaterialTheme.typography.labelLarge,
                     color = Boxy.colors.text2,
                 )
@@ -158,14 +159,14 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 val current = picked[b] ?: ""
-                                PlainChip(stringResource(R.string.xray_balancer_auto), current == "") {
+                                GlassChip(stringResource(R.string.xray_balancer_auto), current == "") {
                                     scope.launch { if (XrayApi.overrideBalancer(api, b, null)) picked[b] = "" }
                                 }
-                                XrayApi.proxyTags(s).forEach { t ->
-                                    PlainChip(t, current == t) {
+                                XrayApi.balancerTargets(s, b).forEach { t ->
+                                    GlassChip(t, current == t) {
                                         scope.launch {
                                             if (XrayApi.overrideBalancer(api, b, t)) picked[b] = t
-                                            else Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                                            else Toast.makeText(context, R.string.xray_balancer_failed, Toast.LENGTH_LONG).show()
                                         }
                                     }
                                 }
@@ -241,15 +242,3 @@ private fun OutboundRow(o: XrayApi.OutboundState, divider: Boolean) {
     if (divider) Box(Modifier.fillMaxWidth().padding(start = 40.dp).height(1.dp).background(Boxy.colors.outline.copy(alpha = 0.3f)))
 }
 
-/** A flat chip: glass chips sample the panel's backdrop, which this panel is drawn into. */
-@Composable
-private fun PlainChip(text: String, selected: Boolean, onClick: () -> Unit) {
-    Text(
-        text,
-        Modifier.clip(RoundedCornerShape(50)).background(if (selected) Boxy.colors.accent.copy(alpha = 0.22f) else Boxy.colors.surface2)
-            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
-        style = MaterialTheme.typography.labelLarge,
-        color = if (selected) Boxy.colors.accent else Boxy.colors.text,
-        maxLines = 1,
-    )
-}

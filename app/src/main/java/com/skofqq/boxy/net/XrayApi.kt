@@ -41,6 +41,8 @@ object XrayApi {
         val outboundStats: Boolean,
         val outbounds: List<Outbound>,
         val balancers: List<String>,
+        /** Each balancer's selector: the tag prefixes of the outbounds it picks from. */
+        val selectors: Map<String, List<String>> = emptyMap(),
         val policy: JSONObject?,
         val log: JSONObject?,
     ) {
@@ -62,6 +64,7 @@ object XrayApi {
         val merged = JSONObject()
         val outbounds = ArrayList<Outbound>()
         val balancers = ArrayList<String>()
+        val selectors = LinkedHashMap<String, List<String>>()
         for (n in names) {
             val text = BoxModule.readFile("$DIR/$n") ?: continue
             val o = runCatching { JSONObject(text) }.getOrNull() ?: continue
@@ -71,7 +74,12 @@ object XrayApi {
                 }
             }
             o.optJSONObject("routing")?.optJSONArray("balancers")?.let { a ->
-                for (i in 0 until a.length()) a.optJSONObject(i)?.optString("tag")?.takeIf { it.isNotBlank() }?.let { balancers.add(it) }
+                for (i in 0 until a.length()) a.optJSONObject(i)?.let { b ->
+                    val tag = b.optString("tag").takeIf { it.isNotBlank() } ?: return@let
+                    balancers.add(tag)
+                    val sel = b.optJSONArray("selector")
+                    selectors[tag] = if (sel == null) emptyList() else (0 until sel.length()).map { sel.optString(it) }.filter { it.isNotBlank() }
+                }
             }
             o.keys().forEach { k -> if (k != "outbounds" && k != "inbounds") merged.put(k, o.get(k)) }
         }
@@ -86,9 +94,16 @@ object XrayApi {
             outboundStats = sys?.optBoolean("statsOutboundUplink") == true && sys.optBoolean("statsOutboundDownlink"),
             outbounds = outbounds.distinctBy { it.tag },
             balancers = balancers.distinct(),
+            selectors = selectors,
             policy = merged.optJSONObject("policy"),
             log = merged.optJSONObject("log"),
         )
+    }
+
+    /** The outbounds [balancer] chooses from: tags starting with one of its selector prefixes. */
+    fun balancerTargets(s: Setup, balancer: String): List<String> {
+        val prefixes = s.selectors[balancer].orEmpty()
+        return s.outbounds.map { it.tag }.filter { t -> prefixes.any { t.startsWith(it) } }
     }
 
     /** Outbounds that carry traffic to a server (not direct / block / dns), the ones worth probing. */

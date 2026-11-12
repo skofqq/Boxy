@@ -57,7 +57,12 @@ fun TlsPingSheet(onDismiss: () -> Unit) {
             })
         }
     } else {
-        TaskDialog(title!!, lines, done, ok) { if (done) onDismiss() }
+        TaskDialog(
+            title!!, lines, done, ok,
+            com.skofqq.boxy.ui.components.TaskTexts(
+                stringResource(R.string.tls_ping_working), stringResource(R.string.tls_ping_ok), stringResource(R.string.tls_ping_failed),
+            ),
+        ) { if (done) onDismiss() }
     }
 }
 
