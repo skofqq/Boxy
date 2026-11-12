@@ -1098,4 +1098,8 @@
     <string name="core_legacy_mihomo_working">Mihomo-ға ауысуда…</string>
     <string name="core_legacy_mihomo_ok">Mihomo-ға ауыстырылды</string>
     <string name="core_legacy_mihomo_failed">Ауыстырылмады: Clash Premium бұрынғыдай қалды</string>
+    <string name="geo_source_size">Жүктеу: %1$s</string>
+    <string name="geo_source_large_title">%1$s — үлкен көз</string>
+    <string name="geo_source_large">Әр геобаза жаңартуында %1$s жүктеледі және файлдар телефонда сақталады (mihomo үшін біріктірілген файлда да). Мобильді интернетте абай болыңыз.</string>
+    <string name="geo_source_large_on">Қосу</string>
 </resources>

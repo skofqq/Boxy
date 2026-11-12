@@ -1098,4 +1098,8 @@
     <string name="core_legacy_mihomo_working">正在切换到 Mihomo…</string>
     <string name="core_legacy_mihomo_ok">已切换到 Mihomo</string>
     <string name="core_legacy_mihomo_failed">未切换：Clash Premium 保持原样</string>
+    <string name="geo_source_size">下载：%1$s</string>
+    <string name="geo_source_large_title">%1$s 体积较大</string>
+    <string name="geo_source_large">每次更新地理库都会下载 %1$s 并保存在手机上（mihomo 还会存于合并文件中）。使用移动数据时请注意。</string>
+    <string name="geo_source_large_on">开启</string>
 </resources>

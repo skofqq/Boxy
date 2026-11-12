@@ -1098,4 +1098,8 @@
     <string name="core_legacy_mihomo_working">Пераход на Mihomo…</string>
     <string name="core_legacy_mihomo_ok">Пераключана на Mihomo</string>
     <string name="core_legacy_mihomo_failed">Не пераключана: Clash Premium застаўся як быў</string>
+    <string name="geo_source_size">Загрузка: %1$s</string>
+    <string name="geo_source_large_title">%1$s — вялікая крыніца</string>
+    <string name="geo_source_large">Пры кожным абнаўленні геабаз спампоўваецца %1$s, і файлы захоўваюцца на тэлефоне (для mihomo — яшчэ і ў аб\'яднаным файле). Асцярожней з мабільным інтэрнэтам.</string>
+    <string name="geo_source_large_on">Уключыць</string>
 </resources>

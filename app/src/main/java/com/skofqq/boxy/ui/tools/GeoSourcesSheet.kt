@@ -49,6 +49,10 @@ fun GeoSourcesSheet(onChanged: (GeoSource, List<GeoSource>) -> Unit, onUpdate: (
     var supported by remember { mutableStateOf(true) }
     var core by remember { mutableStateOf<String?>(null) }
     var geodata by remember { mutableStateOf<Boolean?>(null) }
+    var sizes by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
+    var confirmLarge by remember { mutableStateOf<GeoSource?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) { sizes = runCatching { GeoSources.sizes() }.getOrDefault(emptyMap()) }
     LaunchedEffect(Unit) {
         val (p, e) = CoreTools.geoSources()
         primary = p
@@ -88,11 +92,22 @@ fun GeoSourcesSheet(onChanged: (GeoSource, List<GeoSource>) -> Unit, onUpdate: (
                             )
                         }
                         Text(stringResource(s.description), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+                        // What turning it on costs: downloaded at every geo update, kept on the phone.
+                        sizes[s.id]?.let { n ->
+                            Text(
+                                stringResource(R.string.geo_source_size, com.skofqq.boxy.util.Format.bytes(context, n)),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (n >= GeoSources.LARGE_BYTES) com.skofqq.boxy.ui.theme.Tints.amber.fg else Boxy.colors.text2,
+                            )
+                        }
                     }
                     Switch(
                         checked = enabled,
                         enabled = !isPrimary,
-                        onCheckedChange = { on -> save(p, if (on) extras + s else extras.filter { it.id != s.id }) },
+                        onCheckedChange = { on ->
+                            if (on && (sizes[s.id] ?: 0L) >= GeoSources.LARGE_BYTES) confirmLarge = s
+                            else save(p, if (on) extras + s else extras.filter { it.id != s.id })
+                        },
                         colors = SwitchDefaults.colors(checkedTrackColor = Boxy.colors.accent),
                     )
                 }
@@ -131,6 +146,24 @@ fun GeoSourcesSheet(onChanged: (GeoSource, List<GeoSource>) -> Unit, onUpdate: (
         }
         SheetButtons(stringResource(R.string.geo_update_now), onUpdate)
     }
+    confirmLarge?.let { s ->
+        LargeSourceDialog(s, sizes[s.id] ?: 0L, onConfirm = {
+            confirmLarge = null
+            primary?.let { p -> save(p, extras + s) }
+        }, onDismiss = { confirmLarge = null })
+    }
+}
+
+@Composable
+private fun LargeSourceDialog(s: GeoSource, size: Long, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    com.skofqq.boxy.ui.components.ConfirmDialog(
+        stringResource(R.string.geo_source_large_title, s.title),
+        stringResource(R.string.geo_source_large, com.skofqq.boxy.util.Format.bytes(context, size)),
+        stringResource(R.string.geo_source_large_on),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    )
 }
 
 /** "MetaCubeX + runetfreedom, itdoginfo" for the update row. */

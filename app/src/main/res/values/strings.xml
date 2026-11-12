@@ -1121,4 +1121,8 @@
     <string name="core_legacy_mihomo_working">Switching to Mihomo…</string>
     <string name="core_legacy_mihomo_ok">Switched to Mihomo</string>
     <string name="core_legacy_mihomo_failed">Not switched: Clash Premium stays as it was</string>
+    <string name="geo_source_size">Download: %1$s</string>
+    <string name="geo_source_large_title">%1$s is large</string>
+    <string name="geo_source_large">It downloads %1$s at every geo update and keeps it on the phone (for mihomo also in the merged file). Use mobile data with care.</string>
+    <string name="geo_source_large_on">Turn on</string>
 </resources>

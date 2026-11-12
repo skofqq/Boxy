@@ -1098,4 +1098,8 @@
     <string name="core_legacy_mihomo_working">Passage à Mihomo…</string>
     <string name="core_legacy_mihomo_ok">Passé à Mihomo</string>
     <string name="core_legacy_mihomo_failed">Non basculé : Clash Premium reste tel quel</string>
+    <string name="geo_source_size">Téléchargement : %1$s</string>
+    <string name="geo_source_large_title">%1$s est volumineux</string>
+    <string name="geo_source_large">Télécharge %1$s à chaque mise à jour géo et le garde sur le téléphone (pour mihomo aussi dans le fichier fusionné). Attention aux données mobiles.</string>
+    <string name="geo_source_large_on">Activer</string>
 </resources>

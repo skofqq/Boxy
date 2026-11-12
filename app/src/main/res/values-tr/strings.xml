@@ -1098,4 +1098,8 @@
     <string name="core_legacy_mihomo_working">Mihomo\'ya geçiliyor…</string>
     <string name="core_legacy_mihomo_ok">Mihomo\'ya geçildi</string>
     <string name="core_legacy_mihomo_failed">Geçilmedi: Clash Premium olduğu gibi kaldı</string>
+    <string name="geo_source_size">İndirme: %1$s</string>
+    <string name="geo_source_large_title">%1$s büyük</string>
+    <string name="geo_source_large">Her coğrafi güncellemede %1$s indirir ve telefonda saklar (mihomo için birleştirilmiş dosyada da). Mobil veride dikkatli olun.</string>
+    <string name="geo_source_large_on">Aç</string>
 </resources>
