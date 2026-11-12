@@ -41,17 +41,7 @@ object XraySubscription {
     }
 
     /** Downloads with the module (its User-Agent and mirror), then applies; the module's event is not sent. */
-    fun downloadScript(core: String): String {
-        val s = BoxModule.SETTINGS
-        return """
-            ou=${'$'}(grep -m1 '^update_subscription=' $s); ob=${'$'}(grep -m1 '^bin_name=' $s)
-            sed -i 's/^update_subscription=.*/update_subscription="true"/; s/^bin_name=.*/bin_name="$core"/' $s
-            BOXY_NO_EVENT=1 ${BoxModule.SCRIPTS}/box.tool subs; rc=${'$'}?
-            [ -n "${'$'}ou" ] && sed -i "s/^update_subscription=.*/${'$'}ou/" $s
-            [ -n "${'$'}ob" ] && sed -i "s/^bin_name=.*/${'$'}ob/" $s
-            (exit ${'$'}rc)
-        """.trimIndent()
-    }
+    suspend fun downloadScript(core: String): String = "(export BOXY_NO_EVENT=1; " + BoxModule.toolCommand("subs", core, force = true) + ")"
 
     /**
      * Converts the downloaded links into the subscription file, checks the core's folder and restarts the core when

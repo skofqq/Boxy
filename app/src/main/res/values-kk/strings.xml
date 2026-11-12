@@ -964,7 +964,7 @@
     <string name="singbox_overrides_on">Қосулы · өзгерту үшін түртіңіз</string>
     <string name="singbox_overrides_create">Жасалмаған · жасау үшін түртіңіз</string>
     <string name="sb_lint_title">sing-box-тың ескірген параметрлері</string>
-    <string name="sb_lint_sub">Сақталды. Бұл параметрлер ескірген немесе sing-box-тың жаңа нұсқаларында жұмыс істемейді; жолға өту үшін түртіңіз.</string>
+    <string name="sb_lint_sub">Сақталды. Бұл параметрлер ескірген немесе ядроның жаңа нұсқаларында жұмыс істемейді; жолға өту үшін түртіңіз.</string>
     <string name="sb_lint_line">%1$d-жол · %2$s нұсқасынан</string>
     <string name="sb_lint_core">sing-box өзі ескертеді:</string>
     <string name="sb_lint_geo">geosite / geoip sing-box 1.12-де жойылды. Ережелер жинағын пайдаланыңыз: оларды редактордағы «Геобазадан ереже» жасайды.</string>
@@ -981,7 +981,7 @@
     <string name="sb_cache_body">experimental.cache_file өшірулі, сондықтан әр қайта іске қосудан кейін селекторларда қайтадан әдепкі түйін.</string>
     <string name="sb_cache_enable">Таңдауды есте сақтау</string>
     <string name="sb_cache_enable_sub">cache_file-ді өз баптауларыңызда қосады — жазылым жаңартуы оны өшірмейді</string>
-    <string name="sb_lint_sub_failed">Сақталмады: sing-box конфигурацияны қабылдамайды. Бұл параметрлер жойылған не өзгерген; жолға өту үшін түртіңіз.</string>
+    <string name="sb_lint_sub_failed">Сақталмады: ядро конфигурацияны қабылдамайды. Бұл параметрлер жойылған не өзгерген; жолға өту үшін түртіңіз.</string>
     <string name="xray_panel_off_title">Xray панелі өшірулі</string>
     <string name="xray_panel_off_body">Xray түйіндер күйі мен трафикті metrics арқылы береді. Boxy metrics, stats және observatory-ді (әр серверді 3 минут сайын тексеру) конфигурация жанындағы zz-boxy-panel.json файлына қосады; конфигіңіз өзгермейді.</string>
     <string name="xray_panel_with_api">Теңгергіштерді ауыстыру</string>
@@ -1083,4 +1083,13 @@
     <string name="xray_move_failed">Көшірілмеді: V2Ray бұрынғыдай қалды</string>
     <string name="xray_balancer_failed">Теңгергішті ауыстыру мүмкін болмады: API (RoutingService) жауап бермейді</string>
     <string name="xsub_default_failed">Маршрутизацияны өзгерту мүмкін болмады: конфиг JSON ретінде оқылмайды</string>
+    <string name="sb_lint_line_only">%1$d-жол</string>
+    <string name="xr_lint_title">Xray-дың ескірген параметрлері</string>
+    <string name="xr_lint_allow_insecure">allowInsecure Xray 26-да жойылды: tlsSettings ішінде pinnedPeerCertSha256 (сертификат хэші) не verifyPeerCertByName пайдаланыңыз.</string>
+    <string name="xr_lint_flow">XTLS flow direct / origin / splice жойылды: xtls-rprx-vision пайдаланыңыз.</string>
+    <string name="xr_lint_xtls">security «xtls» жойылды: flow xtls-rprx-vision-мен «tls» не «reality» пайдаланыңыз.</string>
+    <string name="xr_lint_transport">quic, http (h2) және domainsocket транспорттары жойылды: xhttp, grpc не ws пайдаланыңыз.</string>
+    <string name="xr_lint_global_transport">Жоғарғы деңгейдегі «transport» блогы жойылды: баптауларын inbound / outbound streamSettings ішіне көшіріңіз.</string>
+    <string name="xr_lint_dns">Ядро — Linux-жинағы: Android-та /etc/resolv.conf жоқ, сондықтан ол доменді өзі шеше алмайды. «dns» блогын (мысалы, 1.1.1.1, 8.8.8.8 серверлері) және freedom үшін «domainStrategy»: «UseIP» қосыңыз.</string>
+    <string name="sb_lint_http_client">Қашықтағы ереже жинақтары жасырын HTTP-клиент арқылы тек sing-box 1.16-ға дейін жүктеледі: «http_clients» (және route.default_http_client) орнатыңыз.</string>
 </resources>

@@ -8,6 +8,22 @@ fi
 scripts_dir="${0%/*}"
 source /data/adb/box/settings.ini
 
+# Per-run overrides from Boxy, instead of rewriting settings.ini for the duration of a task (which raced with
+# the service and the network scripts reading it meanwhile):
+#   BOX_BIN_NAME   the core to work on (upkernel / geox / subs for a core that is not the active one)
+#   BOX_XCLASH     xclash_option for that run
+#   BOX_FORCE=1    update_geo / update_subscription count as "true" for this run
+if [ -n "${BOX_BIN_NAME}" ]; then
+  bin_name="${BOX_BIN_NAME}"
+  bin_path="${bin_dir}/${bin_name}"
+  bin_log="${box_run}/${bin_name}.log"
+fi
+[ -n "${BOX_XCLASH}" ] && xclash_option="${BOX_XCLASH}"
+if [ "${BOX_FORCE}" = "1" ]; then
+  update_geo="true"
+  update_subscription="true"
+fi
+
 # user agent (settings.ini: user_agent, no spaces)
 user_agent="${user_agent:-box_for_root}"
 # whether use ghproxy to accelerate github download
@@ -944,7 +960,9 @@ upkernel() {
       # Specify files according to architecture
       case $(uname -m) in
         "i386")    download_file="${bin}-linux-32.zip" ;;
-        "x86_64")  download_file="${bin}-linux-64.zip" ;;
+        # Xray publishes an Android build for amd64: its resolver works on Android (the linux one looks for
+        # /etc/resolv.conf, which Android has not, and cannot resolve anything).
+        "x86_64")  if [ "${bin_name}" = "xray" ]; then download_file="${bin}-android-amd64.zip"; else download_file="${bin}-linux-64.zip"; fi ;;
         "armv7l"|"armv8l") download_file="${bin}-linux-arm32-v7a.zip" ;;
         "aarch64") download_file="${bin}-android-arm64-v8a.zip" ;;
         *)

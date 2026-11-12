@@ -135,7 +135,7 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
                     Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card)
                         .clickable {
                             coreSheet = false
-                            launchTask(t.title, coreUpdateScript(t))
+                            scope.launch { launchTask(t.title, BoxModule.toolCommand("upkernel", t.binName, t.xclash)) }
                         }
                         .padding(horizontal = 18.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -157,7 +157,7 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
             onChanged = { p, e -> geoLabel = geoSourcesLabel(p, e) },
             onUpdate = {
                 geoSheet = false
-                launchTask(geoTitle, geoUpdateScript())
+                scope.launch { launchTask(geoTitle, BoxModule.toolCommand("geox", force = true)) }
             },
             onDismiss = { geoSheet = false },
         )
@@ -179,35 +179,6 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
         }
         com.skofqq.boxy.ui.components.TaskDialog(title, taskLines, taskDone, taskOk, texts) { if (taskDone) taskTitle = null }
     }
-}
-
-/**
- * box.tool upkernel downloads the core named in settings.ini, so the target is set
- * for the duration of the update and the previous values are put back afterwards.
- */
-private fun coreUpdateScript(t: CoreTarget): String {
-    val s = BoxModule.SETTINGS
-    val setX = if (t.xclash != null) "sed -i 's/^xclash_option=.*/xclash_option=\"${t.xclash}\"/' $s;" else ""
-    return """
-        ob=${'$'}(grep -m1 '^bin_name=' $s); ox=${'$'}(grep -m1 '^xclash_option=' $s)
-        sed -i 's/^bin_name=.*/bin_name="${t.binName}"/' $s; $setX
-        ${BoxModule.SCRIPTS}/box.tool upkernel; rc=${'$'}?
-        [ -n "${'$'}ob" ] && sed -i "s/^bin_name=.*/${'$'}ob/" $s
-        [ -n "${'$'}ox" ] && sed -i "s/^xclash_option=.*/${'$'}ox/" $s
-        (exit ${'$'}rc)
-    """.trimIndent()
-}
-
-/** box.tool geox only downloads with update_geo="true": it is set for this run and put back afterwards. */
-private fun geoUpdateScript(): String {
-    val s = BoxModule.SETTINGS
-    return """
-        og=${'$'}(grep -m1 '^update_geo=' $s)
-        sed -i 's/^update_geo=.*/update_geo="true"/' $s
-        ${BoxModule.SCRIPTS}/box.tool geox; rc=${'$'}?
-        [ -n "${'$'}og" ] && sed -i "s/^update_geo=.*/${'$'}og/" $s
-        (exit ${'$'}rc)
-    """.trimIndent()
 }
 
 @Composable

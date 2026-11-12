@@ -964,7 +964,7 @@
     <string name="singbox_overrides_on">有効 · タップして編集</string>
     <string name="singbox_overrides_create">未作成 · タップして作成</string>
     <string name="sb_lint_title">古い sing-box 設定</string>
-    <string name="sb_lint_sub">保存しました。以下は新しい sing-box で非推奨または削除済みの設定です。タップで該当行へ移動します。</string>
+    <string name="sb_lint_sub">保存しました。以下は新しいコアで非推奨または動作しない設定です。タップで該当行へ移動します。</string>
     <string name="sb_lint_line">%1$d 行目 · %2$s 以降</string>
     <string name="sb_lint_core">sing-box 自身の警告:</string>
     <string name="sb_lint_geo">geosite / geoip は sing-box 1.12 で削除されました。ルールセットを使ってください（エディタの「ジオベースからルール」で作成できます）。</string>
@@ -981,7 +981,7 @@
     <string name="sb_cache_body">experimental.cache_file がオフのため、再起動のたびにセレクターが既定のノードに戻ります。</string>
     <string name="sb_cache_enable">選択を記憶する</string>
     <string name="sb_cache_enable_sub">上書き設定で cache_file をオンにします（サブスクリプション更新でも戻りません）</string>
-    <string name="sb_lint_sub_failed">保存されていません：sing-box が設定を拒否しました。以下の設定は削除または変更されています。タップで該当行へ移動します。</string>
+    <string name="sb_lint_sub_failed">保存されていません：コアが設定を拒否しました。以下の設定は削除または変更されています。タップで該当行へ移動します。</string>
     <string name="xray_panel_off_title">Xray パネルはオフです</string>
     <string name="xray_panel_off_body">Xray は metrics エンドポイントでノード状態と通信量を返します。Boxy は metrics・stats・observatory（3 分ごとに各サーバーを確認）を設定の隣の zz-boxy-panel.json に追加します。元の設定は変更しません。</string>
     <string name="xray_panel_with_api">バランサーの切り替え</string>
@@ -1083,4 +1083,13 @@
     <string name="xray_move_failed">移行していません：V2Ray はそのままです</string>
     <string name="xray_balancer_failed">バランサーを切り替えられません：API（RoutingService）が応答しません</string>
     <string name="xsub_default_failed">ルーティングを変更できません：設定が JSON として読めません</string>
+    <string name="sb_lint_line_only">%1$d 行目</string>
+    <string name="xr_lint_title">古い Xray 設定</string>
+    <string name="xr_lint_allow_insecure">allowInsecure は Xray 26 で削除されました。tlsSettings で pinnedPeerCertSha256（証明書のハッシュ）か verifyPeerCertByName を使ってください。</string>
+    <string name="xr_lint_flow">XTLS の flow direct / origin / splice は削除されました。xtls-rprx-vision を使ってください。</string>
+    <string name="xr_lint_xtls">security「xtls」は削除されました。flow xtls-rprx-vision と「tls」か「reality」を使ってください。</string>
+    <string name="xr_lint_transport">トランスポート quic・http（h2）・domainsocket は削除されました。xhttp・grpc・ws を使ってください。</string>
+    <string name="xr_lint_global_transport">最上位の「transport」ブロックは削除されました。設定を inbound / outbound の streamSettings に移してください。</string>
+    <string name="xr_lint_dns">コアは Linux 版です。Android には /etc/resolv.conf がないため、単体ではドメインを解決できません。「dns」ブロック（例: サーバー 1.1.1.1、8.8.8.8）と freedom の「domainStrategy」:「UseIP」を追加してください。</string>
+    <string name="sb_lint_http_client">リモートのルールセットが暗黙の HTTP クライアントでダウンロードできるのは sing-box 1.16 までです。「http_clients」（と route.default_http_client）を定義してください。</string>
 </resources>

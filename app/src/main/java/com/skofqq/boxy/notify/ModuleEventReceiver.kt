@@ -33,7 +33,10 @@ class ModuleEventReceiver : BroadcastReceiver() {
             // rule sets from them, then let the running core re-read them. Only on this event, no polling.
             val core = intent.getStringExtra("core") ?: return
             val pending = goAsync()
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            work.launch {
+                // Merging large .dat files can take longer than a receiver may run: the broadcast is let go after
+                // a while and the work goes on in the process.
+                val release = launch { kotlinx.coroutines.delay(RECEIVER_BUDGET_MS); runCatching { pending.finish() } }
                 try {
                     val changed = com.skofqq.boxy.configs.GeoRuleSets.rebuild(core)
                     val state = runCatching { com.skofqq.boxy.root.BoxModule.state() }.getOrNull()
@@ -41,7 +44,7 @@ class ModuleEventReceiver : BroadcastReceiver() {
                         com.skofqq.boxy.root.BoxModule.reloadConfig(core)
                     }
                 } finally {
-                    pending.finish()
+                    if (release.isActive) { release.cancel(); runCatching { pending.finish() } }
                 }
             }
             return
@@ -50,11 +53,12 @@ class ModuleEventReceiver : BroadcastReceiver() {
             // box.tool subs downloaded an Xray / V2Ray subscription: make outbounds of it, check, restart.
             val core = intent.getStringExtra("core") ?: return
             val pending = goAsync()
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            work.launch {
+                val release = launch { kotlinx.coroutines.delay(RECEIVER_BUDGET_MS); runCatching { pending.finish() } }
                 try {
                     com.skofqq.boxy.configs.XraySubscription.apply(core)
                 } finally {
-                    pending.finish()
+                    if (release.isActive) { release.cancel(); runCatching { pending.finish() } }
                 }
             }
             return
@@ -97,6 +101,12 @@ class ModuleEventReceiver : BroadcastReceiver() {
         const val ACTION_GEO_UPDATED = "com.skofqq.boxy.action.GEO_UPDATED"
         const val ACTION_SUBS_LINKS = "com.skofqq.boxy.action.SUBS_LINKS"
         const val CHANNEL_ID = "module_events"
+
+        /** How long a receiver keeps its broadcast open (the system allows 10 s in the foreground). */
+        private const val RECEIVER_BUDGET_MS = 8_000L
+
+        /** Work started by module events that may outlast the broadcast. */
+        private val work = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
         private const val NOTIFICATION_ID = 2
 
         fun createChannel(context: Context) {

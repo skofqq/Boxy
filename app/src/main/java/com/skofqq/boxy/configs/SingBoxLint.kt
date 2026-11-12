@@ -47,6 +47,13 @@ object SingBoxLint {
                 out.add(Finding(text.substring(0, m.range.first).count { it == '\n' }, r.message, r.since))
             }
         }
+        // Remote rule sets download through an implicit HTTP client only until 1.16: http_clients must be defined.
+        if (!Regex("\"(http_clients|default_http_client)\"\\s*:").containsMatchIn(text)) {
+            val rs = section("rule_set")
+            Regex("\"type\"\\s*:\\s*\"remote\"").findAll(text).firstOrNull { rs != null && it.range.first in rs }?.let { m ->
+                out.add(Finding(text.substring(0, m.range.first).count { it == '\n' }, R.string.sb_lint_http_client, "1.14"))
+            }
+        }
         return out.sortedBy { it.line }.distinctBy { it.line to it.message }
     }
 

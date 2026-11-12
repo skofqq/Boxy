@@ -176,15 +176,24 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
         scope.launch {
             val r = ConfigCheck.checkText(core, path, content)
             checking = false
-            val found = if (core == "sing-box") com.skofqq.boxy.configs.SingBoxLint.lint(content) else emptyList()
+            val found = when (core) {
+                "sing-box" -> com.skofqq.boxy.configs.SingBoxLint.lint(content)
+                "xray", "v2fly" -> {
+                    // A Linux build of the core (no resolv.conf on Android) needs its own "dns" block.
+                    val linux = com.skofqq.boxy.root.BoxModule.exec("${com.skofqq.boxy.root.BoxModule.BOX_DIR}/bin/$core version")
+                        .second.firstOrNull()?.contains("linux/") == true
+                    com.skofqq.boxy.configs.XrayLint.lint(content, xray = core == "xray", linuxBuild = linux)
+                }
+                else -> emptyList()
+            }
             if (r is CheckResult.Failed) {
-                // sing-box rejects removed settings without naming the line: the lint finds them.
+                // The cores reject removed settings without naming the line: the lint finds them.
                 if (found.isNotEmpty()) deprecated = Deprecated(found, emptyList(), r.output) else checkError = r.output
             } else {
                 write(content, r == CheckResult.Ok)
-                // Saved, but sing-box settings that are deprecated or already gone are worth fixing.
-                if (core == "sing-box") {
-                    val warns = ConfigCheck.lastWarnings
+                // Saved, but settings that are deprecated or already gone are worth fixing.
+                if (found.isNotEmpty() || core == "sing-box") {
+                    val warns = if (core == "sing-box") ConfigCheck.lastWarnings else emptyList()
                     if (found.isNotEmpty() || warns.isNotEmpty()) deprecated = Deprecated(found, warns, null)
                 }
             }
@@ -452,7 +461,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
         val found = d.found
         val warns = d.warns
         com.skofqq.boxy.ui.components.BoxySheet(
-            stringResource(R.string.sb_lint_title),
+            stringResource(if (ConfigCheck.coreFor(path) == "sing-box") R.string.sb_lint_title else R.string.xr_lint_title),
             stringResource(if (d.error != null) R.string.sb_lint_sub_failed else R.string.sb_lint_sub),
             { deprecated = null },
         ) {
@@ -461,7 +470,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                     Modifier.fillMaxWidth().padding(vertical = 3.dp).clip(RoundedCornerShape(14.dp)).background(colors.card)
                         .clickable { deprecated = null; goTo(f.line) }.padding(horizontal = 14.dp, vertical = 10.dp),
                 ) {
-                    Text(stringResource(R.string.sb_lint_line, f.line + 1, f.since), style = MaterialTheme.typography.labelLarge, color = colors.accent)
+                    Text(if (f.since.isBlank()) stringResource(R.string.sb_lint_line_only, f.line + 1) else stringResource(R.string.sb_lint_line, f.line + 1, f.since), style = MaterialTheme.typography.labelLarge, color = colors.accent)
                     Text(stringResource(f.message), style = MaterialTheme.typography.bodyMedium, color = colors.text)
                 }
             }

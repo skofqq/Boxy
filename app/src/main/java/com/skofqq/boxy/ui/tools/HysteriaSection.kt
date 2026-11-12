@@ -182,8 +182,9 @@ private fun speedFailure(lines: List<String>): Int {
     return when {
         has("may not support speed test") -> R.string.hy_speed_no_support
         has("authentication error|HTTP status code: 40[13]") -> R.string.hy_speed_auth
+        // Before the config case: hysteria reports a server it cannot resolve as "invalid config: server: lookup …".
+        has("no recent network activity|timeout|connection refused|no route|no such host|lookup \\S+: |server misbehaving|network is unreachable|failed to connect") -> R.string.hy_speed_unreachable
         has("failed to (read|parse|load) client config|invalid config") -> R.string.hy_speed_config
-        has("no recent network activity|timeout|connection refused|no route|no such host|failed to connect") -> R.string.hy_speed_unreachable
         has("not installed") -> R.string.hy_speed_no_core
         else -> R.string.hy_speed_failed
     }

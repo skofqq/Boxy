@@ -964,7 +964,7 @@
     <string name="singbox_overrides_on">Açık · düzenlemek için dokunun</string>
     <string name="singbox_overrides_create">Oluşturulmadı · oluşturmak için dokunun</string>
     <string name="sb_lint_title">Eskimiş sing-box ayarları</string>
-    <string name="sb_lint_sub">Kaydedildi. Bu ayarlar eskimiş ya da yeni sing-box sürümlerinde kaldırılmış; satıra gitmek için dokunun.</string>
+    <string name="sb_lint_sub">Kaydedildi. Bu ayarlar eskimiş ya da çekirdeğin yeni sürümlerinde çalışmıyor; satıra gitmek için dokunun.</string>
     <string name="sb_lint_line">Satır %1$d · %2$s sürümünden beri</string>
     <string name="sb_lint_core">sing-box\'ın kendi uyarısı:</string>
     <string name="sb_lint_geo">geosite / geoip sing-box 1.12\'de kaldırıldı. Kural setleri kullanın: düzenleyicideki «Coğrafi veritabanından kural» bunları oluşturur.</string>
@@ -981,7 +981,7 @@
     <string name="sb_cache_body">experimental.cache_file kapalı, bu yüzden her yeniden başlatmada seçicilerde varsayılan düğüme dönülüyor.</string>
     <string name="sb_cache_enable">Seçimi hatırla</string>
     <string name="sb_cache_enable_sub">cache_file\'ı kendi ayarlarınızda açar; abonelik güncellemesi bunu geri almaz</string>
-    <string name="sb_lint_sub_failed">Kaydedilmedi: sing-box yapılandırmayı reddediyor. Bu ayarlar kaldırıldı veya değişti; satıra gitmek için dokunun.</string>
+    <string name="sb_lint_sub_failed">Kaydedilmedi: çekirdek yapılandırmayı reddediyor. Bu ayarlar kaldırıldı veya değişti; satıra gitmek için dokunun.</string>
     <string name="xray_panel_off_title">Xray paneli kapalı</string>
     <string name="xray_panel_off_body">Xray düğüm durumunu ve trafiği metrics uç noktasından bildirir. Boxy, yapılandırmanızın yanındaki zz-boxy-panel.json dosyasına metrics, stats ve observatory (her sunucuyu 3 dakikada bir yoklama) ekler; yapılandırmanız değişmez.</string>
     <string name="xray_panel_with_api">Dengeleyici değiştirme</string>
@@ -1083,4 +1083,13 @@
     <string name="xray_move_failed">Taşınmadı: V2Ray olduğu gibi kaldı</string>
     <string name="xray_balancer_failed">Dengeleyici değiştirilemedi: API (RoutingService) yanıt vermiyor</string>
     <string name="xsub_default_failed">Yönlendirme değiştirilemedi: yapılandırma düz JSON değil</string>
+    <string name="sb_lint_line_only">Satır %1$d</string>
+    <string name="xr_lint_title">Eskimiş Xray ayarları</string>
+    <string name="xr_lint_allow_insecure">allowInsecure Xray 26\'da kaldırıldı: tlsSettings içinde pinnedPeerCertSha256 (sertifika özeti) veya verifyPeerCertByName kullanın.</string>
+    <string name="xr_lint_flow">XTLS akışları direct / origin / splice kaldırıldı: xtls-rprx-vision kullanın.</string>
+    <string name="xr_lint_xtls">security «xtls» kaldırıldı: xtls-rprx-vision akışıyla «tls» veya «reality» kullanın.</string>
+    <string name="xr_lint_transport">quic, http (h2) ve domainsocket taşımaları kaldırıldı: xhttp, grpc veya ws kullanın.</string>
+    <string name="xr_lint_global_transport">Üst düzey «transport» bloğu kaldırıldı: ayarlarını inbound / outbound streamSettings içine taşıyın.</string>
+    <string name="xr_lint_dns">Çekirdek bir Linux derlemesi: Android\'de /etc/resolv.conf yok, bu yüzden alan adlarını kendisi çözemez. Bir «dns» bloğu (ör. 1.1.1.1, 8.8.8.8 sunucuları) ve freedom için «domainStrategy»: «UseIP» ekleyin.</string>
+    <string name="sb_lint_http_client">Uzak kural setleri örtük HTTP istemcisiyle yalnızca sing-box 1.16\'ya kadar indirilir: «http_clients» (ve route.default_http_client) tanımlayın.</string>
 </resources>

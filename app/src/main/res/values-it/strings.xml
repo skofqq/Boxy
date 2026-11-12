@@ -964,7 +964,7 @@
     <string name="singbox_overrides_on">Attive · tocca per modificare</string>
     <string name="singbox_overrides_create">Non create · tocca per crearle</string>
     <string name="sb_lint_title">Impostazioni sing-box obsolete</string>
-    <string name="sb_lint_sub">Salvato. Queste impostazioni sono obsolete o già rimosse nelle versioni recenti di sing-box; tocca per andare alla riga.</string>
+    <string name="sb_lint_sub">Salvato. Queste impostazioni sono obsolete o non funzionano più nelle versioni recenti del core; tocca per andare alla riga.</string>
     <string name="sb_lint_line">Riga %1$d · dalla %2$s</string>
     <string name="sb_lint_core">sing-box stesso avvisa:</string>
     <string name="sb_lint_geo">geosite / geoip sono stati rimossi in sing-box 1.12. Usa i set di regole: «Regola dalla base geo» nell’editor li crea.</string>
@@ -981,7 +981,7 @@
     <string name="sb_cache_body">experimental.cache_file è disattivato, quindi a ogni riavvio i selettori tornano al nodo predefinito.</string>
     <string name="sb_cache_enable">Ricorda la selezione</string>
     <string name="sb_cache_enable_sub">Attiva cache_file nelle tue impostazioni; un aggiornamento dell’abbonamento non lo annulla</string>
-    <string name="sb_lint_sub_failed">Non salvato: sing-box rifiuta la configurazione. Queste impostazioni sono state rimosse o cambiate; tocca per andare alla riga.</string>
+    <string name="sb_lint_sub_failed">Non salvato: il core rifiuta la configurazione. Queste impostazioni sono state rimosse o cambiate; tocca per andare alla riga.</string>
     <string name="xray_panel_off_title">Il pannello Xray è disattivato</string>
     <string name="xray_panel_off_body">Xray espone lo stato dei nodi e il traffico tramite le metriche. Boxy aggiunge metrics, stats e un observatory (prova di ogni server ogni 3 minuti) in zz-boxy-panel.json accanto alla configurazione; la tua configurazione non cambia.</string>
     <string name="xray_panel_with_api">Cambio dei bilanciatori</string>
@@ -1083,4 +1083,13 @@
     <string name="xray_move_failed">Non migrato: V2Ray resta com’era</string>
     <string name="xray_balancer_failed">Impossibile cambiare bilanciatore: l’API (RoutingService) non risponde</string>
     <string name="xsub_default_failed">Impossibile cambiare il routing: la configurazione non è JSON semplice</string>
+    <string name="sb_lint_line_only">Riga %1$d</string>
+    <string name="xr_lint_title">Impostazioni Xray obsolete</string>
+    <string name="xr_lint_allow_insecure">allowInsecure è stato rimosso in Xray 26: usa pinnedPeerCertSha256 (hash del certificato) o verifyPeerCertByName in tlsSettings.</string>
+    <string name="xr_lint_flow">I flussi XTLS direct / origin / splice sono stati rimossi: usa xtls-rprx-vision.</string>
+    <string name="xr_lint_xtls">security «xtls» è stato rimosso: usa «tls» o «reality» con il flusso xtls-rprx-vision.</string>
+    <string name="xr_lint_transport">I trasporti quic, http (h2) e domainsocket sono stati rimossi: usa xhttp, grpc o ws.</string>
+    <string name="xr_lint_global_transport">Il blocco «transport» di primo livello è stato rimosso: sposta le impostazioni in streamSettings di inbound / outbound.</string>
+    <string name="xr_lint_dns">Il core è una build Linux: Android non ha /etc/resolv.conf, quindi non risolve i domini da solo. Aggiungi un blocco «dns» (es. server 1.1.1.1, 8.8.8.8) e «domainStrategy»: «UseIP» per freedom.</string>
+    <string name="sb_lint_http_client">I set di regole remoti si scaricano con un client HTTP implicito solo fino a sing-box 1.16: definisci «http_clients» (e route.default_http_client).</string>
 </resources>

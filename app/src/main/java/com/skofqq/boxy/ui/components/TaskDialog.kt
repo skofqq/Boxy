@@ -239,6 +239,8 @@ fun TaskDialog(
             ) {
                 val vScroll = rememberScrollState()
                 LaunchedEffect(lines.size) { vScroll.scrollTo(vScroll.maxValue) }
+                // A column: AnimatedVisibility stacks its children, which put the copy link over the log.
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                 Box(
                     Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(min = 80.dp, max = 220.dp)
                         .clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(12.dp),
@@ -262,6 +264,7 @@ fun TaskDialog(
                     style = MaterialTheme.typography.labelLarge,
                     color = Boxy.colors.accent,
                 )
+                }
             }
             AnimatedVisibility(done, enter = fadeIn(), exit = fadeOut()) {
                 Column(Modifier.padding(top = 16.dp)) {

@@ -170,6 +170,35 @@ object BoxModule {
         return run("$SCRIPTS/box.tool reload")
     }
 
+    /**
+     * A box.tool command for [core] (and the clash build [xclash]) with the update switches forced on, without
+     * touching settings.ini: the module reads BOX_BIN_NAME / BOX_XCLASH / BOX_FORCE (v1.10.9+). An older module
+     * gets the previous way: the values are written for the run and put back afterwards.
+     */
+    suspend fun toolCommand(args: String, core: String? = null, xclash: String? = null, force: Boolean = false): String {
+        val envSupported = withContext(Dispatchers.IO) { Shell.cmd("grep -q BOX_BIN_NAME $SCRIPTS/box.tool").exec().isSuccess }
+        if (envSupported) {
+            val env = listOfNotNull(
+                core?.let { "BOX_BIN_NAME='$it'" },
+                xclash?.let { "BOX_XCLASH='$it'" },
+                "BOX_FORCE=1".takeIf { force },
+            ).joinToString(" ")
+            return "$env $SCRIPTS/box.tool $args".trim()
+        }
+        val s = SETTINGS
+        val keys = listOfNotNull(
+            core?.let { "bin_name" to it },
+            xclash?.let { "xclash_option" to it },
+            ("update_geo" to "true").takeIf { force },
+            ("update_subscription" to "true").takeIf { force },
+        )
+        val save = keys.joinToString("; ") { (k, _) -> "o_$k=\$(grep -m1 '^$k=' $s)" }
+        val set = keys.joinToString("; ") { (k, v) -> "sed -i 's/^$k=.*/$k=\"$v\"/' $s" }
+        val restore = keys.joinToString("; ") { (k, _) -> "[ -n \"\$o_$k\" ] && sed -i \"s/^$k=.*/\$o_$k/\" $s" }
+        return if (keys.isEmpty()) "$SCRIPTS/box.tool $args"
+        else "( $save; $set; $SCRIPTS/box.tool $args; rc=\$?; $restore; exit \$rc )"
+    }
+
     suspend fun readSetting(key: String): String? = withContext(Dispatchers.IO) {
         parseKv(sh("grep -m1 '^$key=' $SETTINGS 2>/dev/null"))[key]
     }

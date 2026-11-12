@@ -987,7 +987,7 @@
     <string name="singbox_overrides_on">On · tap to edit</string>
     <string name="singbox_overrides_create">Not created · tap to create</string>
     <string name="sb_lint_title">Outdated sing-box settings</string>
-    <string name="sb_lint_sub">Saved. These still work or already break newer sing-box versions; tap one to go to its line.</string>
+    <string name="sb_lint_sub">Saved. These settings are deprecated or no longer work in newer versions of the core; tap one to go to its line.</string>
     <string name="sb_lint_line">Line %1$d · since %2$s</string>
     <string name="sb_lint_core">sing-box itself warns:</string>
     <string name="sb_lint_geo">geosite / geoip were removed in sing-box 1.12. Use rule sets: the editor\'s \"Rule from the geo base\" makes them.</string>
@@ -1004,7 +1004,7 @@
     <string name="sb_cache_body">experimental.cache_file is off, so every restart goes back to the default node in the selectors.</string>
     <string name="sb_cache_enable">Remember the selection</string>
     <string name="sb_cache_enable_sub">Turns cache_file on in your overrides, so a subscription update keeps it</string>
-    <string name="sb_lint_sub_failed">Not saved: sing-box rejects the config. These settings were removed or changed; tap one to go to its line.</string>
+    <string name="sb_lint_sub_failed">Not saved: the core rejects the config. These settings were removed or changed; tap one to go to its line.</string>
     <string name="xray_panel_off_title">The Xray panel is off</string>
     <string name="xray_panel_off_body">Xray reports node status and traffic through its metrics endpoint. Boxy adds metrics, stats and an observatory (a probe of each server every 3 minutes) in zz-boxy-panel.json next to your config; your config is not changed.</string>
     <string name="xray_panel_with_api">Balancer switching</string>
@@ -1106,4 +1106,13 @@
     <string name="xray_move_failed">Not moved: V2Ray stays as it was</string>
     <string name="xray_balancer_failed">Could not switch the balancer: the API (RoutingService) does not answer</string>
     <string name="xsub_default_failed">Could not change the routing: the config is not plain JSON</string>
+    <string name="sb_lint_line_only">Line %1$d</string>
+    <string name="xr_lint_title">Outdated Xray settings</string>
+    <string name="xr_lint_allow_insecure">allowInsecure was removed in Xray 26: use pinnedPeerCertSha256 (the certificate\'s hash) or verifyPeerCertByName in tlsSettings.</string>
+    <string name="xr_lint_flow">XTLS flows direct / origin / splice were removed: use xtls-rprx-vision.</string>
+    <string name="xr_lint_xtls">security \"xtls\" was removed: use \"tls\" or \"reality\" with the flow xtls-rprx-vision.</string>
+    <string name="xr_lint_transport">The transports quic, http (h2) and domainsocket were removed: use xhttp, grpc or ws.</string>
+    <string name="xr_lint_global_transport">The top-level \"transport\" block was removed: move its settings into streamSettings of the inbounds / outbounds.</string>
+    <string name="xr_lint_dns">The core is a Linux build: Android has no /etc/resolv.conf, so it cannot resolve domains by itself. Add a \"dns\" block (e.g. servers 1.1.1.1, 8.8.8.8) and \"domainStrategy\": \"UseIP\" for freedom.</string>
+    <string name="sb_lint_http_client">Remote rule sets download through an implicit HTTP client only until sing-box 1.16: define \"http_clients\" (and route.default_http_client).</string>
 </resources>

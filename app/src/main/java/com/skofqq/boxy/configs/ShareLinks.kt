@@ -33,7 +33,7 @@ object ShareLinks {
         var skipped = 0
         val used = HashSet<String>()
         for (link in links(body)) {
-            val o = runCatching { outbound(link, core) }.getOrNull()
+            val o = runCatching { outbound(link, core) }.getOrNull()?.takeIf { portOk(it) }
             if (o == null) { skipped++; continue }
             // Unique tags: the name from the link, numbered when it repeats.
             val base = TAG_PREFIX + (o.optString("tag").ifBlank { "node" })
@@ -44,6 +44,13 @@ object ShareLinks {
             out.add(o)
         }
         return Result(out, skipped)
+    }
+
+    /** A link without a port (or with 0) would make the core reject the whole subscription file. */
+    private fun portOk(o: JSONObject): Boolean {
+        val s = o.optJSONObject("settings") ?: return false
+        val server = s.optJSONArray("vnext")?.optJSONObject(0) ?: s.optJSONArray("servers")?.optJSONObject(0) ?: s
+        return server.optInt("port", 0) in 1..65535
     }
 
     private fun name(fragment: String?, host: String) =

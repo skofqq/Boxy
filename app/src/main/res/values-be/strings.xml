@@ -964,7 +964,7 @@
     <string name="singbox_overrides_on">Уключаны · націсніце, каб змяніць</string>
     <string name="singbox_overrides_create">Не створаны · націсніце, каб стварыць</string>
     <string name="sb_lint_title">Састарэлыя параметры sing-box</string>
-    <string name="sb_lint_sub">Захавана. Гэтыя параметры састарэлі або ўжо не працуюць у новых версіях sing-box; націсніце, каб перайсці да радка.</string>
+    <string name="sb_lint_sub">Захавана. Гэтыя параметры састарэлі або ўжо не працуюць у новых версіях ядра; націсніце, каб перайсці да радка.</string>
     <string name="sb_lint_line">Радок %1$d · з версіі %2$s</string>
     <string name="sb_lint_core">Сам sing-box папярэджвае:</string>
     <string name="sb_lint_geo">geosite / geoip выдалены ў sing-box 1.12. Выкарыстоўвайце наборы правіл: іх стварае «Правіла з геабазы» ў рэдактары.</string>
@@ -981,7 +981,7 @@
     <string name="sb_cache_body">experimental.cache_file выключаны, таму пасля кожнага перазапуску ў селектарах зноў вузел па змаўчанні.</string>
     <string name="sb_cache_enable">Запамінаць выбар</string>
     <string name="sb_cache_enable_sub">Уключае cache_file у сваіх наладах — абнаўленне падпіскі яго не скіне</string>
-    <string name="sb_lint_sub_failed">Не захавана: sing-box не прымае канфігурацыю. Гэтыя параметры выдалены або зменены; націсніце, каб перайсці да радка.</string>
+    <string name="sb_lint_sub_failed">Не захавана: ядро не прымае канфігурацыю. Гэтыя параметры выдалены або зменены; націсніце, каб перайсці да радка.</string>
     <string name="xray_panel_off_title">Панэль Xray выключана</string>
     <string name="xray_panel_off_body">Xray аддае стан вузлоў і трафік праз metrics. Boxy дадасць metrics, stats і observatory (праверка кожнага сервера раз на 3 хвіліны) у файл zz-boxy-panel.json побач з канфігурацыяй; ваш канфіг не мяняецца.</string>
     <string name="xray_panel_with_api">Пераключэнне балансавальнікаў</string>
@@ -1083,4 +1083,13 @@
     <string name="xray_move_failed">Не перанесена: V2Ray застаўся як быў</string>
     <string name="xray_balancer_failed">Не ўдалося пераключыць балансавальнік: API (RoutingService) не адказвае</string>
     <string name="xsub_default_failed">Не ўдалося змяніць маршрутызацыю: канфіг не чытаецца як JSON</string>
+    <string name="sb_lint_line_only">Радок %1$d</string>
+    <string name="xr_lint_title">Састарэлыя параметры Xray</string>
+    <string name="xr_lint_allow_insecure">allowInsecure выдалены ў Xray 26: выкарыстоўвайце pinnedPeerCertSha256 (хэш сертыфіката) або verifyPeerCertByName у tlsSettings.</string>
+    <string name="xr_lint_flow">XTLS flow direct / origin / splice выдалены: выкарыстоўвайце xtls-rprx-vision.</string>
+    <string name="xr_lint_xtls">security «xtls» выдалены: выкарыстоўвайце «tls» або «reality» з flow xtls-rprx-vision.</string>
+    <string name="xr_lint_transport">Транспарты quic, http (h2) і domainsocket выдалены: выкарыстоўвайце xhttp, grpc або ws.</string>
+    <string name="xr_lint_global_transport">Блок «transport» верхняга ўзроўню выдалены: перанясіце яго налады ў streamSettings inbound / outbound.</string>
+    <string name="xr_lint_dns">Ядро — Linux-зборка: на Android няма /etc/resolv.conf, і само яно не вызначае дамены. Дадайце блок «dns» (напрыклад, серверы 1.1.1.1, 8.8.8.8) і «domainStrategy»: «UseIP» у freedom.</string>
+    <string name="sb_lint_http_client">Аддаленыя наборы правіл спампоўваюцца праз няяўны HTTP-кліент толькі да sing-box 1.16: задайце «http_clients» (і route.default_http_client).</string>
 </resources>
