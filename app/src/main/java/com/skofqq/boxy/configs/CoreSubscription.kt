@@ -164,6 +164,18 @@ object CoreSubscription {
         if (text.startsWith("[") || text.startsWith("{")) {
             val cfg = runCatching { if (text.startsWith("[")) org.json.JSONArray(text).getJSONObject(0) else JSONObject(text) }.getOrNull()
                 ?: return Outcome(false, error = "format", profile = r.profile)
+            // The panel tags this config's own server "proxy" and the others with their names: it gets its name
+            // too (the "remarks"), so the panel in Boxy shows names only. Rules pointing at "proxy" follow.
+            val own = cfg.optString("remarks").replace(Regex("[\"\\\\]"), "").trim()
+            val obs = cfg.optJSONArray("outbounds")
+            val tags = obs?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.optString("tag") } }.orEmpty()
+            // Only a name starting with a flag: the template's balancers select servers by that (and by "proxy").
+            if (own.isNotEmpty() && own.codePointAt(0) in 0x1F1E6..0x1F1FF && own !in tags && obs != null) {
+                (0 until obs.length()).mapNotNull { obs.optJSONObject(it) }.firstOrNull { it.optString("tag") == "proxy" }?.put("tag", own)
+                cfg.optJSONObject("routing")?.optJSONArray("rules")?.let { rules ->
+                    (0 until rules.length()).mapNotNull { rules.optJSONObject(it) }.filter { it.optString("outboundTag") == "proxy" }.forEach { it.put("outboundTag", own) }
+                }
+            }
             cfg.remove("remarks")
             cfg.remove("meta")
             val name = "profiles/${host(url)}.json"
