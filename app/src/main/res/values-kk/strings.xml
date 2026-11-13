@@ -1113,7 +1113,7 @@
     <string name="xray_tested_ago">Тексерілді: %1$s</string>
     <string name="xray_probed_ago">Xray сауалнамасы %1$s (бірнеше минут сайын)</string>
     <string name="xray_delay_note">«Тексеру» ашық қосылым арқылы сұрауды өлшейді, mihomo-дағы unified-delay сияқты. Xray-дің өз сауалнамасы жаңа қосылымды толық есептейді (TLS / REALITY қол алысуымен), сондықтан оның сандары үлкенірек; теңгергіш солар бойынша таңдайды.</string>
-    <string name="xray_no_vpn">VPN-сіз</string>
+    <string name="xray_no_vpn">🇷🇺 VPN-сіз</string>
     <string name="xray_mode_auto">АВТО</string>
     <string name="xray_mode_pinned">БЕКІТІЛГЕН</string>
 </resources>

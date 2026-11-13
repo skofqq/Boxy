@@ -1124,7 +1124,7 @@
     <string name="xray_tested_ago">Проверено %1$s</string>
     <string name="xray_probed_ago">Опрос Xray %1$s (раз в несколько минут)</string>
     <string name="xray_delay_note">«Проверить» меряет запрос по уже открытому соединению, как unified-delay в mihomo. Собственный опрос Xray считает новое соединение целиком (с рукопожатием TLS / REALITY), поэтому его числа больше; балансировщик выбирает по ним.</string>
-    <string name="xray_no_vpn">Без VPN</string>
+    <string name="xray_no_vpn">🇷🇺 Без VPN</string>
     <string name="xray_mode_auto">АВТО</string>
     <string name="xray_mode_pinned">ЗАКРЕПЛЁН</string>
 </resources>
