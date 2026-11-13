@@ -26,18 +26,20 @@ logs="/data/adb/box/run"
 
 rules_add() {
   date > "${logs}/net.log"
-  iptables -t mangle -F LOCAL_IP_V4
+  # Both chains are refilled from scratch: before, nat kept every address the phone ever had.
+  ${iptables} -t mangle -F LOCAL_IP_V4 2>/dev/null
+  ${iptables} -t nat -F LOCAL_IP_V4 2>/dev/null
   ip -4 a | busybox awk '/inet/ {print $2}' | grep -vE "^127.0.0.1" | while read -r local_ipv4 ; do
-    ${iptables} -t mangle -A LOCAL_IP_V4 -d $local_ipv4 -j ACCEPT
+    ${iptables} -t mangle -A LOCAL_IP_V4 -d $local_ipv4 -j ACCEPT 2>/dev/null
     rv1=$?
-    ${iptables} -t nat -A LOCAL_IP_V4 -d $local_ipv4 -j ACCEPT
+    ${iptables} -t nat -A LOCAL_IP_V4 -d $local_ipv4 -j ACCEPT 2>/dev/null
     rv2=$?
     ( [ $rv1 = "0" ] || [ $rv2 = "0" ] ) && echo "[Info]: local ip is $local_ipv4, anti-loopback rule has been inserted" >> ${logs}/net.log 2>&1
   done
 
-  ip6tables -t mangle -F LOCAL_IP_V6
+  ${ip6tables} -t mangle -F LOCAL_IP_V6 2>/dev/null
   ip -6 a | busybox awk '/inet6/ {print $2}' | grep -vE "^fe80|^::1|^fd00" | while read -r local_ipv6 ; do
-    ${ip6tables} -t mangle -A LOCAL_IP_V6 -d $local_ipv6 -j ACCEPT
+    ${ip6tables} -t mangle -A LOCAL_IP_V6 -d $local_ipv6 -j ACCEPT 2>/dev/null
     [ $? = "0" ] && echo "[Info]: local ip is $local_ipv6, anti-loopback rule has been inserted" >> ${logs}/net.log 2>&1
   done
 }

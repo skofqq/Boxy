@@ -414,7 +414,7 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
                     moduleBackups.forEachIndexed { i, b ->
                         com.skofqq.boxy.ui.components.SettingsRow(
                             BoxyIcons.Delete,
-                            backupDate(b.name),
+                            backupDate(b.name, context.resources.configuration.locales[0]),
                             com.skofqq.boxy.util.Format.bytes(context, b.sizeKb * 1024),
                             showDivider = i < moduleBackups.size - 1,
                         ) { deleteBackup = b }
@@ -464,7 +464,7 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
 
     deleteBackup?.let { b ->
         ConfirmDialog(
-            backupDate(b.name),
+            backupDate(b.name, context.resources.configuration.locales[0]),
             stringResource(R.string.module_backup_delete_confirm),
             stringResource(R.string.action_delete),
             onConfirm = {
@@ -736,7 +736,7 @@ fun ModuleUpdateSheet(version: String?, installed: Boolean, onDismiss: () -> Uni
 }
 
 /** "20261113-042100" as a local date and time. */
-private fun backupDate(name: String): String = runCatching {
+private fun backupDate(name: String, locale: Locale): String = runCatching {
     val d = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).parse(name)!!
-    java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT).format(d)
+    java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT, locale).format(d)
 }.getOrDefault(name)

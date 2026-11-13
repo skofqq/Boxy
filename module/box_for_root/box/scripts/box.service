@@ -82,7 +82,7 @@ box_run_crontab() {
     if [ "$update_subscription" = "true" ] || [ "$update_geo" = "true" ]; then
       if [ -n "${interva_update}" ]; then
         log Debug "Crontab interval: ${interva_update}."
-        echo "${interva_update} ${scripts_dir}/box.tool geosub" >> "${box_run}/root"
+        echo "${interva_update} ${box_dir}/scripts/box.tool geosub" >> "${box_run}/root"
         log Info "${bin_name} geox updates: ${update_geo}."
         if [ "${bin_name}" = "clash" ]; then
           log Info "${bin_name} subscription update: ${update_subscription}."
@@ -91,6 +91,8 @@ box_run_crontab() {
         log Debug "Crontab interval is empty, skipping Geox & Subscription schedule setup."
       fi
     fi
+    # Core logs are cut when they grow past 5 MB.
+    echo "*/30 * * * * ${box_dir}/scripts/box.tool logrotate" >> "${box_run}/root"
     cat "${box_dir}/crontab.cfg" >> "${box_run}/root"
     chmod 0644 "${box_run}/root"
     # start crond with the "-c" option and keep it in the background
@@ -663,8 +665,59 @@ hysteria_check() {
   return 1
 }
 
+# Set at the end of a successful start, removed first thing by a stop: the core exiting while it exists is a crash.
+core_up="${box_run}/core.up"
+
+# The previous run's core log is kept as <core>.log.1; this run's starts empty. The core appends to its log
+# (>>), so box.tool logrotate can cut it while it runs.
+rotate_core_log() {
+  case "${bin_log}" in
+    "${box_run}"/*) ;;
+    *) return 0 ;;
+  esac
+  [ -s "${bin_log}" ] && mv -f "${bin_log}" "${bin_log}.1"
+  : > "${bin_log}"
+}
+
+# The core exited by itself (crash, killed by the system): the proxy rules would send every app into a port
+# nobody listens on, so they are removed right away, and Boxy is told. No restart: a core that crashed once
+# would most likely crash again.
+core_crashed() {
+  rm -f "${core_up}" "${box_pid}"
+  log Error "${bin_name} exited by itself (code $1): proxy rules removed, the service is stopped"
+  log Error "$(tail -n 5 "${bin_log}" 2>/dev/null)"
+  "${scripts_dir}/box.iptables" disable >/dev/null 2>&1
+  box_dnscrypt stop
+  stop_cron
+  sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ $(date +"%I:%M %P") | $(t "❌ $bin_name exited by itself, the service is stopped, see the log" "❌ $bin_name завершился сам, сервис остановлен, см. журнал") ] /g" "$PROPFILE"
+  notify_state
+}
+
+# Starts the core ("$@": its command) under a small watcher shell that waits for it (no polling): when the
+# core exits while core.up exists, core_crashed runs. Sets PID and writes box.pid.
+launch_core() {
+  rm -f "${box_pid}" "${core_up}"
+  (
+    trap - EXIT
+    trap '' HUP
+    busybox setuidgid "${box_user_group}" "$@" >> "${bin_log}" 2>&1 &
+    pid=$!
+    echo -n "${pid}" > "${box_pid}"
+    wait "${pid}"
+    rc=$?
+    [ -f "${core_up}" ] && [ "$(cat "${box_pid}" 2>/dev/null)" = "${pid}" ] && core_crashed "${rc}"
+  ) </dev/null >/dev/null 2>&1 &
+  local n=0
+  while [ ! -s "${box_pid}" ] && [ $n -lt 100 ]; do
+    sleep 0.02
+    n=$((n + 1))
+  done
+  PID=$(cat "${box_pid}" 2>/dev/null)
+}
+
 box_run_bin() {
   log Info "client-list: [ ${bin_list[*]} ]"
+  rotate_core_log
   log Info "choose: ${bin_name}, start the service."
   ulimit -SHn 1000000
   # Use ulimit to limit the memory usage of a process to 200MB
@@ -693,15 +746,13 @@ box_run_bin() {
         log Error "configuration failed. Please check ${hysteria_config}"
         exit 1
       fi
-      SSL_CERT_DIR="${go_cert_dirs}" nohup busybox setuidgid "${box_user_group}" "${bin_path}" -c "${hysteria_config}" > "${bin_log}" 2>&1 &
-      PID=$!
+      export SSL_CERT_DIR="${go_cert_dirs}"
+      launch_core "${bin_path}" -c "${hysteria_config}"
 
       sleep 1
 
-      # Cek apakah proses benar-benar berjalan
-      if kill -0 "${PID}" 2>/dev/null; then
-        echo -n "${PID}" > "${box_pid}"
-      else
+      # hysteria exits at once on a bad config or an unreachable server
+      if ! kill -0 "${PID}" 2>/dev/null; then
         prop_description
         log Error "$(cat "${box_run}/${bin_name}.log")"
         log Error "Configuration failed. Please check the log file: ${box_run}/${bin_name}.log"
@@ -711,9 +762,7 @@ box_run_bin() {
     sing-box)
       prepare_singbox
       if ${bin_path} check -D "${box_dir}/${bin_name}" -c "${sing_config}" $(singbox_extra_args) > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -D "${box_dir}/${bin_name}" -c "${sing_config}" $(singbox_extra_args) > "${bin_log}" 2>&1 &
-        PID=$!
-        echo -n $PID > "${box_pid}"
+        launch_core "${bin_path}" run -D "${box_dir}/${bin_name}" -c "${sing_config}" $(singbox_extra_args)
         sleep 0.2
       else
         prop_description
@@ -725,9 +774,7 @@ box_run_bin() {
     clash)
       prepare_clash
       if ${bin_path} -t -d "${box_dir}/${bin_name}" -f "${clash_config}" > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" -d "${box_dir}/${bin_name}" -f "${clash_config}" > "${bin_log}" 2>&1 &
-        PID=$!
-        echo -n $PID > "${box_pid}"
+        launch_core "${bin_path}" -d "${box_dir}/${bin_name}" -f "${clash_config}"
         sleep 0.2
       else
         prop_description
@@ -764,9 +811,7 @@ box_run_bin() {
       local xargs
       xargs=$(xray_args)
       if ${bin_path} -test ${xargs} > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run ${xargs} > "${bin_log}" 2>&1 &
-        PID=$!
-        echo -n $PID > "${box_pid}"
+        launch_core "${bin_path}" run ${xargs}
         sleep 1
       else
         prop_description
@@ -799,9 +844,7 @@ box_run_bin() {
       export V2RAY_LOCATION_ASSET="${box_dir}/${bin_name}"
       export SSL_CERT_DIR="${go_cert_dirs}"
       if ${bin_path} test -d "${box_dir}/${bin_name}" > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -d "${box_dir}/${bin_name}" > "${bin_log}" 2>&1 &
-        PID=$!
-        echo -n $PID > "${box_pid}"
+        launch_core "${bin_path}" run -d "${box_dir}/${bin_name}"
         sleep 1
       else
         prop_description
@@ -1031,6 +1074,7 @@ start_box() {
     count=$((count + 1))
   done
   box_bin_status
+  touch "${core_up}"
 
   # OOM Killer
   # box_pid=$(cat ${box_pid})
@@ -1053,6 +1097,8 @@ start_box() {
 }
 
 stop_box() {
+  # A stop by the module, not a crash: the core's watcher leaves it alone.
+  rm -f "${core_up}"
   stop_cron
   box_dnscrypt stop
   # One process scan for all cores (instead of pgrep + pkill per core), then wait for them to exit:
@@ -1132,6 +1178,33 @@ notify_state() {
   am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.STATE_CHANGED \
     -n com.skofqq.boxy/.notify.ModuleEventReceiver >/dev/null 2>&1 &
 }
+
+# One start / stop / restart at a time (Boxy, the tile, the network scripts and cron may run them together):
+# the others wait, at most a minute. A lock left by a process that is gone is taken over.
+box_lock() {
+  local lock="${box_run}/service.lock" n=0 owner
+  mkdir -p "${box_run}"
+  while ! mkdir "${lock}" 2>/dev/null; do
+    owner=$(cat "${lock}/pid" 2>/dev/null)
+    if [ -n "${owner}" ] && ! kill -0 "${owner}" 2>/dev/null; then
+      rm -rf "${lock}"
+      continue
+    fi
+    if [ $n -ge 600 ]; then
+      log Warning "another start / stop is still running after a minute, going on"
+      rm -rf "${lock}"
+      continue
+    fi
+    sleep 0.1
+    n=$((n + 1))
+  done
+  echo $$ > "${lock}/pid"
+  trap 'rm -rf "${box_run}/service.lock"' EXIT
+}
+
+case "$1" in
+  start|stop|restart) box_lock ;;
+esac
 
 case "$1" in
   start)

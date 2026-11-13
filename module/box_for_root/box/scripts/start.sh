@@ -34,7 +34,7 @@ start_service() {
 }
 
 enable_iptables() {
-  PIDS=("clash" "xray" "sing-box" "v2fly")
+  PIDS=("clash" "xray" "sing-box" "v2fly" "hysteria")
   PID=""
   i=0
   while [ -z "$PID" ] && [ "$i" -lt "${#PIDS[@]}" ]; do

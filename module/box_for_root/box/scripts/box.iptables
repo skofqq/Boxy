@@ -952,7 +952,8 @@ if [[ "${network_mode}" == @(redirect|mixed|tproxy|enhance) ]]; then
       ;;
     disable)
       ipv6_enable
-      probe_user_group || log Error "Failed to check BOX user group. Please ensure ${bin_name} kernel is started."
+      # The core may be gone already (a stop, a crash): nothing to report then.
+      probe_user_group >/dev/null 2>&1
       log Warning "Cleaning up iptables transparent proxy rules."
 
       cleanup_iptables
@@ -1019,7 +1020,8 @@ else
       ;;
     disable)
       ipv6_enable
-      probe_user_group || log Error "Failed to check BOX user group. Please ensure ${bin_name} kernel is started."
+      # The core may be gone already (a stop, a crash): nothing to report then.
+      probe_user_group >/dev/null 2>&1
       log Warning "Cleaning up tun rules."
 
       cleanup_iptables

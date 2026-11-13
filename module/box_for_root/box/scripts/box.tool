@@ -38,9 +38,10 @@ use_ghproxy="false"
 mihomo_stable="enable"
 singbox_stable="enable"
 
-rev1="busybox wget --no-check-certificate -qO-"
+# Version lookups (GitHub API): a stalled request gives up instead of hanging the task.
+rev1="busybox wget --no-check-certificate -T 30 -qO-"
 if which curl >/dev/null; then
-  rev1="curl --progress-bar --insecure -sL"
+  rev1="curl --progress-bar --insecure -sL --connect-timeout 15 --max-time 60"
 fi
 
 # Updating files from URLs
@@ -78,7 +79,7 @@ upfile() {
     echo "${yellow}${request% *} $(mask_url "${update_url}")${normal}"
   else
     request="busybox wget"
-    request+=" --no-check-certificate"
+    request+=" --no-check-certificate -T 30"
     request+=" --user-agent ${user_agent}"
     request+=" -O ${file}"
     request+=" ${update_url}"
@@ -273,6 +274,7 @@ reload() {
 
   case "${bin_name}" in
     clash)
+      ip_port=$(panel_address)
       if [ "${xclash_option}" = "mihomo" ]; then
         endpoint="http://${ip_port}/configs?force=true"
       else
@@ -1554,11 +1556,19 @@ cgroup_cpuset() {
   return 0
 }
 
-ip_port=$(if [ "${bin_name}" = "clash" ]; then busybox awk '/external-controller:/ {print $2}' "${clash_config}"; else find /data/adb/box/sing-box/ -type f -name 'config.json' -exec busybox awk -F'[:,]' '/external_controller/ {print $2":"$3}' {} \; | sed 's/^[ \t]*//;s/"//g'; fi;)
+# The panel address (external-controller): looked up only by reload (clash) and webroot, not on every call.
+panel_address() {
+  if [ "${bin_name}" = "clash" ]; then
+    busybox awk '!/^ *#/ && /external-controller:/ {print $2; exit}' "${clash_config}"
+  else
+    busybox awk -F'"' '/"external_controller"/ {print $4; exit}' "${sing_config}" 2>/dev/null
+  fi
+}
 secret=""
 
 webroot() {
 path_webroot="/data/adb/modules/box_for_root/webroot/index.html"
+ip_port=$(panel_address)
 touch -n > $path_webroot
   if [[ "${bin_name}" = @(clash|sing-box) ]]; then
     echo -e '
@@ -1632,9 +1642,27 @@ bond1() {
   log Debug "rmnet_data* mtu: 9000"
 }
 
+# Core logs above 5 MB: the file is copied to <name>.1 and starts again. The core appends to its
+# log (box.service starts it with >>), so cutting it in place is safe while it runs. Run by cron (box.service
+# adds it to the crontab) and by geosub.
+logrotate() {
+  local f size limit=$((5 * 1024 * 1024))
+  for f in "${box_run}"/*.log; do
+    [ -f "${f}" ] || continue
+    case "${f##*/}" in runs.log) continue ;; esac
+    size=$(wc -c < "${f}" 2>/dev/null || echo 0)
+    [ "${size}" -gt "${limit}" ] || continue
+    cp -f "${f}" "${f}.1" && : > "${f}"
+    log Info "${f##*/} reached $((size / 1024 / 1024)) MB, moved to ${f##*/}.1"
+  done
+}
+
 case "$1" in
   check)
     check
+    ;;
+  logrotate)
+    logrotate
     ;;
   memcg|cpuset|blkio)
     case "$1" in
@@ -1660,6 +1688,7 @@ case "$1" in
     exit $?
     ;;
   geosub)
+    logrotate
     upgeox
     upsubs
     if [ -f "${box_pid}" ]; then
@@ -1725,6 +1754,7 @@ case "$1" in
     echo "  upyq        - Update yq binary"
     echo "  upcurl      - Update curl binary"
     echo "  reload      - Reload running service configuration"
+    echo "  logrotate   - Cut core logs above 5 MB (the rest is kept as <name>.log.1)"
     echo "  webroot     - Update/rebuild webroot files"
     echo "  all         - Run all update commands in sequence"
     echo
