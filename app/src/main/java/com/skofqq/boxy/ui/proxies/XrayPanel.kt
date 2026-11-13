@@ -3,9 +3,10 @@ package com.skofqq.boxy.ui.proxies
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.skofqq.boxy.R
 import com.skofqq.boxy.net.XrayApi
-import com.skofqq.boxy.ui.components.GlassChip
 import com.skofqq.boxy.ui.components.NoticeCard
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.ui.components.SectionCard
@@ -72,10 +71,23 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
     var withApi by remember { mutableStateOf(true) }
     var busy by remember { mutableStateOf(false) }
     var showLog by remember { mutableStateOf(false) }
-    // Balancer -> outbound picked here ("" = the balancer's own choice); Xray does not report the override back.
-    val picked = remember { mutableStateMapOf<String, String>() }
+    // What each balancer is on, asked from Xray when the panel opens and after a pin (not polled).
+    var balancerInfo by remember { mutableStateOf<Map<String, XrayApi.BalancerInfo>>(emptyMap()) }
+    var infoKey by remember { mutableIntStateOf(0) }
+    var openBalancer by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey, reload) { setup = XrayApi.setup() }
+    val apiListen = setup?.takeIf { it.apiRouting }?.api
+    LaunchedEffect(apiListen, running, infoKey, setup?.balancers) {
+        val s = setup
+        if (apiListen == null || !running || s == null) return@LaunchedEffect
+        // Right after a start the observatory has not answered yet: ask again once it had time.
+        balancerInfo = XrayApi.balancerInfo(apiListen, s.balancers)
+        if (balancerInfo.values.any { it.picks == null }) {
+            delay(8000)
+            balancerInfo = XrayApi.balancerInfo(apiListen, s.balancers)
+        }
+    }
     val listen = setup?.metrics
     LaunchedEffect(listen, running) {
         if (listen == null || !running) return@LaunchedEffect
@@ -105,6 +117,26 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
     }
 
     val s = setup
+    // The opened balancer sits outside the list, so scrolling never takes it away.
+    val openApi = s?.api
+    if (s != null && openApi != null && openBalancer != null && openBalancer in s.balancers) {
+        val b = openBalancer!!
+        val v = BalancerView(
+            b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b],
+            metrics?.outbounds.orEmpty().associateBy { it.tag }, s.outbounds.associate { it.tag to it.protocol },
+        )
+        GroupDialog(
+            content = { mod ->
+                OpenBalancer(v, onClose = { openBalancer = null }, onPick = { t ->
+                    scope.launch {
+                        if (XrayApi.overrideBalancer(openApi, b, t)) infoKey++
+                        else Toast.makeText(context, R.string.xray_balancer_failed, Toast.LENGTH_LONG).show()
+                    }
+                }, modifier = mod)
+            },
+            onClose = { openBalancer = null },
+        )
+    }
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Xray", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text)
@@ -148,31 +180,32 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                 val m = metrics
                 if (!running) item { NoticeCard(stringResource(R.string.proxies_stopped_title), stringResource(R.string.panel_core_needed), Modifier.padding(horizontal = 16.dp)) }
                 else if (m == null) item { NoticeCard(stringResource(R.string.xray_panel_no_answer_title), stringResource(R.string.xray_panel_no_answer, s.metrics.orEmpty()), Modifier.padding(horizontal = 16.dp)) }
-                // Balancers: pin one outbound, or give the choice back to the balancer.
+                // Balancers as group cards, two per row; a card opens the servers to pin one or give the choice back.
                 val api = s.api
-                if (api != null && s.apiRouting && s.balancers.isNotEmpty()) item {
-                    SectionCard(stringResource(R.string.xray_balancers), stringResource(R.string.xray_balancers_sub)) {
-                        s.balancers.forEach { b ->
-                            Text(b, Modifier.padding(horizontal = 18.dp, vertical = 4.dp), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text)
+                if (api != null && s.apiRouting && s.balancers.isNotEmpty()) {
+                    val states = m?.outbounds.orEmpty().associateBy { it.tag }
+                    val protocols = s.outbounds.associate { it.tag to it.protocol }
+                    val views = s.balancers.map { b ->
+                        BalancerView(b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b], states, protocols)
+                    }
+                    item {
+                        Text(
+                            stringResource(R.string.xray_balancers),
+                            Modifier.padding(horizontal = 20.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Boxy.colors.text,
+                        )
+                    }
+                    views.chunked(2).forEach { pair ->
+                        item(key = "bal-" + pair.first().tag) {
                             Row(
-                                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 4.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
-                                val current = picked[b] ?: ""
-                                GlassChip(stringResource(R.string.xray_balancer_auto), current == "") {
-                                    scope.launch { if (XrayApi.overrideBalancer(api, b, null)) picked[b] = "" }
-                                }
-                                XrayApi.balancerTargets(s, b).forEach { t ->
-                                    GlassChip(t, current == t) {
-                                        scope.launch {
-                                            if (XrayApi.overrideBalancer(api, b, t)) picked[b] = t
-                                            else Toast.makeText(context, R.string.xray_balancer_failed, Toast.LENGTH_LONG).show()
-                                        }
-                                    }
-                                }
+                                pair.forEach { v -> BalancerTile(v, Modifier.weight(1f).fillMaxHeight()) { openBalancer = v.tag } }
+                                if (pair.size == 1) Spacer(Modifier.weight(1f))
                             }
                         }
-                        Spacer(Modifier.height(8.dp))
                     }
                 }
                 if (m != null) item {
@@ -213,7 +246,7 @@ private fun OutboundRow(o: XrayApi.OutboundState, divider: Boolean) {
             }
             Box(Modifier.size(10.dp).clip(CircleShape).background(color))
             Spacer(Modifier.width(12.dp))
-            Text(o.tag, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(XrayApi.displayName(o.tag), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
                 when {
                     o.alive == true && o.delayMs != null -> "${o.delayMs} ms"

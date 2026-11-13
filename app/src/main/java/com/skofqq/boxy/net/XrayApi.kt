@@ -43,6 +43,8 @@ object XrayApi {
         val balancers: List<String>,
         /** Each balancer's selector: the tag prefixes of the outbounds it picks from. */
         val selectors: Map<String, List<String>> = emptyMap(),
+        /** Each balancer's strategy type (leastPing, random, roundRobin, leastLoad). */
+        val strategies: Map<String, String> = emptyMap(),
         val policy: JSONObject?,
         val log: JSONObject?,
     ) {
@@ -65,6 +67,7 @@ object XrayApi {
         val outbounds = ArrayList<Outbound>()
         val balancers = ArrayList<String>()
         val selectors = LinkedHashMap<String, List<String>>()
+        val strategies = LinkedHashMap<String, String>()
         for (n in names) {
             val text = BoxModule.readFile("$DIR/$n") ?: continue
             val o = runCatching { JSONObject(text) }.getOrNull() ?: continue
@@ -78,6 +81,7 @@ object XrayApi {
                     val tag = b.optString("tag").takeIf { it.isNotBlank() } ?: return@let
                     balancers.add(tag)
                     val sel = b.optJSONArray("selector")
+                    strategies[tag] = b.optJSONObject("strategy")?.optString("type")?.takeIf { it.isNotBlank() } ?: "random"
                     selectors[tag] = if (sel == null) emptyList() else (0 until sel.length()).map { sel.optString(it) }.filter { it.isNotBlank() }
                 }
             }
@@ -95,9 +99,62 @@ object XrayApi {
             outbounds = outbounds.distinctBy { it.tag },
             balancers = balancers.distinct(),
             selectors = selectors,
+            strategies = strategies,
             policy = merged.optJSONObject("policy"),
             log = merged.optJSONObject("log"),
         )
+    }
+
+    /**
+     * A tag as people read it: without Boxy's subscription prefix ("sub-") or a similar short technical prefix
+     * in front of a flag, "_" as spaces. Tags themselves stay as they are.
+     */
+    fun displayName(tag: String): String {
+        var t = tag
+        if (t.startsWith(com.skofqq.boxy.configs.ShareLinks.TAG_PREFIX)) t = t.removePrefix(com.skofqq.boxy.configs.ShareLinks.TAG_PREFIX)
+        else PREFIX_BEFORE_FLAG.find(t)?.let { t = t.substring(it.value.length) }
+        return t.replace('_', ' ').trim().ifBlank { tag }
+    }
+
+    /** "out-🇩🇪…", "proxy-🇫🇮…": a lowercase word and a dash right before a flag (regional indicator pair). */
+    private val PREFIX_BEFORE_FLAG = Regex("^[a-z0-9]{1,8}[-_](?=[\\x{1F1E6}-\\x{1F1FF}])")
+
+    /** Per balancer: the pinned outbound ("" when none) and the one it picks now (null when Xray does not say). */
+    data class BalancerInfo(val override: String, val picks: String?)
+
+    /**
+     * Asks Xray (`xray api bi`) what each balancer is on: one call for all of them, read once when the panel opens
+     * and after a change, so a pin made earlier shows up. The answer lists the balancers in the order asked.
+     */
+    suspend fun balancerInfo(api: String, balancers: List<String>): Map<String, BalancerInfo> = withContext(Dispatchers.IO) {
+        if (balancers.isEmpty()) return@withContext emptyMap()
+        val server = api.let { if (it.startsWith(":")) "127.0.0.1$it" else it }
+        val r = Shell.cmd("timeout 10 $BOX/bin/xray api bi --server=$server ${balancers.joinToString(" ") { q(it) }} 2>/dev/null").exec()
+        if (!r.isSuccess) return@withContext emptyMap()
+        val blocks = ArrayList<BalancerInfo>()
+        var section = ""
+        var override = ""
+        var picks: String? = null
+        var started = false
+        fun close() { if (started) blocks.add(BalancerInfo(override, picks)) }
+        for (raw in r.out) {
+            val line = raw.trim()
+            when {
+                line.startsWith("- Selecting Override") -> { close(); started = true; override = ""; picks = null; section = "o" }
+                line.startsWith("- Selects") -> section = "s"
+                line.startsWith("-") -> section = ""
+                else -> {
+                    val v = line.substringAfter(' ', "").trim()
+                    if (line.firstOrNull()?.isDigit() == true && v.isNotEmpty()) {
+                        if (section == "o" && override.isEmpty()) override = v
+                        if (section == "s" && picks == null) picks = v
+                    }
+                }
+            }
+        }
+        close()
+        if (blocks.size != balancers.size) return@withContext emptyMap()
+        balancers.zip(blocks).toMap()
     }
 
     /** The outbounds [balancer] chooses from: tags starting with one of its selector prefixes. */
