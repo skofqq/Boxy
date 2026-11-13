@@ -66,7 +66,8 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
     val moveTitle = stringResource(R.string.xray_move_title)
 
     SectionCard(stringResource(R.string.xsub_title), stringResource(R.string.xsub_sub)) {
-        SettingsRow(BoxyIcons.Link, stringResource(R.string.xsub_url), url.ifBlank { stringResource(R.string.xsub_url_none) }) { editUrl = true }
+        // The host only: the rest of a subscription URL is its token (shown in full when editing).
+        SettingsRow(BoxyIcons.Link, stringResource(R.string.xsub_url), if (url.isBlank()) stringResource(R.string.xsub_url_none) else XraySubscription.maskUrl(url)) { editUrl = true }
         // More lists with a prefix of their own (white lists "wl" and the like): only Xray.
         if (core == "xray") {
             extras.forEach { e ->
