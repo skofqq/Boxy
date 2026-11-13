@@ -39,9 +39,12 @@ internal class BalancerView(
     val info: XrayApi.BalancerInfo?,
     private val states: Map<String, XrayApi.OutboundState>,
     private val protocols: Map<String, String>,
+    /** Results of the last "Test" (ms over an open connection, 0 = failed); they win over the observatory's. */
+    private val tested: Map<String, Int> = emptyMap(),
 ) {
     /** Delay as the mihomo panel shows it: ms when alive, 0 (a cross) when dead, null before the first probe. */
     fun delay(tag: String?): Int? {
+        tag?.let { tested[it] }?.let { return it }
         val s = tag?.let { states[it] } ?: return null
         return when (s.alive) {
             true -> s.delayMs?.toInt()?.coerceAtLeast(1)
@@ -95,7 +98,7 @@ private fun BalancerHead(b: BalancerView) {
  * balancer ("Auto → Finland"), with its delay.
  */
 @Composable
-private fun BalancerNow(b: BalancerView, long: Boolean) {
+private fun BalancerNow(b: BalancerView, long: Boolean, busy: Boolean = false, onTest: () -> Unit = {}) {
     val auto = stringResource(R.string.xray_balancer_auto)
     val text = when {
         b.pinned != null -> XrayApi.displayName(b.pinned!!)
@@ -103,8 +106,11 @@ private fun BalancerNow(b: BalancerView, long: Boolean) {
         else -> auto
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(if (b.pinned != null) BoxyIcons.ArrowCircle else BoxyIcons.Bolt, null, Modifier.size(16.dp), tint = Boxy.colors.text2)
-        Spacer(Modifier.width(6.dp))
+        // In a card the server name needs the room: the pin mark only, "Auto →" is spelled out when opened.
+        if (b.pinned != null || long) {
+            Icon(if (b.pinned != null) BoxyIcons.ArrowCircle else BoxyIcons.Bolt, null, Modifier.size(16.dp), tint = Boxy.colors.text2)
+            Spacer(Modifier.width(6.dp))
+        }
         Text(
             text,
             Modifier.weight(1f),
@@ -114,18 +120,25 @@ private fun BalancerNow(b: BalancerView, long: Boolean) {
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(Modifier.width(6.dp))
-        DelayPill(b.delay(b.current), busy = false, onTest = {})
+        MsPill(b.delay(b.current), busy, onTest)
     }
 }
 
 /** The opened balancer: "Auto" first, then every outbound it picks from, two per row; the current one is marked. */
 @Composable
-internal fun OpenBalancer(b: BalancerView, onClose: () -> Unit, onPick: (String?) -> Unit, modifier: Modifier) {
+internal fun OpenBalancer(
+    b: BalancerView,
+    busy: Boolean,
+    onClose: () -> Unit,
+    onTest: () -> Unit,
+    onPick: (String?) -> Unit,
+    modifier: Modifier,
+) {
     Column(modifier) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
             BalancerHead(b)
             Spacer(Modifier.height(10.dp))
-            BalancerNow(b, long = true)
+            BalancerNow(b, long = true, busy = busy, onTest = onTest)
         }
         Spacer(Modifier.height(12.dp))
         val auto = stringResource(R.string.xray_balancer_auto)
@@ -142,7 +155,9 @@ internal fun OpenBalancer(b: BalancerView, onClose: () -> Unit, onPick: (String?
                             b.info?.picks?.let { XrayApi.displayName(it) }.orEmpty(),
                             b.delay(b.info?.picks),
                             selected = b.pinned == null,
+                            busy = busy,
                             modifier = Modifier.weight(1f).fillMaxHeight(),
+                            onTest = onTest,
                         ) { onPick(null) }
                     } else {
                         ServerTile(
@@ -150,19 +165,34 @@ internal fun OpenBalancer(b: BalancerView, onClose: () -> Unit, onPick: (String?
                             b.protocol(t),
                             b.delay(t),
                             selected = b.pinned == t,
+                            busy = busy,
                             modifier = Modifier.weight(1f).fillMaxHeight(),
+                            onTest = onTest,
                         ) { onPick(t) }
                     }
                 }
                 if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
         }
-        Text(stringResource(R.string.xray_balancers_sub), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+        Text(
+            stringResource(R.string.xray_balancers_sub) + "\n" + stringResource(R.string.xray_delay_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = Boxy.colors.text2,
+        )
     }
 }
 
 @Composable
-private fun ServerTile(name: String, sub: String, delay: Int?, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+private fun ServerTile(
+    name: String,
+    sub: String,
+    delay: Int?,
+    selected: Boolean,
+    busy: Boolean,
+    modifier: Modifier,
+    onTest: () -> Unit,
+    onClick: () -> Unit,
+) {
     Column(
         modifier.clip(RoundedCornerShape(16.dp))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Boxy.colors.surface2)
@@ -181,7 +211,39 @@ private fun ServerTile(name: String, sub: String, delay: Int?, selected: Boolean
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(sub, Modifier.weight(1f), style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            DelayPill(delay, busy = false, onTest = {})
+            MsPill(delay, busy, onTest)
         }
     }
+}
+
+/** Delay pill with its unit, coloured like the mihomo panel's; a bolt before the first result, tap to test. */
+@Composable
+internal fun MsPill(delay: Int?, busy: Boolean, onTest: () -> Unit) {
+    androidx.compose.foundation.layout.Box(
+        Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.page).clickable(enabled = !busy, onClick = onTest)
+            .padding(horizontal = 9.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        when {
+            busy -> androidx.compose.material3.CircularProgressIndicator(Modifier.size(14.dp), strokeWidth = 2.dp)
+            delay == null -> Icon(BoxyIcons.Bolt, stringResource(R.string.proxies_test), Modifier.size(14.dp), tint = Boxy.colors.text2)
+            delay <= 0 -> Text("×", style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = com.skofqq.boxy.ui.theme.Tints.red.fg)
+            else -> Text(
+                stringResource(R.string.unit_ms, delay),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.SemiBold),
+                color = when {
+                    delay < 300 -> com.skofqq.boxy.ui.theme.Tints.green.fg
+                    delay < 800 -> com.skofqq.boxy.ui.theme.Tints.amber.fg
+                    else -> com.skofqq.boxy.ui.theme.Tints.red.fg
+                },
+            )
+        }
+    }
+}
+
+/** "just now" / "5 min ago" */
+@Composable
+internal fun agoText(at: Long): String {
+    val min = ((System.currentTimeMillis() - at) / 60_000).coerceAtLeast(0)
+    return if (min < 1) stringResource(R.string.xray_ago_now) else stringResource(R.string.xray_ago_min, min.toInt())
 }

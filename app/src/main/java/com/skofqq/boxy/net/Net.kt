@@ -579,7 +579,7 @@ object Net {
     }
 
     private val GROUP_TYPES = setOf("Selector", "URLTest", "Fallback", "LoadBalance", "Relay", "Smart")
-    const val DEFAULT_DELAY_URL = "https://www.gstatic.com/generate_204"
+    const val DEFAULT_DELAY_URL = "http://www.gstatic.com/generate_204"
     const val DEFAULT_DELAY_TIMEOUT = 5000
 
     /** URL and timeout of delay tests (the panel's settings; set from [com.skofqq.boxy.data.Prefs] at start). */

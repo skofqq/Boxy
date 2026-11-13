@@ -1119,4 +1119,9 @@
     <string name="xsub_skip_core">использует то, чего нет в V2Ray (REALITY, XTLS flow, XHTTP или Hysteria)</string>
     <string name="xsub_skip_port">нет правильного порта</string>
     <string name="xsub_skip_broken">ссылку не удалось разобрать (неизвестные или неполные параметры)</string>
+    <string name="xray_ago_now">только что</string>
+    <string name="xray_ago_min">%1$d мин назад</string>
+    <string name="xray_tested_ago">Проверено %1$s</string>
+    <string name="xray_probed_ago">Опрос Xray %1$s (раз в несколько минут)</string>
+    <string name="xray_delay_note">«Проверить» меряет запрос по уже открытому соединению, как unified-delay в mihomo. Собственный опрос Xray считает новое соединение целиком (с рукопожатием TLS / REALITY), поэтому его числа больше; балансировщик выбирает по ним.</string>
 </resources>

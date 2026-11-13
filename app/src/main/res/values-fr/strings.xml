@@ -1108,4 +1108,9 @@
     <string name="xsub_skip_core">utilise ce que V2Ray n\'a pas (REALITY, XTLS flow, XHTTP ou Hysteria)</string>
     <string name="xsub_skip_port">pas de port valide</string>
     <string name="xsub_skip_broken">impossible de lire le lien (paramètres inconnus ou incomplets)</string>
+    <string name="xray_ago_now">à l\'instant</string>
+    <string name="xray_ago_min">il y a %1$d min</string>
+    <string name="xray_tested_ago">Testé %1$s</string>
+    <string name="xray_probed_ago">Sondage Xray %1$s (toutes les quelques minutes)</string>
+    <string name="xray_delay_note">« Tester » mesure une requête sur une connexion déjà ouverte, comme unified-delay de mihomo. Le sondage propre de Xray compte une nouvelle connexion entière (poignée de main TLS / REALITY comprise), d\'où des valeurs plus hautes ; le répartiteur choisit d\'après elles.</string>
 </resources>

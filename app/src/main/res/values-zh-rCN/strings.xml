@@ -1108,4 +1108,9 @@
     <string name="xsub_skip_core">使用了 V2Ray 不具备的功能（REALITY、XTLS flow、XHTTP 或 Hysteria）</string>
     <string name="xsub_skip_port">没有有效端口</string>
     <string name="xsub_skip_broken">无法解析链接（参数未知或不完整）</string>
+    <string name="xray_ago_now">刚刚</string>
+    <string name="xray_ago_min">%1$d 分钟前</string>
+    <string name="xray_tested_ago">已测试：%1$s</string>
+    <string name="xray_probed_ago">Xray 探测 %1$s（每几分钟一次）</string>
+    <string name="xray_delay_note">“测试”测量已打开连接上的请求，与 mihomo 的 unified-delay 相同。Xray 自身的探测计算整个新连接（含 TLS / REALITY 握手），因此数值更高；负载均衡器按其选择。</string>
 </resources>

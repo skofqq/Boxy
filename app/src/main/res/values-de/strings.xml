@@ -1108,4 +1108,9 @@
     <string name="xsub_skip_core">nutzt etwas, das V2Ray nicht hat (REALITY, XTLS flow, XHTTP oder Hysteria)</string>
     <string name="xsub_skip_port">kein gültiger Port</string>
     <string name="xsub_skip_broken">der Link ließ sich nicht lesen (unbekannte oder unvollständige Parameter)</string>
+    <string name="xray_ago_now">gerade eben</string>
+    <string name="xray_ago_min">vor %1$d Min.</string>
+    <string name="xray_tested_ago">Getestet: %1$s</string>
+    <string name="xray_probed_ago">Xray-Prüfung %1$s (alle paar Minuten)</string>
+    <string name="xray_delay_note">„Testen“ misst eine Anfrage über eine offene Verbindung, wie unified-delay in mihomo. Xrays eigene Prüfung misst eine ganze neue Verbindung (mit TLS-/REALITY-Handshake), daher höhere Werte; der Balancer wählt danach.</string>
 </resources>

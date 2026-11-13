@@ -1131,4 +1131,9 @@
     <string name="xsub_skip_core">uses what V2Ray does not have (REALITY, XTLS flow, XHTTP or Hysteria)</string>
     <string name="xsub_skip_port">no valid port</string>
     <string name="xsub_skip_broken">the link could not be read (unknown or incomplete parameters)</string>
+    <string name="xray_ago_now">just now</string>
+    <string name="xray_ago_min">%1$d min ago</string>
+    <string name="xray_tested_ago">Tested %1$s</string>
+    <string name="xray_probed_ago">Xray probe %1$s (every few minutes)</string>
+    <string name="xray_delay_note">\"Test\" measures a request over an open connection, like mihomo\'s unified-delay. Xray\'s own probe times a whole new connection (TLS / REALITY handshake included), so its numbers are higher; the balancer picks by those.</string>
 </resources>

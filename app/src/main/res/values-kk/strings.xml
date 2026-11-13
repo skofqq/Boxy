@@ -1108,4 +1108,9 @@
     <string name="xsub_skip_core">V2Ray-де жоқ мүмкіндікті қолданады (REALITY, XTLS flow, XHTTP немесе Hysteria)</string>
     <string name="xsub_skip_port">дұрыс порт жоқ</string>
     <string name="xsub_skip_broken">сілтемені талдау мүмкін болмады (белгісіз не толық емес параметрлер)</string>
+    <string name="xray_ago_now">жаңа ғана</string>
+    <string name="xray_ago_min">%1$d мин бұрын</string>
+    <string name="xray_tested_ago">Тексерілді: %1$s</string>
+    <string name="xray_probed_ago">Xray сауалнамасы %1$s (бірнеше минут сайын)</string>
+    <string name="xray_delay_note">«Тексеру» ашық қосылым арқылы сұрауды өлшейді, mihomo-дағы unified-delay сияқты. Xray-дің өз сауалнамасы жаңа қосылымды толық есептейді (TLS / REALITY қол алысуымен), сондықтан оның сандары үлкенірек; теңгергіш солар бойынша таңдайды.</string>
 </resources>

@@ -67,7 +67,7 @@ object XraySubscription {
             o.put(
                 "observatory",
                 JSONObject().put("subjectSelector", JSONArray().put(ShareLinks.TAG_PREFIX))
-                    .put("probeUrl", "https://www.gstatic.com/generate_204").put("probeInterval", "3m").put("enableConcurrency", true),
+                    .put("probeUrl", "http://www.gstatic.com/generate_204").put("probeInterval", "3m").put("enableConcurrency", true),
             )
         }
         val target = file(core)

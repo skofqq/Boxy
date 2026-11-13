@@ -1108,4 +1108,9 @@
     <string name="xsub_skip_core">V2Ray\'de olmayan bir şey kullanıyor (REALITY, XTLS flow, XHTTP veya Hysteria)</string>
     <string name="xsub_skip_port">geçerli bağlantı noktası yok</string>
     <string name="xsub_skip_broken">bağlantı okunamadı (bilinmeyen veya eksik parametreler)</string>
+    <string name="xray_ago_now">az önce</string>
+    <string name="xray_ago_min">%1$d dk önce</string>
+    <string name="xray_tested_ago">Test edildi: %1$s</string>
+    <string name="xray_probed_ago">Xray yoklaması %1$s (birkaç dakikada bir)</string>
+    <string name="xray_delay_note">“Test et”, mihomo\'daki unified-delay gibi açık bir bağlantı üzerinden isteği ölçer. Xray\'in kendi yoklaması yeni bir bağlantının tamamını (TLS / REALITY el sıkışması dahil) ölçer, bu yüzden değerleri daha yüksektir; dengeleyici bunlara göre seçer.</string>
 </resources>

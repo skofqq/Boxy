@@ -26,6 +26,9 @@ object XrayApi {
     const val PANEL_FILE = "$DIR/zz-boxy-panel.json"
     const val METRICS_LISTEN = "127.0.0.1:11111"
     const val API_LISTEN = "127.0.0.1:10085"
+    const val PROBE_URL = "http://www.gstatic.com/generate_204"
+    /** Local socks ports of [testDelays], one per outbound tested. */
+    private const val TEST_PORT = 20800
     /** Access log written when the user turns it on; box.service empties it at every start. */
     const val ACCESS_LOG = "$BOX/run/xray-access.log"
 
@@ -53,7 +56,16 @@ object XrayApi {
         val panelReady get() = metrics != null
     }
 
-    data class OutboundState(val tag: String, val alive: Boolean?, val delayMs: Long?, val error: String?, val up: Long, val down: Long)
+    data class OutboundState(
+        val tag: String,
+        val alive: Boolean?,
+        val delayMs: Long?,
+        val error: String?,
+        val up: Long,
+        val down: Long,
+        /** The observatory's last probe, ms since the epoch. */
+        val probedAt: Long? = null,
+    )
 
     data class Metrics(val outbounds: List<OutboundState>, val inUp: Long, val inDown: Long)
 
@@ -193,7 +205,7 @@ object XrayApi {
                 o.put(
                     "observatory",
                     JSONObject().put("subjectSelector", JSONArray(tags))
-                        .put("probeUrl", "https://www.gstatic.com/generate_204").put("probeInterval", "3m").put("enableConcurrency", true),
+                        .put("probeUrl", "http://www.gstatic.com/generate_204").put("probeInterval", "3m").put("enableConcurrency", true),
                 )
             }
         }
@@ -290,6 +302,7 @@ object XrayApi {
                 error = ob?.optString("last_error_reason")?.takeIf { it.isNotBlank() },
                 up = st?.optLong("uplink") ?: 0,
                 down = st?.optLong("downlink") ?: 0,
+                probedAt = ob?.optLong("last_try_time", 0)?.takeIf { it > 0 }?.times(1000),
             )
         }
         var inUp = 0L
@@ -299,6 +312,64 @@ object XrayApi {
         }
         return Metrics(list, inUp, inDown)
     }
+
+    /** Result of [testDelays]: ms of a request over an open connection (0 = failed) and when it was measured. */
+    data class Tested(val delays: Map<String, Int>, val at: Long)
+
+    /**
+     * Tests [tags] now, on tap only: a short-lived Xray (same user as the core, so the proxy rules let it out) with a
+     * local socks port per outbound and the confdir's outbounds as they are. Two requests to the probe URL go over
+     * each one; the second one, over the open connection, is the delay, like mihomo's unified-delay (the first one
+     * also carries the TCP / TLS / REALITY handshake). Xray's own observatory times a whole new connection, so its
+     * numbers are higher; the balancer still picks by those.
+     */
+    suspend fun testDelays(tags: List<String>, url: String = PROBE_URL): Tested = withContext(Dispatchers.IO) {
+        val now = System.currentTimeMillis()
+        if (tags.isEmpty()) return@withContext Tested(emptyMap(), now)
+        val outbounds = JSONArray()
+        Shell.cmd("ls -a $DIR 2>/dev/null").exec().out.filter { it.endsWith(".json") }.sorted().forEach { n ->
+            val o = BoxModule.readFile("$DIR/$n")?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return@forEach
+            o.optJSONArray("outbounds")?.let { a -> for (i in 0 until a.length()) a.optJSONObject(i)?.let { outbounds.put(it) } }
+        }
+        val inbounds = JSONArray()
+        val rules = JSONArray()
+        tags.forEachIndexed { i, t ->
+            inbounds.put(JSONObject().put("tag", "boxy-t$i").put("listen", "127.0.0.1").put("port", TEST_PORT + i).put("protocol", "socks"))
+            rules.put(JSONObject().put("inboundTag", JSONArray().put("boxy-t$i")).put("outboundTag", t))
+        }
+        val cfg = JSONObject().put("log", JSONObject().put("loglevel", "none")).put("inbounds", inbounds).put("outbounds", outbounds)
+            .put("routing", JSONObject().put("rules", rules))
+        val file = "$BOX/run/boxy-delay.json"
+        if (!BoxModule.writeFile(file, cfg.toString())) return@withContext Tested(emptyMap(), now)
+        val group = BoxModule.unquote(BoxModule.readSetting("box_user_group")).orEmpty().ifBlank { "root:net_admin" }
+        val last = "%04X".format(TEST_PORT + tags.size - 1)
+        val curls = tags.indices.joinToString(" ") { i ->
+            "( r=\$($BOX/bin/curl -s -o /dev/null -m 6 -x socks5h://127.0.0.1:${TEST_PORT + i} -w '%{http_code}:%{time_total} ' ${q(url)} ${q(url)}); echo \"$i \$r\" ) & w=\"\$w \$!\";"
+        }
+        val script = "( export SSL_CERT_DIR=/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts; " +
+            "BB=busybox; for b in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox; do [ -x \$b ] && BB=\$b && break; done; " +
+            "\$BB setuidgid ${q(group)} $BOX/bin/xray run -c $file >/dev/null 2>&1 & p=\$!; " +
+            "n=0; while [ \$n -lt 30 ] && ! grep -qi ':$last ' /proc/net/tcp; do sleep 0.1; n=\$((n+1)); done; " +
+            "w=; $curls wait \$w; kill \$p 2>/dev/null; rm -f $file )"
+        val out = Shell.cmd(script).exec().out
+        val delays = HashMap<String, Int>()
+        for (line in out) {
+            val parts = line.trim().split(Regex("\\s+"))
+            val i = parts.firstOrNull()?.toIntOrNull() ?: continue
+            val tag = tags.getOrNull(i) ?: continue
+            val ok = parts.drop(1).mapNotNull { r ->
+                val code = r.substringBefore(':').toIntOrNull() ?: 0
+                val sec = r.substringAfter(':').toDoubleOrNull() ?: 0.0
+                if (code in 200..399 && sec > 0) (sec * 1000).toInt().coerceAtLeast(1) else null
+            }
+            delays[tag] = ok.getOrNull(1) ?: ok.getOrNull(0) ?: 0
+        }
+        tags.forEach { delays.putIfAbsent(it, 0) }
+        Tested(delays, System.currentTimeMillis())
+    }
+
+    /** Time of the observatory's last probe of [tag] (ms), null when it has not probed it yet. */
+    fun lastProbe(m: Metrics?, tag: String): Long? = m?.outbounds?.firstOrNull { it.tag == tag }?.probedAt
 
     /** Points a balancer at [target], or back to its own choice with null (`xray api bo`). */
     suspend fun overrideBalancer(api: String, balancer: String, target: String?): Boolean = withContext(Dispatchers.IO) {
