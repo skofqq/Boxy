@@ -24,6 +24,11 @@ if [ "${BOX_FORCE}" = "1" ]; then
   update_subscription="true"
 fi
 
+# bin/clash is a symlink to the clash build (box.service recreates it at start): without it, use the build itself.
+if [ "${bin_name}" = "clash" ] && [ ! -e "${bin_path}" ] && [ -x "${bin_dir}/xclash/${xclash_option:-mihomo}" ]; then
+  bin_path="${bin_dir}/xclash/${xclash_option:-mihomo}"
+fi
+
 # user agent (settings.ini: user_agent, no spaces)
 user_agent="${user_agent:-box_for_root}"
 # whether use ghproxy to accelerate github download

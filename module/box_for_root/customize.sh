@@ -355,6 +355,12 @@ if [ "${backup_box}" = "true" ]; then
   # Restored cores and tools stay executable (set_perm above made bin/ 0644)
   chmod 0755 /data/adb/box/bin/* /data/adb/box/bin/xclash/* 2>/dev/null
 
+  # bin/clash is a symlink to the chosen clash build, not restored with the cores above: without it box.tool
+  # (check, reload, upkernel) found no clash core until the next service start recreated it.
+  opt=$(grep -m1 '^xclash_option=' /data/adb/box/settings.ini 2>/dev/null | cut -d= -f2 | tr -d '"')
+  [ -f "/data/adb/box/bin/xclash/${opt:-mihomo}" ] || opt=mihomo
+  [ -f "/data/adb/box/bin/xclash/${opt}" ] && ln -sf "/data/adb/box/bin/xclash/${opt}" /data/adb/box/bin/clash
+
   ui_print "— $(t 'Restoring...' 'Восстановление...')"
   ui_print "     ↳  ap.list.cfg"
   ui_print "     ↳  crontab.cfg"
