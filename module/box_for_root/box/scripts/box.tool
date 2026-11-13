@@ -38,11 +38,131 @@ use_ghproxy="false"
 mihomo_stable="enable"
 singbox_stable="enable"
 
-# Version lookups (GitHub API): a stalled request gives up instead of hanging the task.
-rev1="busybox wget --no-check-certificate -T 30 -qO-"
-if which curl >/dev/null; then
-  rev1="curl --progress-bar --insecure -sL --connect-timeout 15 --max-time 60"
+# Downloads check the server's certificate against Android's CA store (the system's, the updatable
+# conscrypt one and certificates the user added), joined into one PEM bundle for curl. curl is the system's
+# or the module's own (bin/curl, box.tool upcurl); busybox wget cannot check certificates at all, so it is
+# only the fallback when there is no curl, and says so.
+ca_bundle="${box_run}/cacert.pem"
+curl_bin=$(command -v curl 2>/dev/null)
+[ -z "${curl_bin}" ] && [ -x "${bin_dir}/curl" ] && curl_bin="${bin_dir}/curl"
+
+make_ca_bundle() {
+  # Rebuilt when missing or older than a day (Android updates its CA store with the conscrypt module).
+  [ -s "${ca_bundle}" ] && [ -z "$(find "${ca_bundle}" -mmin +1440 2>/dev/null)" ] && return 0
+  local d
+  : > "${ca_bundle}.tmp"
+  for d in /apex/com.android.conscrypt/cacerts /system/etc/security/cacerts /data/misc/user/0/cacerts-added; do
+    [ -d "${d}" ] && cat "${d}"/* >> "${ca_bundle}.tmp" 2>/dev/null
+  done
+  if [ -s "${ca_bundle}.tmp" ]; then
+    mv -f "${ca_bundle}.tmp" "${ca_bundle}"
+  else
+    rm -f "${ca_bundle}.tmp"
+  fi
+}
+
+if [ -n "${curl_bin}" ]; then
+  make_ca_bundle
+  curl_tls="--cacert ${ca_bundle}"
+  [ -s "${ca_bundle}" ] || curl_tls="--capath /system/etc/security/cacerts"
 fi
+
+# The module's curl (a static Linux build) cannot use Android's resolver (there is no /etc/resolv.conf). Names
+# are resolved here with the network's own DNS servers (as busybox wget and the apps see them: DNS-over-HTTPS
+# resolvers may give CDN addresses that the network blocks) and passed with --resolve; redirects are followed
+# hop by hop for that. When the network's DNS does not answer, DNS-over-HTTPS is used (certificates checked).
+doh_list="https://1.1.1.1/dns-query https://77.88.8.8/dns-query https://8.8.8.8/dns-query https://9.9.9.9/dns-query"
+dns_servers=""
+
+# The DNS servers of the active networks (IPv4), looked up once per run.
+sys_dns() {
+  [ -n "${dns_servers}" ] || dns_servers=$(dumpsys connectivity 2>/dev/null \
+    | busybox sed -n 's/.*DnsAddresses: \[ \([^]]*\)\].*/\1/p' | tr ', ' '\n\n' \
+    | busybox sed -n 's#^/\([0-9.]*\)$#\1#p' | busybox awk '!seen[$0]++' | head -n 4)
+  echo "${dns_servers}"
+}
+
+# host -> its IPv4 addresses from the network's DNS (at most 4); an address stays as it is.
+resolve_host() {
+  local s ip
+  case "$1" in *[!0-9.]*) ;; *) echo "$1"; return 0 ;; esac
+  for s in $(sys_dns); do
+    ip=$(busybox nslookup "$1" "${s}" 2>/dev/null | busybox awk '
+      /^Name:/ { n = 1; next }
+      n && /^Address/ && $NF ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ { print $NF }' | head -n 4)
+    [ -n "${ip}" ] && { echo ${ip}; return 0; }
+  done
+  return 1
+}
+
+# curl_req <url> <curl arguments>: curl with certificate checks, following redirects; 6 when a name could
+# not be resolved at all.
+curl_req() {
+  local url="$1" hop=0 host port ip ips rc next u wfile="${box_run}/curl.next"
+  shift
+  if [ "${curl_bin}" != "${bin_dir}/curl" ]; then
+    "${curl_bin}" ${curl_tls} -L "$@" "${url}"
+    return
+  fi
+  sys_dns >/dev/null
+  while [ ${hop} -lt 8 ]; do
+    host="${url#*://}"
+    host="${host%%/*}"
+    host="${host%%\?*}"
+    host="${host##*@}"
+    case "${url}" in http://*) port=80 ;; *) port=443 ;; esac
+    case "${host}" in *:*) port="${host##*:}"; host="${host%:*}" ;; esac
+    rm -f "${wfile}"
+    if ips=$(resolve_host "${host}"); then
+      # A network may block some addresses of a CDN (connection refused, reset, timed out): the next one is tried.
+      for ip in ${ips}; do
+        "${curl_bin}" ${curl_tls} --resolve "${host}:${port}:${ip}" -w "%output{${wfile}}%{redirect_url}" "$@" "${url}"
+        rc=$?
+        case ${rc} in 7|28|35|52|56) continue ;; esac
+        break
+      done
+    else
+      rc=6
+      for u in $(cat "${box_run}/doh.url" 2>/dev/null) ${doh_list}; do
+        "${curl_bin}" ${curl_tls} --doh-url "${u}" -w "%output{${wfile}}%{redirect_url}" "$@" "${url}"
+        rc=$?
+        [ ${rc} -eq 6 ] && continue
+        echo "${u}" > "${box_run}/doh.url"
+        break
+      done
+    fi
+    [ ${rc} -eq 0 ] || { rm -f "${wfile}"; return ${rc}; }
+    next=$(cat "${wfile}" 2>/dev/null)
+    rm -f "${wfile}"
+    [ -z "${next}" ] && return 0
+    url="${next}"
+    hop=$((hop + 1))
+  done
+  log Error "Too many redirects: $(mask_url "$1")"
+  return 47
+}
+
+# busybox wget cannot check certificates: used only without curl, or when curl could resolve nothing.
+wget_warn() {
+  case "$1" in
+    https://*) log Warning "$2: the certificate of $(mask_url "$1") is not checked (busybox wget)" >&2 ;;
+  esac
+}
+
+# Text from a URL to stdout (version lookups, GitHub API). A stalled request gives up instead of hanging.
+fetch_text() {
+  local rc=6 tmp="${box_run}/fetch.$$"
+  if [ -n "${curl_bin}" ]; then
+    curl_req "$1" -fsS --connect-timeout 15 --max-time 60 -o "${tmp}"
+    rc=$?
+    [ ${rc} -eq 0 ] && cat "${tmp}"
+    rm -f "${tmp}"
+    [ ${rc} -eq 6 ] || return ${rc}
+  fi
+  wget_warn "$1" "$([ -n "${curl_bin}" ] && echo "curl could not resolve the name" || echo "no curl")"
+  busybox wget -T 30 -qO- "$1"
+}
+rev1="fetch_text"
 
 # Updating files from URLs
 # A URL as the logs show it: public sources (GitHub, jsDelivr) as they are, anything else (a subscription
@@ -66,33 +186,69 @@ upfile() {
   if [ "${use_ghproxy}" == true ] && [[ "${update_url}" == @(https://github.com/*|https://raw.githubusercontent.com/*|https://gist.github.com/*|https://gist.githubusercontent.com/*) ]]; then
     update_url="${url_ghproxy}/${update_url}"
   fi
-  # request
-  if which curl >/dev/null; then
-    # curl="$(which curl || echo /data/adb/box/bin/curl)"
-    request="curl --progress-bar"
-    request+=" -L"
-    request+=" --insecure"
-    request+=" --user-agent ${user_agent}"
-    request+=" --connect-timeout 30 --max-time 180"
-    request+=" -o ${file}"
-    request+=" ${update_url}"
-    echo "${yellow}${request% *} $(mask_url "${update_url}")${normal}"
-  else
-    request="busybox wget"
-    request+=" --no-check-certificate -T 30"
-    request+=" --user-agent ${user_agent}"
-    request+=" -O ${file}"
-    request+=" ${update_url}"
-    echo "${yellow}${request% *} $(mask_url "${update_url}")${normal}"
+  local rc=6
+  if [ -n "${curl_bin}" ]; then
+    echo "${yellow}curl --fail -o ${file} $(mask_url "${update_url}")${normal}"
+    curl_req "${update_url}" --progress-bar --fail --user-agent "${user_agent}" \
+      --connect-timeout 30 --max-time 300 -o "${file}" >&2
+    rc=$?
   fi
-  ${request} >&2 || {
+  if [ ${rc} -eq 6 ]; then
+    echo "${yellow}busybox wget -T 30 -O ${file} $(mask_url "${update_url}")${normal}"
+    wget_warn "${update_url}" "$([ -n "${curl_bin}" ] && echo "curl could not resolve the name" || echo "no curl (box.tool upcurl)")"
+    busybox wget -T 30 --user-agent "${user_agent}" -O "${file}" "${update_url}" >&2
+    rc=$?
+  fi
+  if [ ${rc} -ne 0 ]; then
+    rm -f "${file}"
     if [ -f "${file_bak}" ]; then
       mv "${file_bak}" "${file}" || true
     fi
-    log Error "Download $(mask_url "${update_url}") failed"
+    case ${rc} in
+      51|58|60|77|83|90|91) log Error "Download $(mask_url "${update_url}") failed: the server's certificate is not trusted (curl ${rc})" ;;
+      *) log Error "Download $(mask_url "${update_url}") failed" ;;
+    esac
     return 1
-  }
+  fi
   return 0
+}
+
+# GitHub publishes a sha256 digest for release assets ("digest": "sha256:…" in the API reply). The version
+# lookups save the reply (gh_api); verify_asset checks a downloaded file against its asset's digest. Assets
+# without a digest (older releases, alpha builds found without the API) are installed unverified, as before.
+api_json="${box_run}/github_api.json"
+gh_api() {
+  $rev1 "$1" 2>/dev/null | tee "${api_json}"
+}
+
+asset_digest() {
+  [ -s "${api_json}" ] || return 0
+  # Only the fields needed, without spaces (busybox awk's gsub crashes on long release notes).
+  tr ',{}' '\n\n\n' < "${api_json}" | busybox grep -E '^[[:space:]]*"(name|digest|browser_download_url)":' \
+    | tr -d ' \t\r' | busybox awk -v want="\"name\":\"$1\"" '
+    $0 == want { found = 1; next }
+    found && /^"digest":"sha256:[0-9a-f]+"$/ { sub(/^"digest":"sha256:/, ""); sub(/"$/, ""); print; exit }
+    found && /^"browser_download_url"/ { found = 0 }'
+}
+
+# verify_asset <downloaded file> <asset name>: 1 (and the file removed) when its sha256 is not the published one.
+verify_asset() {
+  local file="$1" want have
+  want=$(asset_digest "$2")
+  if [ -z "${want}" ]; then
+    log Info "GitHub publishes no sha256 for $2, not verified"
+    return 0
+  fi
+  have=$(sha256sum "${file}" 2>/dev/null | busybox awk '{print $1}')
+  if [ "${have}" = "${want}" ]; then
+    log Info "sha256 verified: $2"
+    return 0
+  fi
+  log Error "sha256 of $2 does not match the published one (${want}, got ${have:-nothing}): the download is discarded"
+  rm -f "${file}"
+  # A file downloaded in place (hysteria) gets the previous one back.
+  [ -f "${file}.bak" ] && mv -f "${file}.bak" "${file}"
+  return 1
 }
 
 # Restart the binary, after stopping and running again
@@ -340,7 +496,7 @@ upcurl() {
 
   # Fetch latest version from GitHub
   log Info "Fetching latest static-curl version..."
-  local latest_version=$($rev1 "https://api.github.com/repos/stunnel/static-curl/releases" \
+  local latest_version=$(gh_api "https://api.github.com/repos/stunnel/static-curl/releases" \
     | grep "tag_name" | busybox grep -oE "[0-9][0-9.]*(-[0-9]+)?" | head -1)
 
   if [ -z "$latest_version" ]; then
@@ -352,7 +508,7 @@ upcurl() {
   # Download
   local download_link="https://github.com/stunnel/static-curl/releases/download/${latest_version}/curl-linux-${arch}-musl-${latest_version}.tar.xz"
   log Info "Downloading from: ${download_link}"
-  if ! upfile "${bin_dir}/curl.tar.xz" "${download_link}"; then
+  if ! upfile "${bin_dir}/curl.tar.xz" "${download_link}" || ! verify_asset "${bin_dir}/curl.tar.xz" "curl-linux-${arch}-musl-${latest_version}.tar.xz"; then
     log Error "Failed to download curl binary."
     return 1
   fi
@@ -864,7 +1020,7 @@ updnscrypt() {
     x86_64) a="x86_64" ;;
     *) log Error "Unsupported architecture: $(uname -m)"; return 1 ;;
   esac
-  ver=$($rev1 "https://api.github.com/repos/DNSCrypt/dnscrypt-proxy/releases/latest" | grep '"tag_name"' | busybox grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+  ver=$(gh_api "https://api.github.com/repos/DNSCrypt/dnscrypt-proxy/releases/latest" | grep '"tag_name"' | busybox grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
   if [ -z "${ver}" ]; then
     log Error "Failed to get the latest dnscrypt-proxy version"
     return 1
@@ -878,7 +1034,7 @@ updnscrypt() {
   zip="${bin_dir}/dnscrypt-proxy.zip"
   tmp="${bin_dir}/dnscrypt.tmp"
   log Info "Downloading dnscrypt-proxy ${ver} (android_${a})"
-  upfile "${zip}" "${url}" || return 1
+  upfile "${zip}" "${url}" && verify_asset "${zip}" "dnscrypt-proxy-android_${a}-${ver}.zip" || return 1
   rm -rf "${tmp}" && mkdir -p "${tmp}"
   if ! busybox unzip -o "${zip}" -d "${tmp}" >/dev/null 2>&1; then
     log Error "Failed to unpack ${zip}"
@@ -912,6 +1068,7 @@ upkernel() {
   # su -c /data/adb/box/scripts/box.tool upkernel [force]
   force_update=false
   [ "$1" = "force" ] && force_update=true
+  rm -f "${api_json}"
   mkdir -p "${bin_dir}/backup"
   if [ -f "${bin_dir}/${bin_name}" ]; then
     cp "${bin_dir}/${bin_name}" "${bin_dir}/backup/${bin_name}.bak" >/dev/null 2>&1
@@ -934,11 +1091,11 @@ upkernel() {
     
       if [ "${singbox_stable}" = "disable" ]; then
         log Info "Fetching ${bin_name} pre-release version info..."
-        latest_version=$($rev1 "${api_url}" \
+        latest_version=$(gh_api "${api_url}" \
           | grep "tag_name" | busybox grep -oE "v[0-9].*" | head -1 | cut -d'"' -f1)
       else
         log Info "Fetching ${bin_name} latest stable version info..."
-        latest_version=$($rev1 "${api_url}/latest" \
+        latest_version=$(gh_api "${api_url}/latest" \
           | grep "tag_name" | busybox grep -oE "v[0-9.]*" | head -1)
       fi
     
@@ -952,7 +1109,7 @@ upkernel() {
       download_link="${url_down}/download/${latest_version}/sing-box-${latest_version#v}-${platform}-${arch}.tar.gz"
       log Info "Downloading from: ${download_link}"
     
-      if upfile "${box_dir}/${file_kernel}.tar.gz" "${download_link}"; then
+      if upfile "${box_dir}/${file_kernel}.tar.gz" "${download_link}" && verify_asset "${box_dir}/${file_kernel}.tar.gz" "sing-box-${latest_version#v}-${platform}-${arch}.tar.gz"; then
         log Info "Download completed: ${box_dir}/${file_kernel}.tar.gz"
         log Info "Installing ${bin_name}..."
         xkernel
@@ -969,7 +1126,7 @@ upkernel() {
 
         if [ "${mihomo_stable}" = "enable" ]; then
           log Info "Fetching latest stable version..."
-          latest_version=$($rev1 "https://api.github.com/repos/MetaCubeX/mihomo/releases" \
+          latest_version=$(gh_api "https://api.github.com/repos/MetaCubeX/mihomo/releases" \
             | grep "tag_name" | busybox grep -oE "v[0-9.]*" | head -1)
           if [ -z "${latest_version}" ]; then
             log Error "Failed to retrieve latest stable version."
@@ -1002,7 +1159,7 @@ upkernel() {
         # Download file
         full_url="${download_link}/download/${tag}/${filename}.gz"
         log Info "Downloading from: ${full_url}"
-        if upfile "${box_dir}/${file_kernel}.gz" "${full_url}"; then
+        if upfile "${box_dir}/${file_kernel}.gz" "${full_url}" && verify_asset "${box_dir}/${file_kernel}.gz" "${filename}.gz"; then
           log Info "Download completed successfully: ${box_dir}/${file_kernel}.gz"
           log Info "Installing kernel..."
           xkernel
@@ -1029,7 +1186,7 @@ upkernel() {
       log Info "Fetching latest release info from ${api_url}..."
     
       # Get the latest version
-      latest_version=$($rev1 "${api_url}" | grep "tag_name" | busybox grep -oE "v[0-9.]*" | head -1)
+      latest_version=$(gh_api "${api_url}" | grep "tag_name" | busybox grep -oE "v[0-9.]*" | head -1)
       if [ -z "${latest_version}" ]; then
         log Error "Failed to retrieve latest version for ${bin_name}."
         exit 1
@@ -1058,7 +1215,7 @@ upkernel() {
       log Info "Downloading from: ${full_url}"
     
       # Download & execute xkernel
-      if upfile "${box_dir}/${file_kernel}.zip" "${full_url}"; then
+      if upfile "${box_dir}/${file_kernel}.zip" "${full_url}" && verify_asset "${box_dir}/${file_kernel}.zip" "${download_file}"; then
         log Info "Download completed: ${box_dir}/${file_kernel}.zip"
         log Info "Extracting and installing..."
         xkernel
@@ -1095,7 +1252,7 @@ upkernel() {
     
       # Fetch the latest version of Hysteria from GitHub releases
       log Info "Fetching latest Hysteria version from GitHub..."
-      local latest_version=$($rev1 "https://api.github.com/repos/apernet/hysteria/releases" \
+      local latest_version=$(gh_api "https://api.github.com/repos/apernet/hysteria/releases" \
         | grep "tag_name" | grep -oE "[0-9.].*" | head -1 | sed 's/,//g' | cut -d '"' -f 1)
     
       if [ -z "${latest_version}" ]; then
@@ -1108,7 +1265,7 @@ upkernel() {
       local download_link="https://github.com/apernet/hysteria/releases/download/app%2Fv${latest_version}/hysteria-android-${arch}"
       log Info "Downloading Hysteria from: ${download_link}"
     
-      if upfile "${bin_dir}/hysteria" "${download_link}"; then
+      if upfile "${bin_dir}/hysteria" "${download_link}" && verify_asset "${bin_dir}/hysteria" "hysteria-android-${arch}"; then
         log Info "Hysteria binary downloaded successfully to ${bin_dir}/hysteria"
         log Info "Reloading kernel..."
         xkernel
