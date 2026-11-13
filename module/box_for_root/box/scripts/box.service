@@ -442,7 +442,13 @@ dnscrypt_singbox() {
     fi
     [ "$(${yq} -r '[.dns.servers[]? | select(.tag == "dnscrypt")] | length' "${sing_config}" 2>/dev/null)" = "0" ] || return 0
     [ -f "${bak}" ] || ${yq} -o=json '{"final": (.dns.final // "")}' "${sing_config}" > "${bak}"
-    if [ "$(${yq} -r '[.dns.servers[]? | select(has("type"))] | length' "${sing_config}" 2>/dev/null)" != "0" ]; then
+    # The new format when the config already uses it, or when there are no servers to follow and the core is
+    # 1.12+ (1.14 no longer reads the legacy one).
+    local sbv
+    sbv=$("${bin_path}" version 2>/dev/null | head -n 1 | busybox grep -oE '[0-9]+\.[0-9]+' | head -n 1)
+    if [ "$(${yq} -r '[.dns.servers[]? | select(has("type"))] | length' "${sing_config}" 2>/dev/null)" != "0" ] \
+      || { [ "$(${yq} -r '(.dns.servers // []) | length' "${sing_config}" 2>/dev/null)" = "0" ] \
+        && [ -n "${sbv}" ] && { [ "${sbv%%.*}" -gt 1 ] || [ "${sbv#*.}" -ge 12 ]; }; }; then
       # sing-box 1.12+ server format: dials directly unless a detour is set.
       server="{\"type\": \"udp\", \"tag\": \"dnscrypt\", \"server\": \"127.0.0.1\", \"server_port\": ${port}}"
     else
@@ -472,9 +478,22 @@ clash_dns_free_53() {
   fi
 }
 
+# Users of the proxy ports (Boxy → Proxy authentication) live in clash/.proxy-auth.yaml: authentication and
+# skip-auth-prefixes are put into the config at every start and reload, so a subscription that replaces the
+# config does not drop them. Nothing is logged about them.
+clash_apply_auth() {
+  local f="${box_dir}/clash/.proxy-auth.yaml" yq="yq"
+  [ -s "${f}" ] && [ -f "${clash_config}" ] || return 0
+  command -v yq >/dev/null 2>&1 || yq="${box_dir}/bin/yq"
+  ${yq} -i ".authentication = load(\"${f}\").authentication | .[\"skip-auth-prefixes\"] = load(\"${f}\").[\"skip-auth-prefixes\"]
+    | del(.[\"skip-auth-prefixes\"] | select(. == null or length == 0))" "${clash_config}" >/dev/null 2>&1 \
+    || log Warning "Proxy users could not be put into ${clash_config##*/} (yq)"
+}
+
 prepare_clash() {
   clash_dns_free_53
   dnscrypt_clash
+  clash_apply_auth
 
   # check configuration file
   if ! [ -f "${clash_config}" ]; then
@@ -655,20 +674,24 @@ core_crashed() {
   notify_state
 }
 
-# Starts the core ("$@": its command) under a small watcher shell that waits for it (no polling): when the
-# core exits while core.up exists, core_crashed runs. Sets PID and writes box.pid.
+# The watcher (box.service __watch <command>): starts the core as its child and waits for it (no polling); when
+# the core exits while core.up exists, core_crashed runs.
+watch_core() {
+  trap '' HUP
+  busybox setuidgid "${box_user_group}" "$@" >> "${bin_log}" 2>&1 &
+  local pid=$! rc
+  echo -n "${pid}" > "${box_pid}"
+  wait "${pid}"
+  rc=$?
+  [ -f "${core_up}" ] && [ "$(cat "${box_pid}" 2>/dev/null)" = "${pid}" ] && core_crashed "${rc}"
+}
+
+# Starts the core ("$@": its command) under the watcher. It is a new process (not a subshell): a subshell would
+# keep the shell's copy of the caller's output open, and whoever reads it (Boxy) would wait for as long as the
+# core runs. Sets PID and writes box.pid.
 launch_core() {
   rm -f "${box_pid}" "${core_up}"
-  (
-    trap - EXIT
-    trap '' HUP
-    busybox setuidgid "${box_user_group}" "$@" >> "${bin_log}" 2>&1 &
-    pid=$!
-    echo -n "${pid}" > "${box_pid}"
-    wait "${pid}"
-    rc=$?
-    [ -f "${core_up}" ] && [ "$(cat "${box_pid}" 2>/dev/null)" = "${pid}" ] && core_crashed "${rc}"
-  ) </dev/null >/dev/null 2>&1 &
+  nohup /system/bin/sh "${box_dir}/scripts/box.service" __watch "$@" </dev/null >/dev/null 2>&1 &
   local n=0
   while [ ! -s "${box_pid}" ] && [ $n -lt 100 ]; do
     sleep 0.02
@@ -1156,6 +1179,8 @@ case "$1" in
     if [ "${bin_name}" = "sing-box" ]; then
       prep_log="${box_run}/check.log"
       prepare_singbox
+    elif [ "${bin_name}" = "clash" ]; then
+      clash_apply_auth
     fi
     ;;
   status)
@@ -1177,6 +1202,10 @@ case "$1" in
     ;;
   kcron)
     stop_cron
+    ;;
+  __watch)
+    shift
+    watch_core "$@"
     ;;
   help|-h|--help|"")
     echo "${yellow}Usage${normal}: ${green}$0${normal} {${yellow}start|stop|restart|status|cron|kcron${normal}}"

@@ -390,6 +390,15 @@ reload_singbox() {
     log Error "Configuration check failed, sing-box keeps the previous config"
     return 1
   fi
+  # SIGHUP re-reads the files sing-box was started with: overrides that appeared since (or went away) need a
+  # restart, or their inbounds would be lost.
+  local started_with=false
+  tr '\0' ' ' < "/proc/${pid}/cmdline" 2>/dev/null | busybox grep -q -- "-C ${box_dir}/sing-box/.overrides" && started_with=true
+  if [ "${started_with}" != "$( [ -n "$(sb_overrides)" ] && echo true || echo false )" ]; then
+    log Info "sing-box overrides changed since start: restarting instead of SIGHUP"
+    restart_box
+    return 0
+  fi
   kill -HUP "${pid}" || { log Error "Failed to signal sing-box (PID ${pid})"; return 1; }
   sleep 1
   if kill -0 "${pid}" 2>/dev/null; then
@@ -418,6 +427,8 @@ reload() {
     curl_command="${bin_dir}/curl"
   fi
 
+  # The module's own edits (clash: the proxy users) go into the config first, as at start.
+  [ "${bin_name}" = "clash" ] && "${scripts_dir}/box.service" prepare >/dev/null 2>&1
   # The config is checked before the core gets it
   if ! check; then
     log Error "Configuration check failed, aborting reload."
