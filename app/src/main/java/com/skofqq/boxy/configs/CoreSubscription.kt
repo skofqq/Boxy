@@ -64,13 +64,34 @@ object CoreSubscription {
     private fun host(url: String) = runCatching { Uri.parse(url).host }.getOrNull()?.removePrefix("www.")?.replace(Regex("[^A-Za-z0-9._-]"), "_") ?: "subscription"
 
     suspend fun load(context: Context, target: String, url: String): Outcome = withContext(Dispatchers.IO) {
-        when (target) {
+        val o = when (target) {
             "clash" -> clash(context, url)
             "sing-box" -> singBox(context, url)
             "xray" -> xray(context, url)
             "hysteria" -> hysteria(context, url)
             else -> Outcome(false, error = "core")
         }
+        if (o.ok) o.profile?.updateHours?.let { applyUpdateInterval(it) }
+        o
+    }
+
+    /** The module's default update schedule (settings.ini interva_update): it counts as "not set by the user". */
+    private const val DEFAULT_INTERVAL = "0 0,6,12,18 * * *"
+
+    /**
+     * The panel's profile-update-interval (hours) becomes the module's update schedule, unless the user set one of
+     * their own (anything but the module's default).
+     */
+    suspend fun applyUpdateInterval(hours: Int): Boolean {
+        val current = BoxModule.unquote(BoxModule.readSetting("interva_update")).orEmpty().trim()
+        if (current.isNotEmpty() && current != DEFAULT_INTERVAL) return false
+        val cron = when {
+            hours <= 0 -> return false
+            hours < 24 -> "0 */$hours * * *"
+            else -> "0 4 */${(hours / 24).coerceIn(1, 30)} * *"
+        }
+        if (cron == current) return true
+        return BoxModule.writeSetting("interva_update", cron)
     }
 
     private fun failed(r: SubClient.Reply?): Outcome = when {

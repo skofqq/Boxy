@@ -84,7 +84,7 @@ object XrayInsecureFix {
                     if (!tls.has("allowInsecure")) return@forEach
                     val on = tls.optBoolean("allowInsecure")
                     val tag = ob.optString("tag").ifBlank { ob.optString("protocol") }
-                    val hash = if (on && !tls.has("pinnedPeerCertSha256")) server(ob, tls)?.let { (sni, host, port) -> certHash(sni, host, port) } else null
+                    val hash = if (on && !tls.has("pinnedPeerCertSha256")) server(ob, tls)?.let { (sni, host, port) -> certHash(sni, host, port)?.also { registerPin(it, sni, host, port) } } else null
                     items += Item(tls, tag, on, hash)
                 }
             }
@@ -139,11 +139,22 @@ object XrayInsecureFix {
             if (tag !in tags) continue
             val tls = ob.optJSONObject("streamSettings")?.optJSONObject("tlsSettings")
                 ?: JSONObject().also { ob.optJSONObject("streamSettings")?.put("tlsSettings", it) }
-            val hash = server(ob, tls)?.let { (sni, host, port) -> certHash(sni, host, port) }
+            val hash = server(ob, tls)?.let { (sni, host, port) -> certHash(sni, host, port)?.also { registerPin(it, sni, host, port) } }
             if (hash != null) tls.put("pinnedPeerCertSha256", hash)
             else missed += ShareLinks.Skipped(tag.removePrefix(ShareLinks.TAG_PREFIX), ob.optString("protocol"), ShareLinks.SkipReason.UNPINNED)
         }
         return missed
+    }
+
+    /**
+     * Pins made for allowInsecure / insecure=1 servers are listed in xray/.pins ("<hash> <sni> <host> <port>"): the
+     * module checks them before every Xray start and follows a renewed certificate (box.tool repin), so a pin does
+     * not break the server when its (usually self-signed or short-lived) certificate changes.
+     */
+    private fun registerPin(hash: String, sni: String, host: String, port: Int) {
+        val clean = { s: String -> s.filter { it.isLetterOrDigit() || it in ".-:_[]" } }
+        val f = "${BoxModule.BOX_DIR}/xray/.pins"
+        Shell.cmd("grep -q '^$hash ' $f 2>/dev/null || echo '$hash ${clean(sni)} ${clean(host)} $port' >> $f; chmod 600 $f").exec()
     }
 
     /** tlsSettings of an outbound: its streamSettings and the download half of an xhttp one. */

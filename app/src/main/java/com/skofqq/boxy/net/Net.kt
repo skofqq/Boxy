@@ -172,6 +172,8 @@ object Net {
         for (head in listOf(true, false)) {
             val r = SubClient.fetch(ctx, url, SubClient.Format.LINKS, headOnly = head) ?: continue
             val p = r.profile
+            // The panel's suggested update interval, unless the user set their own schedule.
+            p.updateHours?.let { runCatching { com.skofqq.boxy.configs.CoreSubscription.applyUpdateInterval(it) } }
             val info = p.info ?: continue
             return info.copy(name = p.title ?: info.name, announce = p.announce, supportUrl = p.supportUrl, webPageUrl = p.webPageUrl)
         }
