@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">Праверана %1$s</string>
     <string name="xray_probed_ago">Апытанне Xray %1$s (раз на некалькі хвілін)</string>
     <string name="xray_delay_note">«Праверыць» мерае запыт па ўжо адкрытым злучэнні, як unified-delay у mihomo. Уласнае апытанне Xray лічыць новае злучэнне цалкам (з поціскам рук TLS / REALITY), таму яго лікі большыя; балансавальнік выбірае па іх.</string>
+    <string name="xray_no_vpn">Без VPN</string>
+    <string name="xray_mode_auto">АЎТА</string>
+    <string name="xray_mode_pinned">ЗАМАЦАВАНЫ</string>
 </resources>

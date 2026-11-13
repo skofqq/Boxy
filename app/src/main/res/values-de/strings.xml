@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">Getestet: %1$s</string>
     <string name="xray_probed_ago">Xray-Prüfung %1$s (alle paar Minuten)</string>
     <string name="xray_delay_note">„Testen“ misst eine Anfrage über eine offene Verbindung, wie unified-delay in mihomo. Xrays eigene Prüfung misst eine ganze neue Verbindung (mit TLS-/REALITY-Handshake), daher höhere Werte; der Balancer wählt danach.</string>
+    <string name="xray_no_vpn">Ohne VPN</string>
+    <string name="xray_mode_auto">AUTO</string>
+    <string name="xray_mode_pinned">FEST</string>
 </resources>

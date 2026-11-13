@@ -172,7 +172,14 @@ object XrayApi {
     /** The outbounds [balancer] chooses from: tags starting with one of its selector prefixes. */
     fun balancerTargets(s: Setup, balancer: String): List<String> {
         val prefixes = s.selectors[balancer].orEmpty()
-        return s.outbounds.map { it.tag }.filter { t -> prefixes.any { t.startsWith(it) } }
+        val own = s.outbounds.map { it.tag }.filter { t -> prefixes.any { t.startsWith(it) } }
+        // A balancer over "direct" only (a group like "RU sites: no VPN") goes direct by itself; a pin can point it
+        // at any server, since Xray takes any outbound tag as the override.
+        // A balancer over servers can likewise be pinned to "No VPN" (a freedom outbound); its own choice never is.
+        val proxies = proxyTags(s)
+        val direct = s.outbounds.filter { it.protocol == "freedom" }.map { it.tag }
+        return if (own.isNotEmpty() && own.none { it in proxies }) own + proxies.filter { it !in own }
+        else own + direct.filter { it !in own }
     }
 
     /** Outbounds that carry traffic to a server (not direct / block / dns), the ones worth probing. */
@@ -347,10 +354,11 @@ object XrayApi {
             "( r=\$($BOX/bin/curl -s -o /dev/null -m 6 -x socks5h://127.0.0.1:${TEST_PORT + i} -w '%{http_code}:%{time_total} ' ${q(url)} ${q(url)}); echo \"$i \$r\" ) & w=\"\$w \$!\";"
         }
         val script = "( export SSL_CERT_DIR=/apex/com.android.conscrypt/cacerts:/system/etc/security/cacerts; " +
+            "pkill -f boxy-delay.json 2>/dev/null; n=0; while [ \$n -lt 20 ] && grep -qi '0100007F:%04X 00000000:0000 0A' /proc/net/tcp; do sleep 0.1; n=\$((n+1)); done; ".format(TEST_PORT) +
             "BB=busybox; for b in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox; do [ -x \$b ] && BB=\$b && break; done; " +
             "\$BB setuidgid ${q(group)} $BOX/bin/xray run -c $file >/dev/null 2>&1 & p=\$!; " +
-            "n=0; while [ \$n -lt 30 ] && ! grep -qi ':$last ' /proc/net/tcp; do sleep 0.1; n=\$((n+1)); done; " +
-            "w=; $curls wait \$w; kill \$p 2>/dev/null; rm -f $file )"
+            "n=0; while [ \$n -lt 30 ] && ! grep -qi '0100007F:$last 00000000:0000 0A' /proc/net/tcp; do sleep 0.1; n=\$((n+1)); done; " +
+            "w=; $curls wait \$w; kill \$p 2>/dev/null; wait \$p 2>/dev/null; rm -f $file )"
         val out = Shell.cmd(script).exec().out
         val delays = HashMap<String, Int>()
         for (line in out) {
@@ -370,6 +378,45 @@ object XrayApi {
 
     /** Time of the observatory's last probe of [tag] (ms), null when it has not probed it yet. */
     fun lastProbe(m: Metrics?, tag: String): Long? = m?.outbounds?.firstOrNull { it.tag == tag }?.probedAt
+
+    /**
+     * Pins made in Boxy, "balancer<TAB>outbound" per line. Xray keeps an override only while it runs, so Boxy puts
+     * them back after a start ([restorePins]). A .txt file: Xray's confdir reads only its config formats.
+     */
+    const val PINS_FILE = "$DIR/boxy-pins.txt"
+
+    suspend fun pins(): Map<String, String> = withContext(Dispatchers.IO) {
+        BoxModule.readFile(PINS_FILE).orEmpty().lines().mapNotNull { l ->
+            val p = l.split('\t')
+            if (p.size == 2 && p[0].isNotBlank() && p[1].isNotBlank()) p[0] to p[1] else null
+        }.toMap()
+    }
+
+    /** Remembers (or with null forgets) the pin of [balancer]. */
+    suspend fun savePin(balancer: String, target: String?) {
+        val all = pins().toMutableMap()
+        if (target == null) all.remove(balancer) else all[balancer] = target
+        if (all.isEmpty()) Shell.cmd("rm -f ${q(PINS_FILE)}").exec()
+        else BoxModule.writeFile(PINS_FILE, all.entries.joinToString("") { "${it.key}\t${it.value}\n" })
+    }
+
+    /**
+     * Puts the remembered pins back into a running Xray (after a start the overrides are gone): only those whose
+     * balancer and outbound still exist and that Xray does not have already. Returns how many were applied.
+     */
+    suspend fun restorePins(s: Setup? = null): Int {
+        val pins = pins()
+        if (pins.isEmpty()) return 0
+        val setup = s ?: setup()
+        val api = setup.api?.takeIf { setup.apiRouting } ?: return 0
+        val tags = setup.outbounds.map { it.tag }.toSet()
+        val wanted = pins.filter { (b, t) -> b in setup.balancers && t in tags }
+        if (wanted.isEmpty()) return 0
+        val now = balancerInfo(api, setup.balancers)
+        var n = 0
+        wanted.forEach { (b, t) -> if (now[b]?.override != t && overrideBalancer(api, b, t)) n++ }
+        return n
+    }
 
     /** Points a balancer at [target], or back to its own choice with null (`xray api bo`). */
     suspend fun overrideBalancer(api: String, balancer: String, target: String?): Boolean = withContext(Dispatchers.IO) {

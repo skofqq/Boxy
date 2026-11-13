@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">Testato %1$s</string>
     <string name="xray_probed_ago">Sondaggio Xray %1$s (ogni pochi minuti)</string>
     <string name="xray_delay_note">«Testa» misura una richiesta su una connessione già aperta, come unified-delay di mihomo. Il sondaggio di Xray conta un\'intera nuova connessione (handshake TLS / REALITY incluso), quindi valori più alti; il bilanciatore sceglie in base a quelli.</string>
+    <string name="xray_no_vpn">Senza VPN</string>
+    <string name="xray_mode_auto">AUTO</string>
+    <string name="xray_mode_pinned">FISSATO</string>
 </resources>

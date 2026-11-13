@@ -1136,4 +1136,7 @@
     <string name="xray_tested_ago">Tested %1$s</string>
     <string name="xray_probed_ago">Xray probe %1$s (every few minutes)</string>
     <string name="xray_delay_note">\"Test\" measures a request over an open connection, like mihomo\'s unified-delay. Xray\'s own probe times a whole new connection (TLS / REALITY handshake included), so its numbers are higher; the balancer picks by those.</string>
+    <string name="xray_no_vpn">No VPN</string>
+    <string name="xray_mode_auto">AUTO</string>
+    <string name="xray_mode_pinned">PINNED</string>
 </resources>

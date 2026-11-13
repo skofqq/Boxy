@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">テスト: %1$s</string>
     <string name="xray_probed_ago">Xray の計測 %1$s（数分ごと）</string>
     <string name="xray_delay_note">「テスト」は mihomo の unified-delay と同じく、開いた接続上のリクエストを計測します。Xray 自身の計測は新しい接続全体（TLS / REALITY ハンドシェイク込み）を測るため値が大きく、バランサーはそれで選びます。</string>
+    <string name="xray_no_vpn">VPN なし</string>
+    <string name="xray_mode_auto">自動</string>
+    <string name="xray_mode_pinned">固定</string>
 </resources>

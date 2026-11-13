@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">Test edildi: %1$s</string>
     <string name="xray_probed_ago">Xray yoklaması %1$s (birkaç dakikada bir)</string>
     <string name="xray_delay_note">“Test et”, mihomo\'daki unified-delay gibi açık bir bağlantı üzerinden isteği ölçer. Xray\'in kendi yoklaması yeni bir bağlantının tamamını (TLS / REALITY el sıkışması dahil) ölçer, bu yüzden değerleri daha yüksektir; dengeleyici bunlara göre seçer.</string>
+    <string name="xray_no_vpn">VPN\'siz</string>
+    <string name="xray_mode_auto">OTO</string>
+    <string name="xray_mode_pinned">SABİT</string>
 </resources>

@@ -26,6 +26,20 @@ class ModuleEventReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_STATE_CHANGED) {
             // The service started or stopped: notification, tile and widgets follow at once.
             com.skofqq.boxy.service.BoxControl.changed(context)
+            // Xray started: put back the server pins made in the panel (only when there are any).
+            val pending = goAsync()
+            work.launch {
+                try {
+                    val st = runCatching { com.skofqq.boxy.root.BoxModule.state() }.getOrNull()
+                    if (st?.running == true && com.skofqq.boxy.root.BoxModule.unquote(st.core) == "xray") {
+                        // The API listens a moment after the start.
+                        kotlinx.coroutines.delay(1500)
+                        runCatching { com.skofqq.boxy.net.XrayApi.restorePins() }
+                    }
+                } finally {
+                    runCatching { pending.finish() }
+                }
+            }
             return
         }
         if (intent.action == ACTION_GEO_UPDATED) {

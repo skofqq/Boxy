@@ -54,10 +54,17 @@ internal class BalancerView(
     }
 
     fun protocol(tag: String) = protocols[tag].orEmpty()
+
+    /** How a tag reads: "No VPN" for a direct (freedom) outbound, else the name without the subscription prefix. */
+    @Composable
+    fun name(tag: String): String =
+        if (protocols[tag] == "freedom") stringResource(R.string.xray_no_vpn) else XrayApi.displayName(tag)
     val pinned: String? get() = info?.override?.takeIf { it.isNotEmpty() }
     /** The outbound traffic goes through now: the pinned one, else the balancer's own pick. */
     val current: String? get() = pinned ?: info?.picks
     val alive get() = targets.count { states[it]?.alive == true }
+    /** Servers among the choices: "No VPN" (freedom) is not one. */
+    val servers get() = targets.count { protocols[it] != "freedom" }
 }
 
 /** Balancer card in the panel's grid, like a mihomo group: name, strategy with live / total, and where it goes. */
@@ -74,7 +81,7 @@ internal fun BalancerTile(b: BalancerView, modifier: Modifier, onOpen: () -> Uni
 }
 
 @Composable
-private fun BalancerHead(b: BalancerView) {
+private fun BalancerHead(b: BalancerView, long: Boolean = false) {
     Column {
         Text(
             b.tag,
@@ -85,7 +92,12 @@ private fun BalancerHead(b: BalancerView) {
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            "${b.strategy.uppercase()} · ${b.alive}/${b.targets.size}",
+            // Auto or pinned, then live / all servers ("No VPN" not counted); the strategy when opened.
+            listOfNotNull(
+                stringResource(if (b.pinned != null) R.string.xray_mode_pinned else R.string.xray_mode_auto),
+                "${b.alive}/${b.servers}",
+                b.strategy.uppercase().takeIf { long },
+            ).joinToString(" · "),
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, letterSpacing = 1.sp),
             color = Boxy.colors.text2,
             maxLines = 1,
@@ -101,8 +113,8 @@ private fun BalancerHead(b: BalancerView) {
 private fun BalancerNow(b: BalancerView, long: Boolean, busy: Boolean = false, onTest: () -> Unit = {}) {
     val auto = stringResource(R.string.xray_balancer_auto)
     val text = when {
-        b.pinned != null -> XrayApi.displayName(b.pinned!!)
-        b.info?.picks != null -> if (long) "$auto → ${XrayApi.displayName(b.info.picks)}" else XrayApi.displayName(b.info.picks)
+        b.pinned != null -> b.name(b.pinned!!)
+        b.info?.picks != null -> if (long) "$auto → ${b.name(b.info.picks)}" else b.name(b.info.picks)
         else -> auto
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -136,7 +148,7 @@ internal fun OpenBalancer(
 ) {
     Column(modifier) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
-            BalancerHead(b)
+            BalancerHead(b, long = true)
             Spacer(Modifier.height(10.dp))
             BalancerNow(b, long = true, busy = busy, onTest = onTest)
         }
@@ -152,7 +164,7 @@ internal fun OpenBalancer(
                     if (t == null) {
                         ServerTile(
                             auto,
-                            b.info?.picks?.let { XrayApi.displayName(it) }.orEmpty(),
+                            b.info?.picks?.let { b.name(it) }.orEmpty(),
                             b.delay(b.info?.picks),
                             selected = b.pinned == null,
                             busy = busy,
@@ -161,7 +173,7 @@ internal fun OpenBalancer(
                         ) { onPick(null) }
                     } else {
                         ServerTile(
-                            XrayApi.displayName(t),
+                            b.name(t),
                             b.protocol(t),
                             b.delay(t),
                             selected = b.pinned == t,

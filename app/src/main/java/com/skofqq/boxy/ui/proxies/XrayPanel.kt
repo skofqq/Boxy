@@ -94,6 +94,8 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
         val s = setup
         if (apiListen == null || !running || s == null) return@LaunchedEffect
         // Right after a start the observatory has not answered yet: ask again once it had time.
+        // Pins made earlier come back after a core restart (Xray forgets them).
+        XrayApi.restorePins(s)
         balancerInfo = XrayApi.balancerInfo(apiListen, s.balancers)
         if (balancerInfo.values.any { it.picks == null }) {
             delay(8000)
@@ -141,7 +143,10 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
             content = { mod ->
                 OpenBalancer(v, testing, onClose = { openBalancer = null }, onTest = { runTest(v.targets) }, onPick = { t ->
                     scope.launch {
-                        if (XrayApi.overrideBalancer(openApi, b, t)) infoKey++
+                        if (XrayApi.overrideBalancer(openApi, b, t)) {
+                            XrayApi.savePin(b, t)
+                            infoKey++
+                        }
                         else Toast.makeText(context, R.string.xray_balancer_failed, Toast.LENGTH_LONG).show()
                     }
                 }, modifier = mod)

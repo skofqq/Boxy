@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">已测试：%1$s</string>
     <string name="xray_probed_ago">Xray 探测 %1$s（每几分钟一次）</string>
     <string name="xray_delay_note">“测试”测量已打开连接上的请求，与 mihomo 的 unified-delay 相同。Xray 自身的探测计算整个新连接（含 TLS / REALITY 握手），因此数值更高；负载均衡器按其选择。</string>
+    <string name="xray_no_vpn">不走 VPN</string>
+    <string name="xray_mode_auto">自动</string>
+    <string name="xray_mode_pinned">已固定</string>
 </resources>

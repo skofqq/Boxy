@@ -1113,4 +1113,7 @@
     <string name="xray_tested_ago">Testé %1$s</string>
     <string name="xray_probed_ago">Sondage Xray %1$s (toutes les quelques minutes)</string>
     <string name="xray_delay_note">« Tester » mesure une requête sur une connexion déjà ouverte, comme unified-delay de mihomo. Le sondage propre de Xray compte une nouvelle connexion entière (poignée de main TLS / REALITY comprise), d\'où des valeurs plus hautes ; le répartiteur choisit d\'après elles.</string>
+    <string name="xray_no_vpn">Sans VPN</string>
+    <string name="xray_mode_auto">AUTO</string>
+    <string name="xray_mode_pinned">ÉPINGLÉ</string>
 </resources>
