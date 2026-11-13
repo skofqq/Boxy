@@ -1,0 +1,32 @@
+#!/system/bin/sh
+# Shared by the module's scripts, sourced first: busybox in PATH, the settings.ini check and the message language.
+
+# busybox of Magisk / KernelSU / APatch
+command -v busybox >/dev/null 2>&1 || export PATH="/data/adb/magisk:/data/adb/ksu/bin:/data/adb/ap/bin:${PATH}:/system/bin"
+
+# A settings.ini with a syntax error would leave a script with half of its values: none runs with it.
+box_check_settings() {
+  mkdir -p /data/adb/box/run
+  /system/bin/sh -n /data/adb/box/settings.ini 2>"/data/adb/box/run/settings_err.log" && return 0
+  echo "Err: settings.ini contains a syntax error" | tee -a "/data/adb/box/run/settings_err.log"
+  return 1
+}
+
+# Language of user-visible messages: Russian when the system language is Russian. BOX_LANG=ru|en forces one.
+if [ -z "${BOX_LANG}" ]; then
+  box_locale=$(getprop persist.sys.locale)
+  [ -z "${box_locale}" ] && box_locale=$(getprop ro.product.locale)
+  case "${box_locale}" in
+    ru*) BOX_LANG="ru" ;;
+    *) BOX_LANG="en" ;;
+  esac
+fi
+
+# t "English" "Русский"
+t() {
+  if [ "${BOX_LANG}" = "ru" ]; then
+    printf '%s' "$2"
+  else
+    printf '%s' "$1"
+  fi
+}

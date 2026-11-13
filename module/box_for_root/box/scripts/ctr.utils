@@ -2,22 +2,14 @@
 
 get_current_ssid() {
   SSID=$(cmd wifi status 2>/dev/null | sed -n 's/.*SSID: "\([^"]*\)".*/\1/p' | head -n1)
-  # SSID=$(dumpsys wifi | grep 'mWifiInfo' | head -n 1 | busybox awk -F'SSID: |, BSSID' '{print $2}')
 
   if [ -z "$SSID" ] || [ "$SSID" = "<unknown ssid>" ]; then
-    # if command -v iwconfig >/dev/null 2>&1; then
-      SSID=$(iwconfig wlan0 2>/dev/null | grep 'ESSID' | busybox awk -F ':' '{print $2}' | tr -d '"')
-      if [ -z "$SSID" ] || [ "$SSID" = "off/any" ]; then
-        echo "unknown"
-      else
-        echo "$SSID"
-      fi
-    # else
-      # log_msg "Warning: 'iwconfig' not found, unable to retrieve SSID."
-      # log_msg "Warning: The program 'iwconfig' is not installed. You can install it in Termux by running:"
-      # log_msg "Warning: pkg install root-repo && pkg install wireless-tools"
-      # echo "unknown"
-    # fi
+    SSID=$(iwconfig wlan0 2>/dev/null | grep 'ESSID' | busybox awk -F ':' '{print $2}' | tr -d '"')
+    if [ -z "$SSID" ] || [ "$SSID" = "off/any" ]; then
+      echo "unknown"
+    else
+      echo "$SSID"
+    fi
   else
     echo "$SSID"
   fi

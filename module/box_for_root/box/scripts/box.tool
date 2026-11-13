@@ -1,9 +1,6 @@
 #!/system/bin/sh
-# Validate settings.ini
-if ! /system/bin/sh -n /data/adb/box/settings.ini 2>"/data/adb/box/run/settings_err.log"; then
-  echo "Err: settings.ini contains a syntax error" | tee -a "/data/adb/box/run/settings_err.log"
-  exit 1
-fi
+. /data/adb/box/scripts/box.common
+box_check_settings || exit 1
 
 scripts_dir="${0%/*}"
 source /data/adb/box/settings.ini
@@ -254,7 +251,6 @@ verify_asset() {
 # Restart the binary, after stopping and running again
 restart_box() {
   "${scripts_dir}/box.service" restart
-  # PIDS=("clash" "xray" "sing-box" "v2fly" "hysteria")
   PIDS=(${bin_name})
   PID=""
   i=0
@@ -413,7 +409,7 @@ reload() {
 
   curl_command="curl"
 
-  # Pastikan curl tersedia
+  # clash reloads through its API: curl is needed
   if [ "${bin_name}" = "clash" ] && ! command -v curl >/dev/null; then
     if [ ! -x "${bin_dir}/curl" ]; then
       log Debug "${bin_dir}/curl not found, downloading..."
@@ -422,7 +418,7 @@ reload() {
     curl_command="${bin_dir}/curl"
   fi
 
-  # Cek config sebelum reload
+  # The config is checked before the core gets it
   if ! check; then
     log Error "Configuration check failed, aborting reload."
     return 1
@@ -693,7 +689,7 @@ upgeox() {
     clash)
       local geodata_mode
       geodata_mode=$(busybox awk '!/^ *#/ && /geodata-mode:*./{print $2}' "${clash_config}")
-      if [[ "${xclash_option}" == "premium" || "${geodata_mode:-false}" == "false" ]]; then
+      if [ "${geodata_mode:-false}" = "false" ]; then
         url=$(geo_src_url "${primary}" mmdb)
         geo_fetch "${dir}/Country.mmdb" "${url:-$(geo_src_url metacubex mmdb)}" || failed=true
       fi
@@ -702,7 +698,7 @@ upgeox() {
         # get the source's prefix, e.g. rf-ru-blocked), so the primary source is kept as a pair as well.
         pair_primary=true
       else
-        if [[ "${xclash_option}" != "premium" && "${geodata_mode:-false}" != "false" ]]; then
+        if [ "${geodata_mode:-false}" != "false" ]; then
           url=$(geo_src_url "${primary}" geoip)
           geo_fetch "${dir}/GeoIP.dat" "${url:-$(geo_src_url metacubex geoip)}" || failed=true
         fi
@@ -1168,18 +1164,13 @@ upkernel() {
           return 1
         fi
       else
-        log Warning "clash.${xclash_option} repository has been deleted."
+        log Warning "Clash Premium is retired and not downloaded: switch to mihomo (xclash_option=\"mihomo\")"
+        return 1
       fi
       ;;
-    "xray"|"v2fly")
-      # Specify the binary name
-      if [ "${bin_name}" = "xray" ]; then
-        bin='Xray'
-        repo_path="XTLS/Xray-core/releases"
-      else
-        bin='v2ray'
-        repo_path="v2fly/v2ray-core/releases"
-      fi
+    "xray")
+      bin='Xray'
+      repo_path="XTLS/Xray-core/releases"
       api_url="https://api.github.com/repos/${repo_path}"
     
       log Info "Updating ${bin_name} from ${repo_path}"
@@ -1199,7 +1190,7 @@ upkernel() {
         "i386")    download_file="${bin}-linux-32.zip" ;;
         # Xray publishes an Android build for amd64: its resolver works on Android (the linux one looks for
         # /etc/resolv.conf, which Android has not, and cannot resolve anything).
-        "x86_64")  if [ "${bin_name}" = "xray" ]; then download_file="${bin}-android-amd64.zip"; else download_file="${bin}-linux-64.zip"; fi ;;
+        "x86_64")  download_file="${bin}-android-amd64.zip" ;;
         "armv7l"|"armv8l") download_file="${bin}-linux-arm32-v7a.zip" ;;
         "aarch64") download_file="${bin}-android-arm64-v8a.zip" ;;
         *)
@@ -1428,11 +1419,8 @@ xkernel() {
         rm -r "${src_dir}"
       fi
       ;;
-    "v2fly"|"xray")
+    "xray")
       bin="xray"
-      if [ "${bin_name}" != "xray" ]; then
-        bin="v2ray"
-      fi
       log Info "Selected binary to extract: ${bin}"
       
       unzip_command="unzip"
@@ -1494,69 +1482,9 @@ xkernel() {
   return ${xkernel_rc}
 }
 
-# Check and update yacd
-upxui() {
-  # su -c /data/adb/box/scripts/box.tool upxui
-  xdashboard="${bin_name}/dashboard"
-  if [[ "${bin_name}" == @(clash|sing-box) ]]; then
-    file_dashboard="${box_dir}/${xdashboard}.zip"
-    url="https://github.com/Zephyruso/zashboard/archive/gh-pages.zip"
-    if [ "$use_ghproxy" == true ]; then
-      url="${url_ghproxy}/${url}"
-    fi
-    dir_name="zashboard-gh-pages"
-    log Debug "Download ${url}"
-
-    if which curl >/dev/null; then
-      rev2="curl -L --progress-bar --insecure ${url} -o"
-    else
-      rev2="busybox wget --no-check-certificate ${url} -O"
-    fi
-
-    if $rev2 "${file_dashboard}" >/dev/null; then
-      log Info "Dashboard file downloaded: ${file_dashboard}"
-    
-      if [ ! -d "${box_dir}/${xdashboard}" ]; then
-        log Info "Dashboard folder not exist, creating it"
-        mkdir "${box_dir}/${xdashboard}"
-      else
-        log Info "Dashboard folder exists, cleaning old files"
-        rm -rf "${box_dir}/${xdashboard}/"*
-      fi
-    
-      if command -v unzip >/dev/null; then
-        unzip_command="unzip"
-        log Info "Using system unzip"
-      else
-        unzip_command="busybox unzip"
-        log Info "Using busybox unzip"
-      fi
-    
-      log Info "Extracting dashboard from ${file_dashboard}..."
-      "${unzip_command}" -o "${file_dashboard}" "${dir_name}/*" -d "${box_dir}/${xdashboard}" >/dev/null
-    
-      log Info "Moving extracted files to ${box_dir}/${xdashboard}/"
-      mv -f "${box_dir}/${xdashboard}/$dir_name"/* "${box_dir}/${xdashboard}/"
-    
-      log Info "Cleaning up temporary files"
-      rm -f "${file_dashboard}"
-      rm -rf "${box_dir}/${xdashboard}/${dir_name}"
-    
-      log Info "Dashboard update completed successfully"
-    else
-      log Error "Failed to download dashboard"
-      return 1
-    fi
-    return 0
-  else
-    log Debug "${bin_name} does not support dashboards"
-    return 1
-  fi
-}
-
 cgroup_blkio() {
   local pid_file="$1"
-  local fallback_weight="${2:-900}"  # default weight jika pakai 'box'
+  local fallback_weight="${2:-900}"  # weight of the box group when there is no foreground group
 
   if [ -z "$pid_file" ] || [ ! -f "$pid_file" ]; then
     log Warning "PID file missing or invalid: $pid_file"
@@ -1569,7 +1497,7 @@ cgroup_blkio() {
     return 1
   fi
 
-  # Temukan blkio path
+  # The blkio cgroup mount
   if [ -z "$blkio_path" ]; then
     blkio_path=$(mount | busybox awk '/blkio/ {print $3}' | head -1)
     if [ -z "$blkio_path" ] || [ ! -d "$blkio_path" ]; then
@@ -1578,7 +1506,7 @@ cgroup_blkio() {
     fi
   fi
 
-  # Pilih target group: foreground jika ada, jika tidak buat box
+  # The foreground group when there is one, otherwise a box group
   local target
   if [ -d "${blkio_path}/foreground" ]; then
     target="${blkio_path}/foreground"
@@ -1637,7 +1565,7 @@ cgroup_memcg() {
     return 1
   fi
 
-  # Deteksi memcg_path jika belum diset
+  # The memory cgroup mount, unless set
   if [ -z "$memcg_path" ]; then
     memcg_path=$(mount | grep cgroup | busybox awk '/memory/{print $3}' | head -1)
     if [ -z "$memcg_path" ] || [ ! -d "$memcg_path" ]; then
@@ -1646,7 +1574,7 @@ cgroup_memcg() {
     fi
   fi
 
-  # Gunakan bin_name jika tersedia, default ke 'app'
+  # A group named after the core
   local name="${bin_name:-app}"
   local target="${memcg_path}/${name}"
   mkdir -p "$target"
@@ -1676,7 +1604,7 @@ cgroup_cpuset() {
     return 1
   fi
 
-  # Deteksi jumlah core jika cores belum ditentukan
+  # All CPUs when none are set
   if [ -z "${cores}" ]; then
     local total_core
     total_core=$(nproc --all 2>/dev/null)
@@ -1687,7 +1615,7 @@ cgroup_cpuset() {
     cores="0-$((total_core - 1))"
   fi
 
-  # Deteksi cpuset_path
+  # The cpuset cgroup mount
   if [ -z "${cpuset_path}" ]; then
     cpuset_path=$(mount | grep cgroup | busybox awk '/cpuset/{print $3}' | head -1)
     if [ -z "${cpuset_path}" ] || [ ! -d "${cpuset_path}" ]; then
@@ -1763,42 +1691,6 @@ touch -n > $path_webroot
   fi
 }
 
-bond0() {
-  # Menonaktifkan mode low latency untuk TCP
-  sysctl -w net.ipv4.tcp_low_latency=0 >/dev/null 2>&1
-  log Debug "tcp low latency: 0"
-
-  # Mengatur panjang antrian transmisi (txqueuelen) menjadi 3000 untuk semua interface wireless (wlan*)
-  for dev in /sys/class/net/wlan*; do ip link set dev $(basename $dev) txqueuelen 3000; done
-  log Debug "wlan* txqueuelen: 3000"
-
-  # Mengatur panjang antrian transmisi (txqueuelen) menjadi 1000 untuk semua interface rmnet_data*
-  for txqueuelen in /sys/class/net/rmnet_data*; do txqueuelen_name=$(basename $txqueuelen); ip link set dev $txqueuelen_name txqueuelen 1000; done
-  log Debug "rmnet_data* txqueuelen: 1000"
-
-  # Mengatur MTU (Maximum Transmission Unit) menjadi 1500 untuk semua interface rmnet_data*
-  for mtu in /sys/class/net/rmnet_data*; do mtu_name=$(basename $mtu); ip link set dev $mtu_name mtu 1500; done
-  log Debug "rmnet_data* mtu: 1500"
-}
-
-bond1() {
-  # Mengaktifkan mode low latency untuk TCP
-  sysctl -w net.ipv4.tcp_low_latency=1 >/dev/null 2>&1
-  log Debug "tcp low latency: 1"
-
-  # Mengatur panjang antrian transmisi (txqueuelen) menjadi 4000 untuk semua interface wireless (wlan*)
-  for dev in /sys/class/net/wlan*; do ip link set dev $(basename $dev) txqueuelen 4000; done
-  log Debug "wlan* txqueuelen: 4000"
-
-  # Mengatur panjang antrian transmisi (txqueuelen) menjadi 2000 untuk semua interface rmnet_data*
-  for txqueuelen in /sys/class/net/rmnet_data*; do txqueuelen_name=$(basename $txqueuelen); ip link set dev $txqueuelen_name txqueuelen 2000; done
-  log Debug "rmnet_data* txqueuelen: 2000"
-
-  # Mengatur MTU (Maximum Transmission Unit) menjadi 9000 untuk semua interface rmnet_data*
-  for mtu in /sys/class/net/rmnet_data*; do mtu_name=$(basename $mtu); ip link set dev $mtu_name mtu 9000; done
-  log Debug "rmnet_data* mtu: 9000"
-}
-
 # Core logs above 5 MB: the file is copied to <name>.1 and starts again. The core appends to its
 # log (box.service starts it with >>), so cutting it in place is safe while it runs. Run by cron (box.service
 # adds it to the crontab) and by geosub.
@@ -1837,9 +1729,6 @@ case "$1" in
         ;;
     esac
     ;;
-  bond0|bond1)
-    $1
-    ;;
   updnscrypt)
     updnscrypt "$2"
     exit $?
@@ -1873,9 +1762,6 @@ case "$1" in
   upkernel)
     upkernel "$2"
     ;;
-  upxui)
-    upxui
-    ;;
   upyq|upcurl)
     $1
     ;;
@@ -1891,7 +1777,6 @@ case "$1" in
       upkernel
       upgeox
       upsubs
-      upxui
     done
     ;;
   help|-h|--help|"")
@@ -1902,12 +1787,10 @@ case "$1" in
     echo "  memcg       - Apply memory cgroup limit to process"
     echo "  cpuset      - Apply CPU core affinity to process"
     echo "  blkio       - Apply I/O weight limit to process"
-    echo "  bond0|bond1 - Run bonding configuration functions"
     echo "  geosub      - Update both subscription and GeoX files, then reload if running"
     echo "  geox        - Update GeoX database, then reload if running"
     echo "  subs        - Update subscription (clash, sing-box), then reload if running"
     echo "  upkernel    - Update kernel-related components"
-    echo "  upxui       - Update XUI panel"
     echo "  upyq        - Update yq binary"
     echo "  upcurl      - Update curl binary"
     echo "  reload      - Reload running service configuration"

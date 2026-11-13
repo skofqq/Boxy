@@ -1,9 +1,6 @@
 #!/system/bin/sh
-# Validate settings.ini
-if ! /system/bin/sh -n /data/adb/box/settings.ini 2>"/data/adb/box/run/settings_err.log"; then
-  echo "Err: settings.ini contains a syntax error" | tee -a "/data/adb/box/run/settings_err.log"
-  exit 1
-fi
+. /data/adb/box/scripts/box.common
+box_check_settings || exit 1
 
 scripts_dir="${0%/*}"
 file_settings="/data/adb/box/settings.ini"
@@ -73,9 +70,6 @@ start_inotifyd() {
     if grep -q -e "box.inotify" -e "net.inotify" "/proc/$PID/cmdline"; then
       kill -9 "$PID"
     fi
-    # if grep -q "box.inotify" "/proc/$PID/cmdline"; then
-      # kill -9 "$PID"
-    # fi
   done
   inotifyd "${scripts_dir}/box.inotify" "${moddir}" > "/dev/null" 2>&1 &
   net_inotifyd

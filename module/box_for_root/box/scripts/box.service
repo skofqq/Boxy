@@ -1,33 +1,12 @@
 #!/system/bin/sh
-# Validate settings.ini
-if ! /system/bin/sh -n /data/adb/box/settings.ini 2>"/data/adb/box/run/settings_err.log"; then
-  echo "Err: settings.ini contains a syntax error" | tee -a "/data/adb/box/run/settings_err.log"
-  exit 1
-fi
+. /data/adb/box/scripts/box.common
+box_check_settings || exit 1
 
 scripts_dir="${0%/*}"
 source /data/adb/box/settings.ini
 
 PROPFILE="/data/adb/modules/box_for_root/module.prop"
 
-# UI language for user-visible messages: Russian when the system language is Russian.
-if [ -z "$BOX_LANG" ]; then
-  sys_locale=$(getprop persist.sys.locale)
-  [ -z "$sys_locale" ] && sys_locale=$(getprop ro.product.locale)
-  case "$sys_locale" in
-    ru*) BOX_LANG="ru" ;;
-    *) BOX_LANG="en" ;;
-  esac
-fi
-
-# t "English" "Русский"
-t() {
-  if [ "$BOX_LANG" = "ru" ]; then
-    printf '%s' "$2"
-  else
-    printf '%s' "$1"
-  fi
-}
 log_backup="false"
 
 box_check_logs() {
@@ -184,19 +163,6 @@ box_check_bin() {
 
   log Info "${version_output}"
 }
-
-# create_tun_link() {
-  # mkdir -p /dev/net
-  # [ ! -L /dev/net/tun ] && ln -s /dev/tun /dev/net/tun
-
-  # if [ ! -c "/dev/net/tun" ]; then
-      # log Error "Cannot create /dev/net/tun. Possible reasons:"
-      # log Warning "Your system does not support the TUN/TAP driver."
-      # log Warning "Your system kernel version is not compatible with the TUN/TAP driver."
-      # sed -i 's/network_mode=.*/network_mode="tproxy"/g' "${settings}"
-      # exit 1
-  # fi
-# }
 
 # sing-box user overrides: sing-box/.overrides/*.json, passed with -C. sing-box merges the files sorted by path and
 # the first one wins for plain values, so ".overrides" (sorted before config.json) wins over the subscription's
@@ -518,10 +484,6 @@ prepare_clash() {
     log Info "config ${clash_config}"
   fi
 
-  # ipv6=$(busybox awk '/ipv6:/ { print $2; found=1; exit } END{ if(!found) print "false" }' "${clash_config}" | head -n 1 2>/dev/null)
-  # sed -i "s/ipv6=.*/ipv6=\"${ipv6}\"/g" ${settings}
-  # sed -i "s/ipv6:.*/ipv6: ${ipv6}/g" "${clash_config}"
-
   # write external_controller, if not in $clash_config
   clash_external_controller=$(busybox awk '!/^ *#/ && /external-controller: /{print $1}' "${clash_config}")
   if [ -z "${clash_external_controller}" ]; then
@@ -720,8 +682,6 @@ box_run_bin() {
   rotate_core_log
   log Info "choose: ${bin_name}, start the service."
   ulimit -SHn 1000000
-  # Use ulimit to limit the memory usage of a process to 200MB
-  # ulimit -v 200000  # Set the virtual memory limit in KB
   case "${bin_name}" in
     hysteria)
       # sync port
@@ -958,7 +918,6 @@ box_bin_status() {
 
 start_box() {
   # Clear the log file and add the timestamp and delimiter
-  # cd /data/adb/box/bin; chmod 755 *
   sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ $current_time | $(t "⚠️ Module is working! but no service is running" "⚠️ Модуль работает, но сервис не запущен") ] /g" "$PROPFILE"
 
   echo -n "" > "${box_log}"
@@ -979,7 +938,6 @@ start_box() {
   fi
 
   # Update iptables if bin_name is still running
-  # PIDS=("clash" "xray" "sing-box" "v2fly")
   PIDS=("${bin_list[@]}")
   PID=""
   i=0
@@ -1017,16 +975,6 @@ start_box() {
       ;;
   esac
 
-  # apk manager check
-  # versionName=$(dumpsys package xyz.chz.bfm | grep versionName | busybox awk -F '=' '{print $2}' | sed 's/-.*//')
-  # if [[ -n "${versionName}" && $(echo "${versionName}" | busybox awk '{print ($1 < 1.13)}') -eq 1 ]]; then
-    # log Error "Update BFR Manager Apps, Use version 1.13.+"
-    # log Error "current version: ${versionName}"
-    # exit 1
-  # else
-    # [ -n "${versionName}" ] && log Info "BFR Manager: ${versionName}"
-  # fi
-
   # busybox check
   busybox_code=$(busybox | busybox grep -oE '[0-9.]*' | head -n 1)
   if [ "$(echo "${busybox_code}" | busybox awk -F. '{printf "%03d%03d%03d\n", $1, $2, $3}')" -lt "$(echo "1.36.1" | busybox awk -F. '{printf "%03d%03d%03d\n", $1, $2, $3}')" ]; then
@@ -1040,11 +988,6 @@ start_box() {
   box_permission
   box_check_bin
   box_check_logs
-
-  # Execute the create_tun_link functions
-  # if [[ "${network_mode}" == @(mixed|tun) ]]; then
-    # create_tun_link
-  # fi
 
   # Execute box_run_crontab if run_crontab is not equal to "false"
   [ "${run_crontab}" = "true" ] && box_run_crontab || log Info "crontab disabled."
@@ -1075,23 +1018,6 @@ start_box() {
   done
   box_bin_status
   touch "${core_up}"
-
-  # OOM Killer
-  # box_pid=$(cat ${box_pid})
-  # # Setting oom_adj
-  # echo -17 > /proc/$box_pid/oom_adj
-  # if [ $? -eq 0 ]; then
-    # log Info "set oom_adj for PID $box_pid to -17"
-  # else
-    # log Error "failed to set oom_adj for PID $box_pid"
-  # fi
-  # # Setting process priorities
-  # renice -n -20 -p $box_pid
-  # if [ $? -eq 0 ]; then
-    # log Info "set priority for PID $box_pid to -20"
-  # else
-    # log Error "failed to set priority for PID $box_pid"
-  # fi
 
   true
 }

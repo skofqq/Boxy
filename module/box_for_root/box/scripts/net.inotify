@@ -6,7 +6,7 @@ events=$1
 
 [ "$events" = "w" ] && [ -f "/data/adb/box/run/box.pid" ] || exit 0
 
-export PATH="/data/adb/magisk:/data/adb/ksu/bin:/data/adb/ap/bin:$PATH:/system/bin"
+. /data/adb/box/scripts/box.common
 
 # ex: 7.1.1
 buildVersion=$(getprop ro.build.version.release)

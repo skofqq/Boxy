@@ -1,28 +1,12 @@
 #!/system/bin/sh
 
-# Definisi variabel
+# Paths
 box_dir="/data/adb/box"
 box_run="${box_dir}/run"
 box_pid="${box_run}/box.pid"
 
-# UI language for user-visible messages: Russian when the system language is Russian.
-if [ -z "$BOX_LANG" ]; then
-  sys_locale=$(getprop persist.sys.locale)
-  [ -z "$sys_locale" ] && sys_locale=$(getprop ro.product.locale)
-  case "$sys_locale" in
-    ru*) BOX_LANG="ru" ;;
-    *) BOX_LANG="en" ;;
-  esac
-fi
-
-# t "English" "Русский"
-t() {
-  if [ "$BOX_LANG" = "ru" ]; then
-    printf '%s' "$2"
-  else
-    printf '%s' "$1"
-  fi
-}
+# busybox in PATH, the message language and t()
+. "${box_dir}/scripts/box.common"
 
 run_as_su() {
     su -c "$1"

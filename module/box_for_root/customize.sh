@@ -431,22 +431,6 @@ if [ "${backup_box}" = "true" ]; then
   fi
 fi
 
-# create_resolv() {
-  # # Check if the resolv.conf file exists
-  # if [ ! -f /system/etc/resolv.conf ]; then
-    # # Ensure the target directory exists before writing the file
-    # mkdir -p "$MODPATH/system/etc/security/cacerts/"
-    # # Create resolv.conf with the specified nameservers
-    # cat > "$MODPATH/system/etc/resolv.conf" <<EOF
-# # nameserver 8.8.8.8
-# # nameserver 1.1.1.1
-# # nameserver 114.114.114.114
-# EOF
-  # fi
-  # ui_print "— create $MODPATH/system/etc/resolv.conf"
-# }
-# create_resolv
-
 # Test the active config with the core that is already installed, so a broken file is reported now
 check_active_config() {
   local ini="/data/adb/box/settings.ini" core name dir bin
@@ -477,7 +461,7 @@ check_active_config
 
 # Module description in the manager's module list
 if [ "$BOX_LANG" = "ru" ]; then
-  sed -i "s/^description=.*/description=Прокси-туннель на Android через sing-box, clash, v2ray, hysteria и xray/" $MODPATH/module.prop
+  sed -i "s/^description=.*/description=Прокси-туннель на Android через mihomo (clash), sing-box, xray и hysteria/" $MODPATH/module.prop
 fi
 
 # Update module description if no kernel binaries are found

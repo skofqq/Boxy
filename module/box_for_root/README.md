@@ -59,7 +59,7 @@ su -c /data/adb/box/scripts/box.iptables disable && su -c /data/adb/box/scripts/
 You can run the following command to get other related operating instructions:
 ```bash
   su -c /data/adb/box/scripts/box.tool
-  # usage: {check|geosub|geox|subs|upkernel|upxui|upyq|upcurl|reload|all}
+  # usage: {check|geosub|geox|subs|upkernel|updnscrypt|upyq|upcurl|reload|logrotate|all}
   su -c /data/adb/box/scripts/box.service
   # usage: $0 {start|stop|restart|status|cron|kcron}
   su -c /data/adb/box/scripts/box.iptables
