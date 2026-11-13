@@ -65,6 +65,7 @@ Languages: English, Русский, Українська, Беларуская, 
 - Core updates check the current config with the new core first and keep the old one if it does not accept it
 - Config check: the core tests a file (`mihomo -t`, `sing-box check`, …) before it is selected or saved, and shows the error line
 - Subscription import: QR code (camera or picture), pasted link, `clash://install-config` and `sing-box://import-remote-profile` links
+- Proxy authentication: login and password on the mixed / SOCKS / HTTP ports of mihomo, sing-box, Xray and Hysteria (several users, a port added when there is none); kept apart from the config, so subscription updates keep them
 - DNS: DNS hijack switch; optional DNSCrypt with dnscrypt-proxy as the core's upstream DNS, download, on / off, server list with filters and latency sorting, config editor and a check of which resolver websites see
 - Network control: Wi‑Fi rules, SSID / BSSID lists with nearby Wi‑Fi scan, proxy on/off for hotspot clients, hotspot client MAC filter, SIM operator rules
 - Update: cores (Mihomo, Sing-box, Xray, Hysteria), subscription, geo databases, web UI with live output
@@ -84,7 +85,7 @@ Languages: English, Русский, Українська, Беларуская, 
 - Navigation: Apps or Logs as a fourth tab
 - GitHub mirror for all downloads (module scripts included)
 - Notifications: service status with actions and failed subscription updates (each can be turned off), Quick Settings tile, home screen widgets, start at boot switch, open panel on launch
-- Backup and restore of module files and app preferences
+- Backup and restore of module files and app preferences; the module's own backups made before each update (date, size, delete)
 - App updates (GitHub releases) and module updates (`updateJson`)
 
 ## Module
@@ -94,6 +95,10 @@ BSSID matching and hotspot MAC filter). See [module/README.md](module/README.md)
 
 It installs over taamarin's module as an update. Updates ask nothing: `settings.ini` values, configs, cores, app lists and
 the GitHub mirror are kept. Press Volume Down within the first 3 seconds to go through the full setup with questions.
+
+Before an update the installer moves the old data to `/data/adb/box/backups/<date>/` (the last 3 are kept). Downloads check
+the server certificate against Android's CA store and the cores against the sha256 GitHub publishes. When a core exits by itself
+the proxy rules are removed at once. Removing the module leaves `box-backup-<date>.tar.gz` in `/sdcard/Download`.
 
 ## Folder structure
 
@@ -109,6 +114,7 @@ Module working directory: `/data/adb/box/`
 ├── hysteria/             # hysteria configs
 ├── dnscrypt/             # dnscrypt-proxy config (optional DNSCrypt)
 ├── scripts/              # module scripts
+│   ├── box.common        # shared helpers: busybox PATH, settings.ini check, message language
 │   ├── box.service       # start / stop / restart of the core
 │   ├── box.iptables      # transparent proxy rules (tproxy, redirect, tun)
 │   ├── box.tool          # updates: cores, subscriptions, geo databases, web UI
@@ -117,7 +123,8 @@ Module working directory: `/data/adb/box/`
 │   ├── ctr.utils         # helpers for network control (SSID, BSSID, SIM operator)
 │   ├── net.inotify       # keeps local address rules current when the network changes
 │   └── start.sh          # start at boot
-├── run/                  # runtime state and logs: box.pid, runs.log, <core>.log
+├── backups/              # copies made by the installer before each update (the last 3)
+├── run/                  # runtime state and logs: box.pid, runs.log, <core>.log (+ .log.1 of the previous run)
 ├── settings.ini          # main settings
 ├── package.list.cfg      # apps for the blacklist / whitelist mode
 ├── ap.list.cfg           # hotspot and tethering interfaces to proxy or ignore

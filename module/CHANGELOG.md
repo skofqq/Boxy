@@ -1,5 +1,52 @@
 # Box for Root (Boxy edition)
 
+## v1.11.0
+
+New:
+- Update backups in `backups/<YYYYMMDD-HHMMSS>/`, the last 3 kept; old `box.XXXXXXXXXX` folders are moved there or removed
+- `settings.ini`: every setting of the old file is carried over on update, multi-line arrays and unknown keys included
+- A core that exits by itself: proxy rules and ip rules are removed at once, Boxy is told (no restart, no polling)
+- Downloads check the server certificate against Android's CA store; mihomo, sing-box, Xray, Hysteria, curl and
+  dnscrypt-proxy are checked against the sha256 digest GitHub publishes
+- Proxy users for mihomo (`clash/.proxy-auth.yaml`) put into the config at every start and reload
+- Core logs: the previous run is kept as `<core>.log.1`; `box.tool logrotate` (cron, geosub) cuts logs above 5 MB
+- One start / stop / restart at a time (lock)
+- Uninstall leaves `box-backup-<date>.tar.gz` in `/sdcard/Download`
+- `box.common`: shared helpers of the scripts
+
+Fixes:
+- Problem: a core crash left the proxy rules in place and apps without network. Fix: the core runs under a watcher.
+- Problem: iptables were not enabled at boot when hysteria was the core. Fix: hysteria is in the boot-time check.
+- Problem: nat `LOCAL_IP_V4` collected every address the phone ever had. Fix: the chain is refilled from scratch.
+- Problem: GitHub version lookups could hang. Fix: timeouts on every request.
+- Problem: sing-box 1.14 did not start with DNSCrypt when the config had no DNS servers. Fix: the 1.12+ server format.
+- Problem: a sing-box reload ignored override files added since the start. Fix: such a reload restarts the core.
+- Problem: cron lines had relative paths when the service was started as `./box.service`. Fix: absolute paths.
+- Removed: upxui, bond0 / bond1, V2Ray and Clash Premium downloads (they still start), commented-out code.
+
+Новое:
+- Резервные копии при обновлении в `backups/<ГГГГММДД-ЧЧММСС>/`, хранятся 3 последние; старые папки `box.XXXXXXXXXX`
+  переносятся туда или удаляются
+- `settings.ini`: при обновлении переносятся все настройки старого файла, включая многострочные массивы и свои ключи
+- Ядро завершилось само: правила прокси и ip rule снимаются сразу, Boxy получает событие (без перезапуска и опроса)
+- Загрузки проверяют сертификат сервера по хранилищу CA Android; mihomo, sing-box, Xray, Hysteria, curl и
+  dnscrypt-proxy сверяются с sha256, который публикует GitHub
+- Пользователи прокси для mihomo (`clash/.proxy-auth.yaml`) вписываются в конфигурацию при каждом запуске и reload
+- Логи ядер: прошлый запуск сохраняется как `<ядро>.log.1`; `box.tool logrotate` (cron, geosub) режет логи больше 5 МБ
+- Запуск / остановка / перезапуск по одному (блокировка)
+- После удаления модуля в `/sdcard/Download` остаётся `box-backup-<дата>.tar.gz`
+- `box.common`: общие функции скриптов
+
+Исправления:
+- Проблема: при падении ядра правила прокси оставались, приложения были без сети. Решение: ядро работает под наблюдателем.
+- Проблема: при загрузке iptables не включались, если ядро — hysteria. Решение: hysteria в проверке при загрузке.
+- Проблема: в nat `LOCAL_IP_V4` копились все адреса телефона. Решение: цепочка заполняется заново.
+- Проблема: запросы версий к GitHub могли зависнуть. Решение: таймауты на всех запросах.
+- Проблема: sing-box 1.14 не запускался с DNSCrypt, если в конфигурации не было DNS-серверов. Решение: формат серверов 1.12+.
+- Проблема: reload sing-box не видел файлов overrides, появившихся после запуска. Решение: в этом случае ядро перезапускается.
+- Проблема: строки cron были с относительными путями при запуске `./box.service`. Решение: абсолютные пути.
+- Удалено: upxui, bond0 / bond1, загрузка V2Ray и Clash Premium (запускаются по-прежнему), закомментированный код.
+
 ## v1.10.9
 
 - The service tells Boxy right away when it starts, stops or restarts, so the app's notification, tile and
