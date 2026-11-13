@@ -1741,6 +1741,38 @@ cert_sha256() {
   rm -f "${pem}" "${pem}.leaf"
 }
 
+# Pins made for servers that had allowInsecure (by this script or by Boxy), one per line:
+# "<hash> <sni> <host> <port>". Such a server usually has a self-signed or short-lived certificate: when it
+# renews, the pin would stop every connection to it. xray_repin (before every Xray start) asks the server again
+# and puts the new hash into every Xray file that has the old one. Only pins listed here are touched.
+pins_file="${box_dir}/xray/.pins"
+pin_register() {
+  [ -n "$1" ] || return 0
+  busybox grep -q "^$1 " "${pins_file}" 2>/dev/null && return 0
+  echo "$1 $2 $3 $4" >> "${pins_file}"
+  chmod 600 "${pins_file}" 2>/dev/null
+}
+
+xray_repin() {
+  [ -s "${pins_file}" ] || return 0
+  local h sni host port new f files tmp="${pins_file}.new"
+  : > "${tmp}"
+  while read -r h sni host port; do
+    [ -n "${h}" ] || continue
+    files=$(busybox grep -l "${h}" "${box_dir}"/xray/*.json "${box_dir}"/xray/profiles/*.json "${box_dir}"/xray/subs/*.json 2>/dev/null)
+    # A pin no file uses any more is forgotten.
+    [ -n "${files}" ] || continue
+    new=$(cert_sha256 "${sni}" "${host}" "${port}")
+    if [ -n "${new}" ] && [ "${new}" != "${h}" ]; then
+      for f in ${files}; do busybox sed -i "s/${h}/${new}/g" "${f}"; done
+      log Warning "[pin] ${sni}: its certificate changed, the pin follows it (was ${h:0:12}…, now ${new:0:12}…)"
+      h="${new}"
+    fi
+    echo "${h} ${sni} ${host} ${port}" >> "${tmp}"
+  done < "${pins_file}"
+  mv -f "${tmp}" "${pins_file}"
+}
+
 xray_fix_insecure() {
   local f="$1" tmp="${box_run}/xfix.json" yq="yq" i val tag sni host port hash o
   [ -f "${f}" ] && busybox grep -q '"allowInsecure"' "${f}" || return 0
@@ -1764,6 +1796,7 @@ xray_fix_insecure() {
       [ -n "${host}" ] && hash=$(cert_sha256 "${sni}" "${host}" "${port}")
       if [ -n "${hash}" ]; then
         ${yq} -i -p=json -o=json "${o}.streamSettings.tlsSettings.pinnedPeerCertSha256 = \"${hash}\"" "${tmp}"
+        pin_register "${hash}" "${sni}" "${host}" "${port}"
         log Info "[allowInsecure] ${tag}: pinned to the certificate its server presents now"
       else
         log Warning "[allowInsecure] ${tag}: server not reachable, its certificate is now checked normally"
@@ -1806,6 +1839,9 @@ case "$1" in
   fixinsecure)
     shift
     for f in "$@"; do xray_fix_insecure "${f}"; done
+    ;;
+  repin)
+    xray_repin
     ;;
   memcg|cpuset|blkio)
     case "$1" in

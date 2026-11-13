@@ -10,6 +10,8 @@ New:
   allowInsecure) with the new examples, only when they are byte for byte the shipped files.
 - Xray: `allowInsecure` (removed in Xray 26) is migrated at start: the outbound gets `pinnedPeerCertSha256` of the
   certificate its server presents (`box.tool fixinsecure <file>`), the previous file stays as `.allowinsecure.bak`.
+  Such pins are listed in `xray/.pins` and checked before every Xray start (`box.tool repin`): when the server's
+  certificate renews, the pin follows it. Servers that needed allowInsecure should get a valid certificate.
 - Subscription downloads send Boxy's device id (`x-hwid`, `x-device-os`, `x-ver-os`) when `.hwid` exists, for panels
   with a device limit (Remnawave).
 
@@ -26,6 +28,8 @@ Fixes:
   примерами — только если они побайтово совпадают с поставлявшимися файлами.
 - Xray: `allowInsecure` (удалён в Xray 26) переносится при запуске: outbound получает `pinnedPeerCertSha256` сертификата,
   который показывает его сервер (`box.tool fixinsecure <файл>`), прежний файл остаётся как `.allowinsecure.bak`.
+  Такие закрепления записаны в `xray/.pins` и проверяются перед каждым запуском Xray (`box.tool repin`): когда сертификат
+  сервера обновляется, закрепление следует за ним. Серверам, которым был нужен allowInsecure, лучше получить нормальный сертификат.
 - Загрузка подписок отправляет ID устройства Boxy (`x-hwid`, `x-device-os`, `x-ver-os`), если есть `.hwid` — для панелей
   с лимитом устройств (Remnawave).
 
