@@ -72,14 +72,17 @@ if [ -d "/data/adb/box" ]; then
   # Backups live in /data/adb/box/backups/<YYYYMMDD-HHMMSS>/: everything else in /data/adb/box moves into a new
   # one (backups/ itself never does, so they do not nest), and the last 3 are kept.
   bak_root="/data/adb/box/backups"
-  mkdir -p "${bak_root}"
-  # Backups of older versions (box.XXXXXXXXXX next to the data): moved into backups/ under their date, or
-  # dropped when a newer one is already there.
+  mkdir -p "${bak_root}" && chmod 0700 "${bak_root}"
+  now_stamp=$(date +%Y%m%d-%H%M%S)
+  temp_dir="${bak_root}/${now_stamp}"
+  # Backups of older versions (box.XXXXXXXXXX next to the data): moved into backups/ under their date (that of
+  # their settings.ini, which the folder's own date does not keep), or dropped when a newer one is already there.
   for old_bak in /data/adb/box/box.??????????; do
     [ -d "${old_bak}" ] || continue
-    stamp=$(date -r "${old_bak}" +%Y%m%d-%H%M%S 2>/dev/null)
+    stamp=$(date -r "${old_bak}/settings.ini" +%Y%m%d-%H%M%S 2>/dev/null || date -r "${old_bak}" +%Y%m%d-%H%M%S 2>/dev/null)
     newest=$(ls -1 "${bak_root}" 2>/dev/null | sort | tail -n 1)
-    if [ -n "${stamp}" ] && { [ -z "${newest}" ] || [ "${stamp}" \> "${newest}" ]; } && [ ! -e "${bak_root}/${stamp}" ]; then
+    if [ -n "${stamp}" ] && [ "${stamp}" \< "${now_stamp}" ] && { [ -z "${newest}" ] || [ "${stamp}" \> "${newest}" ]; } \
+      && [ ! -e "${bak_root}/${stamp}" ]; then
       mv "${old_bak}" "${bak_root}/${stamp}"
       # Older versions moved the previous backup into the new one: those copies inside are dropped.
       for nested in "${bak_root}/${stamp}"/box.??????????; do
@@ -89,7 +92,8 @@ if [ -d "/data/adb/box" ]; then
       rm -rf "${old_bak}"
     fi
   done
-  temp_dir="${bak_root}/$(date +%Y%m%d-%H%M%S)"
+  # Two installs within one second: the second backup gets its own folder.
+  [ -e "${temp_dir}" ] && temp_dir="${temp_dir}-$$"
   mkdir -p "${temp_dir}"
   for item in /data/adb/box/* /data/adb/box/.[!.]*; do
     [ -e "${item}" ] || continue
@@ -205,7 +209,7 @@ else
 fi
 
 find_bin() {
-  bin_dir="$temp_bak"
+  bin_dir="$temp_dir"
 
   check_bin() {
     local name="$1"
@@ -254,7 +258,7 @@ find_bin() {
   }
 
   # List of binaries to check
-  for bin in yq curl sing-box v2fly xray hysteria; do
+  for bin in yq curl sing-box xray hysteria; do
     timeout 1 getevent -cl >/dev/null
 
     check_bin "$bin"
@@ -295,7 +299,7 @@ restore_ini() {
   # array "key=(" up to its ")" too) whose old value is literal replaces the new file's line, as long as the
   # new file's value is literal as well (lines built from other values, like xray_config="${box_dir}/…" or
   # proxy_mode=$(…), stay the new version's). Settings the new file no longer has are appended at the end.
-  busybox awk '
+  awk '
     function start(line) { return match(line, /^[A-Za-z_][A-Za-z0-9_]*=/) }
     function opens(line,  v) { v = substr(line, index(line, "=") + 1); return (v ~ /^\(/ && v !~ /\)[[:space:]]*(#.*)?$/) }
     FNR == 1 { file++ }

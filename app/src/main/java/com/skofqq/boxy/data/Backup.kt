@@ -25,7 +25,7 @@ object Backup {
     /** A copy the module installer made of /data/adb/box before an update (backups/<YYYYMMDD-HHMMSS>). */
     data class ModuleBackup(val name: String, val sizeKb: Long)
 
-    private val BACKUP_NAME = Regex("^[0-9]{8}-[0-9]{6}$")
+    private val BACKUP_NAME = Regex("^[0-9]{8}-[0-9]{6}(-[0-9]+)?$")
 
     suspend fun moduleBackups(): List<ModuleBackup> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         com.topjohnwu.superuser.Shell.cmd(
