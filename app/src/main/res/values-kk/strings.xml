@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">Тізім мекенжайын енгізіңіз</string>
     <string name="xsub_extra_remove_msg">Бұл тізімді (%1$s) алып тастау керек пе? Оның серверлері келесі жаңартуда жойылады.</string>
     <string name="xsub_skip_insecure">Жария мекенжайға TLS / REALITY-сіз VLESS: Xray 26 мұны тыйады (әрі бүкіл файлды қабылдамас еді)</string>
+    <string name="module_backups">Модульдің сақтық көшірмелері</string>
+    <string name="module_backups_sub">Модуль оларды әр жаңарту алдында жасайды (/data/adb/box/backups, соңғы 3-еуі сақталады). Жою үшін басыңыз.</string>
+    <string name="module_backup_delete_confirm">Модуль деректерінің бұл көшірмесін жою керек пе? Қайтару мүмкін емес.</string>
 </resources>

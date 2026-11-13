@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">URL der Liste eingeben</string>
     <string name="xsub_extra_remove_msg">Diese Liste (%1$s) entfernen? Ihre Server verschwinden beim nächsten Update.</string>
     <string name="xsub_skip_insecure">VLESS ohne TLS / REALITY zu einer öffentlichen Adresse: Xray 26 verbietet das (und würde die ganze Datei ablehnen)</string>
+    <string name="module_backups">Modul-Sicherungen</string>
+    <string name="module_backups_sub">Vom Modul vor jedem Update angelegt (/data/adb/box/backups, die letzten 3 bleiben). Zum Löschen antippen.</string>
+    <string name="module_backup_delete_confirm">Diese Kopie der Moduldaten löschen? Das lässt sich nicht rückgängig machen.</string>
 </resources>

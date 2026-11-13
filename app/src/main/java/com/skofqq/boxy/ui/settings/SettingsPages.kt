@@ -352,6 +352,11 @@ fun BackupScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () -> Unit
     var scopeChoice by remember { mutableStateOf(BackupScope.BOTH) }
     var exportScope by remember { mutableStateOf(BackupScope.BOTH) }
     var confirm by remember { mutableStateOf(false) }
+    // Copies the module installer made before updates (backups/<date>): listed, removable one by one.
+    var moduleBackups by remember { mutableStateOf<List<Backup.ModuleBackup>>(emptyList()) }
+    var deleteBackup by remember { mutableStateOf<Backup.ModuleBackup?>(null) }
+    var backupsKey by remember { mutableStateOf(0) }
+    LaunchedEffect(backupsKey) { moduleBackups = Backup.moduleBackups() }
 
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         if (uri != null) {
@@ -404,6 +409,18 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
                     }
                 }
             }
+            if (moduleBackups.isNotEmpty()) item {
+                SectionCard(stringResource(R.string.module_backups), stringResource(R.string.module_backups_sub)) {
+                    moduleBackups.forEachIndexed { i, b ->
+                        com.skofqq.boxy.ui.components.SettingsRow(
+                            BoxyIcons.Delete,
+                            backupDate(b.name),
+                            com.skofqq.boxy.util.Format.bytes(context, b.sizeKb * 1024),
+                            showDivider = i < moduleBackups.size - 1,
+                        ) { deleteBackup = b }
+                    }
+                }
+            }
         } else {
             item {
                 SectionCard(stringResource(R.string.backup_file_title), null) {
@@ -445,6 +462,21 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
         if (busy) item { Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
     }
 
+    deleteBackup?.let { b ->
+        ConfirmDialog(
+            backupDate(b.name),
+            stringResource(R.string.module_backup_delete_confirm),
+            stringResource(R.string.action_delete),
+            onConfirm = {
+                deleteBackup = null
+                scope.launch {
+                    if (!Backup.deleteModuleBackup(b.name)) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    backupsKey++
+                }
+            },
+            onDismiss = { deleteBackup = null },
+        )
+    }
     if (confirm) {
         ConfirmDialog(
             stringResource(R.string.backup_restore),
@@ -702,3 +734,9 @@ fun ModuleUpdateSheet(version: String?, installed: Boolean, onDismiss: () -> Uni
         }
     }
 }
+
+/** "20261113-042100" as a local date and time. */
+private fun backupDate(name: String): String = runCatching {
+    val d = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).parse(name)!!
+    java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT).format(d)
+}.getOrDefault(name)

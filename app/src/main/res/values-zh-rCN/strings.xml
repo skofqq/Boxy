@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">请输入列表地址</string>
     <string name="xsub_extra_remove_msg">移除此列表（%1$s）？其服务器将在下次更新时消失。</string>
     <string name="xsub_skip_insecure">指向公网地址且无 TLS / REALITY 的 VLESS：Xray 26 禁止这种用法（并会拒绝整个文件）</string>
+    <string name="module_backups">模块备份</string>
+    <string name="module_backups_sub">模块在每次更新前创建（/data/adb/box/backups，保留最近 3 份）。点按可删除。</string>
+    <string name="module_backup_delete_confirm">删除这份模块数据副本？此操作无法撤销。</string>
 </resources>

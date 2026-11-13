@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">Listenin URL\'sini girin</string>
     <string name="xsub_extra_remove_msg">Bu liste (%1$s) kaldırılsın mı? Sunucuları bir sonraki güncellemede gider.</string>
     <string name="xsub_skip_insecure">Herkese açık adrese TLS / REALITY olmadan VLESS: Xray 26 buna izin vermez (ve tüm dosyayı reddederdi)</string>
+    <string name="module_backups">Modül yedekleri</string>
+    <string name="module_backups_sub">Modül her güncellemeden önce oluşturur (/data/adb/box/backups, son 3 tanesi tutulur). Silmek için dokunun.</string>
+    <string name="module_backup_delete_confirm">Modül verilerinin bu kopyası silinsin mi? Geri alınamaz.</string>
 </resources>

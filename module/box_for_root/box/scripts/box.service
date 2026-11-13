@@ -123,7 +123,13 @@ xclash() {
 
 box_ownership() {
   # Set ownership and permission of kernel directory
-  chown -R ${box_user_group} ${box_dir}
+  # Not backups/: copies of earlier versions, nothing the core reads.
+  chown ${box_user_group} ${box_dir}
+  for item in ${box_dir}/* ${box_dir}/.[!.]*; do
+    [ -e "${item}" ] || continue
+    [ "${item}" = "${box_dir}/backups" ] && continue
+    chown -R ${box_user_group} "${item}"
+  done
   chmod -R 644 ${box_dir}/${bin_name}
 
   chown ${box_user_group} ${bin_path}

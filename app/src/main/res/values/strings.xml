@@ -1148,4 +1148,7 @@
     <string name="xsub_extra_bad_url">Enter the list\'s URL</string>
     <string name="xsub_extra_remove_msg">Remove this list (%1$s)? Its servers go at the next update.</string>
     <string name="xsub_skip_insecure">VLESS without TLS / REALITY to a public address: Xray 26 refuses it (and would reject the whole file)</string>
+    <string name="module_backups">Module backups</string>
+    <string name="module_backups_sub">Made by the module before each update (/data/adb/box/backups, the last 3 are kept). Tap one to delete it.</string>
+    <string name="module_backup_delete_confirm">Delete this copy of the module\'s data? It cannot be undone.</string>
 </resources>

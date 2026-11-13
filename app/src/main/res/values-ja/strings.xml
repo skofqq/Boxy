@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">リストの URL を入力してください</string>
     <string name="xsub_extra_remove_msg">このリスト（%1$s）を削除しますか？ サーバーは次回の更新で消えます。</string>
     <string name="xsub_skip_insecure">公開アドレスへの TLS / REALITY なしの VLESS: Xray 26 は禁止しています（ファイル全体が拒否されます）</string>
+    <string name="module_backups">モジュールのバックアップ</string>
+    <string name="module_backups_sub">更新のたびにモジュールが作成します（/data/adb/box/backups、最新 3 件を保持）。タップで削除。</string>
+    <string name="module_backup_delete_confirm">モジュールデータのこのコピーを削除しますか？元に戻せません。</string>
 </resources>

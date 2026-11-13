@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">Saisissez l\'URL de la liste</string>
     <string name="xsub_extra_remove_msg">Retirer cette liste (%1$s) ? Ses serveurs disparaissent à la prochaine mise à jour.</string>
     <string name="xsub_skip_insecure">VLESS sans TLS / REALITY vers une adresse publique : Xray 26 l\'interdit (et rejetterait tout le fichier)</string>
+    <string name="module_backups">Sauvegardes du module</string>
+    <string name="module_backups_sub">Créées par le module avant chaque mise à jour (/data/adb/box/backups, les 3 dernières sont gardées). Touchez pour supprimer.</string>
+    <string name="module_backup_delete_confirm">Supprimer cette copie des données du module ? C\'est irréversible.</string>
 </resources>

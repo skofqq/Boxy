@@ -1125,4 +1125,7 @@
     <string name="xsub_extra_bad_url">Вкажіть адресу списку</string>
     <string name="xsub_extra_remove_msg">Прибрати цей список (%1$s)? Його сервери зникнуть під час наступного оновлення.</string>
     <string name="xsub_skip_insecure">VLESS без TLS / REALITY на публічну адресу: Xray 26 таке забороняє (і відхилив би весь файл)</string>
+    <string name="module_backups">Резервні копії модуля</string>
+    <string name="module_backups_sub">Модуль робить їх перед кожним оновленням (/data/adb/box/backups, зберігаються останні 3). Натисніть, щоб видалити.</string>
+    <string name="module_backup_delete_confirm">Видалити цю копію даних модуля? Скасувати не можна.</string>
 </resources>

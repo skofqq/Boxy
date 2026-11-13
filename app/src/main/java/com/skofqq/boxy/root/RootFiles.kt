@@ -32,11 +32,11 @@ object RootFiles {
         }.sortedWith(compareBy<RootFile>({ !it.isDir }, { it.name.lowercase() }))
     }
 
-    /** Recursive search by name under a directory. */
+    /** Recursive search by name under a directory (not into the module's backups of earlier versions). */
     suspend fun search(dir: String, query: String): List<RootFile> = withContext(Dispatchers.IO) {
         val pattern = "*" + query.replace("'", "") + "*"
         val out = Shell.cmd(
-            "find ${q(dir)} -iname '$pattern' 2>/dev/null | head -n 300 | while read -r f; do stat -c '%F|%s|%Y|%n' \"\$f\"; done",
+            "find ${q(dir)} -path '${BoxModule.BOX_DIR}/backups' -prune -o -iname '$pattern' -print 2>/dev/null | head -n 300 | while read -r f; do stat -c '%F|%s|%Y|%n' \"\$f\"; done",
         ).exec().out
         out.mapNotNull { line ->
             val parts = line.split('|', limit = 4)

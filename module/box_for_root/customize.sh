@@ -69,15 +69,39 @@ ui_print "— $(t 'Installing Box for Magisk/KernelSU/APatch' 'Установк�
 unzip -o "$ZIPFILE" -x 'META-INF/*' -x 'webroot/*' -d "$MODPATH" >&2
 if [ -d "/data/adb/box" ]; then
   ui_print "— $(t 'Backup existing box data' 'Резервная копия текущих данных box')"
-  # Older backups (box.XXXXXXXXXX) would be moved into the new one and nest with every update
-  # (gigabytes after a few updates, and every later step walks through them). Only the latest is kept.
+  # Backups live in /data/adb/box/backups/<YYYYMMDD-HHMMSS>/: everything else in /data/adb/box moves into a new
+  # one (backups/ itself never does, so they do not nest), and the last 3 are kept.
+  bak_root="/data/adb/box/backups"
+  mkdir -p "${bak_root}"
+  # Backups of older versions (box.XXXXXXXXXX next to the data): moved into backups/ under their date, or
+  # dropped when a newer one is already there.
   for old_bak in /data/adb/box/box.??????????; do
-    [ -d "${old_bak}" ] && rm -rf "${old_bak}"
+    [ -d "${old_bak}" ] || continue
+    stamp=$(date -r "${old_bak}" +%Y%m%d-%H%M%S 2>/dev/null)
+    newest=$(ls -1 "${bak_root}" 2>/dev/null | sort | tail -n 1)
+    if [ -n "${stamp}" ] && { [ -z "${newest}" ] || [ "${stamp}" \> "${newest}" ]; } && [ ! -e "${bak_root}/${stamp}" ]; then
+      mv "${old_bak}" "${bak_root}/${stamp}"
+      # Older versions moved the previous backup into the new one: those copies inside are dropped.
+      for nested in "${bak_root}/${stamp}"/box.??????????; do
+        [ -d "${nested}" ] && rm -rf "${nested}"
+      done
+    else
+      rm -rf "${old_bak}"
+    fi
   done
-  temp_bak=$(mktemp -d "/data/adb/box/box.XXXXXXXXXX")
-  temp_dir="${temp_bak}"
-  mv /data/adb/box/* "${temp_dir}/"
+  temp_dir="${bak_root}/$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "${temp_dir}"
+  for item in /data/adb/box/* /data/adb/box/.[!.]*; do
+    [ -e "${item}" ] || continue
+    [ "${item}" = "${bak_root}" ] && continue
+    mv "${item}" "${temp_dir}/"
+  done
   mv "$MODPATH/box/"* /data/adb/box/
+  # The newest 3 stay.
+  ls -1 "${bak_root}" | sort -r | tail -n +4 | while read -r old; do
+    [ -n "${old}" ] && rm -rf "${bak_root:?}/${old}"
+  done
+  ui_print "     ↳  backups/${temp_dir##*/}"
   backup_box="true"
 else
   mv "$MODPATH/box" /data/adb/
@@ -99,7 +123,13 @@ unzip -j -o "$ZIPFILE" 'sbfr' -d "$MODPATH/system/bin" >&2
 # Set permissions
 ui_print "— $(t 'Setting permissions...' 'Настройка прав доступа...')"
 set_perm_recursive $MODPATH 0 0 0755 0644
-set_perm_recursive /data/adb/box/ 0 3005 0755 0644
+# Everything but backups/ (copies of earlier versions, left as they are)
+set_perm /data/adb/box 0 3005 0755
+for item in /data/adb/box/* /data/adb/box/.[!.]*; do
+  [ -e "${item}" ] || continue
+  [ "${item}" = "/data/adb/box/backups" ] && continue
+  if [ -d "${item}" ]; then set_perm_recursive "${item}" 0 3005 0755 0644; else set_perm "${item}" 0 3005 0644; fi
+done
 set_perm_recursive /data/adb/box/scripts/ 0 3005 0755 0700
 set_perm ${service_dir}/box_service.sh 0 0 0755
 set_perm $MODPATH/uninstall.sh 0 0 0755
@@ -260,29 +290,48 @@ fi
 restore_ini() {
   backup_ini="$temp_dir/settings.ini"
   target_ini="/data/adb/box/settings.ini"
-
-  # List of keys to restore (separate with spaces)
-  keys="network_mode bin_name ipv6 xclash_option renew update_subscription run_crontab interva_update update_geo subscription_url_clash subscription_url_singbox name_clash_config clash_config name_provide_clash_config clash_provide_path custom_rules_subs name_provide_clash_rules name_sing_config name_xray_config name_v2fly_config name_hysteria_config tproxy_port redir_port box_user_group cgroup_memcg memcg_limit cgroup_cpuset allow_cpu cgroup_blkio weight enable_network_service_control use_module_on_wifi_disconnect use_module_on_wifi use_ssid_matching use_wifi_list_mode wifi_ssids_list wifi_bssids_list use_sim_matching use_sim_list_mode sim_operators_list dns_hijack quic user_agent dnscrypt dnscrypt_port mac_filter mac_mode macs_list inotify_log_enabled geo_source geo_extra subscription_url_xray subscription_extra_xray"
-
-  for key in $keys; do
-      value=$(grep "^$key=" "$backup_ini")
-      if [ -n "$value" ]; then
-          # Escape special characters to make it safe for sed
-          esc_value=$(printf '%s\n' "$value" | sed -e 's/[&/\]/\\&/g')
-
-          if grep -q "^$key=" "$target_ini"; then
-              # Replace old line
-              # sed -i "s|^$key=.*|$value|" "$target_ini"
-              sed -i "s|^$key=.*|$esc_value|" "$target_ini"
-          else
-              # Append at the end of the file
-              echo "$value" >> "$target_ini"
-          fi
-          ui_print "— $(t 'Restored' 'Восстановлено'): $key"
-      else
-          ui_print "— $(t "Skipped: $key not found in backup" "Пропущено: $key нет в резервной копии")"
-      fi
-  done
+  [ -f "${backup_ini}" ] || return 0
+  # Every setting of the old file is carried over, not a fixed list: a key=value line (a multi-line
+  # array "key=(" up to its ")" too) whose old value is literal replaces the new file's line, as long as the
+  # new file's value is literal as well (lines built from other values, like xray_config="${box_dir}/…" or
+  # proxy_mode=$(…), stay the new version's). Settings the new file no longer has are appended at the end.
+  busybox awk '
+    function start(line) { return match(line, /^[A-Za-z_][A-Za-z0-9_]*=/) }
+    function opens(line,  v) { v = substr(line, index(line, "=") + 1); return (v ~ /^\(/ && v !~ /\)[[:space:]]*(#.*)?$/) }
+    FNR == 1 { file++ }
+    file == 1 {
+      if (inblk) { blk = blk "\n" $0; if ($0 ~ /\)[[:space:]]*(#.*)?$/) { inblk = 0; old[key] = blk } ; next }
+      if (start($0)) {
+        key = substr($0, 1, index($0, "=") - 1); order[++n] = key
+        if (opens($0)) { inblk = 1; blk = $0 } else old[key] = $0
+      }
+      next
+    }
+    {
+      if (skip) { if (!keepnew) { if ($0 ~ /\)[[:space:]]*(#.*)?$/) skip = 0; next } ; print; if ($0 ~ /\)[[:space:]]*(#.*)?$/) skip = 0; next }
+      if (start($0)) {
+        k = substr($0, 1, index($0, "=") - 1); seen[k] = 1
+        multi = opens($0)
+        keepnew = !((k in old) && old[k] !~ /\$/ && $0 !~ /\$/)
+        if (!keepnew) { print old[k]; carried++ } else print
+        if (multi) { skip = 1; if (!keepnew) next } ; next
+      }
+      print
+    }
+    END {
+      for (i = 1; i <= n; i++) { k = order[i]; if (!(k in seen) && (k in old) && old[k] !~ /\$/) { if (!hdr++) print "\n# Kept from the previous version"; print old[k]; seen[k] = 1; added++ } }
+      printf "%d %d\n", carried, added > "/dev/stderr"
+    }
+  ' "${backup_ini}" "${target_ini}" > "${target_ini}.new" 2> "${TMPDIR:-/data/local/tmp}/ini_count"
+  if [ -s "${target_ini}.new" ] && /system/bin/sh -n "${target_ini}.new" 2>/dev/null; then
+    mv -f "${target_ini}.new" "${target_ini}"
+    read -r carried added < "${TMPDIR:-/data/local/tmp}/ini_count"
+    ui_print "— $(t "Settings kept: ${carried:-0}, carried from the old version: ${added:-0}" "Сохранено настроек: ${carried:-0}, перенесено из старой версии: ${added:-0}")"
+  else
+    rm -f "${target_ini}.new"
+    ui_print "— $(t 'settings.ini could not be merged, the new one is used: check your settings' 'settings.ini не удалось объединить, используется новый: проверьте настройки')"
+  fi
+  rm -f "${TMPDIR:-/data/local/tmp}/ini_count"
 }
 
 apply_ini() {

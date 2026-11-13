@@ -22,7 +22,28 @@ enum class BackupScope { MODULES, APPS, BOTH }
 object Backup {
     private val ROOT_FILES = listOf("settings.ini", "package.list.cfg", "ap.list.cfg", "gid.list.cfg", "crontab.cfg")
     // Core configs and the dnscrypt-proxy config (dnscrypt-proxy.toml with the picked servers, block lists).
-    private val CORE_DIRS = listOf("clash", "sing-box", "xray", "v2fly", "hysteria", "dnscrypt")
+    /** A copy the module installer made of /data/adb/box before an update (backups/<YYYYMMDD-HHMMSS>). */
+    data class ModuleBackup(val name: String, val sizeKb: Long)
+
+    private val BACKUP_NAME = Regex("^[0-9]{8}-[0-9]{6}$")
+
+    suspend fun moduleBackups(): List<ModuleBackup> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        com.topjohnwu.superuser.Shell.cmd(
+            "for d in ${BoxModule.BOX_DIR}/backups/*/; do [ -d \"\$d\" ] || continue; n=\${d%/}; echo \"\${n##*/} \$(du -sk \"\$d\" 2>/dev/null | cut -f1)\"; done",
+        ).exec().out.mapNotNull { l ->
+            val p = l.trim().split(' ')
+            if (p.size == 2 && BACKUP_NAME.matches(p[0])) ModuleBackup(p[0], p[1].toLongOrNull() ?: 0) else null
+        }.sortedByDescending { it.name }
+    }
+
+    suspend fun deleteModuleBackup(name: String): Boolean {
+        if (!BACKUP_NAME.matches(name)) return false
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            com.topjohnwu.superuser.Shell.cmd("rm -rf '${BoxModule.BOX_DIR}/backups/$name'").exec().isSuccess
+        }
+    }
+
+    private val CORE_DIRS = listOf("clash", "sing-box", "xray", "xray/profiles", "v2fly", "hysteria", "dnscrypt")
     private val CONFIG_EXT = setOf("yaml", "yml", "json", "txt", "list", "conf", "toml")
     // Preference files with data the app collects (TrafficStats, AppTraffic, Subscriptions).
     private val DATA_PREFS = listOf("traffic", "app_traffic", "subscriptions")
