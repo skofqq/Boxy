@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">🇷🇺 VPN-сіз</string>
     <string name="xray_mode_auto">АВТО</string>
     <string name="xray_mode_pinned">БЕКІТІЛГЕН</string>
+    <string name="xsub_extra_item">Қосымша тізім «%1$s»</string>
+    <string name="xsub_extra_add">Тізім қосу</string>
+    <string name="xsub_extra_add_sub">Өз префиксі бар қосымша сілтеме тізімдері (мысалы, ақ тізімдер «wl»)</string>
+    <string name="xsub_extra_prefix">Префикс (латын әріптері, сандар)</string>
+    <string name="xsub_extra_add_msg">Серверлер xray/subs/&lt;префикс&gt;.json ішінде «&lt;префикс&gt;-…» outbound-тарына айналады. Конфиг оларды теңгергіштері «&lt;префикс&gt;-» таңдаса ғана алады; бірнеше сілтеменің префиксі бірдей болуы мүмкін.</string>
+    <string name="xsub_extra_bad_prefix">Латын әріптері не сандардан тұратын префикс, «sub» емес</string>
+    <string name="xsub_extra_bad_url">Тізім мекенжайын енгізіңіз</string>
+    <string name="xsub_extra_remove_msg">Бұл тізімді (%1$s) алып тастау керек пе? Оның серверлері келесі жаңартуда жойылады.</string>
+    <string name="xsub_skip_insecure">Жария мекенжайға TLS / REALITY-сіз VLESS: Xray 26 мұны тыйады (әрі бүкіл файлды қабылдамас еді)</string>
 </resources>

@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">Ohne VPN</string>
     <string name="xray_mode_auto">AUTO</string>
     <string name="xray_mode_pinned">FEST</string>
+    <string name="xsub_extra_item">Zusatzliste „%1$s“</string>
+    <string name="xsub_extra_add">Liste hinzufügen</string>
+    <string name="xsub_extra_add_sub">Weitere Linklisten mit eigenem Präfix (z. B. Whitelists „wl“)</string>
+    <string name="xsub_extra_prefix">Präfix (lateinische Buchstaben, Ziffern)</string>
+    <string name="xsub_extra_add_msg">Die Server werden Outbounds „&lt;Präfix&gt;-…“ in xray/subs/&lt;Präfix&gt;.json. Eine Konfiguration nutzt sie nur, wenn ihre Balancer „&lt;Präfix&gt;-“ wählen; mehrere URLs dürfen ein Präfix teilen.</string>
+    <string name="xsub_extra_bad_prefix">Ein Präfix aus lateinischen Buchstaben oder Ziffern, nicht „sub“</string>
+    <string name="xsub_extra_bad_url">URL der Liste eingeben</string>
+    <string name="xsub_extra_remove_msg">Diese Liste (%1$s) entfernen? Ihre Server verschwinden beim nächsten Update.</string>
+    <string name="xsub_skip_insecure">VLESS ohne TLS / REALITY zu einer öffentlichen Adresse: Xray 26 verbietet das (und würde die ganze Datei ablehnen)</string>
 </resources>

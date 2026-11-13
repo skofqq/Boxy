@@ -1139,4 +1139,13 @@
     <string name="xray_no_vpn">No VPN</string>
     <string name="xray_mode_auto">AUTO</string>
     <string name="xray_mode_pinned">PINNED</string>
+    <string name="xsub_extra_item">Extra list \"%1$s\"</string>
+    <string name="xsub_extra_add">Add a list</string>
+    <string name="xsub_extra_add_sub">More share-link lists with a prefix of their own (e.g. white lists \"wl\")</string>
+    <string name="xsub_extra_prefix">Prefix (latin letters, digits)</string>
+    <string name="xsub_extra_add_msg">The servers become outbounds \"&lt;prefix&gt;-…\" in xray/subs/&lt;prefix&gt;.json. A config uses them only when its balancers select \"&lt;prefix&gt;-\"; several URLs may share a prefix.</string>
+    <string name="xsub_extra_bad_prefix">A prefix of latin letters or digits, not \"sub\"</string>
+    <string name="xsub_extra_bad_url">Enter the list\'s URL</string>
+    <string name="xsub_extra_remove_msg">Remove this list (%1$s)? Its servers go at the next update.</string>
+    <string name="xsub_skip_insecure">VLESS without TLS / REALITY to a public address: Xray 26 refuses it (and would reject the whole file)</string>
 </resources>

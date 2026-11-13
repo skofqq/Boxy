@@ -37,6 +37,50 @@ object CoreTools {
         return "$BOX/$dir/$name"
     }
 
+    /** Extra Xray subscriptions: xray/subs/<prefix>.json, outbounds "<prefix>-…". */
+    const val XRAY_SUBS = "$BOX/xray/subs"
+
+    /** Is [config] an Xray profile (xray/profiles/…), run on its own rather than with the whole folder? */
+    fun isXrayProfile(config: String) = config.startsWith("$BOX/xray/profiles/")
+
+    /** The extra subscription files [config] uses: its text selects "<prefix>-". */
+    private suspend fun usedXraySubs(config: String): List<String> {
+        val text = BoxModule.readFile(config).orEmpty()
+        return Shell.cmd("ls $XRAY_SUBS/*.json 2>/dev/null").exec().out.filter { f ->
+            val p = f.substringAfterLast('/').removeSuffix(".json")
+            p.isNotBlank() && text.contains("\"$p-")
+        }
+    }
+
+    /** Boxy's own files in xray/ (zz-boxy-*.json), sorted as Xray reads them. */
+    private fun boxyXrayFiles(): List<String> =
+        Shell.cmd("ls $BOX/xray/zz-boxy-*.json 2>/dev/null").exec().out.filter { it.isNotBlank() }.sorted()
+
+    /**
+     * Xray's arguments for [config] (the active one by default), as the module's xray_args builds them: the whole
+     * xray/ folder for a config in it, a profile alone with Boxy's files, plus the extra subscriptions it uses.
+     */
+    suspend fun xrayArgs(config: String? = null): String = withContext(Dispatchers.IO) {
+        val cfg = config ?: activeConfig("xray")
+        val parts = ArrayList<String>()
+        if (isXrayProfile(cfg)) {
+            parts += "-c ${q(cfg)}"
+            boxyXrayFiles().forEach { parts += "-c ${q(it)}" }
+        } else {
+            parts += "-confdir $BOX/xray"
+        }
+        usedXraySubs(cfg).forEach { parts += "-c ${q(it)}" }
+        parts.joinToString(" ")
+    }
+
+    /** The files of [xrayArgs] for reading them as Xray merges them. */
+    suspend fun xrayFiles(config: String? = null): List<String> = withContext(Dispatchers.IO) {
+        val cfg = config ?: activeConfig("xray")
+        val base = if (isXrayProfile(cfg)) listOf(cfg) + boxyXrayFiles()
+        else Shell.cmd("ls -a $BOX/xray 2>/dev/null").exec().out.filter { it.endsWith(".json") }.sorted().map { "$BOX/xray/$it" }
+        base + usedXraySubs(cfg)
+    }
+
     /**
      * sing-box re-reads its config on SIGHUP: it runs the check itself, keeps the old config when the new one fails,
      * and keeps the same process (and the module's iptables). The check is run first so a bad config is reported.
@@ -64,7 +108,7 @@ object CoreTools {
         val cmd = when (core) {
             "clash" -> "timeout 30 $BOX/bin/${choice.binary} -t -d $BOX/clash -f ${q(cfg)}"
             "sing-box" -> "timeout 30 $BOX/bin/sing-box check -D $BOX/sing-box -c ${q(cfg)} ${ConfigCheck.OVERRIDES_ARG}"
-            "xray" -> "XRAY_LOCATION_ASSET=$BOX/xray timeout 30 $BOX/bin/xray -test -confdir $BOX/xray"
+            "xray" -> "XRAY_LOCATION_ASSET=$BOX/xray timeout 30 $BOX/bin/xray -test ${xrayArgs(cfg)}"
             else -> "V2RAY_LOCATION_ASSET=$BOX/v2fly timeout 30 $BOX/bin/v2fly test -d $BOX/v2fly"
         }
         val r = Shell.cmd("$cmd 2>&1").exec()

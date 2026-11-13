@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">VPN なし</string>
     <string name="xray_mode_auto">自動</string>
     <string name="xray_mode_pinned">固定</string>
+    <string name="xsub_extra_item">追加リスト「%1$s」</string>
+    <string name="xsub_extra_add">リストを追加</string>
+    <string name="xsub_extra_add_sub">独自のプレフィックス付きの追加リンクリスト（例: ホワイトリスト「wl」）</string>
+    <string name="xsub_extra_prefix">プレフィックス（英字・数字）</string>
+    <string name="xsub_extra_add_msg">サーバーは xray/subs/&lt;プレフィックス&gt;.json の outbound「&lt;プレフィックス&gt;-…」になります。設定のバランサーが「&lt;プレフィックス&gt;-」を選ぶ場合のみ使われます。複数の URL で同じプレフィックスを使えます。</string>
+    <string name="xsub_extra_bad_prefix">英字か数字のプレフィックス（「sub」以外）</string>
+    <string name="xsub_extra_bad_url">リストの URL を入力してください</string>
+    <string name="xsub_extra_remove_msg">このリスト（%1$s）を削除しますか？ サーバーは次回の更新で消えます。</string>
+    <string name="xsub_skip_insecure">公開アドレスへの TLS / REALITY なしの VLESS: Xray 26 は禁止しています（ファイル全体が拒否されます）</string>
 </resources>

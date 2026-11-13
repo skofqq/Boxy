@@ -48,6 +48,9 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
     var url by remember { mutableStateOf("") }
     var status by remember { mutableStateOf<XraySubscription.Status?>(null) }
     var editUrl by remember { mutableStateOf(false) }
+    var extras by remember { mutableStateOf<List<XraySubscription.Extra>>(emptyList()) }
+    var addExtra by remember { mutableStateOf(false) }
+    var removeExtra by remember { mutableStateOf<XraySubscription.Extra?>(null) }
     var confirmMove by remember { mutableStateOf(false) }
     var taskTitle by remember { mutableStateOf<String?>(null) }
     val taskLines = remember { mutableStateListOf<String>() }
@@ -56,6 +59,7 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
     LaunchedEffect(core, reload) {
         url = XraySubscription.url()
         status = XraySubscription.status(core)
+        extras = if (core == "xray") XraySubscription.extras() else emptyList()
     }
     val updateTitle = stringResource(R.string.xsub_update)
     val appliedText = stringResource(R.string.xsub_applied)
@@ -63,7 +67,14 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
 
     SectionCard(stringResource(R.string.xsub_title), stringResource(R.string.xsub_sub)) {
         SettingsRow(BoxyIcons.Link, stringResource(R.string.xsub_url), url.ifBlank { stringResource(R.string.xsub_url_none) }) { editUrl = true }
-        if (url.isNotBlank()) {
+        // More lists with a prefix of their own (white lists "wl" and the like): only Xray.
+        if (core == "xray") {
+            extras.forEach { e ->
+                SettingsRow(BoxyIcons.Link, stringResource(R.string.xsub_extra_item, e.prefix), XraySubscription.maskUrl(e.url)) { removeExtra = e }
+            }
+            SettingsRow(BoxyIcons.Add, stringResource(R.string.xsub_extra_add), stringResource(R.string.xsub_extra_add_sub)) { addExtra = true }
+        }
+        if (url.isNotBlank() || extras.isNotEmpty()) {
             SettingsRow(
                 BoxyIcons.Refresh,
                 updateTitle,
@@ -128,6 +139,40 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
             onDismiss = { editUrl = false },
         )
     }
+    if (addExtra) {
+        InputDialog(
+            stringResource(R.string.xsub_extra_add),
+            listOf(stringResource(R.string.xsub_extra_prefix) to "wl", stringResource(R.string.xsub_url_hint) to ""),
+            message = stringResource(R.string.xsub_extra_add_msg),
+            validate = { v ->
+                when {
+                    XraySubscription.cleanPrefix(v[0]).isEmpty() || XraySubscription.cleanPrefix(v[0]) == "sub" -> context.getString(R.string.xsub_extra_bad_prefix)
+                    !v[1].trim().contains("://") -> context.getString(R.string.xsub_extra_bad_url)
+                    else -> null
+                }
+            },
+            onConfirm = { v ->
+                addExtra = false
+                scope.launch {
+                    XraySubscription.setExtras(extras + XraySubscription.Extra(XraySubscription.cleanPrefix(v[0]), v[1].trim()))
+                    reload++
+                }
+            },
+            onDismiss = { addExtra = false },
+        )
+    }
+    removeExtra?.let { e ->
+        ConfirmDialog(
+            stringResource(R.string.xsub_extra_item, e.prefix),
+            stringResource(R.string.xsub_extra_remove_msg, XraySubscription.maskUrl(e.url)),
+            stringResource(R.string.action_delete),
+            onConfirm = {
+                removeExtra = null
+                scope.launch { XraySubscription.setExtras(extras - e); reload++ }
+            },
+            onDismiss = { removeExtra = null },
+        )
+    }
     if (confirmMove) {
         ConfirmDialog(
             moveTitle,
@@ -164,6 +209,7 @@ internal fun skipText(context: android.content.Context, k: com.skofqq.boxy.confi
             com.skofqq.boxy.configs.ShareLinks.SkipReason.CORE -> R.string.xsub_skip_core
             com.skofqq.boxy.configs.ShareLinks.SkipReason.PORT -> R.string.xsub_skip_port
             com.skofqq.boxy.configs.ShareLinks.SkipReason.BROKEN -> R.string.xsub_skip_broken
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.INSECURE -> R.string.xsub_skip_insecure
         },
     )
     return context.getString(R.string.xsub_skip_line, k.name, k.scheme, why)

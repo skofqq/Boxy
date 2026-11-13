@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">Без VPN</string>
     <string name="xray_mode_auto">АВТО</string>
     <string name="xray_mode_pinned">ЗАКРІПЛЕНО</string>
+    <string name="xsub_extra_item">Дод. список «%1$s»</string>
+    <string name="xsub_extra_add">Додати список</string>
+    <string name="xsub_extra_add_sub">Ще списки посилань зі своїм префіксом (наприклад, білі списки «wl»)</string>
+    <string name="xsub_extra_prefix">Префікс (латиниця, цифри)</string>
+    <string name="xsub_extra_add_msg">Сервери стануть outbound\'ами «&lt;префікс&gt;-…» у xray/subs/&lt;префікс&gt;.json. Конфіг бере їх, лише якщо його балансувальники обирають «&lt;префікс&gt;-»; кілька посилань можуть мати один префікс.</string>
+    <string name="xsub_extra_bad_prefix">Префікс із латиниці або цифр, не «sub»</string>
+    <string name="xsub_extra_bad_url">Вкажіть адресу списку</string>
+    <string name="xsub_extra_remove_msg">Прибрати цей список (%1$s)? Його сервери зникнуть під час наступного оновлення.</string>
+    <string name="xsub_skip_insecure">VLESS без TLS / REALITY на публічну адресу: Xray 26 таке забороняє (і відхилив би весь файл)</string>
 </resources>

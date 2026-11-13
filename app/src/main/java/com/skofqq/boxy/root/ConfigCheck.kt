@@ -48,7 +48,9 @@ object ConfigCheck {
                 "[ -x \"\$b\" ] || exit 127; timeout 30 \"\$b\" -t -d ${q(dir)} -f ${q(file)} 2>&1"
             "sing-box" -> "b=$BOX/bin/sing-box; [ -x \"\$b\" ] || exit 127; timeout 30 \"\$b\" check -D ${q(dir)} -c ${q(file)} $OVERRIDES_ARG 2>&1"
             "xray" -> "b=$BOX/bin/xray; [ -x \"\$b\" ] || exit 127; " +
-                "XRAY_LOCATION_ASSET=${q(dir)} timeout 30 \"\$b\" run -test -c ${q(file)} 2>&1"
+                // A profile is checked with Boxy's files and the subscriptions it uses, as it would run.
+                "XRAY_LOCATION_ASSET=${q(dir)} timeout 30 \"\$b\" run -test " +
+                (if (CoreTools.isXrayProfile(file)) CoreTools.xrayArgs(file) else "-c ${q(file)}") + " 2>&1"
             "v2fly" -> "b=$BOX/bin/v2fly; [ -x \"\$b\" ] || exit 127; " +
                 "V2RAY_LOCATION_ASSET=${q(dir)} timeout 30 \"\$b\" test -c ${q(file)} 2>&1"
             // hysteria has no check command: Boxy checks the YAML, the server part and the module's blocks itself.

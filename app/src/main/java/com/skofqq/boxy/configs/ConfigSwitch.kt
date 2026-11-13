@@ -69,10 +69,13 @@ object ConfigSwitch {
     suspend fun list(): ConfigList {
         val core = BoxModule.readSetting("bin_name") ?: "clash"
         val (dir, key) = coreConfig(core)
-        val files = RootFiles.list("${BoxModule.BOX_DIR}/$dir")
-            .filter { !it.isDir && !it.name.startsWith(".") && it.extension in EXTENSIONS }
-            .map { it.name }
-            .sortedBy { it.lowercase() }
+        val files = (
+            RootFiles.list("${BoxModule.BOX_DIR}/$dir")
+                .filter { !it.isDir && !it.name.startsWith(".") && !it.name.startsWith("zz-boxy-") && it.extension in EXTENSIONS }
+                .map { it.name }
+                .sortedBy { it.lowercase() } +
+                (if (core == "xray") com.skofqq.boxy.ui.tools.xrayProfiles().map { it.name }.sorted() else emptyList())
+            )
         return ConfigList(core, BoxModule.readSetting(key), files)
     }
 

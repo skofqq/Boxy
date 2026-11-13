@@ -154,7 +154,10 @@ internal fun OpenBalancer(
         }
         Spacer(Modifier.height(12.dp))
         val auto = stringResource(R.string.xray_balancer_auto)
-        val tiles: List<String?> = listOf<String?>(null) + b.targets
+        // Auto, "No VPN", then the live servers by delay and the dead / untested ones last (lists can be long).
+        val direct = b.targets.filter { b.protocol(it) == "freedom" }
+        val servers = b.targets.filter { it !in direct }.sortedBy { t -> b.delay(t)?.takeIf { it > 0 } ?: Int.MAX_VALUE }
+        val tiles: List<String?> = listOf<String?>(null) + direct + servers
         tiles.chunked(2).forEach { pair ->
             Row(
                 Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 10.dp),

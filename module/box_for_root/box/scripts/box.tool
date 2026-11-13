@@ -44,6 +44,16 @@ if which curl >/dev/null; then
 fi
 
 # Updating files from URLs
+# A URL as the logs show it: public sources (GitHub, jsDelivr) as they are, anything else (a subscription
+# with its token) as the host only.
+mask_url() {
+  case "$1" in
+    https://github.com/*|https://raw.githubusercontent.com/*|https://api.github.com/*|https://objects.githubusercontent.com/*|https://cdn.jsdelivr.net/*|https://gist.githubusercontent.com/*)
+      echo "$1" ;;
+    *) echo "$1" | busybox sed -E 's#^([a-zA-Z]+://[^/?#]+).*#\1/***#' ;;
+  esac
+}
+
 upfile() {
   file="$1"
   update_url="$2"
@@ -65,21 +75,20 @@ upfile() {
     request+=" --connect-timeout 30 --max-time 180"
     request+=" -o ${file}"
     request+=" ${update_url}"
-    echo "${yellow}${request}${normal}"
+    echo "${yellow}${request% *} $(mask_url "${update_url}")${normal}"
   else
     request="busybox wget"
     request+=" --no-check-certificate"
     request+=" --user-agent ${user_agent}"
     request+=" -O ${file}"
     request+=" ${update_url}"
-    echo "${yellow}${request}${normal}"
+    echo "${yellow}${request% *} $(mask_url "${update_url}")${normal}"
   fi
   ${request} >&2 || {
     if [ -f "${file_bak}" ]; then
       mv "${file_bak}" "${file}" || true
     fi
-    request_url=$(echo "${request}" | sed -E 's/(token=[^&]{6})[^&]*/\1*****/')
-    log Error "Download ${request_url} failed"
+    log Error "Download $(mask_url "${update_url}") failed"
     return 1
   }
   return 0
@@ -106,6 +115,29 @@ restart_box() {
 }
 
 # sing-box user overrides (sing-box/.overrides/*.json, see box.service): checked together with the config.
+# The files Xray runs with. A config in xray/ itself: the whole folder (a config may be split into files), as
+# before. A config in xray/profiles/: that file alone with Boxy's files from xray/ (zz-boxy-*.json). Either way
+# the extra subscriptions (xray/subs/<prefix>.json, outbounds "<prefix>-…") the config uses, nothing else.
+xray_args() {
+  local d="${box_dir}/xray" f p
+  case "${xray_config}" in
+    "${d}"/profiles/*)
+      printf '%s' "-c ${xray_config}"
+      for f in "${d}"/zz-boxy-*.json; do
+        [ -f "${f}" ] && printf ' %s' "-c ${f}"
+      done
+      ;;
+    *) printf '%s' "-confdir ${d}" ;;
+  esac
+  for f in "${d}"/subs/*.json; do
+    [ -f "${f}" ] || continue
+    p="${f##*/}"
+    p="${p%.json}"
+    busybox grep -q "\"${p}-" "${xray_config}" && printf ' %s' "-c ${f}"
+  done
+  echo
+}
+
 sb_overrides() {
   ls "${box_dir}/sing-box/.overrides"/*.json >/dev/null 2>&1 && echo "-C ${box_dir}/sing-box/.overrides"
 }
@@ -157,7 +189,7 @@ check() {
       ;;
     xray)
       export XRAY_LOCATION_ASSET="${box_dir}/xray"
-      if ${bin_path} -test -confdir "${box_dir}/${bin_name}" 2>/dev/null; then
+      if ${bin_path} -test $(xray_args) 2>/dev/null; then
         log Info "Xray configuration passed"
       else
         log Error "Configuration check failed for xray"
@@ -442,7 +474,7 @@ geo_fetch() {
       return 0
     fi
   fi
-  log Info "Downloading ${url}"
+  log Info "Downloading $(mask_url "${url}")"
   if upfile "${file}" "${url}" && [ -s "${file}" ]; then
     rm -f "${file}.bak"
     # Sources without a .sha256sum are downloaded every time: only a different file counts as a change.
@@ -454,7 +486,7 @@ geo_fetch() {
     log Info "${file##*/} updated"
     return 0
   fi
-  log Error "Failed to download ${url}"
+  log Error "Failed to download $(mask_url "${url}")"
   return 1
 }
 
@@ -634,8 +666,7 @@ upsubs() {
               update_file_name="${update_file_name}.subscription"
             fi
 
-            # token_url="${sub_url:0:25}*****"
-            token_url=$(echo "$sub_url" | sed -E 's/(token=[^&]{6})[^&]*/\1*****/')
+            token_url=$(mask_url "${sub_url}")
             log Debug "Downloading ${token_url} → ${update_file_name}"
             if upfile "${update_file_name}" "${sub_url}"; then
               log Info "${update_file_name} saved"
@@ -747,7 +778,9 @@ upsubs() {
     "xray"|"v2fly")
       # A list of share links (base64 or plain). Boxy turns it into outbounds "sub-…" in
       # ${bin_name}/zz-boxy-subscription.json, checks the folder with the core and restarts it.
-      if [ -z "${subscription_url_xray}" ]; then
+      # subscription_extra_xray=("wl https://…" …): more lists, each "<prefix> <url>", saved per prefix as
+      # xray/subs/<prefix>.txt (several URLs of one prefix are joined) and turned into outbounds "<prefix>-…".
+      if [ -z "${subscription_url_xray}" ] && [ -z "${subscription_extra_xray[*]}" ]; then
         log Warning "${bin_name} subscription url is empty..."
         return 1
       fi
@@ -756,8 +789,48 @@ upsubs() {
         return 1
       fi
       log Info "${bin_name} daily updates subscription → $(date)"
+      local extra_ok=true got_extra=false
+      if [ "${bin_name}" = "xray" ] && [ -n "${subscription_extra_xray[*]}" ]; then
+        local sdir="${box_dir}/xray/subs" e pfx eurl part done_pfx=" "
+        mkdir -p "${sdir}"
+        for e in "${subscription_extra_xray[@]}"; do
+          pfx="${e%% *}"
+          [ -z "${pfx}" ] || [ "${pfx}" = "${e}" ] && continue
+          case "${done_pfx}" in *" ${pfx} "*) ;; *) : > "${sdir}/${pfx}.new"; done_pfx="${done_pfx}${pfx} " ;; esac
+          eurl="${e#* }"
+          part="${sdir}/${pfx}.part"
+          if upfile "${part}" "${eurl}" && [ -s "${part}" ]; then
+            # Plain lists are joined line by line; a base64 body is decoded first.
+            if busybox grep -q '://' "${part}"; then cat "${part}" >> "${sdir}/${pfx}.new"
+            else busybox base64 -d "${part}" >> "${sdir}/${pfx}.new" 2>/dev/null; fi
+            echo >> "${sdir}/${pfx}.new"
+          else
+            extra_ok=false
+          fi
+          rm -f "${part}" "${part}.bak"
+        done
+        for pfx in ${done_pfx}; do
+          if [ -s "${sdir}/${pfx}.new" ]; then
+            mv -f "${sdir}/${pfx}.new" "${sdir}/${pfx}.txt"
+            got_extra=true
+            log Info "subs/${pfx}.txt saved"
+          else
+            rm -f "${sdir}/${pfx}.new"
+          fi
+        done
+      fi
+      if [ -z "${subscription_url_xray}" ]; then
+        if [ "${got_extra}" = true ]; then
+          [ -z "${BOXY_NO_EVENT}" ] && am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.SUBS_LINKS \
+            -n com.skofqq.boxy/.notify.ModuleEventReceiver --es core "${bin_name}" >/dev/null 2>&1 &
+          return 0
+        fi
+        log Error "update subscription failed"
+        return 1
+      fi
       if upfile "${box_dir}/${bin_name}/subscription.txt" "${subscription_url_xray}"; then
         rm -f "${box_dir}/${bin_name}/subscription.txt.bak"
+        [ "${extra_ok}" = true ] || log Warning "some extra subscription lists could not be downloaded"
         log Info "subscription.txt saved, Boxy converts it into outbounds"
         [ -z "${BOXY_NO_EVENT}" ] && am broadcast --user current -f 0x10000020 -a com.skofqq.boxy.action.SUBS_LINKS \
           -n com.skofqq.boxy/.notify.ModuleEventReceiver --es core "${bin_name}" >/dev/null 2>&1 &
@@ -1070,7 +1143,7 @@ kernel_test_config() {
   case "${bin_name}" in
     clash) timeout 60 "${b}" -t -d "${box_dir}/clash" -f "${cfg}" > "${out}" 2>&1 ;;
     sing-box) timeout 60 "${b}" check -D "${box_dir}/sing-box" -c "${cfg}" $(sb_overrides) > "${out}" 2>&1 ;;
-    xray) XRAY_LOCATION_ASSET="${box_dir}/xray" timeout 60 "${b}" -test -confdir "${box_dir}/xray" > "${out}" 2>&1 ;;
+    xray) XRAY_LOCATION_ASSET="${box_dir}/xray" timeout 60 "${b}" -test $(xray_args) > "${out}" 2>&1 ;;
     v2fly) V2RAY_LOCATION_ASSET="${box_dir}/v2fly" timeout 60 "${b}" test -d "${box_dir}/v2fly" > "${out}" 2>&1 ;;
   esac || return 1
   return 0

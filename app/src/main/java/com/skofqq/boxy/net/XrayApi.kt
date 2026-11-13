@@ -73,15 +73,15 @@ object XrayApi {
 
     /** The confdir's JSON files (Xray reads them all, hidden ones too), read and merged as Xray does. */
     suspend fun setup(withoutPanel: Boolean = false): Setup = withContext(Dispatchers.IO) {
-        val panel = PANEL_FILE.substringAfterLast('/')
-        val names = Shell.cmd("ls -a $DIR 2>/dev/null").exec().out.filter { it.endsWith(".json") && !(withoutPanel && it == panel) }.sorted()
+        // The files the core runs with (the whole folder, or a profile with Boxy's files), as Xray merges them.
+        val names = com.skofqq.boxy.root.CoreTools.xrayFiles().filter { !(withoutPanel && it == PANEL_FILE) }
         val merged = JSONObject()
         val outbounds = ArrayList<Outbound>()
         val balancers = ArrayList<String>()
         val selectors = LinkedHashMap<String, List<String>>()
         val strategies = LinkedHashMap<String, String>()
         for (n in names) {
-            val text = BoxModule.readFile("$DIR/$n") ?: continue
+            val text = BoxModule.readFile(n) ?: continue
             val o = runCatching { JSONObject(text) }.getOrNull() ?: continue
             o.optJSONArray("outbounds")?.let { a ->
                 for (i in 0 until a.length()) a.optJSONObject(i)?.let { ob ->
@@ -234,7 +234,7 @@ object XrayApi {
         val s = setup(withoutPanel = true)
         val had = BoxModule.readFile(PANEL_FILE)
         if (!BoxModule.writeFile(PANEL_FILE, panelJson(s, withApi, accessLog))) return@withContext Result.failure(IllegalStateException("write"))
-        val r = Shell.cmd("XRAY_LOCATION_ASSET=$DIR timeout 30 $BOX/bin/xray -test -confdir $DIR 2>&1").exec()
+        val r = Shell.cmd("XRAY_LOCATION_ASSET=$DIR timeout 30 $BOX/bin/xray -test ${com.skofqq.boxy.root.CoreTools.xrayArgs()} 2>&1").exec()
         if (!r.isSuccess) {
             if (had != null) BoxModule.writeFile(PANEL_FILE, had) else Shell.cmd("rm -f ${q(PANEL_FILE)}").exec()
             return@withContext Result.failure(
@@ -334,8 +334,8 @@ object XrayApi {
         val now = System.currentTimeMillis()
         if (tags.isEmpty()) return@withContext Tested(emptyMap(), now)
         val outbounds = JSONArray()
-        Shell.cmd("ls -a $DIR 2>/dev/null").exec().out.filter { it.endsWith(".json") }.sorted().forEach { n ->
-            val o = BoxModule.readFile("$DIR/$n")?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return@forEach
+        com.skofqq.boxy.root.CoreTools.xrayFiles().forEach { n ->
+            val o = BoxModule.readFile(n)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return@forEach
             o.optJSONArray("outbounds")?.let { a -> for (i in 0 until a.length()) a.optJSONObject(i)?.let { outbounds.put(it) } }
         }
         val inbounds = JSONArray()
@@ -380,24 +380,33 @@ object XrayApi {
     fun lastProbe(m: Metrics?, tag: String): Long? = m?.outbounds?.firstOrNull { it.tag == tag }?.probedAt
 
     /**
-     * Pins made in Boxy, "balancer<TAB>outbound" per line. Xray keeps an override only while it runs, so Boxy puts
+     * Pins made in Boxy, "config<TAB>balancer<TAB>outbound" per line. Xray keeps an override only while it runs, so Boxy puts
      * them back after a start ([restorePins]). A .txt file: Xray's confdir reads only its config formats.
      */
     const val PINS_FILE = "$DIR/boxy-pins.txt"
 
-    suspend fun pins(): Map<String, String> = withContext(Dispatchers.IO) {
-        BoxModule.readFile(PINS_FILE).orEmpty().lines().mapNotNull { l ->
+    /** All remembered pins: config name -> (balancer -> outbound). Each config keeps its own. */
+    private suspend fun allPins(): Map<String, Map<String, String>> = withContext(Dispatchers.IO) {
+        val out = LinkedHashMap<String, LinkedHashMap<String, String>>()
+        BoxModule.readFile(PINS_FILE).orEmpty().lines().forEach { l ->
             val p = l.split('\t')
-            if (p.size == 2 && p[0].isNotBlank() && p[1].isNotBlank()) p[0] to p[1] else null
-        }.toMap()
+            if (p.size == 3 && p.all { it.isNotBlank() }) out.getOrPut(p[0]) { LinkedHashMap() }[p[1]] = p[2]
+        }
+        out
     }
 
-    /** Remembers (or with null forgets) the pin of [balancer]. */
+    private suspend fun activeName(): String = BoxModule.unquote(BoxModule.readSetting("name_xray_config")).orEmpty().ifBlank { "config.json" }
+
+    /** Pins of the active config. */
+    suspend fun pins(): Map<String, String> = allPins()[activeName()].orEmpty()
+
+    /** Remembers (or with null forgets) the pin of [balancer] for the active config. */
     suspend fun savePin(balancer: String, target: String?) {
-        val all = pins().toMutableMap()
-        if (target == null) all.remove(balancer) else all[balancer] = target
-        if (all.isEmpty()) Shell.cmd("rm -f ${q(PINS_FILE)}").exec()
-        else BoxModule.writeFile(PINS_FILE, all.entries.joinToString("") { "${it.key}\t${it.value}\n" })
+        val all = allPins().mapValues { it.value.toMutableMap() }.toMutableMap()
+        val mine = all.getOrPut(activeName()) { mutableMapOf() }
+        if (target == null) mine.remove(balancer) else mine[balancer] = target
+        val text = all.entries.joinToString("") { (cfg, m) -> m.entries.joinToString("") { "$cfg\t${it.key}\t${it.value}\n" } }
+        if (text.isEmpty()) Shell.cmd("rm -f ${q(PINS_FILE)}").exec() else BoxModule.writeFile(PINS_FILE, text)
     }
 
     /**

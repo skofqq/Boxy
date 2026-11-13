@@ -363,6 +363,29 @@ dnscrypt_dir="${box_dir}/dnscrypt"
 dnscrypt_bin="${bin_dir}/dnscrypt-proxy"
 dnscrypt_pid="${box_run}/dnscrypt.pid"
 
+# The files Xray runs with. A config in xray/ itself: the whole folder (a config may be split into files), as
+# before. A config in xray/profiles/: that file alone with Boxy's files from xray/ (zz-boxy-*.json). Either way
+# the extra subscriptions (xray/subs/<prefix>.json, outbounds "<prefix>-…") the config uses, nothing else.
+xray_args() {
+  local d="${box_dir}/xray" f p
+  case "${xray_config}" in
+    "${d}"/profiles/*)
+      printf '%s' "-c ${xray_config}"
+      for f in "${d}"/zz-boxy-*.json; do
+        [ -f "${f}" ] && printf ' %s' "-c ${f}"
+      done
+      ;;
+    *) printf '%s' "-confdir ${d}" ;;
+  esac
+  for f in "${d}"/subs/*.json; do
+    [ -f "${f}" ] || continue
+    p="${f##*/}"
+    p="${p%.json}"
+    busybox grep -q "\"${p}-" "${xray_config}" && printf ' %s' "-c ${f}"
+  done
+  echo
+}
+
 box_dnscrypt() {
   case "$1" in
     start)
@@ -732,8 +755,10 @@ box_run_bin() {
       export SSL_CERT_DIR="${go_cert_dirs}"
       # The access log (when Boxy turned it on) starts empty with every run.
       [ -f "${box_run}/xray-access.log" ] && : > "${box_run}/xray-access.log"
-      if ${bin_path} -test -confdir "${box_dir}/${bin_name}" > "${box_run}/${bin_name}.log" 2>&1; then
-        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run -confdir "${box_dir}/${bin_name}" > "${bin_log}" 2>&1 &
+      local xargs
+      xargs=$(xray_args)
+      if ${bin_path} -test ${xargs} > "${box_run}/${bin_name}.log" 2>&1; then
+        nohup busybox setuidgid "${box_user_group}" "${bin_path}" run ${xargs} > "${bin_log}" 2>&1 &
         PID=$!
         echo -n $PID > "${box_pid}"
         sleep 1

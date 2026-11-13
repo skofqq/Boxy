@@ -78,6 +78,10 @@ fun coreConfig(core: String): Pair<String, String> = when (core) {
 
 private val CONFIG_EXTENSIONS = setOf("yaml", "yml", "json")
 
+/** Configs in xray/profiles/, named "profiles/<file>" as settings.ini name_xray_config takes them. */
+suspend fun xrayProfiles(): List<RootFile> =
+    RootFiles.list("${BoxModule.BOX_DIR}/xray/profiles").filter { !it.isDir && it.extension == "json" }.map { it.copy(name = "profiles/${it.name}") }
+
 /** Choose the active config of the current core. */
 @Composable
 fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String) -> Unit, onManage: (String) -> Unit) {
@@ -100,6 +104,11 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
             // Hysteria profiles switch at once: the running core restarts with the chosen one.
             if (if (c == "hysteria") HysteriaProfiles.activate(f.name) else BoxModule.writeSetting(coreConfig(c).second, f.name)) {
                 active = f.name
+                // Xray has no reload: a running core restarts with the chosen config.
+                if (c == "xray") {
+                    val st = BoxModule.state()
+                    if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
+                }
                 Toast.makeText(context, context.getString(R.string.config_selected, f.name), Toast.LENGTH_SHORT).show()
             }
         }
@@ -124,7 +133,9 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
         val all = RootFiles.list("${BoxModule.BOX_DIR}/$dir")
         folders = all.filter { it.isDir && !it.name.startsWith(".") }
         // Boxy's own Xray files (panel, subscription) are not configs to pick.
-        files = all.filter { !it.isDir && !it.name.startsWith(".") && !it.name.startsWith("zz-boxy-") && it.extension in CONFIG_EXTENSIONS }
+        files = all.filter { !it.isDir && !it.name.startsWith(".") && !it.name.startsWith("zz-boxy-") && it.extension in CONFIG_EXTENSIONS } +
+            // Xray profiles: configs that run on their own, not merged with the rest of xray/.
+            (if (c == "xray") xrayProfiles() else emptyList())
         overrides = if (c == "sing-box") RootFiles.exists(SingBoxOverrides.FILE) else null
     }
     val dir = "${BoxModule.BOX_DIR}/${coreConfig(core ?: "clash").first}"

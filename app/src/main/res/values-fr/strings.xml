@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">Sans VPN</string>
     <string name="xray_mode_auto">AUTO</string>
     <string name="xray_mode_pinned">ÉPINGLÉ</string>
+    <string name="xsub_extra_item">Liste en plus « %1$s »</string>
+    <string name="xsub_extra_add">Ajouter une liste</string>
+    <string name="xsub_extra_add_sub">D\'autres listes de liens avec leur propre préfixe (p. ex. listes blanches « wl »)</string>
+    <string name="xsub_extra_prefix">Préfixe (lettres latines, chiffres)</string>
+    <string name="xsub_extra_add_msg">Les serveurs deviennent des outbounds « &lt;préfixe&gt;-… » dans xray/subs/&lt;préfixe&gt;.json. Une config ne les utilise que si ses répartiteurs choisissent « &lt;préfixe&gt;- » ; plusieurs URL peuvent partager un préfixe.</string>
+    <string name="xsub_extra_bad_prefix">Un préfixe en lettres latines ou chiffres, pas « sub »</string>
+    <string name="xsub_extra_bad_url">Saisissez l\'URL de la liste</string>
+    <string name="xsub_extra_remove_msg">Retirer cette liste (%1$s) ? Ses serveurs disparaissent à la prochaine mise à jour.</string>
+    <string name="xsub_skip_insecure">VLESS sans TLS / REALITY vers une adresse publique : Xray 26 l\'interdit (et rejetterait tout le fichier)</string>
 </resources>

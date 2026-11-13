@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">VPN\'siz</string>
     <string name="xray_mode_auto">OTO</string>
     <string name="xray_mode_pinned">SABİT</string>
+    <string name="xsub_extra_item">Ek liste “%1$s”</string>
+    <string name="xsub_extra_add">Liste ekle</string>
+    <string name="xsub_extra_add_sub">Kendi önekiyle başka bağlantı listeleri (ör. beyaz listeler “wl”)</string>
+    <string name="xsub_extra_prefix">Önek (Latin harfler, rakamlar)</string>
+    <string name="xsub_extra_add_msg">Sunucular xray/subs/&lt;önek&gt;.json içinde “&lt;önek&gt;-…” outbound\'larına dönüşür. Bir yapılandırma bunları yalnızca dengeleyicileri “&lt;önek&gt;-” seçtiğinde kullanır; birden çok URL aynı öneki paylaşabilir.</string>
+    <string name="xsub_extra_bad_prefix">Latin harf veya rakamlardan bir önek, “sub” değil</string>
+    <string name="xsub_extra_bad_url">Listenin URL\'sini girin</string>
+    <string name="xsub_extra_remove_msg">Bu liste (%1$s) kaldırılsın mı? Sunucuları bir sonraki güncellemede gider.</string>
+    <string name="xsub_skip_insecure">Herkese açık adrese TLS / REALITY olmadan VLESS: Xray 26 buna izin vermez (ve tüm dosyayı reddederdi)</string>
 </resources>

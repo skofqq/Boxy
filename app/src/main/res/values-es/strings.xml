@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">Sin VPN</string>
     <string name="xray_mode_auto">AUTO</string>
     <string name="xray_mode_pinned">FIJADO</string>
+    <string name="xsub_extra_item">Lista extra «%1$s»</string>
+    <string name="xsub_extra_add">Añadir lista</string>
+    <string name="xsub_extra_add_sub">Más listas de enlaces con su propio prefijo (p. ej. listas blancas «wl»)</string>
+    <string name="xsub_extra_prefix">Prefijo (letras latinas, dígitos)</string>
+    <string name="xsub_extra_add_msg">Los servidores pasan a ser outbounds «&lt;prefijo&gt;-…» en xray/subs/&lt;prefijo&gt;.json. Una configuración los usa solo si sus balanceadores eligen «&lt;prefijo&gt;-»; varias URL pueden compartir prefijo.</string>
+    <string name="xsub_extra_bad_prefix">Un prefijo de letras latinas o dígitos, no «sub»</string>
+    <string name="xsub_extra_bad_url">Introduce la URL de la lista</string>
+    <string name="xsub_extra_remove_msg">¿Quitar esta lista (%1$s)? Sus servidores desaparecen en la próxima actualización.</string>
+    <string name="xsub_skip_insecure">VLESS sin TLS / REALITY a una dirección pública: Xray 26 lo prohíbe (y rechazaría todo el archivo)</string>
 </resources>

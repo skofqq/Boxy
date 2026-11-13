@@ -11,7 +11,16 @@ import org.json.JSONObject
  * and listed by name with the reason: V2Ray has no REALITY, XTLS flow, XHTTP or Hysteria.
  */
 object ShareLinks {
-    enum class SkipReason { SCHEME, CORE, PORT, BROKEN }
+    enum class SkipReason { SCHEME, CORE, PORT, BROKEN, INSECURE }
+
+    /** Xray 26 refuses VLESS without TLS / REALITY / encryption to a public address, and with it the whole file. */
+    private class Insecure : Exception()
+
+    private fun privateHost(h: String): Boolean {
+        val p = h.split('.').mapNotNull { it.toIntOrNull() }
+        if (p.size != 4) return h == "localhost"
+        return p[0] == 10 || p[0] == 127 || (p[0] == 172 && p[1] in 16..31) || (p[0] == 192 && p[1] == 168) || (p[0] == 100 && p[1] in 64..127)
+    }
 
     /** A link that did not become an outbound: its name as the subscription shows it, its scheme and why. */
     data class Skipped(val name: String, val scheme: String, val reason: SkipReason)
@@ -20,11 +29,14 @@ object ShareLinks {
 
     const val TAG_PREFIX = "sub-"
 
+    private val SCHEME_LINE = Regex("^[A-Za-z][A-Za-z0-9+.-]*://")
+
     /** The links of a subscription body (base64-encoded or plain). */
     fun links(body: String): List<String> {
         val text = body.trim()
         val plain = if (Regex("^[A-Za-z0-9+/=_\\-\\s]+$").matches(text) && !text.contains("://")) decode(text) ?: text else text
-        return plain.lines().map { it.trim() }.filter { it.contains("://") }
+        // Only lines that start with a scheme: lists put "support-url: https://…" and the like in headers.
+        return plain.lines().map { it.trim() }.filter { SCHEME_LINE.containsMatchIn(it) }
     }
 
     /** Base64 in either alphabet, padded or not. */
@@ -33,7 +45,7 @@ object ShareLinks {
         String(Base64.decode(clean + "=".repeat((4 - clean.length % 4) % 4), Base64.DEFAULT), Charsets.UTF_8)
     }.getOrNull()
 
-    fun convert(body: String, core: String): Result {
+    fun convert(body: String, core: String, prefix: String = TAG_PREFIX): Result {
         val out = ArrayList<JSONObject>()
         val skipped = ArrayList<Skipped>()
         val used = HashSet<String>()
@@ -43,6 +55,7 @@ object ShareLinks {
             val o = parsed.getOrNull()
             val reason = when {
                 scheme !in SCHEMES -> SkipReason.SCHEME
+                parsed.exceptionOrNull() is Insecure -> SkipReason.INSECURE
                 parsed.isFailure -> SkipReason.BROKEN
                 o == null -> if (core == "xray") SkipReason.BROKEN else SkipReason.CORE
                 !portOk(o) -> SkipReason.PORT
@@ -50,7 +63,7 @@ object ShareLinks {
             }
             if (reason != null || o == null) { skipped.add(Skipped(linkName(link), scheme, reason ?: SkipReason.BROKEN)); continue }
             // Unique tags: the name from the link, numbered when it repeats.
-            val base = TAG_PREFIX + (o.optString("tag").ifBlank { "node" })
+            val base = prefix + (o.optString("tag").ifBlank { "node" })
             var tag = base
             var n = 2
             while (!used.add(tag)) tag = "$base-${n++}"
@@ -160,6 +173,8 @@ object ShareLinks {
         val o = JSONObject().put("tag", name(u.fragment, host)).put("protocol", "vless")
             .put("settings", JSONObject().put("vnext", JSONArray().put(JSONObject().put("address", host).put("port", u.port).put("users", JSONArray().put(user)))))
         o.put("streamSettings", stream(q(u, "type"), q(u, "security"), { q(u, it) }, core) ?: return null)
+        val plain = (q(u, "security") ?: "none").equals("none", true) && (q(u, "encryption") ?: "none").equals("none", true)
+        if (core == "xray" && plain && !privateHost(host)) throw Insecure()
         return o
     }
 

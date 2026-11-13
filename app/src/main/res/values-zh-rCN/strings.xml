@@ -1116,4 +1116,13 @@
     <string name="xray_no_vpn">不走 VPN</string>
     <string name="xray_mode_auto">自动</string>
     <string name="xray_mode_pinned">已固定</string>
+    <string name="xsub_extra_item">附加列表“%1$s”</string>
+    <string name="xsub_extra_add">添加列表</string>
+    <string name="xsub_extra_add_sub">带自己前缀的更多链接列表（例如白名单“wl”）</string>
+    <string name="xsub_extra_prefix">前缀（拉丁字母、数字）</string>
+    <string name="xsub_extra_add_msg">服务器会成为 xray/subs/&lt;前缀&gt;.json 中的 outbound“&lt;前缀&gt;-…”。只有当配置的负载均衡器选择“&lt;前缀&gt;-”时才会使用；多个 URL 可共用一个前缀。</string>
+    <string name="xsub_extra_bad_prefix">由拉丁字母或数字组成的前缀，不能是“sub”</string>
+    <string name="xsub_extra_bad_url">请输入列表地址</string>
+    <string name="xsub_extra_remove_msg">移除此列表（%1$s）？其服务器将在下次更新时消失。</string>
+    <string name="xsub_skip_insecure">指向公网地址且无 TLS / REALITY 的 VLESS：Xray 26 禁止这种用法（并会拒绝整个文件）</string>
 </resources>
