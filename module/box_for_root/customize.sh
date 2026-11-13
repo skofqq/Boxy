@@ -384,6 +384,29 @@ if [ "${backup_box}" = "true" ]; then
     restore_config "$dir"
   done
 
+  # The module's old placeholders / examples that cannot run on current cores (an empty mihomo config, the
+  # sing-box "# Please enter..." text, Xray's example with allowInsecure) give way to the new commented examples,
+  # but only when they are byte for byte the shipped ones: a config the user touched is never replaced.
+  replace_shipped() {
+    local name="$1" f="/data/adb/box/$1" h s
+    shift
+    [ -f "${f}" ] || return 0
+    h=$(sha256sum "${f}" | awk '{print $1}')
+    for s in "$@"; do
+      if [ "${h}" = "${s}" ]; then
+        unzip -p "$ZIPFILE" "box/${name}" > "${f}" && ui_print "     ↳  ${name}: $(t 'the new example config' 'новый пример конфигурации')"
+        return 0
+      fi
+    done
+    # sing-box / mihomo: a file of nothing but # lines is a placeholder whatever its wording (it holds no setting).
+    if { [ "${name}" = "sing-box/config.json" ] || [ "${name}" = "clash/config.yaml" ]; } && ! grep -qvE '^[[:space:]]*(#.*)?$' "${f}"; then
+      unzip -p "$ZIPFILE" "box/${name}" > "${f}" && ui_print "     ↳  ${name}: $(t 'the new example config' 'новый пример конфигурации')"
+    fi
+  }
+  replace_shipped clash/config.yaml 062387eba3620611c1d99f49a94b8355082ea69297bf12cf44e22fe2f4cddb5f
+  replace_shipped xray/config.json 9e6b1f8b3f72153b73f57ea03444fd881b7392d357b8ad05be6c0f451d018069
+  replace_shipped sing-box/config.json e76e85f894100895fb1b39819f33b1dd2a61e26bd0bd1180643c84e9dc64bfa7
+
   restore_kernel() {
     kernel_name="$1"
     if [ ! -f "/data/adb/box/bin/$kernel_name" ] && [ -f "${temp_dir}/bin/${kernel_name}" ]; then

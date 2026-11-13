@@ -1,3 +1,75 @@
-# Please enter or replace with your configuration here,
-# 请在此输入或替换为你的配置,
-# Silahkan masukkan atau ganti dengan konfigurasi kamu di sini,
+# Box for Root: example mihomo (clash) config. It has no proxy server yet, so everything goes DIRECT.
+# Import a subscription in Boxy (Tools → Import subscription) or replace this file with your own config.
+# Every option is described in clash/config_docs.yaml.
+
+# Ports the module sends the phone's traffic to; kept in sync with settings.ini (tproxy_port, redir_port).
+tproxy-port: 9898
+redir-port: 9797
+# A port for apps that use a proxy themselves (HTTP and SOCKS5). Boxy → Tools → Proxy authentication adds a login.
+mixed-port: 7890
+# Accept connections from other devices (hotspot clients): false keeps the ports to this phone.
+allow-lan: false
+# rule: by the rules below; global: everything through one proxy; direct: nothing through a proxy.
+mode: rule
+# Log level: silent, error, warning, info, debug. The log is /data/adb/box/run/clash.log
+log-level: warning
+# IPv6 traffic (also settings.ini ipv6).
+ipv6: false
+# The panel's API and its address; secret protects it.
+external-controller: 127.0.0.1:9090
+external-ui: ./dashboard
+secret: ""
+
+dns:
+  enable: true
+  # The module redirects the apps' DNS (port 53) here. Port 53 itself stays free for the Wi-Fi hotspot.
+  listen: 0.0.0.0:1053
+  # fake-ip answers with addresses from fake-ip-range and finds the real ones later (fast); redir-host resolves for real.
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  # Resolvers for the servers' own domain names (plain IPs, so they need no DNS themselves).
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  # Resolvers for everything else (DNS-over-HTTPS here).
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://dns.google/dns-query
+
+# Your servers, for example (all REPLACE_ME values are yours to fill in):
+# - name: my-server              # the name the groups and rules refer to
+#   type: vless                  # vless, vmess, trojan, ss, hysteria2, tuic, ...
+#   server: REPLACE_ME.example.com
+#   port: 443
+#   uuid: REPLACE_ME
+#   network: tcp
+#   tls: true
+#   flow: xtls-rprx-vision
+#   servername: REPLACE_ME.example.com
+#   client-fingerprint: chrome
+#   reality-opts:
+#     public-key: REPLACE_ME
+#     short-id: REPLACE_ME
+proxies: []
+
+# Or a subscription that mihomo downloads and updates itself:
+# proxy-providers:
+#   my-sub:
+#     type: http
+#     url: "https://REPLACE_ME.example.com/sub"
+#     interval: 3600
+#     path: ./proxy_providers/my-sub.yaml
+#     health-check: { enable: true, url: "https://www.gstatic.com/generate_204", interval: 300 }
+
+# Groups to choose a server in (the panel switches them). With servers above, list them in "proxies" or use
+# "use: [my-sub]" for a provider.
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - DIRECT
+
+# Rules are checked top down; MATCH takes the rest.
+rules:
+  - GEOIP,private,DIRECT,no-resolve
+  - MATCH,PROXY

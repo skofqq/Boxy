@@ -1,3 +1,59 @@
-# Please enter or replace with your configuration here,
-# 请在此输入或替换为你的配置,
-# Silahkan masukkan atau ganti dengan konfigurasi kamu di sini,
+// Box for Root: example sing-box config (sing-box 1.12+). It has no proxy server yet, so everything goes direct.
+// Import a subscription in Boxy (Tools → Import subscription) or replace this file with your own config.
+// Note: the module removes whole-line comments when it edits the config at the first start; the commented
+// copy stays in sing-box/config.example.jsonc.
+{
+  // Log level: trace, debug, info, warn, error, fatal, panic. The log is /data/adb/box/run/sing-box.log
+  "log": {
+    "level": "warn"
+  },
+  // DNS servers. "local" asks Android's own resolver; add e.g. { "type": "https", "tag": "doh", "server": "1.1.1.1" }
+  // and set "final" to its tag to resolve through it.
+  "dns": {
+    "servers": [
+      {
+        "type": "local",
+        "tag": "local"
+      }
+    ]
+  },
+  // Where traffic comes in. The module sends the phone's traffic to the tproxy port of settings.ini (tproxy_port)
+  // and keeps listen_port in sync with it. In tun / mixed mode the module adds a tun inbound itself.
+  "inbounds": [
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "::",
+      "listen_port": 9898
+    }
+  ],
+  // Where traffic goes. Put your server first, for example (all REPLACE_ME values are yours to fill in):
+  // {
+  //   "type": "vless",                  // vless, vmess, trojan, shadowsocks, hysteria2, tuic, ...
+  //   "tag": "proxy",                   // the name the route below refers to
+  //   "server": "REPLACE_ME.example.com",
+  //   "server_port": 443,
+  //   "uuid": "REPLACE_ME",
+  //   "flow": "xtls-rprx-vision",
+  //   "tls": {
+  //     "enabled": true,
+  //     "server_name": "REPLACE_ME.example.com",
+  //     "utls": { "enabled": true, "fingerprint": "chrome" },
+  //     "reality": { "enabled": true, "public_key": "REPLACE_ME", "short_id": "REPLACE_ME" }
+  //   }
+  // },
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  // Routing: rules are checked top down, "final" takes the rest. With a server above, set "final": "proxy".
+  "route": {
+    "final": "direct",
+    // Leaves the device through its current network (needed on Android).
+    "auto_detect_interface": true,
+    // The DNS server used to resolve the servers' own domain names.
+    "default_domain_resolver": "local"
+  }
+}

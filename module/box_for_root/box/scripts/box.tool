@@ -183,17 +183,37 @@ upfile() {
   if [ "${use_ghproxy}" == true ] && [[ "${update_url}" == @(https://github.com/*|https://raw.githubusercontent.com/*|https://gist.github.com/*|https://gist.githubusercontent.com/*) ]]; then
     update_url="${url_ghproxy}/${update_url}"
   fi
-  local rc=6
+  # Subscriptions (not GitHub and the like) get the device id Boxy keeps in .hwid, for panels with a device limit
+  # (Remnawave: x-hwid, x-device-os, x-ver-os). Never shown in the log.
+  local rc=6 hw="" os="" ver=""
+  case "$(mask_url "${update_url}")" in
+    *'/***') if [ -s "${box_dir}/.hwid" ]; then
+               hw=$(head -n 1 "${box_dir}/.hwid" | tr -cd 'A-Za-z0-9=-' | cut -c1-64)
+               os="Android"
+               ver=$(getprop ro.build.version.release)
+             fi ;;
+  esac
   if [ -n "${curl_bin}" ]; then
     echo "${yellow}curl --fail -o ${file} $(mask_url "${update_url}")${normal}"
-    curl_req "${update_url}" --progress-bar --fail --user-agent "${user_agent}" \
-      --connect-timeout 30 --max-time 300 -o "${file}" >&2
+    if [ -n "${hw}" ]; then
+      curl_req "${update_url}" --progress-bar --fail --user-agent "${user_agent}" \
+        -H "x-hwid: ${hw}" -H "x-device-os: ${os}" -H "x-ver-os: ${ver}" \
+        --connect-timeout 30 --max-time 300 -o "${file}" >&2
+    else
+      curl_req "${update_url}" --progress-bar --fail --user-agent "${user_agent}" \
+        --connect-timeout 30 --max-time 300 -o "${file}" >&2
+    fi
     rc=$?
   fi
   if [ ${rc} -eq 6 ]; then
     echo "${yellow}busybox wget -T 30 -O ${file} $(mask_url "${update_url}")${normal}"
     wget_warn "${update_url}" "$([ -n "${curl_bin}" ] && echo "curl could not resolve the name" || echo "no curl (box.tool upcurl)")"
-    busybox wget -T 30 --user-agent "${user_agent}" -O "${file}" "${update_url}" >&2
+    if [ -n "${hw}" ]; then
+      busybox wget -T 30 --user-agent "${user_agent}" --header "x-hwid: ${hw}" --header "x-device-os: ${os}" \
+        --header "x-ver-os: ${ver}" -O "${file}" "${update_url}" >&2
+    else
+      busybox wget -T 30 --user-agent "${user_agent}" -O "${file}" "${update_url}" >&2
+    fi
     rc=$?
   fi
   if [ ${rc} -ne 0 ]; then
@@ -1702,6 +1722,65 @@ touch -n > $path_webroot
   fi
 }
 
+# Xray 26 refuses to start with tlsSettings.allowInsecure ("migrated to pinnedPeerCertSha256"). An outbound with
+# allowInsecure: true gets pinnedPeerCertSha256 = the SHA-256 of the certificate its server presents now (curl
+# fetches it without checking, xray tls hash computes the value Xray compares), so it keeps connecting to a server
+# with a self-signed certificate, and only to that one. allowInsecure: false is dropped. A server that cannot be
+# reached is left to normal certificate checks. The file is kept as <file>.allowinsecure.bak; it is rewritten by
+# yq, so its // comments go (Boxy's "Fix" keeps them).
+cert_sha256() {
+  local sni="$1" host="$2" port="$3" ip pem="${box_run}/peer.pem" c="${curl_bin:-${bin_dir}/curl}"
+  [ -x "${c}" ] || command -v "${c}" >/dev/null 2>&1 || return 1
+  sys_dns >/dev/null
+  ip=$(resolve_host "${host}" | busybox awk '{print $1}')
+  [ -n "${ip}" ] || return 1
+  "${c}" -k -s --connect-timeout 8 --max-time 12 --resolve "${sni}:${port}:${ip}" -o /dev/null -w '%{certs}' \
+    "https://${sni}:${port}/" > "${pem}" 2>/dev/null
+  busybox awk '/BEGIN CERTIFICATE/{n++} n==1' "${pem}" | busybox sed '/END CERTIFICATE/q' > "${pem}.leaf"
+  [ -s "${pem}.leaf" ] && "${bin_dir}/xray" tls hash --cert "${pem}.leaf" 2>/dev/null | busybox awk '/SHA256/{print $NF; exit}'
+  rm -f "${pem}" "${pem}.leaf"
+}
+
+xray_fix_insecure() {
+  local f="$1" tmp="${box_run}/xfix.json" yq="yq" i val tag sni host port hash o
+  [ -f "${f}" ] && busybox grep -q '"allowInsecure"' "${f}" || return 0
+  command -v yq >/dev/null 2>&1 || yq="${box_dir}/bin/yq"
+  busybox sed -E 's#^[[:space:]]*//.*$##' "${f}" > "${tmp}"
+  if ! ${yq} -p=json -o=json '.' "${tmp}" >/dev/null 2>&1; then
+    log Warning "[allowInsecure] ${f##*/} cannot be read here: fix it in Boxy (Configs → the file → Fix)"
+    rm -f "${tmp}"
+    return 1
+  fi
+  for i in $(${yq} -p=json -oy '(.outbounds // []) | to_entries | .[] | select(.value.streamSettings.tlsSettings.allowInsecure != null) | .key' "${tmp}"); do
+    o=".outbounds[${i}]"
+    val=$(${yq} -p=json -oy "${o}.streamSettings.tlsSettings.allowInsecure" "${tmp}")
+    tag=$(${yq} -p=json -oy "${o}.tag // \"#${i}\"" "${tmp}")
+    if [ "${val}" = "true" ] && [ -z "$(${yq} -p=json -oy "${o}.streamSettings.tlsSettings.pinnedPeerCertSha256 // \"\"" "${tmp}")" ]; then
+      host=$(${yq} -p=json -oy "${o}.settings | (.vnext[0].address // .servers[0].address // .address // \"\")" "${tmp}")
+      port=$(${yq} -p=json -oy "${o}.settings | (.vnext[0].port // .servers[0].port // .port // 443)" "${tmp}")
+      sni=$(${yq} -p=json -oy "${o}.streamSettings.tlsSettings.serverName // \"\"" "${tmp}")
+      [ -z "${sni}" ] && sni="${host}"
+      hash=""
+      [ -n "${host}" ] && hash=$(cert_sha256 "${sni}" "${host}" "${port}")
+      if [ -n "${hash}" ]; then
+        ${yq} -i -p=json -o=json "${o}.streamSettings.tlsSettings.pinnedPeerCertSha256 = \"${hash}\"" "${tmp}"
+        log Info "[allowInsecure] ${tag}: pinned to the certificate its server presents now"
+      else
+        log Warning "[allowInsecure] ${tag}: server not reachable, its certificate is now checked normally"
+      fi
+    fi
+    ${yq} -i -p=json -o=json "del(${o}.streamSettings.tlsSettings.allowInsecure)" "${tmp}"
+  done
+  if busybox grep -q '"allowInsecure"' "${tmp}"; then
+    log Warning "[allowInsecure] ${f##*/} has it outside the outbounds' tlsSettings: fix it in Boxy"
+    rm -f "${tmp}"
+    return 1
+  fi
+  cp -f "${f}" "${f}.allowinsecure.bak"
+  mv -f "${tmp}" "${f}"
+  log Info "[allowInsecure] ${f##*/} migrated (previous file: ${f##*/}.allowinsecure.bak)"
+}
+
 # Core logs above 5 MB: the file is copied to <name>.1 and starts again. The core appends to its
 # log (box.service starts it with >>), so cutting it in place is safe while it runs. Run by cron (box.service
 # adds it to the crontab) and by geosub.
@@ -1723,6 +1802,10 @@ case "$1" in
     ;;
   logrotate)
     logrotate
+    ;;
+  fixinsecure)
+    shift
+    for f in "$@"; do xray_fix_insecure "${f}"; done
     ;;
   memcg|cpuset|blkio)
     case "$1" in

@@ -1,5 +1,39 @@
 # Box for Root (Boxy edition)
 
+## v1.11.1
+
+New:
+- Example configs for all four cores that run on current cores, with English comments on what each setting does:
+  no proxy server yet (everything direct, Hysteria: server REPLACE_ME), the module's tproxy / redirect ports.
+  sing-box keeps a commented copy in `sing-box/config.example.jsonc`.
+- An update replaces the old placeholders / examples (mihomo and sing-box "# Please enter…", the Xray example with
+  allowInsecure) with the new examples, only when they are byte for byte the shipped files.
+- Xray: `allowInsecure` (removed in Xray 26) is migrated at start: the outbound gets `pinnedPeerCertSha256` of the
+  certificate its server presents (`box.tool fixinsecure <file>`), the previous file stays as `.allowinsecure.bak`.
+- Subscription downloads send Boxy's device id (`x-hwid`, `x-device-os`, `x-ver-os`) when `.hwid` exists, for panels
+  with a device limit (Remnawave).
+
+Fixes:
+- Problem: Xray did not start with configs that have `allowInsecure` ("migrated to pinnedPeerCertSha256"). Fix: migration at start.
+- Problem: sing-box did not start with the shipped config (a text placeholder, "unexpected end of JSON input"). Fix: a valid example.
+- Problem: yq could not edit configs with // comments, so the tproxy port and tun settings were not applied. Fix: comment lines are removed before the module's edits (sing-box), Xray only when the port really changes.
+
+Новое:
+- Примеры конфигураций для всех четырёх ядер, которые запускаются на текущих версиях, с комментариями на английском, за
+  что отвечает каждый параметр: без прокси-сервера (всё напрямую, у Hysteria — server REPLACE_ME), порты tproxy / redirect
+  модуля. У sing-box копия с комментариями — `sing-box/config.example.jsonc`.
+- Обновление заменяет старые заглушки и примеры (mihomo и sing-box «# Please enter…», пример Xray с allowInsecure) новыми
+  примерами — только если они побайтово совпадают с поставлявшимися файлами.
+- Xray: `allowInsecure` (удалён в Xray 26) переносится при запуске: outbound получает `pinnedPeerCertSha256` сертификата,
+  который показывает его сервер (`box.tool fixinsecure <файл>`), прежний файл остаётся как `.allowinsecure.bak`.
+- Загрузка подписок отправляет ID устройства Boxy (`x-hwid`, `x-device-os`, `x-ver-os`), если есть `.hwid` — для панелей
+  с лимитом устройств (Remnawave).
+
+Исправления:
+- Проблема: Xray не запускался с конфигурациями, где есть `allowInsecure`. Решение: перенос при запуске.
+- Проблема: sing-box не запускался с поставляемой конфигурацией (текстовая заглушка, «unexpected end of JSON input»). Решение: валидный пример.
+- Проблема: yq не мог править конфигурации с // комментариями — порт tproxy и настройки tun не применялись. Решение: строки-комментарии убираются перед правками модуля (sing-box), у Xray — только если порт действительно меняется.
+
 ## v1.11.0
 
 New:

@@ -1,76 +1,38 @@
+// Box for Root: example Xray config (Xray 26). It has no proxy server yet, so everything goes direct.
+// Import a subscription in Boxy (Tools → Import subscription) or replace this file with your own config.
+// Every *.json in this folder is loaded together (a config may be split into files); Boxy's own files are
+// named zz-boxy-*.json.
 {
+  // loglevel: debug, info, warning, error, none. The log is /data/adb/box/run/xray.log
+  "log": {
+    "loglevel": "warning"
+  },
+  // DNS servers Xray resolves domain names with (Android has no /etc/resolv.conf for it).
   "dns": {
-    "queryStrategy": "UseIP",
     "servers": [
       "1.1.1.1",
-      {
-        "address": "1.1.1.1",
-        "domains": [
-          "domain:googleapis.cn",
-          "domain:gstatic.com"
-        ]
-      },
-      {
-        "address": "223.5.5.5",
-        "domains": [
-          "domain:dns.alidns.com",
-          "domain:doh.pub",
-          "domain:dot.pub",
-          "domain:doh.360.cn",
-          "domain:dot.360.cn",
-          "geosite:cn",
-          "geosite:geolocation-cn"
-        ],
-        "expectIPs": [
-          "geoip:cn"
-        ],
-        "skipFallback": true
-      }
-    ],
-    "tag": "dns",
-    "hosts": {
-      "geosite:category-ads-all": "127.0.0.1",
-      "domain:googleapis.cn": "googleapis.com",
-      "dns.pub": [
-        "1.12.12.12",
-        "120.53.53.53"
-      ],
-      "dns.alidns.com": [
-        "223.5.5.5",
-        "223.6.6.6",
-        "2400:3200::1",
-        "2400:3200:baba::1"
-      ],
-      "one.one.one.one": [
-        "1.1.1.1",
-        "1.0.0.1",
-        "2606:4700:4700::1111",
-        "2606:4700:4700::1001"
-      ],
-      "dns.google": [
-        "8.8.8.8",
-        "8.8.4.4",
-        "2001:4860:4860::8888",
-        "2001:4860:4860::8844"
-      ]
-    }
+      "8.8.8.8"
+    ]
   },
+  // Where traffic comes in. The module sends the phone's traffic to the tproxy port of settings.ini (tproxy_port)
+  // and keeps "port" of the inbound tagged tproxy-in in sync with it. Xray runs in tproxy mode only.
   "inbounds": [
     {
+      "tag": "tproxy-in",
       "port": 9898,
       "protocol": "dokodemo-door",
-      "tag": "tproxy-in",
       "settings": {
+        // Take the original destination of redirected connections.
         "followRedirect": true,
         "network": "tcp,udp"
       },
+      // Read the domain from HTTP / TLS, so routing rules by domain work.
       "sniffing": {
+        "enabled": true,
         "destOverride": [
           "http",
           "tls"
-        ],
-        "enabled": true,
-        "routeOnly": false
+        ]
       },
       "streamSettings": {
         "sockopt": {
@@ -79,117 +41,56 @@
       }
     }
   ],
-  "log": {
-    "access": "none",
-    "dnsLog": true,
-    "loglevel": "error"
-  },
+  // Where traffic goes. Put your server first, for example (all REPLACE_ME values are yours to fill in):
+  // {
+  //   "tag": "proxy",                   // the name routing refers to
+  //   "protocol": "vless",              // vless, vmess, trojan, shadowsocks, hysteria, ...
+  //   "settings": {
+  //     "vnext": [{
+  //       "address": "REPLACE_ME.example.com",
+  //       "port": 443,
+  //       "users": [{ "id": "REPLACE_ME", "encryption": "none", "flow": "xtls-rprx-vision" }]
+  //     }]
+  //   },
+  //   "streamSettings": {
+  //     "network": "tcp",
+  //     "security": "reality",          // or "tls": "tlsSettings": { "serverName": "..." }
+  //     "realitySettings": {
+  //       "serverName": "REPLACE_ME.example.com",
+  //       "fingerprint": "chrome",
+  //       "publicKey": "REPLACE_ME",
+  //       "shortId": "REPLACE_ME"
+  //     }
+  //   }
+  // },
+  // A server with a self-signed certificate: "allowInsecure" no longer exists in Xray 26. Pin its certificate
+  // instead with "pinnedPeerCertSha256" in tlsSettings (get the hash with: xray tls ping <domain>).
   "outbounds": [
     {
-      "protocol": "vmess",
-      "tag": "proxy",
-      "mux": {
-        "concurrency": 8,
-        "enabled": false
-      },
-      "settings": {
-        "vnext": [
-          {
-            "address": "u.taamarin.com",
-            "port": 443,
-            "users": [
-              {
-                "alterId": 0,
-                "encryption": "",
-                "flow": "",
-                "id": "",
-                "level": 8,
-                "security": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "allowInsecure": true,
-          "fingerprint": "",
-          "publicKey": "",
-          "serverName": "u.taamarin.com",
-          "shortId": "",
-          "show": false,
-          "spiderX": ""
-        },
-        "wsSettings": {
-          "path": "/vmess",
-          "headers": {
-            "Host": "u.taamarin.com"
-          }
-        }
-      }
-    },
-    {
       "protocol": "freedom",
-      "tag": "direct",
-      "settings": {
-        "domainStrategy": "UseIP"
-      }
+      "tag": "direct"
     },
     {
       "protocol": "blackhole",
-      "tag": "block",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      }
+      "tag": "block"
     },
     {
       "protocol": "dns",
       "tag": "dns-out"
     }
   ],
+  // Routing: rules are checked top down; traffic no rule matches goes to the first outbound ("direct" here).
+  // With a server above, add a last rule { "network": "tcp,udp", "outboundTag": "proxy" }.
   "routing": {
-    "domainMatcher": "mph",
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
       {
+        // DNS queries of the apps go to Xray's DNS (the servers above).
         "inboundTag": [
           "tproxy-in"
         ],
-        "outboundTag": "dns-out",
         "port": 53,
-        "type": "field"
-      },
-      {
-        "domain": [
-          "regexp:^.*googlesyndication.com$",
-          "regexp:^.*adtival\\.network$"
-        ],
-        "outboundTag": "proxy",
-        "type": "field"
-      },
-      {
-        "domain": [
-          "geosite:youtube"
-        ],
-        "network": "udp",
-        "outboundTag": "block",
-        "type": "field"
-      },
-      {
-        "domain": [
-          "geosite:category-ads-all"
-        ],
-        "outboundTag": "block",
-        "type": "field"
-      },
-      {
-        "network": "tcp,udp",
-        "outboundTag": "proxy",
-        "type": "field"
+        "outboundTag": "dns-out"
       }
     ]
   }

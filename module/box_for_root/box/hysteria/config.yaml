@@ -1,39 +1,43 @@
-server: free.jeelsboobz.art:16872
-auth: "6ebd7494-93ff-4b2f-991c-1aeba9a1e44b"
+# Box for Root: example Hysteria 2 client config. Fill in the REPLACE_ME values with your server's, or add a
+# hysteria2:// link in Boxy (Tools → Configs → Hysteria profiles).
+
+# Your server: host:port (a port range like host:20000-50000 turns on port hopping).
+server: REPLACE_ME.example.com:443
+# The password (or user:password) the server expects.
+auth: REPLACE_ME
 
 tls:
-  sni: bing.com
-  insecure: true
+  # The name the server's certificate is for (when "server" is an IP address).
+  sni: REPLACE_ME.example.com
+  # A self-signed certificate: pin it instead of turning checks off, e.g.
+  # pinSHA256: "BA:88:45:17:A1:..."
+  insecure: false
 
-obfs:
-  type: salamander 
-  salamander:
-    password: "n0X9yN4T0gWIybkYYEyYdsOub"
+# Salamander obfuscation, only when the server uses it:
+# obfs:
+#   type: salamander
+#   salamander:
+#     password: REPLACE_ME
 
+# Your connection's real speed: Hysteria sends at this rate (leave out to let it measure).
 bandwidth:
-  up: 100 mbps
+  up: 50 mbps
   down: 100 mbps
 
+# Connect to the server only when the first request comes, not at start.
 lazy: true
 
+# Ports for apps that use a proxy themselves. Boxy → Tools → Proxy authentication adds a login.
 socks5:
   listen: 127.0.0.1:1080
-  # username: user
-  # password: pass
-  # disableUDP: false
-
 http:
   listen: 127.0.0.1:7080
-  # username: king
-  # password: kong
-  # realm: martian
 
+# Where the module sends the phone's traffic; kept in sync with settings.ini (tproxy_port, redir_port).
 tcpTProxy:
   listen: :9898
-
 udpTProxy:
   listen: :9898
   timeout: 20s
-
 tcpRedirect:
   listen: :9797
