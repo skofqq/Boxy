@@ -636,6 +636,8 @@ geo_src_url() {
   case "$1:$2" in
     metacubex:geosite) echo "${mc}/geosite.dat" ;;
     metacubex:geoip) echo "${mc}/geoip-lite.dat" ;;
+    # The full GeoIP for Xray: geoip-lite has only a few countries (no geoip:ru), 16 MB instead of 0.2 MB.
+    metacubex:geoip-full) echo "${mc}/geoip.dat" ;;
     metacubex:mmdb) echo "${mc}/country-lite.mmdb" ;;
     runetfreedom:geosite) echo "${rf}/geosite.dat" ;;
     runetfreedom:geoip) echo "${rf}/geoip.dat" ;;
@@ -737,8 +739,9 @@ upgeox() {
       fi
       ;;
     *)
-      url=$(geo_src_url "${primary}" geoip)
-      geo_fetch "${dir}/geoip.dat" "${url:-$(geo_src_url metacubex geoip)}" || failed=true
+      url=$(geo_src_url "${primary}" geoip-full)
+      [ -z "${url}" ] && url=$(geo_src_url "${primary}" geoip)
+      geo_fetch "${dir}/geoip.dat" "${url:-$(geo_src_url metacubex geoip-full)}" || failed=true
       geo_fetch "${dir}/geosite.dat" "$(geo_src_url "${primary}" geosite)" || failed=true
       ;;
   esac
