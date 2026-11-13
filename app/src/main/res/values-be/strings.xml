@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s — вялікая крыніца</string>
     <string name="geo_source_large">Пры кожным абнаўленні геабаз спампоўваецца %1$s, і файлы захоўваюцца на тэлефоне (для mihomo — яшчэ і ў аб\'яднаным файле). Асцярожней з мабільным інтэрнэтам.</string>
     <string name="geo_source_large_on">Уключыць</string>
+    <string name="xsub_skipped">Не дададзена: %1$d</string>
+    <string name="xsub_skip_line">%1$s (%2$s): %3$s</string>
+    <string name="xsub_skip_scheme">такі тып спасылкі не падтрымліваецца</string>
+    <string name="xsub_skip_core">выкарыстоўвае тое, чаго няма ў V2Ray (REALITY, XTLS flow, XHTTP або Hysteria)</string>
+    <string name="xsub_skip_port">няма правільнага порта</string>
+    <string name="xsub_skip_broken">спасылку не ўдалося разабраць (невядомыя або няпоўныя параметры)</string>
 </resources>

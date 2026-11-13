@@ -75,7 +75,11 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
                 scope.launch {
                     val downloaded = RootTask.run(XraySubscription.downloadScript(core)) { taskLines.addTaskLine(it) }
                     taskOk = downloaded && XraySubscription.apply(core).fold(
-                        onSuccess = { (n, skipped) -> taskLines.add("✓ " + String.format(appliedText, n, skipped)); true },
+                        onSuccess = { (n, skipped) ->
+                            taskLines.add("✓ " + String.format(appliedText, n, skipped.size))
+                            skipped.forEach { taskLines.add("– " + skipText(context, it)) }
+                            true
+                        },
                         onFailure = { taskLines.add("✗ " + it.message.orEmpty()); false },
                     )
                     taskDone = true
@@ -85,6 +89,14 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
             }
         }
         val st = status
+        // Links of the last update that are not servers, by name and reason: a server missing in the panel is explained here.
+        if (st != null && st.skipped.isNotEmpty()) {
+            SettingsRow(
+                BoxyIcons.Info,
+                stringResource(R.string.xsub_skipped, st.skipped.size),
+                st.skipped.joinToString("\n") { skipText(context, it) },
+            ) {}
+        }
         if (st != null && st.servers > 0) {
             SwitchRow(
                 BoxyIcons.Tune,
@@ -142,4 +154,17 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
         com.skofqq.boxy.ui.components.TaskTexts(stringResource(R.string.subs_task_working), stringResource(R.string.subs_task_ok), stringResource(R.string.subs_task_failed))
     }
     taskTitle?.let { t -> TaskDialog(t, taskLines, taskDone, taskOk, texts) { if (taskDone) taskTitle = null } }
+}
+
+/** "Estonia (hysteria2): the link could not be read" */
+internal fun skipText(context: android.content.Context, k: com.skofqq.boxy.configs.ShareLinks.Skipped): String {
+    val why = context.getString(
+        when (k.reason) {
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.SCHEME -> R.string.xsub_skip_scheme
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.CORE -> R.string.xsub_skip_core
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.PORT -> R.string.xsub_skip_port
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.BROKEN -> R.string.xsub_skip_broken
+        },
+    )
+    return context.getString(R.string.xsub_skip_line, k.name, k.scheme, why)
 }

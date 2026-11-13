@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s è grande</string>
     <string name="geo_source_large">Scarica %1$s a ogni aggiornamento geo e lo tiene sul telefono (per mihomo anche nel file unito). Attenzione ai dati mobili.</string>
     <string name="geo_source_large_on">Attiva</string>
+    <string name="xsub_skipped">Non aggiunti: %1$d</string>
+    <string name="xsub_skip_line">%1$s (%2$s): %3$s</string>
+    <string name="xsub_skip_scheme">questo tipo di link non è supportato</string>
+    <string name="xsub_skip_core">usa ciò che V2Ray non ha (REALITY, XTLS flow, XHTTP o Hysteria)</string>
+    <string name="xsub_skip_port">nessuna porta valida</string>
+    <string name="xsub_skip_broken">impossibile leggere il link (parametri sconosciuti o incompleti)</string>
 </resources>

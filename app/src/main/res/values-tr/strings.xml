@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s büyük</string>
     <string name="geo_source_large">Her coğrafi güncellemede %1$s indirir ve telefonda saklar (mihomo için birleştirilmiş dosyada da). Mobil veride dikkatli olun.</string>
     <string name="geo_source_large_on">Aç</string>
+    <string name="xsub_skipped">Eklenmedi: %1$d</string>
+    <string name="xsub_skip_line">%1$s (%2$s): %3$s</string>
+    <string name="xsub_skip_scheme">bu bağlantı türü desteklenmiyor</string>
+    <string name="xsub_skip_core">V2Ray\'de olmayan bir şey kullanıyor (REALITY, XTLS flow, XHTTP veya Hysteria)</string>
+    <string name="xsub_skip_port">geçerli bağlantı noktası yok</string>
+    <string name="xsub_skip_broken">bağlantı okunamadı (bilinmeyen veya eksik parametreler)</string>
 </resources>

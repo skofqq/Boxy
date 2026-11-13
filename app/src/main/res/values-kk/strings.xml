@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s — үлкен көз</string>
     <string name="geo_source_large">Әр геобаза жаңартуында %1$s жүктеледі және файлдар телефонда сақталады (mihomo үшін біріктірілген файлда да). Мобильді интернетте абай болыңыз.</string>
     <string name="geo_source_large_on">Қосу</string>
+    <string name="xsub_skipped">Қосылмады: %1$d</string>
+    <string name="xsub_skip_line">%1$s (%2$s): %3$s</string>
+    <string name="xsub_skip_scheme">мұндай сілтеме түрі қолдау көрсетілмейді</string>
+    <string name="xsub_skip_core">V2Ray-де жоқ мүмкіндікті қолданады (REALITY, XTLS flow, XHTTP немесе Hysteria)</string>
+    <string name="xsub_skip_port">дұрыс порт жоқ</string>
+    <string name="xsub_skip_broken">сілтемені талдау мүмкін болмады (белгісіз не толық емес параметрлер)</string>
 </resources>

@@ -8,10 +8,15 @@ import org.json.JSONObject
 /**
  * Share links (vless / vmess / trojan / ss / hysteria2) as Xray outbounds, for subscriptions of Xray and V2Ray.
  * A subscription body is base64 or plain text, one link per line. Links the target core cannot use are skipped
- * and counted: V2Ray has no REALITY, XTLS flow, XHTTP or Hysteria; Xray has no Salamander obfuscation.
+ * and listed by name with the reason: V2Ray has no REALITY, XTLS flow, XHTTP or Hysteria.
  */
 object ShareLinks {
-    data class Result(val outbounds: List<JSONObject>, val skipped: Int)
+    enum class SkipReason { SCHEME, CORE, PORT, BROKEN }
+
+    /** A link that did not become an outbound: its name as the subscription shows it, its scheme and why. */
+    data class Skipped(val name: String, val scheme: String, val reason: SkipReason)
+
+    data class Result(val outbounds: List<JSONObject>, val skipped: List<Skipped>)
 
     const val TAG_PREFIX = "sub-"
 
@@ -30,11 +35,20 @@ object ShareLinks {
 
     fun convert(body: String, core: String): Result {
         val out = ArrayList<JSONObject>()
-        var skipped = 0
+        val skipped = ArrayList<Skipped>()
         val used = HashSet<String>()
         for (link in links(body)) {
-            val o = runCatching { outbound(link, core) }.getOrNull()?.takeIf { portOk(it) }
-            if (o == null) { skipped++; continue }
+            val scheme = link.substringBefore("://").lowercase()
+            val parsed = runCatching { outbound(link, core) }
+            val o = parsed.getOrNull()
+            val reason = when {
+                scheme !in SCHEMES -> SkipReason.SCHEME
+                parsed.isFailure -> SkipReason.BROKEN
+                o == null -> if (core == "xray") SkipReason.BROKEN else SkipReason.CORE
+                !portOk(o) -> SkipReason.PORT
+                else -> null
+            }
+            if (reason != null || o == null) { skipped.add(Skipped(linkName(link), scheme, reason ?: SkipReason.BROKEN)); continue }
             // Unique tags: the name from the link, numbered when it repeats.
             val base = TAG_PREFIX + (o.optString("tag").ifBlank { "node" })
             var tag = base
@@ -45,6 +59,16 @@ object ShareLinks {
         }
         return Result(out, skipped)
     }
+
+    private val SCHEMES = setOf("vmess", "vless", "trojan", "ss", "hysteria2", "hy2")
+
+    /** The name a link shows in a client: the vmess "ps", else the #fragment, else the host. */
+    fun linkName(link: String): String = runCatching {
+        if (link.startsWith("vmess://", true)) {
+            decode(link.substringAfter("://"))?.let { JSONObject(it).optString("ps") }?.takeIf { it.isNotBlank() }?.let { return it }
+        }
+        Uri.decode(link.substringAfter('#', "")).trim().ifBlank { Uri.parse(link).host ?: link.substringBefore("://") }
+    }.getOrDefault(link.substringBefore("://"))
 
     /** A link without a port (or with 0) would make the core reject the whole subscription file. */
     private fun portOk(o: JSONObject): Boolean {
@@ -185,9 +209,19 @@ object ShareLinks {
         )
     }
 
-    /** Xray's hysteria outbound (version 2). Salamander obfuscation is not supported there: such links are skipped. */
+    /**
+     * Xray's hysteria outbound (version 2). Salamander obfuscation goes into streamSettings.finalmask: the link's
+     * "fm" (Xray's finalmask JSON as Remnawave and others publish it) when present, else built from
+     * obfs=salamander&obfs-password. Any other obfs is skipped.
+     */
     private fun hysteria2(u: Uri): JSONObject? {
-        if (q(u, "obfs") != null) return null
+        val fm = q(u, "fm")?.let { JSONObject(it) }
+        val obfs = q(u, "obfs")
+        val mask = fm ?: obfs?.let {
+            if (!it.equals("salamander", true)) return null
+            val pw = q(u, "obfs-password") ?: return null
+            JSONObject().put("udp", JSONArray().put(JSONObject().put("type", "salamander").put("settings", JSONObject().put("password", pw))))
+        }
         val host = u.host ?: return null
         val port = u.port.takeIf { it > 0 } ?: 443
         val tls = JSONObject().apply { (q(u, "sni") ?: host).let { put("serverName", it) }; q(u, "alpn")?.let { put("alpn", JSONArray(it.split(','))) } }
@@ -196,7 +230,8 @@ object ShareLinks {
             .put(
                 "streamSettings",
                 JSONObject().put("network", "hysteria").put("security", "tls").put("tlsSettings", tls)
-                    .put("hysteriaSettings", JSONObject().put("version", 2).put("auth", Uri.decode(u.userInfo ?: ""))),
+                    .put("hysteriaSettings", JSONObject().put("version", 2).put("auth", Uri.decode(u.userInfo ?: "")))
+                    .apply { mask?.let { put("finalmask", it) } },
             )
     }
 }

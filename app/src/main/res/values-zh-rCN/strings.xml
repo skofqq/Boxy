@@ -1015,7 +1015,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">更新订阅</string>
     <string name="xsub_servers">服务器：%1$d</string>
-    <string name="xsub_applied">已应用 %1$d 台服务器，跳过 %2$d 个链接</string>
+    <string name="xsub_applied">已应用 %1$d 个服务器，跳过 %2$d 个链接</string>
     <string name="xsub_default">所有流量走订阅</string>
     <string name="xsub_default_sub">最后一条路由规则指向负载均衡“sub”：按延迟选最快的服务器</string>
     <string name="xsub_default_sub_v2">最后一条路由规则指向负载均衡“sub”（V2Ray 随机选择）</string>
@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s 体积较大</string>
     <string name="geo_source_large">每次更新地理库都会下载 %1$s 并保存在手机上（mihomo 还会存于合并文件中）。使用移动数据时请注意。</string>
     <string name="geo_source_large_on">开启</string>
+    <string name="xsub_skipped">未添加：%1$d</string>
+    <string name="xsub_skip_line">%1$s（%2$s）：%3$s</string>
+    <string name="xsub_skip_scheme">不支持此类链接</string>
+    <string name="xsub_skip_core">使用了 V2Ray 不具备的功能（REALITY、XTLS flow、XHTTP 或 Hysteria）</string>
+    <string name="xsub_skip_port">没有有效端口</string>
+    <string name="xsub_skip_broken">无法解析链接（参数未知或不完整）</string>
 </resources>

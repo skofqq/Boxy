@@ -1015,7 +1015,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">サブスクリプションを更新</string>
     <string name="xsub_servers">サーバー: %1$d</string>
-    <string name="xsub_applied">%1$d 台を適用、%2$d 件のリンクをスキップ</string>
+    <string name="xsub_applied">サーバー %1$d 件を適用、リンク %2$d 件をスキップ</string>
     <string name="xsub_default">すべての通信をサブスクリプション経由に</string>
     <string name="xsub_default_sub">バランサー「sub」への最後のルーティングルール：ping が最速のサーバー</string>
     <string name="xsub_default_sub_v2">バランサー「sub」への最後のルーティングルール（V2Ray はランダムに選択）</string>
@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s は大きいです</string>
     <string name="geo_source_large">ジオ更新のたびに %1$s をダウンロードし、端末に保存します（mihomo では統合ファイルにも）。モバイル通信にご注意ください。</string>
     <string name="geo_source_large_on">オンにする</string>
+    <string name="xsub_skipped">追加されなかったもの: %1$d</string>
+    <string name="xsub_skip_line">%1$s（%2$s）: %3$s</string>
+    <string name="xsub_skip_scheme">この種類のリンクには対応していません</string>
+    <string name="xsub_skip_core">V2Ray にない機能を使っています（REALITY、XTLS flow、XHTTP、Hysteria）</string>
+    <string name="xsub_skip_port">有効なポートがありません</string>
+    <string name="xsub_skip_broken">リンクを読み取れませんでした（不明または不完全なパラメータ）</string>
 </resources>

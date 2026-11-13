@@ -1102,4 +1102,10 @@
     <string name="geo_source_large_title">%1$s est volumineux</string>
     <string name="geo_source_large">Télécharge %1$s à chaque mise à jour géo et le garde sur le téléphone (pour mihomo aussi dans le fichier fusionné). Attention aux données mobiles.</string>
     <string name="geo_source_large_on">Activer</string>
+    <string name="xsub_skipped">Non ajoutés : %1$d</string>
+    <string name="xsub_skip_line">%1$s (%2$s) : %3$s</string>
+    <string name="xsub_skip_scheme">ce type de lien n\'est pas pris en charge</string>
+    <string name="xsub_skip_core">utilise ce que V2Ray n\'a pas (REALITY, XTLS flow, XHTTP ou Hysteria)</string>
+    <string name="xsub_skip_port">pas de port valide</string>
+    <string name="xsub_skip_broken">impossible de lire le lien (paramètres inconnus ou incomplets)</string>
 </resources>
