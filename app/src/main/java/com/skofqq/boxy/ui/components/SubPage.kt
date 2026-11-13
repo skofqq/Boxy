@@ -108,6 +108,7 @@ fun BoxyTextField(
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
     container: androidx.compose.ui.graphics.Color = Boxy.colors.surface2,
+    visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
 ) {
     // The text itself is only a line high: a tap anywhere on the field (padding, icon, empty space) focuses it,
     // instead of falling through to whatever lies under a floating field.
@@ -135,6 +136,7 @@ fun BoxyTextField(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Boxy.colors.text),
                 cursorBrush = SolidColor(Boxy.colors.accent),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                visualTransformation = visualTransformation,
                 modifier = Modifier.fillMaxWidth().focusRequester(focus),
             )
         }

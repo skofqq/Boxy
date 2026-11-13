@@ -80,6 +80,7 @@ fun ToolsScreen(contentPadding: PaddingValues, navExtra: NavExtra, active: Boole
                 r == ROUTE_SUBSCRIPTION -> SubscriptionScreen(contentPadding, onBack = pop)
                 r == ROUTE_TRAFFIC -> TrafficScreen(contentPadding, onBack = pop)
                 r == ROUTE_AUTOMATION -> AutomationScreen(contentPadding, onBack = pop)
+                r == ROUTE_PROXY_AUTH -> ProxyAuthScreen(contentPadding, onBack = pop)
             }
         }
     }
@@ -96,6 +97,7 @@ const val ROUTE_TRAFFIC = "traffic"
 const val ROUTE_AUTOMATION = "automation"
 const val ROUTE_DNSCRYPT = "dnscrypt"
 const val ROUTE_DNS = "dns"
+const val ROUTE_PROXY_AUTH = "proxy_auth"
 
 /** Opens a Tools page from elsewhere: set [request] to a route and switch to the Tools tab. */
 object ToolsNav {
@@ -138,6 +140,7 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
                 SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
                 SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub)) { push(ROUTE_DNSCRYPT) }
+                SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub)) { push(ROUTE_PROXY_AUTH) }
                 SettingsRow(BoxyIcons.Speed, stringResource(R.string.tls_ping_title), stringResource(R.string.tls_ping_row_sub), showDivider = false) { tlsPing = true }
             }
         }
