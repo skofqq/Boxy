@@ -9,7 +9,8 @@ import kotlinx.coroutines.withContext
 sealed interface CorePrecheck {
     data object Ok : CorePrecheck
     data object NoKernel : CorePrecheck
-    data class NoConfig(val path: String) : CorePrecheck
+    /** [placeholder]: the file is still the module's placeholder or example, not a config of the user's. */
+    data class NoConfig(val path: String, val placeholder: Boolean = false) : CorePrecheck
     data class BadConfig(val path: String, val output: String) : CorePrecheck
 }
 
@@ -101,6 +102,7 @@ object CoreTools {
         val core = choice.binName
         val cfg = activeConfig(core)
         if (!Shell.cmd("[ -s ${q(cfg)} ]").exec().isSuccess) return@withContext CorePrecheck.NoConfig(cfg)
+        if (isPlaceholder(core, cfg)) return@withContext CorePrecheck.NoConfig(cfg, placeholder = true)
         if (core == "hysteria") {
             val r = ConfigCheck.check("hysteria", cfg)
             return@withContext if (r is CheckResult.Failed) CorePrecheck.BadConfig(cfg, r.output) else CorePrecheck.Ok
@@ -113,6 +115,47 @@ object CoreTools {
         }
         val r = Shell.cmd("$cmd 2>&1").exec()
         if (r.isSuccess) CorePrecheck.Ok else CorePrecheck.BadConfig(cfg, errorLines(r.out))
+    }
+
+    /**
+     * Is the config still the module's placeholder or example rather than one of the user's? Older modules shipped a
+     * text placeholder (sing-box, mihomo: "# Please enter or replace with your configuration here") and an Xray
+     * example with an empty account (u.taamarin.com); the current examples are valid configs without a single proxy
+     * server (Hysteria: server REPLACE_ME). A core check of the old ones only says "unexpected end of JSON input"
+     * or complains about the example's settings; the new ones would start and send everything direct.
+     */
+    suspend fun isPlaceholder(core: String, path: String): Boolean {
+        val text = BoxModule.readFile(path) ?: return false
+        if ("Please enter or replace with your configuration" in text) return true
+        return when (core) {
+            "xray", "v2fly" -> {
+                if ("u.taamarin.com" in text && Regex("\"id\"\\s*:\\s*\"\"").containsMatchIn(text)) return true
+                val files = if (core == "xray") runCatching { xrayFiles(path) }.getOrDefault(listOf(path)) else listOf(path)
+                val local = setOf("freedom", "blackhole", "dns", "loopback")
+                files.none { f ->
+                    val o = jsonOf(if (f == path) text else BoxModule.readFile(f)) ?: return@none false
+                    val obs = o.optJSONArray("outbounds") ?: return@none false
+                    (0 until obs.length()).any { obs.optJSONObject(it)?.optString("protocol") !in local }
+                }
+            }
+            "sing-box" -> {
+                val o = jsonOf(text) ?: return false
+                val obs = o.optJSONArray("outbounds")
+                val local = setOf("direct", "block", "dns", "selector", "urltest")
+                (o.optJSONArray("endpoints")?.length() ?: 0) == 0 &&
+                    (obs == null || (0 until obs.length()).none { obs.optJSONObject(it)?.optString("type") !in local }) &&
+                    !Shell.cmd("ls ${ConfigCheck.SINGBOX_OVERRIDES}/*.json >/dev/null 2>&1 && grep -qE '\"(server|server_port)\"' ${ConfigCheck.SINGBOX_OVERRIDES}/*.json").exec().isSuccess
+            }
+            "clash" -> Shell.cmd(
+                "$BOX/bin/yq '((.proxies // []) | length) + ((.[\"proxy-providers\"] // {}) | length)' ${q(path)} 2>/dev/null",
+            ).exec().out.firstOrNull()?.trim() == "0"
+            "hysteria" -> Regex("(?m)^server:\\s*\"?REPLACE_ME").containsMatchIn(text)
+            else -> false
+        }
+    }
+
+    private fun jsonOf(text: String?): org.json.JSONObject? = text?.let {
+        runCatching { org.json.JSONObject(it.lines().filterNot { l -> l.trimStart().startsWith("//") }.joinToString("\n")) }.getOrNull()
     }
 
     private fun errorLines(lines: List<String>): String {

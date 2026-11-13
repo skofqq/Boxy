@@ -247,6 +247,12 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     stringResource(R.string.settings_data_source),
                     sourceChoices.first { it.value == prefs.subscriptionSource }.title,
                 ) { sourceDialog = true }
+                var hwid by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(com.skofqq.boxy.net.SubClient.sendHwid(context)) }
+                SwitchRow(BoxyIcons.Shield, stringResource(R.string.settings_send_hwid), stringResource(R.string.settings_send_hwid_sub), hwid) { on ->
+                    hwid = on
+                    com.skofqq.boxy.net.SubClient.setSendHwid(context, on)
+                    scope.launch { com.skofqq.boxy.net.SubClient.syncModule(context.applicationContext) }
+                }
                 SettingsRow(BoxyIcons.Router, stringResource(R.string.settings_latency_targets), stringResource(R.string.settings_latency_targets_sub), showDivider = false) {
                     push(ROUTE_LATENCY)
                 }

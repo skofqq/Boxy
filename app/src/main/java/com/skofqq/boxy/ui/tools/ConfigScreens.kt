@@ -96,6 +96,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
     var downloadDialog by remember { mutableStateOf(false) }
     var checking by remember { mutableStateOf<String?>(null) }
     var checkError by remember { mutableStateOf<Pair<RootFile, String>?>(null) }
+    var xrayFix by remember { mutableStateOf<RootFile?>(null) }
     var overrides by remember { mutableStateOf<Boolean?>(null) }
 
     fun select(f: RootFile) {
@@ -274,7 +275,15 @@ SubPageHeader(
             onProceed = { checkError = null; select(f) },
             onDismiss = { checkError = null },
             onEdit = { checkError = null; onEdit(f.path) },
+            onFix = if (com.skofqq.boxy.configs.XrayInsecureFix.applies(output)) ({ checkError = null; xrayFix = f }) else null,
         )
+    }
+    xrayFix?.let { f ->
+        com.skofqq.boxy.ui.components.XrayFixDialog(f.path) { ok ->
+            xrayFix = null
+            reload++
+            if (ok) select(f)
+        }
     }
 }
 

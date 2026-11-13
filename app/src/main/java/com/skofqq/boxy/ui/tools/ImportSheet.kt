@@ -74,6 +74,17 @@ object ImportLinks {
         val raw = text?.trim() ?: return null
         val uri = runCatching { Uri.parse(raw) }.getOrNull()
         when (uri?.scheme?.lowercase()) {
+            // boxy://import/<url-encoded subscription URL>[#name] or boxy://import?url=…&name=…&core=…
+            // (for a panel's app list, e.g. Remnawave's subscription page).
+            "boxy" -> {
+                if (uri.host?.lowercase() != "import") return null
+                val url = uri.getQueryParameter("url")
+                    ?: raw.substringAfter("://").substringAfter('/', "").substringBefore('#').substringBefore('?').takeIf { it.isNotBlank() }?.let { decode(it) }
+                    ?: return null
+                if (!url.startsWith("http://") && !url.startsWith("https://")) return null
+                val core = uri.getQueryParameter("core")?.takeIf { it in setOf("clash", "sing-box", "xray", "hysteria") }
+                return ImportRequest(url, uri.getQueryParameter("name") ?: uri.fragment?.let { decode(it) }, core)
+            }
             "clash", "clashmeta", "clashx" -> {
                 val url = uri.getQueryParameter("url") ?: return null
                 return ImportRequest(url, uri.getQueryParameter("name"), "clash")
@@ -165,6 +176,18 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
     val c = core ?: "clash"
     val ext = if (c == "sing-box" || c == "xray" || c == "v2fly") "json" else "yaml"
     var url by remember { mutableStateOf(request.url) }
+    // A subscription link in the clipboard is offered when the sheet opens empty (read once, nothing in the background).
+    var fromClipboard by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (url.isEmpty()) {
+            val cm = context.getSystemService(android.content.ClipboardManager::class.java)
+            val clip = runCatching { cm?.primaryClip?.getItemAt(0)?.coerceToText(context)?.toString() }.getOrNull()
+            ImportLinks.parse(clip)?.url?.takeIf { it.startsWith("http://") || it.startsWith("https://") }?.let {
+                url = it
+                fromClipboard = true
+            }
+        }
+    }
     var name by remember(c) { mutableStateOf(fileName(request, ext)) }
     var activate by remember { mutableStateOf(true) }
     var busy by remember { mutableStateOf(false) }
@@ -183,6 +206,9 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
             BoxyTextField(url, { url = it.trim() }, stringResource(R.string.config_url_example), Modifier.fillMaxWidth())
             Spacer(Modifier.height(10.dp))
             BoxyTextField(name, { name = it }, stringResource(R.string.config_placeholder_name), Modifier.fillMaxWidth())
+            if (fromClipboard) {
+                Text(stringResource(R.string.import_from_clipboard), Modifier.padding(top = 6.dp), color = Boxy.colors.text2, style = MaterialTheme.typography.bodySmall)
+            }
             if (!validUrl && url.isNotEmpty()) {
                 Text(stringResource(R.string.config_url_invalid), Modifier.padding(top = 6.dp), color = Tints.red.fg, style = MaterialTheme.typography.bodySmall)
             }
@@ -204,6 +230,26 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
                 if (!validUrl || busy) return@SheetButtons
                 val file = sanitize(name).ifBlank { "subscription.$ext" }
                 busy = true
+                if (activate) {
+                    // Asked in this core's format (HWID headers when allowed); a link list becomes a config of this core.
+                    scope.launch {
+                        val o = com.skofqq.boxy.configs.CoreSubscription.load(context.applicationContext, c, url)
+                        busy = false
+                        when {
+                            o.ok -> {
+                                Toast.makeText(context, context.getString(R.string.core_setup_loaded, o.servers), Toast.LENGTH_SHORT).show()
+                                onDismiss()
+                            }
+                            o.limit == com.skofqq.boxy.net.SubClient.Limit.MAX_DEVICES -> Toast.makeText(context, R.string.sub_limit_devices, Toast.LENGTH_LONG).show()
+                            o.limit == com.skofqq.boxy.net.SubClient.Limit.HWID_REQUIRED -> Toast.makeText(context, R.string.sub_limit_hwid, Toast.LENGTH_LONG).show()
+                            o.error == "download" -> Toast.makeText(context, R.string.config_download_failed, Toast.LENGTH_SHORT).show()
+                            o.error == "empty" -> Toast.makeText(context, R.string.core_setup_err_empty, Toast.LENGTH_LONG).show()
+                            o.error == "format" -> Toast.makeText(context, context.getString(R.string.core_setup_err_format, c), Toast.LENGTH_LONG).show()
+                            else -> checkError = file to (o.error ?: "")
+                        }
+                    }
+                    return@SheetButtons
+                }
                 scope.launch {
                     val text = download(url, c)
                     val saved = text != null && RootFiles.write("$dir/$file", text)
@@ -263,19 +309,15 @@ private fun fileName(r: ImportRequest, ext: String): String {
 
 private fun sanitize(s: String) = s.trim().replace(Regex("[\\\\/:*?\"<>|\\s]+"), "_")
 
-private suspend fun download(url: String, core: String): String? = withContext(Dispatchers.IO) {
-    runCatching {
-        val c = URL(url).openConnection() as HttpURLConnection
-        c.connectTimeout = 15000
-        c.readTimeout = 30000
-        // Many panels return a full config only for a known client User-Agent.
-        c.setRequestProperty("User-Agent", if (core == "sing-box") "sing-box" else "clash.meta")
-        try {
-            if (c.responseCode in 200..299) c.inputStream.bufferedReader().readText() else null
-        } finally {
-            c.disconnect()
-        }
-    }.getOrNull()?.takeIf { it.isNotBlank() }
+private suspend fun download(url: String, core: String): String? {
+    // Many panels return a full config only for a known client User-Agent.
+    val format = when (core) {
+        "sing-box" -> com.skofqq.boxy.net.SubClient.Format.SINGBOX
+        "xray" -> com.skofqq.boxy.net.SubClient.Format.XRAY
+        "hysteria" -> com.skofqq.boxy.net.SubClient.Format.LINKS
+        else -> com.skofqq.boxy.net.SubClient.Format.MIHOMO
+    }
+    return com.skofqq.boxy.net.SubClient.fetch(com.skofqq.boxy.BoxyApp.instance, url, format)?.takeIf { it.ok }?.body
 }
 
 /** Appends the URL and file name to subscription_url_clash / name_provide_clash_config in settings.ini. */

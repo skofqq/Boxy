@@ -211,6 +211,8 @@ internal fun skipText(context: android.content.Context, k: com.skofqq.boxy.confi
             com.skofqq.boxy.configs.ShareLinks.SkipReason.PORT -> R.string.xsub_skip_port
             com.skofqq.boxy.configs.ShareLinks.SkipReason.BROKEN -> R.string.xsub_skip_broken
             com.skofqq.boxy.configs.ShareLinks.SkipReason.INSECURE -> R.string.xsub_skip_insecure
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.UNPINNED -> R.string.xsub_skip_unpinned
+            com.skofqq.boxy.configs.ShareLinks.SkipReason.SINGBOX -> R.string.xsub_skip_singbox
         },
     )
     return context.getString(R.string.xsub_skip_line, k.name, k.scheme, why)

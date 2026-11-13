@@ -36,6 +36,10 @@ data class SubscriptionInfo(
     /** Unix seconds, 0 when unknown. */
     val expire: Long,
     val updatedAt: Long = System.currentTimeMillis(),
+    /** From the panel's reply headers (announce, support-url, profile-web-page-url). */
+    val announce: String? = null,
+    val supportUrl: String? = null,
+    val webPageUrl: String? = null,
 ) {
     val used: Long get() = upload + download
     val remaining: Long get() = (total - used).coerceAtLeast(0)
@@ -159,8 +163,22 @@ object Net {
         }.getOrNull()
     }
 
-    /** Traffic quota from the subscription-userinfo header of a subscription URL. */
-    suspend fun subscription(url: String): SubscriptionInfo? = withContext(Dispatchers.IO) {
+    /**
+     * Quota and what the panel says about the subscription (title, announce, support and web page links), asked the
+     * way a client app does (HWID headers when allowed); falls back to the plain request below.
+     */
+    suspend fun subscription(url: String): SubscriptionInfo? {
+        val ctx = com.skofqq.boxy.BoxyApp.instance
+        for (head in listOf(true, false)) {
+            val r = SubClient.fetch(ctx, url, SubClient.Format.LINKS, headOnly = head) ?: continue
+            val p = r.profile
+            val info = p.info ?: continue
+            return info.copy(name = p.title ?: info.name, announce = p.announce, supportUrl = p.supportUrl, webPageUrl = p.webPageUrl)
+        }
+        return subscriptionPlain(url)
+    }
+
+    private suspend fun subscriptionPlain(url: String): SubscriptionInfo? = withContext(Dispatchers.IO) {
         for (method in listOf("HEAD", "GET")) {
             val info = runCatching {
                 val c = open(url, method, ua = "clash")

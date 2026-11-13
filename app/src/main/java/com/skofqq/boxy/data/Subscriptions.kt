@@ -68,6 +68,7 @@ object Subscriptions {
             SubscriptionInfo(
                 o.optString("name").ifBlank { null }, o.optLong("up"), o.optLong("down"),
                 o.optLong("total"), o.optLong("expire"), o.optLong("at"),
+                o.optString("announce").ifBlank { null }, o.optString("support").ifBlank { null }, o.optString("web").ifBlank { null },
             )
         }
     }.getOrDefault(emptyList())
@@ -77,7 +78,8 @@ object Subscriptions {
         list.forEach {
             arr.put(
                 JSONObject().put("name", it.name ?: "").put("up", it.upload).put("down", it.download)
-                    .put("total", it.total).put("expire", it.expire).put("at", it.updatedAt),
+                    .put("total", it.total).put("expire", it.expire).put("at", it.updatedAt)
+                    .put("announce", it.announce ?: "").put("support", it.supportUrl ?: "").put("web", it.webPageUrl ?: ""),
             )
         }
         prefs.subscriptionCache = arr.toString()

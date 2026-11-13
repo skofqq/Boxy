@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -101,6 +102,22 @@ fun HomeSheets(sheet: HomeSheet, vm: HomeViewModel, prefs: Prefs, onDismiss: () 
                     InfoRow(stringResource(R.string.sub_total), if (sub.total > 0) Format.bytes(context, sub.total) else dash)
                     InfoRow(stringResource(R.string.sub_expire_label), Format.date(sub.expire))
                     InfoRow(stringResource(R.string.sub_updated_label), Format.dateTime(sub.updatedAt))
+                    sub.announce?.let {
+                        Text(it, Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text)
+                    }
+                    listOfNotNull(
+                        sub.webPageUrl?.let { stringResource(R.string.sub_web_page) to it },
+                        sub.supportUrl?.let { stringResource(R.string.sub_support) to it },
+                    ).forEach { (label, link) ->
+                        Text(
+                            label,
+                            Modifier.fillMaxWidth().clickable {
+                                runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(link))) }
+                            }.padding(horizontal = 16.dp, vertical = 10.dp),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Boxy.colors.accent,
+                        )
+                    }
                 }
             }
             SheetButtons(stringResource(R.string.action_refresh), vm::refreshSubscription)

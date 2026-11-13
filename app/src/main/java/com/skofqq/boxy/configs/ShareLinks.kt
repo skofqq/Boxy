@@ -11,7 +11,8 @@ import org.json.JSONObject
  * and listed by name with the reason: V2Ray has no REALITY, XTLS flow, XHTTP or Hysteria.
  */
 object ShareLinks {
-    enum class SkipReason { SCHEME, CORE, PORT, BROKEN, INSECURE }
+    /** UNPINNED is not a skipped link: an insecure=1 server Xray could not pin (unreachable), now checked normally. */
+    enum class SkipReason { SCHEME, CORE, PORT, BROKEN, INSECURE, UNPINNED, SINGBOX }
 
     /** Xray 26 refuses VLESS without TLS / REALITY / encryption to a public address, and with it the whole file. */
     private class Insecure : Exception()
@@ -25,7 +26,22 @@ object ShareLinks {
     /** A link that did not become an outbound: its name as the subscription shows it, its scheme and why. */
     data class Skipped(val name: String, val scheme: String, val reason: SkipReason)
 
-    data class Result(val outbounds: List<JSONObject>, val skipped: List<Skipped>)
+    /**
+     * [insecure]: tags of outbounds whose link asked to skip certificate checks (insecure=1 / allowInsecure=1).
+     * Xray 26 has no allowInsecure: the caller pins their certificates (XrayInsecureFix.pinOutbound).
+     */
+    data class Result(val outbounds: List<JSONObject>, val skipped: List<Skipped>, val insecure: List<String> = emptyList())
+
+    /** Does the link ask to skip certificate checks? */
+    fun insecureLink(link: String): Boolean = runCatching {
+        val yes = setOf("1", "true")
+        if (link.startsWith("vmess://", true)) {
+            val j = JSONObject(decode(link.substringAfter("://").substringBefore('#')) ?: return false)
+            return j.optString("allowInsecure").lowercase() in yes || j.optString("insecure").lowercase() in yes
+        }
+        val u = Uri.parse(link)
+        listOf("insecure", "allowInsecure", "allow_insecure", "skip-cert-verify").any { u.getQueryParameter(it)?.lowercase() in yes }
+    }.getOrDefault(false)
 
     const val TAG_PREFIX = "sub-"
 
@@ -49,6 +65,7 @@ object ShareLinks {
         val out = ArrayList<JSONObject>()
         val skipped = ArrayList<Skipped>()
         val used = HashSet<String>()
+        val insecure = ArrayList<String>()
         for (link in links(body)) {
             val scheme = link.substringBefore("://").lowercase()
             val parsed = runCatching { outbound(link, core) }
@@ -69,8 +86,9 @@ object ShareLinks {
             while (!used.add(tag)) tag = "$base-${n++}"
             o.put("tag", tag)
             out.add(o)
+            if (insecureLink(link) && o.optJSONObject("streamSettings")?.optString("security") == "tls") insecure.add(tag)
         }
-        return Result(out, skipped)
+        return Result(out, skipped, insecure)
     }
 
     private val SCHEMES = setOf("vmess", "vless", "trojan", "ss", "hysteria2", "hy2")

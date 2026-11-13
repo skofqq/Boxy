@@ -76,6 +76,7 @@ import com.skofqq.boxy.ui.tools.ImportSheet
 import com.skofqq.boxy.ui.tools.ToolsScreen
 import com.skofqq.boxy.util.withAppLocale
 import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
 
 private enum class Tab { HOME, APPS, LOGS, TOOLS, SETTINGS }
 
@@ -178,6 +179,7 @@ class MainActivity : ComponentActivity() {
         val firstLaunch = savedInstanceState == null
         if (firstLaunch) ImportLinks.fromIntent(intent)?.let { ImportBus.request = it }
         if (firstLaunch) tileLongPress(intent)
+        if (firstLaunch) lifecycleScope.launch { runCatching { com.skofqq.boxy.net.SubClient.syncModule(applicationContext) } }
         setContent {
             BoxyTheme(prefs.themeMode, prefs.trueBlack) {
                 val dark = Boxy.colors.isDark
@@ -252,6 +254,13 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
         if (pager.currentPage != index) pager.scrollToPage(index)
     }
     LaunchedEffect(pager.settledPage) { current = tabs.getOrElse(pager.settledPage) { Tab.HOME } }
+    LaunchedEffect(com.skofqq.boxy.ui.tools.ToolsNav.showTools) {
+        if (com.skofqq.boxy.ui.tools.ToolsNav.showTools) {
+            com.skofqq.boxy.ui.tools.ToolsNav.showTools = false
+            val i = tabs.indexOf(Tab.TOOLS)
+            if (i >= 0) pager.animateScrollToPage(i)
+        }
+    }
     LaunchedEffect(PanelBus.settings) {
         if (PanelBus.settings) {
             PanelBus.settings = false

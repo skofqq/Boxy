@@ -75,6 +75,8 @@ fun ConfigErrorDialog(
     onDismiss: () -> Unit,
     onEdit: (() -> Unit)? = null,
     editLabel: String? = null,
+    /** A one-tap repair for a known problem (Xray's removed allowInsecure), shown first. */
+    onFix: (() -> Unit)? = null,
 ) {
     GlassAlertDialog(
         onDismissRequest = onDismiss,
@@ -98,7 +100,13 @@ fun ConfigErrorDialog(
         },
         confirmButton = {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (onEdit != null) DialogButton(editLabel ?: stringResource(R.string.config_edit), Boxy.colors.accent, androidx.compose.ui.graphics.Color.White, onEdit)
+                if (onFix != null) DialogButton(stringResource(R.string.xray_fix_action), Boxy.colors.accent, androidx.compose.ui.graphics.Color.White, onFix)
+                if (onEdit != null) DialogButton(
+                    editLabel ?: stringResource(R.string.config_edit),
+                    if (onFix != null) Boxy.colors.surface2 else Boxy.colors.accent,
+                    if (onFix != null) Boxy.colors.text else androidx.compose.ui.graphics.Color.White,
+                    onEdit,
+                )
                 DialogButton(proceed, Tints.red.bg, Tints.red.fg, onProceed)
                 DialogButton(stringResource(R.string.action_cancel), Boxy.colors.surface2, Boxy.colors.text, onDismiss)
             }
@@ -108,7 +116,7 @@ fun ConfigErrorDialog(
 }
 
 @Composable
-private fun DialogButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+internal fun DialogButton(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
     androidx.compose.foundation.layout.Box(
         Modifier.fillMaxWidth().height(48.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)).background(bg)
             .clickable(onClick = onClick),

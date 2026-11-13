@@ -96,6 +96,7 @@ object XraySubscription {
         if (body != null) {
             val conv = ShareLinks.convert(body, core)
             skipped += conv.skipped
+            if (core == "xray") skipped += XrayInsecureFix.pinOutbounds(conv.outbounds, conv.insecure)
             servers += conv.outbounds.size
             if (conv.outbounds.isNotEmpty()) {
                 val o = JSONObject().put("outbounds", JSONArray(conv.outbounds))
@@ -115,6 +116,7 @@ object XraySubscription {
             val prefix = txt.substringAfterLast('/').removeSuffix(".txt")
             val conv = ShareLinks.convert(BoxModule.readFile(txt).orEmpty(), core, "$prefix-")
             skipped += conv.skipped.map { it.copy(name = "$prefix: ${it.name}") }
+            if (core == "xray") skipped += XrayInsecureFix.pinOutbounds(conv.outbounds, conv.insecure).map { it.copy(name = "$prefix: ${it.name}") }
             servers += conv.outbounds.size
             if (conv.outbounds.isNotEmpty()) writes["${CoreTools.XRAY_SUBS}/$prefix.json"] = GeoRules.pretty(JSONObject().put("outbounds", JSONArray(conv.outbounds)))
         }
@@ -143,7 +145,8 @@ object XraySubscription {
     suspend fun ensureBalancer(core: String, byDefault: Boolean): Boolean {
         val path = CoreTools.activeConfig(core)
         val text = BoxModule.readFile(path) ?: return false
-        val root = runCatching { JSONObject(text) }.getOrNull() ?: return false
+        // Whole-line // comments (the module's example has them) are dropped: the file is rewritten anyway.
+        val root = runCatching { JSONObject(text.lines().filterNot { it.trimStart().startsWith("//") }.joinToString("\n")) }.getOrNull() ?: return false
         val routing = root.optJSONObject("routing") ?: JSONObject().also { root.put("routing", it) }
         val balancers = routing.optJSONArray("balancers") ?: JSONArray().also { routing.put("balancers", it) }
         if ((0 until balancers.length()).none { balancers.optJSONObject(it)?.optString("tag") == BALANCER }) {

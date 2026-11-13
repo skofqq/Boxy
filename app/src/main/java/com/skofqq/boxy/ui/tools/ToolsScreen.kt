@@ -104,6 +104,8 @@ object ToolsNav {
     var request by androidx.compose.runtime.mutableStateOf<String?>(null)
     /** The config editor is open: the tab pager must not take its slanted swipes. */
     var editorOpen by androidx.compose.runtime.mutableStateOf(false)
+    /** Asks the main screen to show the Tools tab (for a [request] made from another tab). */
+    var showTools by androidx.compose.runtime.mutableStateOf(false)
 }
 
 @Composable

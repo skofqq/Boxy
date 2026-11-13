@@ -194,6 +194,7 @@ private fun Chooser(onDone: () -> Unit) {
     var list by remember { mutableStateOf<ConfigList?>(null) }
     var applying by remember { mutableStateOf<String?>(null) }
     var failed by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var fixing by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) { list = runCatching { ConfigSwitch.list() }.getOrNull() ?: ConfigList("clash", null, emptyList()) }
 
     fun apply(name: String) {
@@ -223,11 +224,17 @@ private fun Chooser(onDone: () -> Unit) {
     val name = applying
     val error = failed
     when {
+        fixing != null -> com.skofqq.boxy.ui.components.XrayFixDialog("${BoxModule.BOX_DIR}/${coreConfig(l.core).first}/${fixing}") { ok ->
+            val n = fixing!!
+            fixing = null
+            if (ok) apply(n) else onDone()
+        }
         error != null -> ConfigErrorDialog(
             error.second,
             stringResource(R.string.check_select_anyway),
             onProceed = { failed = null; apply(error.first) },
             onDismiss = onDone,
+            onFix = if (com.skofqq.boxy.configs.XrayInsecureFix.applies(error.second)) ({ failed = null; fixing = error.first }) else null,
         )
         name != null -> GlassAlertDialog(
             onDismissRequest = {},

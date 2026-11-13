@@ -66,6 +66,8 @@ Languages: English, Русский, Українська, Беларуская, 
 - Config check: the core tests a file (`mihomo -t`, `sing-box check`, …) before it is selected or saved, and shows the error line
 - Subscription import: QR code (camera or picture), pasted link, `clash://install-config` and `sing-box://import-remote-profile` links
 - Proxy authentication: login and password on the mixed / SOCKS / HTTP ports of mihomo, sing-box, Xray and Hysteria (several users, a port added when there is none); kept apart from the config, so subscription updates keep them
+- Subscriptions from panels (Remnawave and others): a config for the target core on a core switch from the subscription you already have (sing-box / mihomo JSON or YAML, Xray JSON or links, Hysteria links); device id (HWID) for panels with a device limit, with a clear message when the limit is reached; title, quota, expiry, announce, support and web page from the panel's headers; a subscription link in the clipboard is offered on import; `boxy://import/<url>` deep link
+- Xray 26: `allowInsecure` is replaced with a certificate pin in one tap (or by the module at start); links with `insecure=1` get a pin too
 - DNS: DNS hijack switch; optional DNSCrypt with dnscrypt-proxy as the core's upstream DNS, download, on / off, server list with filters and latency sorting, config editor and a check of which resolver websites see
 - Network control: Wi‑Fi rules, SSID / BSSID lists with nearby Wi‑Fi scan, proxy on/off for hotspot clients, hotspot client MAC filter, SIM operator rules
 - Update: cores (Mihomo, Sing-box, Xray, Hysteria), subscription, geo databases, web UI with live output
@@ -87,6 +89,19 @@ Languages: English, Русский, Українська, Беларуская, 
 - Notifications: service status with actions and failed subscription updates (each can be turned off), Quick Settings tile, home screen widgets, start at boot switch, open panel on launch
 - Backup and restore of module files and app preferences; the module's own backups made before each update (date, size, delete)
 - App updates (GitHub releases) and module updates (`updateJson`)
+
+## Adding Boxy to a subscription page
+
+A panel's app list can add a subscription to Boxy in one tap with a deep link:
+
+```
+boxy://import/<the subscription URL, URL-encoded>
+boxy://import?url=<URL-encoded subscription URL>&name=<name>&core=<clash|sing-box|xray|hysteria>
+```
+
+For Remnawave, Boxy identifies itself as `Boxy/1.1 (sing-box; …)`, `Boxy/1.1 (xray; …)`, `Boxy/1.1 (mihomo; …)`: response rules
+can serve it its own templates by User-Agent. It sends `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model` (a random id of the
+install; Settings → Send device ID).
 
 ## Module
 

@@ -39,6 +39,7 @@ fun ModuleSettingSheet(
     val scope = rememberCoroutineScope()
     var checking by remember { mutableStateOf<String?>(null) }
     var problem by remember { mutableStateOf<Pair<CoreChoice, CorePrecheck>?>(null) }
+    var xrayFix by remember { mutableStateOf<String?>(null) }
     fun apply(c: CoreChoice) {
         onApply(listOfNotNull("bin_name" to c.binName, c.xclash?.let { "xclash_option" to it }))
         onDismiss()
@@ -102,7 +103,30 @@ fun ModuleSettingSheet(
         }
     }
     problem?.let { (c, p) ->
-        CoreProblemDialog(c, p, onSwitch = { problem = null; apply(c) }, onDismiss = { problem = null })
+        if (c.id == "xray" && p is CorePrecheck.BadConfig && com.skofqq.boxy.configs.XrayInsecureFix.applies(p.output)) {
+            ConfigErrorDialog(
+                p.output,
+                stringResource(R.string.core_switch_anyway),
+                onProceed = { problem = null; apply(c) },
+                onDismiss = { problem = null },
+                onFix = { problem = null; xrayFix = p.path },
+            )
+        } else if (p is CorePrecheck.NoConfig && p.placeholder) {
+            CoreSetupDialog(c, p.path, onSwitch = { problem = null; apply(c) }, onDismiss = { problem = null })
+        } else {
+            CoreProblemDialog(c, p, onSwitch = { problem = null; apply(c) }, onDismiss = { problem = null })
+        }
+    }
+    xrayFix?.let { path ->
+        XrayFixDialog(path) { ok ->
+            xrayFix = null
+            // Fixed: the switch goes on (its pre-check runs again).
+            if (ok) CORE_CHOICES.firstOrNull { it.id == "xray" }?.let { x ->
+                scope.launch {
+                    if (runCatching { CoreTools.precheck(x) }.getOrDefault(CorePrecheck.Ok) == CorePrecheck.Ok) apply(x)
+                }
+            }
+        }
     }
 }
 
@@ -110,7 +134,7 @@ fun ModuleSettingSheet(
 private fun CoreProblemDialog(c: CoreChoice, p: CorePrecheck, onSwitch: () -> Unit, onDismiss: () -> Unit) {
     val message = when (p) {
         CorePrecheck.NoKernel -> stringResource(R.string.module_core_missing_toast)
-        is CorePrecheck.NoConfig -> stringResource(R.string.core_switch_no_config, p.path)
+        is CorePrecheck.NoConfig -> stringResource(if (p.placeholder) R.string.core_switch_placeholder else R.string.core_switch_no_config, p.path)
         is CorePrecheck.BadConfig -> stringResource(R.string.core_switch_bad_config, p.path) + "\n\n" + p.output
         CorePrecheck.Ok -> ""
     }
