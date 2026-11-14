@@ -58,7 +58,7 @@ object CoreTools {
      * subscription ("sub-…" servers) only when the profile uses it (a full config from a panel has its own servers).
      */
     private suspend fun boxyXrayFiles(config: String): List<String> {
-        val usesSub = BoxModule.readFile(config).orEmpty().contains("\"sub")
+        val usesSub = Regex("\"sub[-\"]").containsMatchIn(BoxModule.readFile(config).orEmpty())
         return Shell.cmd("ls $BOX/xray/zz-boxy-*.json 2>/dev/null").exec().out.filter { it.isNotBlank() }
             .filter { usesSub || !it.endsWith("/zz-boxy-subscription.json") }.sorted()
     }
@@ -69,14 +69,16 @@ object CoreTools {
      */
     suspend fun xrayArgs(config: String? = null): String = withContext(Dispatchers.IO) {
         val cfg = config ?: activeConfig("xray")
+        // Xray puts a later file's outbounds first and the first one is the default: the extra lists go before the
+        // config, so none of their servers becomes the default (-confdir is read after the -c files anyway).
         val parts = ArrayList<String>()
+        usedXraySubs(cfg).forEach { parts += "-c ${q(it)}" }
         if (isXrayProfile(cfg)) {
             parts += "-c ${q(cfg)}"
             boxyXrayFiles(cfg).forEach { parts += "-c ${q(it)}" }
         } else {
             parts += "-confdir $BOX/xray"
         }
-        usedXraySubs(cfg).forEach { parts += "-c ${q(it)}" }
         parts.joinToString(" ")
     }
 
@@ -85,7 +87,7 @@ object CoreTools {
         val cfg = config ?: activeConfig("xray")
         val base = if (isXrayProfile(cfg)) listOf(cfg) + boxyXrayFiles(cfg)
         else Shell.cmd("ls -a $BOX/xray 2>/dev/null").exec().out.filter { it.endsWith(".json") }.sorted().map { "$BOX/xray/$it" }
-        base + usedXraySubs(cfg)
+        usedXraySubs(cfg) + base
     }
 
     /**

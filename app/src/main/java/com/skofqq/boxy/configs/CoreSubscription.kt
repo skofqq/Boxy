@@ -183,6 +183,9 @@ object CoreSubscription {
                 cfg.optJSONObject("routing")?.optJSONArray("rules")?.let { rules ->
                     (0 until rules.length()).mapNotNull { rules.optJSONObject(it) }.filter { it.optString("outboundTag") == "proxy" }.forEach { it.put("outboundTag", own) }
                 }
+                cfg.optJSONObject("routing")?.optJSONArray("balancers")?.let { bals ->
+                    (0 until bals.length()).mapNotNull { bals.optJSONObject(it) }.filter { it.optString("fallbackTag") == "proxy" }.forEach { it.put("fallbackTag", own) }
+                }
             }
             cfg.remove("remarks")
             cfg.remove("meta")

@@ -292,26 +292,28 @@ restart_box() {
 # before. A config in xray/profiles/: that file alone with Boxy's files from xray/ (zz-boxy-*.json). Either way
 # the extra subscriptions (xray/subs/<prefix>.json, outbounds "<prefix>-…") the config uses, nothing else.
 xray_args() {
-  local d="${box_dir}/xray" f p
-  case "${xray_config}" in
-    "${d}"/profiles/*)
-      printf '%s' "-c ${xray_config}"
-      for f in "${d}"/zz-boxy-*.json; do
-        [ -f "${f}" ] || continue
-        # The links subscription ("sub-…" servers) only for a profile that uses them: a full config from a panel
-        # carries its own servers.
-        [ "${f##*/}" = "zz-boxy-subscription.json" ] && ! busybox grep -q '"sub' "${xray_config}" && continue
-        printf ' %s' "-c ${f}"
-      done
-      ;;
-    *) printf '%s' "-confdir ${d}" ;;
-  esac
+  local d="${box_dir}/xray" f p subs=""
+  # Xray puts the outbounds of a later file first, and the first outbound is the default: the extra lists go
+  # before the config, so none of their servers becomes the default one (-confdir is read after the -c files).
   for f in "${d}"/subs/*.json; do
     [ -f "${f}" ] || continue
     p="${f##*/}"
     p="${p%.json}"
-    busybox grep -q "\"${p}-" "${xray_config}" && printf ' %s' "-c ${f}"
+    busybox grep -q "\"${p}-" "${xray_config}" && subs="${subs}-c ${f} "
   done
+  case "${xray_config}" in
+    "${d}"/profiles/*)
+      printf '%s' "${subs}-c ${xray_config}"
+      for f in "${d}"/zz-boxy-*.json; do
+        [ -f "${f}" ] || continue
+        # The links subscription ("sub-…" servers, balancer "sub") only for a profile that uses them: a full
+        # config from a panel carries its own servers (and its own observatory, which this file's would replace).
+        [ "${f##*/}" = "zz-boxy-subscription.json" ] && ! busybox grep -qE '"sub(-|")' "${xray_config}" && continue
+        printf ' %s' "-c ${f}"
+      done
+      ;;
+    *) printf '%s' "${subs}-confdir ${d}" ;;
+  esac
   echo
 }
 
