@@ -1,6 +1,6 @@
 # Box for Root (Boxy edition)
 
-## v1.11.1
+## v1.12.0
 
 New:
 - Example configs for all four cores that run on current cores, with English comments on what each setting does:
@@ -19,6 +19,9 @@ Fixes:
 - Problem: Xray did not start with configs that have `allowInsecure` ("migrated to pinnedPeerCertSha256"). Fix: migration at start.
 - Problem: sing-box did not start with the shipped config (a text placeholder, "unexpected end of JSON input"). Fix: a valid example.
 - Problem: yq could not edit configs with // comments, so the tproxy port and tun settings were not applied. Fix: comment lines are removed before the module's edits (sing-box), Xray only when the port really changes.
+- Problem: the sing-box port sync ran yq on every *.json in sing-box/, including the commented example ("bad file … invalid character"). Fix: other files are edited only when they are plain JSON.
+- Problem: an Xray profile (xray/profiles/, a full config from a panel) ran with the links subscription file too: its servers twice and its observatory replacing the profile's, so balancers had no picks. Fix: `zz-boxy-subscription.json` goes with a profile only when the profile uses it ("sub-" / balancer "sub").
+- Problem: Xray puts a later file's outbounds first and the first outbound is the default, so with the White List file loaded last every connection no balancer could place went to a White List server. Fix: the extra lists (`xray/subs/*.json`) are loaded before the config.
 
 Новое:
 - Примеры конфигураций для всех четырёх ядер, которые запускаются на текущих версиях, с комментариями на английском, за
@@ -37,6 +40,9 @@ Fixes:
 - Проблема: Xray не запускался с конфигурациями, где есть `allowInsecure`. Решение: перенос при запуске.
 - Проблема: sing-box не запускался с поставляемой конфигурацией (текстовая заглушка, «unexpected end of JSON input»). Решение: валидный пример.
 - Проблема: yq не мог править конфигурации с // комментариями — порт tproxy и настройки tun не применялись. Решение: строки-комментарии убираются перед правками модуля (sing-box), у Xray — только если порт действительно меняется.
+- Проблема: синхронизация портов sing-box запускала yq на каждом *.json в sing-box/, включая пример с комментариями («bad file … invalid character»). Решение: другие файлы правятся, только если это обычный JSON.
+- Проблема: профиль Xray (xray/profiles/, полный конфиг из панели) запускался вместе с файлом подписки из ссылок: серверы дважды, а его observatory подменял observatory профиля — у балансеров не было выбора. Решение: `zz-boxy-subscription.json` подключается к профилю, только если профиль его использует («sub-» / балансер «sub»).
+- Проблема: Xray ставит исходящие более позднего файла первыми, а первый исходящий — исходящий по умолчанию: с файлом White List в конце всё, что балансеры не могли распределить, уходило через сервер White List. Решение: дополнительные списки (`xray/subs/*.json`) подключаются до конфига.
 
 ## v1.11.0
 

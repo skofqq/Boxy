@@ -26,10 +26,10 @@ object SubClient {
      * no default Xray JSON rule) or "Boxy/.*sing-box" to serve Boxy's own templates (configs/remnawave-templates).
      */
     enum class Format(val userAgent: String) {
-        SINGBOX("SFA/1.1 (sing-box; singbox; Boxy/1.1; Android)"),
-        MIHOMO("clash.meta (mihomo; Boxy/1.1; Android)"),
-        XRAY("Boxy/1.1 (xray; Android)"),
-        LINKS("Boxy/1.1 (Android)"),
+        SINGBOX("SFA/2.0 (sing-box; singbox; Boxy/2.0; Android)"),
+        MIHOMO("clash.meta (mihomo; Boxy/2.0; Android)"),
+        XRAY("Boxy/2.0 (xray; Android)"),
+        LINKS("Boxy/2.0 (Android)"),
     }
 
     data class Profile(

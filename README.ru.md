@@ -100,7 +100,7 @@ boxy://import/<адрес подписки, URL-encoded>
 boxy://import?url=<адрес подписки, URL-encoded>&name=<название>&core=<clash|sing-box|xray|hysteria>
 ```
 
-Для Remnawave Boxy представляется как `SFA/1.1 (sing-box; …; Boxy/1.1; …)`, `Boxy/1.1 (xray; …)`, `clash.meta (mihomo; Boxy/1.1; …)` — правилами ответа
+Для Remnawave Boxy представляется как `SFA/2.0 (sing-box; …; Boxy/2.0; …)`, `Boxy/2.0 (xray; …)`, `clash.meta (mihomo; Boxy/2.0; …)` — правилами ответа
 можно отдавать ей свои шаблоны по User-Agent. Boxy отправляет `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model`
 (случайный ID установки; «Настройки → Отправлять ID устройства»).
 
