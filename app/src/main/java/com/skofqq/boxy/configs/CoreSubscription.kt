@@ -156,14 +156,22 @@ object CoreSubscription {
     }
 
     private suspend fun xray(context: Context, url: String): Outcome {
-        val r = SubClient.fetch(context, url, SubClient.Format.XRAY)
+        var r = SubClient.fetch(context, url, SubClient.Format.XRAY)
         if (r == null || !r.ok) return failed(r)
-        val text = r.body!!.trim()
+        var text = r.body!!.trim()
+        // Links although Xray JSON was asked for (the panel has no response rule for Boxy's User-Agent): Remnawave
+        // also serves its Xray JSON template at <subscription>/json, used when that is a full config.
+        if (!text.startsWith("[") && !text.startsWith("{")) {
+            jsonUrl(url)?.let { SubClient.fetch(context, it, SubClient.Format.XRAY) }
+                ?.takeIf { it.ok && isXrayJson(it.body!!.trim()) }
+                ?.let { r = it; text = it.body!!.trim() }
+        }
+        val reply = r!!
         // A panel template (Xray JSON): an array of full configs, one per server, each with every server (Remnawave's
         // injector); the first one becomes a profile.
         if (text.startsWith("[") || text.startsWith("{")) {
             val cfg = runCatching { if (text.startsWith("[")) org.json.JSONArray(text).getJSONObject(0) else JSONObject(text) }.getOrNull()
-                ?: return Outcome(false, error = "format", profile = r.profile)
+                ?: return Outcome(false, error = "format", profile = reply.profile)
             // The panel tags this config's own server "proxy" and the others with their names: it gets its name
             // too (the "remarks"), so the panel in Boxy shows names only. Rules pointing at "proxy" follow.
             val own = cfg.optString("remarks").replace(Regex("[\"\\\\]"), "").trim()
@@ -180,24 +188,39 @@ object CoreSubscription {
             cfg.remove("meta")
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
-            install("xray", name, cfg.toString(2) + "\n")?.let { return Outcome(false, error = it, profile = r.profile) }
+            install("xray", name, cfg.toString(2) + "\n")?.let { return Outcome(false, error = it, profile = reply.profile) }
             val n = cfg.optJSONArray("outbounds")?.let { a -> (0 until a.length()).count { a.optJSONObject(it)?.optString("protocol") !in setOf("freedom", "blackhole", "dns", "loopback") } } ?: 0
-            return Outcome(true, n, profile = r.profile)
+            return Outcome(true, n, profile = reply.profile)
         }
-        if (ShareLinks.links(text).isEmpty()) return Outcome(false, error = "format", profile = r.profile)
+        if (ShareLinks.links(text).isEmpty()) return Outcome(false, error = "format", profile = reply.profile)
         val prevUrl = XraySubscription.url()
-        if (!BoxModule.writeFile(XraySubscription.downloaded("xray"), r.body)) return Outcome(false, error = "write")
+        if (!BoxModule.writeFile(XraySubscription.downloaded("xray"), reply.body)) return Outcome(false, error = "write")
         XraySubscription.setUrl(url)
         val res = XraySubscription.apply("xray")
         if (res.isFailure) {
             XraySubscription.setUrl(prevUrl)
-            return Outcome(false, error = res.exceptionOrNull()?.message, profile = r.profile)
+            return Outcome(false, error = res.exceptionOrNull()?.message, profile = reply.profile)
         }
         // The servers carry traffic only through the balancer: the active config gets it (and the last rule).
         XraySubscription.ensureBalancer("xray", byDefault = true)
         val (servers, skipped) = res.getOrThrow()
-        return Outcome(true, servers, skipped, profile = r.profile)
+        return Outcome(true, servers, skipped, profile = reply.profile)
     }
+
+
+    /** Remnawave's Xray JSON path of a subscription URL: <path>/json, null when it is one already. */
+    private fun jsonUrl(url: String): String? {
+        val base = url.substringBefore('#').substringBefore('?').trimEnd('/')
+        if (base.endsWith("/json") || base.endsWith("/v2ray-json") || base.count { it == '/' } < 3) return null
+        val query = url.substringBefore('#').substringAfter('?', "")
+        return "$base/json" + (if (query.isNotEmpty()) "?$query" else "")
+    }
+
+    /** A full Xray config, or an array of them. */
+    private fun isXrayJson(text: String): Boolean = runCatching {
+        val cfg = if (text.startsWith("[")) org.json.JSONArray(text).getJSONObject(0) else JSONObject(text)
+        cfg.optJSONArray("outbounds")?.let { it.length() > 0 } == true
+    }.getOrDefault(false)
 
     private suspend fun hysteria(context: Context, url: String): Outcome {
         val r = SubClient.fetch(context, url, SubClient.Format.LINKS)
