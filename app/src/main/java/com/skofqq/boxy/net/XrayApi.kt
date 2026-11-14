@@ -141,8 +141,11 @@ object XrayApi {
     suspend fun balancerInfo(api: String, balancers: List<String>): Map<String, BalancerInfo> = withContext(Dispatchers.IO) {
         if (balancers.isEmpty()) return@withContext emptyMap()
         val server = api.let { if (it.startsWith(":")) "127.0.0.1$it" else it }
-        val r = Shell.cmd("timeout 10 $BOX/bin/xray api bi --server=$server ${balancers.joinToString(" ") { q(it) }} 2>/dev/null").exec()
-        if (!r.isSuccess) return@withContext emptyMap()
+        // One balancer per call: Xray 26 answers only for the first one when several are named. A failed call still
+        // gives its (empty) block, so the blocks line up with the balancers.
+        val r = Shell.cmd(balancers.joinToString("; ") { b ->
+            "echo '  - Selecting Override:'; timeout 10 $BOX/bin/xray api bi --server=$server ${q(b)} 2>/dev/null | grep -v 'Selecting Override'"
+        }).exec()
         val blocks = ArrayList<BalancerInfo>()
         var section = ""
         var override = ""
