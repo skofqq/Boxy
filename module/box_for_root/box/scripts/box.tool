@@ -297,7 +297,11 @@ xray_args() {
     "${d}"/profiles/*)
       printf '%s' "-c ${xray_config}"
       for f in "${d}"/zz-boxy-*.json; do
-        [ -f "${f}" ] && printf ' %s' "-c ${f}"
+        [ -f "${f}" ] || continue
+        # The links subscription ("sub-…" servers) only for a profile that uses them: a full config from a panel
+        # carries its own servers.
+        [ "${f##*/}" = "zz-boxy-subscription.json" ] && ! busybox grep -q '"sub' "${xray_config}" && continue
+        printf ' %s' "-c ${f}"
       done
       ;;
     *) printf '%s' "-confdir ${d}" ;;

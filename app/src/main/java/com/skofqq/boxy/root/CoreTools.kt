@@ -53,9 +53,15 @@ object CoreTools {
         }
     }
 
-    /** Boxy's own files in xray/ (zz-boxy-*.json), sorted as Xray reads them. */
-    private fun boxyXrayFiles(): List<String> =
-        Shell.cmd("ls $BOX/xray/zz-boxy-*.json 2>/dev/null").exec().out.filter { it.isNotBlank() }.sorted()
+    /**
+     * Boxy's own files in xray/ (zz-boxy-*.json) for the profile [config], sorted as Xray reads them; the links
+     * subscription ("sub-…" servers) only when the profile uses it (a full config from a panel has its own servers).
+     */
+    private suspend fun boxyXrayFiles(config: String): List<String> {
+        val usesSub = BoxModule.readFile(config).orEmpty().contains("\"sub")
+        return Shell.cmd("ls $BOX/xray/zz-boxy-*.json 2>/dev/null").exec().out.filter { it.isNotBlank() }
+            .filter { usesSub || !it.endsWith("/zz-boxy-subscription.json") }.sorted()
+    }
 
     /**
      * Xray's arguments for [config] (the active one by default), as the module's xray_args builds them: the whole
@@ -66,7 +72,7 @@ object CoreTools {
         val parts = ArrayList<String>()
         if (isXrayProfile(cfg)) {
             parts += "-c ${q(cfg)}"
-            boxyXrayFiles().forEach { parts += "-c ${q(it)}" }
+            boxyXrayFiles(cfg).forEach { parts += "-c ${q(it)}" }
         } else {
             parts += "-confdir $BOX/xray"
         }
@@ -77,7 +83,7 @@ object CoreTools {
     /** The files of [xrayArgs] for reading them as Xray merges them. */
     suspend fun xrayFiles(config: String? = null): List<String> = withContext(Dispatchers.IO) {
         val cfg = config ?: activeConfig("xray")
-        val base = if (isXrayProfile(cfg)) listOf(cfg) + boxyXrayFiles()
+        val base = if (isXrayProfile(cfg)) listOf(cfg) + boxyXrayFiles(cfg)
         else Shell.cmd("ls -a $BOX/xray 2>/dev/null").exec().out.filter { it.endsWith(".json") }.sorted().map { "$BOX/xray/$it" }
         base + usedXraySubs(cfg)
     }
