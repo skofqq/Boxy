@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -538,7 +539,8 @@ private fun GroupHead(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String
             )
         }
         Spacer(Modifier.width(8.dp))
-        GroupIcon(group.icon, iconSize)
+        // The one set by hand wins; a core without icons (sing-box) gets the mihomo config's for the same name.
+        GroupIcon(if (GroupIcons.isCustom(group.name)) GroupIcons.icon(group.name) else group.icon ?: GroupIcons.icon(group.name), iconSize)
     }
 }
 
@@ -571,8 +573,13 @@ private fun GroupTile(
     onOpen: () -> Unit,
     onTest: () -> Unit,
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) { GroupIcons.load(context) }
+    var editIcon by remember { mutableStateOf(false) }
+    if (editIcon) GroupIconDialog(group.name) { editIcon = false }
     Column(
-        modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card).clickable(onClick = onOpen).padding(14.dp),
+        modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card)
+            .combinedClickable(onClick = onOpen, onLongClick = { editIcon = true }).padding(14.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         GroupHead(group, snap, delays, 38.dp)

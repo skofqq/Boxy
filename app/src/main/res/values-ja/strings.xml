@@ -996,6 +996,9 @@
     <string name="xray_outbounds_sub">observatory による状態と遅延、起動以降の通信量。停止中のものをタップすると理由を表示</string>
     <string name="xray_dead">停止</string>
     <string name="xray_pool_alive">%2$d 件中 %1$d 件が稼働</string>
+    <string name="group_icon_title">アイコン: %1$s</string>
+    <string name="group_icon_hint">画像の URL（PNG または SVG）</string>
+    <string name="group_icon_message">空欄: 同じ名前のグループの mihomo 設定のアイコン。</string>
     <string name="xray_access_log">アクセスログ</string>
     <string name="xray_access_log_sub">どのドメインがどの inbound / outbound を通ったか</string>
     <string name="xray_access_search">ドメインまたは outbound</string>

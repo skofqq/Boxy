@@ -1019,6 +1019,9 @@
     <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
     <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
+    <string name="group_icon_title">Icon: %1$s</string>
+    <string name="group_icon_hint">Image URL (PNG or SVG)</string>
+    <string name="group_icon_message">Empty: the icon from the mihomo config with the same group name.</string>
     <string name="xray_access_log">Access log</string>
     <string name="xray_access_log_sub">Which domain went through which inbound and outbound</string>
     <string name="xray_access_search">Domain or outbound</string>

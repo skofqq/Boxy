@@ -996,6 +996,9 @@
     <string name="xray_outbounds_sub">Stato e ritardo dall’observatory, traffico dall’avvio; tocca uno non disponibile per il motivo</string>
     <string name="xray_dead">giù</string>
     <string name="xray_pool_alive">%1$d di %2$d attivi</string>
+    <string name="group_icon_title">Icona: %1$s</string>
+    <string name="group_icon_hint">URL dell’immagine (PNG o SVG)</string>
+    <string name="group_icon_message">Vuoto: l’icona dalla configurazione mihomo del gruppo con lo stesso nome.</string>
     <string name="xray_access_log">Log degli accessi</string>
     <string name="xray_access_log_sub">Quale dominio è passato per quale inbound e outbound</string>
     <string name="xray_access_search">Dominio o outbound</string>

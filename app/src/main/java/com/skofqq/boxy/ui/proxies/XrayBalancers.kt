@@ -2,6 +2,9 @@ package com.skofqq.boxy.ui.proxies
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -85,8 +88,13 @@ internal fun poolName(prefix: String) = if (prefix == "wl") "⚡️ White List" 
 /** Balancer card in the panel's grid, like a mihomo group: name, strategy with live / total, and where it goes. */
 @Composable
 internal fun BalancerTile(b: BalancerView, modifier: Modifier, onOpen: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(Unit) { GroupIcons.load(context) }
+    var editIcon by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    if (editIcon) GroupIconDialog(b.tag) { editIcon = false }
     Column(
-        modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card).clickable(onClick = onOpen).padding(14.dp),
+        modifier.clip(RoundedCornerShape(22.dp)).background(Boxy.colors.card)
+            .combinedClickable(onClick = onOpen, onLongClick = { editIcon = true }).padding(14.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         BalancerHead(b)
@@ -97,7 +105,9 @@ internal fun BalancerTile(b: BalancerView, modifier: Modifier, onOpen: () -> Uni
 
 @Composable
 private fun BalancerHead(b: BalancerView, long: Boolean = false) {
-    Column {
+    // Xray has no group icons: the mihomo config's for the same name, or one set by hand (long press).
+    Row(verticalAlignment = Alignment.Top) {
+    Column(Modifier.weight(1f)) {
         Text(
             b.tag,
             style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold),
@@ -117,6 +127,9 @@ private fun BalancerHead(b: BalancerView, long: Boolean = false) {
             color = Boxy.colors.text2,
             maxLines = 1,
         )
+    }
+        Spacer(Modifier.width(8.dp))
+        GroupIconImage(GroupIcons.icon(b.tag), if (long) 32.dp else 38.dp)
     }
 }
 

@@ -996,6 +996,9 @@
     <string name="xray_outbounds_sub">Observatory берген күй мен кідіріс, іске қосылғаннан бергі трафик; себебін көру үшін қолжетімсізін түртіңіз</string>
     <string name="xray_dead">қолжетімсіз</string>
     <string name="xray_pool_alive">%2$d ішінен %1$d қолжетімді</string>
+    <string name="group_icon_title">Белгіше: %1$s</string>
+    <string name="group_icon_hint">Сурет сілтемесі (PNG не SVG)</string>
+    <string name="group_icon_message">Бос — дәл осындай атаулы топтың mihomo конфигіндегі белгішесі.</string>
     <string name="xray_access_log">Қатынау журналы</string>
     <string name="xray_access_log_sub">Қай домен қай inbound пен outbound арқылы өтті</string>
     <string name="xray_access_search">Домен немесе outbound</string>

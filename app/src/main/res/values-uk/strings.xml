@@ -996,6 +996,9 @@
     <string name="xray_outbounds_sub">Стан і затримка від observatory, трафік від запуску; натисніть на недоступний, щоб побачити причину</string>
     <string name="xray_dead">недоступний</string>
     <string name="xray_pool_alive">%1$d з %2$d доступні</string>
+    <string name="group_icon_title">Іконка: %1$s</string>
+    <string name="group_icon_hint">Посилання на зображення (PNG або SVG)</string>
+    <string name="group_icon_message">Порожньо — іконка з конфігу mihomo для групи з тією ж назвою.</string>
     <string name="xray_access_log">Журнал доступу</string>
     <string name="xray_access_log_sub">Який домен через який inbound і outbound пройшов</string>
     <string name="xray_access_search">Домен або outbound</string>
