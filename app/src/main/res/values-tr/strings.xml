@@ -995,6 +995,7 @@
     <string name="xray_outbounds">Outbound\'lar</string>
     <string name="xray_outbounds_sub">Observatory\'den durum ve gecikme, başlangıçtan beri trafik; nedenini görmek için ölü olana dokunun</string>
     <string name="xray_dead">kapalı</string>
+    <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
     <string name="xray_access_log">Erişim günlüğü</string>
     <string name="xray_access_log_sub">Hangi alan adı hangi inbound ve outbound üzerinden geçti</string>
     <string name="xray_access_search">Alan adı veya outbound</string>

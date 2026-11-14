@@ -995,6 +995,7 @@
     <string name="xray_outbounds">Outbounds</string>
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
+    <string name="xray_pool_alive">%1$d von %2$d an</string>
     <string name="xray_access_log">Zugriffsprotokoll</string>
     <string name="xray_access_log_sub">Welche Domain über welchen Inbound und Outbound lief</string>
     <string name="xray_access_search">Domain oder Outbound</string>

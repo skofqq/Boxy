@@ -995,6 +995,7 @@
     <string name="xray_outbounds">出站</string>
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
+    <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
     <string name="xray_access_log">访问日志</string>
     <string name="xray_access_log_sub">哪个域名经过了哪个入站和出站</string>
     <string name="xray_access_search">域名或出站</string>

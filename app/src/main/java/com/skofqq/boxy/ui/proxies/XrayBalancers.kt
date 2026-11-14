@@ -41,7 +41,17 @@ internal class BalancerView(
     private val protocols: Map<String, String>,
     /** Results of the last "Test" (ms over an open connection, 0 = failed); they win over the observatory's. */
     private val tested: Map<String, Int> = emptyMap(),
+    /** Prefixes of the extra lists (subscription_extra_xray, e.g. "wl"): their servers are shown as one entry. */
+    private val pooled: Set<String> = emptySet(),
 ) {
+    fun isPooled(tag: String) = pooled.any { tag.startsWith("$it-") }
+
+    /** The pooled servers among the choices, by prefix. */
+    fun pools(): Map<String, List<String>> = targets.filter { isPooled(it) }.groupBy { t -> pooled.first { t.startsWith("$it-") } }
+
+    /** The live pooled server with the lowest delay. */
+    fun best(list: List<String>): String? = list.filter { (delay(it) ?: 0) > 0 }.minByOrNull { delay(it)!! }
+
     /** Delay as the mihomo panel shows it: ms when alive, 0 (a cross) when dead, null before the first probe. */
     fun delay(tag: String?): Int? {
         tag?.let { tested[it] }?.let { return it }
@@ -66,6 +76,11 @@ internal class BalancerView(
     /** Servers among the choices: "No VPN" (freedom) is not one. */
     val servers get() = targets.count { protocols[it] != "freedom" }
 }
+
+private const val POOL = "\u0000pool:"
+
+/** How an extra list reads: "⚡️ White List" for "wl", else its prefix. */
+internal fun poolName(prefix: String) = if (prefix == "wl") "⚡️ White List" else "⚡️ $prefix"
 
 /** Balancer card in the panel's grid, like a mihomo group: name, strategy with live / total, and where it goes. */
 @Composable
@@ -156,8 +171,10 @@ internal fun OpenBalancer(
         val auto = stringResource(R.string.xray_balancer_auto)
         // Auto, "No VPN", then the live servers by delay and the dead / untested ones last (lists can be long).
         val direct = b.targets.filter { b.protocol(it) == "freedom" }
-        val servers = b.targets.filter { it !in direct }.sortedBy { t -> b.delay(t)?.takeIf { it > 0 } ?: Int.MAX_VALUE }
-        val tiles: List<String?> = listOf<String?>(null) + direct + servers
+        // An extra list (a White List of hundreds of servers) is one tile: its fastest live server.
+        val pools = b.pools()
+        val servers = b.targets.filter { it !in direct && !b.isPooled(it) }.sortedBy { t -> b.delay(t)?.takeIf { it > 0 } ?: Int.MAX_VALUE }
+        val tiles: List<String?> = listOf<String?>(null) + direct + pools.keys.map { POOL + it } + servers
         tiles.chunked(2).forEach { pair ->
             Row(
                 Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 10.dp),
@@ -174,6 +191,18 @@ internal fun OpenBalancer(
                             modifier = Modifier.weight(1f).fillMaxHeight(),
                             onTest = onTest,
                         ) { onPick(null) }
+                    } else if (t.startsWith(POOL)) {
+                        val list = pools[t.removePrefix(POOL)].orEmpty()
+                        val best = b.best(list)
+                        ServerTile(
+                            poolName(t.removePrefix(POOL)),
+                            "${list.count { (b.delay(it) ?: 0) > 0 }}/${list.size}" + (best?.let { " · " + b.name(it) } ?: ""),
+                            b.delay(best) ?: if (list.any { b.delay(it) == 0 }) 0 else null,
+                            selected = b.pinned != null && b.isPooled(b.pinned!!) && list.contains(b.pinned),
+                            busy = busy,
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            onTest = onTest,
+                        ) { if (best != null) onPick(best) }
                     } else {
                         ServerTile(
                             b.name(t),

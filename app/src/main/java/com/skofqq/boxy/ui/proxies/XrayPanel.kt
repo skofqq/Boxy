@@ -89,6 +89,11 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
     }
 
     LaunchedEffect(reloadKey, reload) { setup = XrayApi.setup() }
+    // Extra lists (subscription_extra_xray, e.g. a White List): shown as one entry, not server by server.
+    var pooled by remember { mutableStateOf(setOf("wl")) }
+    LaunchedEffect(reloadKey) {
+        pooled = runCatching { com.skofqq.boxy.configs.XraySubscription.extras().map { it.prefix }.toSet() }.getOrDefault(emptySet()) + "wl"
+    }
     val apiListen = setup?.takeIf { it.apiRouting }?.api
     LaunchedEffect(apiListen, running, infoKey, setup?.balancers) {
         val s = setup
@@ -137,7 +142,7 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
         val b = openBalancer!!
         val v = BalancerView(
             b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b],
-            metrics?.outbounds.orEmpty().associateBy { it.tag }, s.outbounds.associate { it.tag to it.protocol }, tested?.delays.orEmpty(),
+            metrics?.outbounds.orEmpty().associateBy { it.tag }, s.outbounds.associate { it.tag to it.protocol }, tested?.delays.orEmpty(), pooled,
         )
         GroupDialog(
             content = { mod ->
@@ -203,7 +208,7 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                     val states = m?.outbounds.orEmpty().associateBy { it.tag }
                     val protocols = s.outbounds.associate { it.tag to it.protocol }
                     val views = s.balancers.map { b ->
-                        BalancerView(b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b], states, protocols, tested?.delays.orEmpty())
+                        BalancerView(b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b], states, protocols, tested?.delays.orEmpty(), pooled)
                     }
                     item {
                         Column(Modifier.padding(horizontal = 20.dp)) {
@@ -239,8 +244,12 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                 }
                 if (m != null) item {
                     SectionCard(stringResource(R.string.xray_outbounds), stringResource(R.string.xray_outbounds_sub)) {
-                        val list = m.outbounds.sortedWith(compareBy({ it.alive != true }, { it.delayMs ?: Long.MAX_VALUE }, { it.tag }))
-                        list.forEachIndexed { i, o -> OutboundRow(o, tested?.delays?.get(o.tag), i < list.size - 1) }
+                        val isPooled = { t: String -> pooled.any { t.startsWith("$it-") } }
+                        val list = m.outbounds.filterNot { isPooled(it.tag) }.sortedWith(compareBy({ it.alive != true }, { it.delayMs ?: Long.MAX_VALUE }, { it.tag }))
+                        // An extra list is one row: how many of its servers are alive and the fastest one.
+                        val pools = m.outbounds.filter { isPooled(it.tag) }.groupBy { o -> pooled.first { o.tag.startsWith("$it-") } }
+                        list.forEachIndexed { i, o -> OutboundRow(o, tested?.delays?.get(o.tag), i < list.size - 1 || pools.isNotEmpty()) }
+                        pools.entries.forEachIndexed { i, (prefix, items) -> PoolRow(prefix, items, i < pools.size - 1) }
                     }
                 }
                 item {
@@ -260,6 +269,42 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
             }
         }
     }
+}
+
+@Composable
+private fun PoolRow(prefix: String, items: List<XrayApi.OutboundState>, divider: Boolean) {
+    val context = LocalContext.current
+    val live = items.filter { it.alive == true }
+    val best = live.minByOrNull { it.delayMs ?: Long.MAX_VALUE }
+    Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 10.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            val color = when {
+                live.isNotEmpty() -> Tints.green.fg
+                items.any { it.alive == false } -> Tints.red.fg
+                else -> Tints.gray.fg
+            }
+            Box(Modifier.size(10.dp).clip(CircleShape).background(color))
+            Spacer(Modifier.width(12.dp))
+            Text(poolName(prefix), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text, maxLines = 1)
+            Text(
+                stringResource(R.string.xray_pool_alive, live.size, items.size),
+                style = MaterialTheme.typography.labelLarge,
+                color = color,
+            )
+        }
+        Text(
+            listOfNotNull(
+                best?.let { XrayApi.displayName(it.tag) + (it.delayMs?.let { d -> " · " + context.getString(R.string.unit_ms, d.toInt()) } ?: "") },
+                "↑ ${Format.bytes(context, items.sumOf { it.up })}   ↓ ${Format.bytes(context, items.sumOf { it.down })}",
+            ).joinToString("   "),
+            Modifier.padding(start = 22.dp, top = 2.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = Boxy.colors.text2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+    if (divider) Box(Modifier.fillMaxWidth().padding(start = 40.dp).height(1.dp).background(Boxy.colors.outline.copy(alpha = 0.3f)))
 }
 
 @Composable

@@ -995,6 +995,7 @@
     <string name="xray_outbounds">Выходныя (outbounds)</string>
     <string name="xray_outbounds_sub">Стан і затрымка ад observatory, трафік з моманту запуску; націсніце на недаступны, каб убачыць прычыну</string>
     <string name="xray_dead">недаступны</string>
+    <string name="xray_pool_alive">%1$d з %2$d даступныя</string>
     <string name="xray_access_log">Журнал доступу</string>
     <string name="xray_access_log_sub">Які дамен праз які inbound і outbound прайшоў</string>
     <string name="xray_access_search">Дамен або outbound</string>
