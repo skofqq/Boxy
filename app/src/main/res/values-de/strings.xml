@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
+    <string name="config_selected_restart">%1$s ist aktiv; der laufende Kern übernimmt sie nach einem Neustart</string>
     <string name="cs_tools_title">Kern-Einstellungen</string>
     <string name="cs_tools_sub">Protokoll, Serverprüfung, Gruppen, DNS… des aktiven Kerns</string>
     <string name="cs_hub_title">Aktiver Kern</string>

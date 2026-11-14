@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Observatory берген күй мен кідіріс, іске қосылғаннан бергі трафик; себебін көру үшін қолжетімсізін түртіңіз</string>
     <string name="xray_dead">қолжетімсіз</string>
     <string name="xray_pool_alive">%2$d ішінен %1$d қолжетімді</string>
+    <string name="config_selected_restart">%1$s таңдалды; жұмыс істеп тұрған ядро оны қайта іске қосылғаннан кейін алады</string>
     <string name="cs_tools_title">Ядро баптаулары</string>
     <string name="cs_tools_sub">Белсенді ядроның журналы, серверлерді тексеру, топтар, DNS…</string>
     <string name="cs_hub_title">Белсенді ядро</string>

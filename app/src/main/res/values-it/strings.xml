@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Stato e ritardo dall’observatory, traffico dall’avvio; tocca uno non disponibile per il motivo</string>
     <string name="xray_dead">giù</string>
     <string name="xray_pool_alive">%1$d di %2$d attivi</string>
+    <string name="config_selected_restart">%1$s è attivo; il core in esecuzione lo userà dopo il riavvio</string>
     <string name="cs_tools_title">Impostazioni del core</string>
     <string name="cs_tools_sub">Log, controllo server, gruppi, DNS… del core attivo</string>
     <string name="cs_hub_title">Core attivo</string>

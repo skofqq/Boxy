@@ -20,7 +20,11 @@ enum class BackupScope { MODULES, APPS, BOTH }
  * Large binary data (cores, geo databases, dashboards, logs) is not included.
  */
 object Backup {
-    private val ROOT_FILES = listOf("settings.ini", "package.list.cfg", "ap.list.cfg", "gid.list.cfg", "crontab.cfg")
+    private val ROOT_FILES = listOf(
+        "settings.ini", "package.list.cfg", "ap.list.cfg", "gid.list.cfg", "crontab.cfg",
+        // Xray certificate pins (no extension, so not picked up with the configs below).
+        "xray/.pins",
+    )
     // Core configs and the dnscrypt-proxy config (dnscrypt-proxy.toml with the picked servers, block lists).
     /** A copy the module installer made of /data/adb/box before an update (backups/<YYYYMMDD-HHMMSS>). */
     data class ModuleBackup(val name: String, val sizeKb: Long)
@@ -43,10 +47,12 @@ object Backup {
         }
     }
 
-    private val CORE_DIRS = listOf("clash", "sing-box", "xray", "xray/profiles", "v2fly", "hysteria", "dnscrypt")
+    private val CORE_DIRS = listOf("clash", "sing-box", "sing-box/.overrides", "xray", "xray/profiles", "v2fly", "hysteria", "dnscrypt")
     private val CONFIG_EXT = setOf("yaml", "yml", "json", "txt", "list", "conf", "toml")
     // Preference files with data the app collects (TrafficStats, AppTraffic, Subscriptions).
-    private val DATA_PREFS = listOf("traffic", "app_traffic", "subscriptions")
+    private val DATA_PREFS = listOf("traffic", "app_traffic", "subscriptions", "core_settings")
+    // Boxy's own files: Xray routing profiles, group icons set by hand.
+    private val APP_FILES = listOf("routing_profiles.json", "group_icons.json")
 
     suspend fun export(context: Context, uri: Uri, prefs: Prefs, scope: BackupScope = BackupScope.BOTH): Boolean = withContext(Dispatchers.IO) {
         runCatching {
@@ -72,6 +78,7 @@ object Backup {
                             val all = context.getSharedPreferences(name, Context.MODE_PRIVATE).all
                             if (all.isNotEmpty()) put("apps/$name.json", encode(all).toString().toByteArray())
                         }
+                        APP_FILES.forEach { f -> java.io.File(context.filesDir, f).takeIf { it.isFile }?.let { put("apps/files/$f", it.readBytes()) } }
                     }
                     put("manifest.json", JSONObject().put("app", "Boxy").put("created", System.currentTimeMillis()).toString().toByteArray())
                 }
@@ -119,6 +126,10 @@ object Backup {
                             e.name == "apps/prefs.json" && scope != BackupScope.MODULES -> {
                                 val map = decode(JSONObject(String(bytes)))
                                 withContext(Dispatchers.Main) { prefs.importAll(map) }
+                            }
+                            e.name.startsWith("apps/files/") && scope != BackupScope.MODULES -> {
+                                val f = e.name.removePrefix("apps/files/")
+                                if (f in APP_FILES) java.io.File(context.filesDir, f).writeBytes(bytes)
                             }
                             e.name.startsWith("apps/") && scope != BackupScope.MODULES -> {
                                 val name = e.name.removePrefix("apps/").removeSuffix(".json")

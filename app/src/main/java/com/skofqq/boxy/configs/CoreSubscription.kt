@@ -124,9 +124,13 @@ object CoreSubscription {
         if (!Regex("(?m)^(proxies|proxy-providers):").containsMatchIn(body)) return Outcome(false, error = "format", profile = r.profile)
         val name = "${host(url)}.yaml"
         install("clash", name, body)?.let { return Outcome(false, error = it, profile = r.profile) }
-        // The module renews this config from the URL (renew=true: the whole file, not only its proxies).
-        BoxModule.writeSettingRaw("subscription_url_clash", BoxModule.toArray(listOf(url)))
-        BoxModule.writeSetting("renew", "true")
+        // The module renews this config from the URL (renew=true: the whole file, not only its proxies) — only when
+        // the user has no mihomo subscriptions yet: an existing list (proxy providers, other URLs) is never replaced.
+        val existing = BoxModule.parseArray(BoxModule.readSettingRaw("subscription_url_clash"))
+        if (existing.isEmpty()) {
+            BoxModule.writeSettingRaw("subscription_url_clash", BoxModule.toArray(listOf(url)))
+            BoxModule.writeSetting("renew", "true")
+        }
         val servers = Regex("(?m)^\\s*-\\s*\\{?\\s*name:").findAll(body).count()
         return Outcome(true, servers, profile = r.profile)
     }

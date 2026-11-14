@@ -104,12 +104,18 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
             // Hysteria profiles switch at once: the running core restarts with the chosen one.
             if (if (c == "hysteria") HysteriaProfiles.activate(f.name) else BoxModule.writeSetting(coreConfig(c).second, f.name)) {
                 active = f.name
-                // Xray has no reload: a running core restarts with the chosen config.
-                if (c == "xray") {
-                    val st = BoxModule.state()
-                    if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
+                val st = BoxModule.state()
+                val runs = st.running && BoxModule.unquote(st.core) == c
+                // Xray has no reload: a running core restarts with the chosen config. mihomo / sing-box keep the old
+                // one until a restart: the message says so and offers it.
+                if (c == "xray" && runs) BoxModule.restart()
+                if (runs && c != "xray" && c != "hysteria") {
+                    com.skofqq.boxy.ui.components.BoxyToast.withAction(
+                        context, context.getString(R.string.config_selected_restart, f.name), context.getString(R.string.panel_settings_restart),
+                    ) { scope.launch { BoxModule.restart() } }.show()
+                } else {
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.config_selected, f.name), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 }
-                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.config_selected, f.name), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             }
         }
     }
