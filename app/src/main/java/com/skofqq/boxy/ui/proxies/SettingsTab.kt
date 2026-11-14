@@ -94,6 +94,8 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
     var taskOk by remember { mutableStateOf(false) }
     // sing-box without cache_file forgets the selected node at every restart.
     var cacheFileOff by remember { mutableStateOf(false) }
+    // sing-box's settings beyond its clash_api (overrides file and config), see CoreSettings.
+    var sbValues by remember { mutableStateOf<Map<String, String>?>(null) }
 
     LaunchedEffect(api, reload) {
         if (api == null) return@LaunchedEffect
@@ -103,6 +105,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
         webUi = com.skofqq.boxy.net.Dashboards.installed(bin)
         coreName = CORE_NAMES[bin] ?: bin
         cacheFileOff = bin == "sing-box" && com.skofqq.boxy.configs.SingBoxOverrides.cacheFileOn() == false
+        sbValues = if (bin == "sing-box") com.skofqq.boxy.configs.CoreSettings.singBoxValues(context) else null
     }
 
     fun launchTask(title: String, cmd: String) {
@@ -224,6 +227,26 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
                     MenuChip(logLevelLabel(level), false, LOG_LEVELS.map { it to logLevelLabel(it) }, level) { patch("log-level", it) }
                 }
             }
+        }
+        if (core.core == "sing-box") {
+            item { com.skofqq.boxy.ui.components.NoticeCard("Sing-box", stringResource(R.string.cs_restart_note_sb), Modifier.padding(horizontal = 2.dp)) }
+            singBoxSettings(
+                sbValues,
+                busy,
+                onSet = { key, value ->
+                    if (busy[key] != true) {
+                        busy[key] = true
+                        scope.launch {
+                            val r = com.skofqq.boxy.configs.CoreSettings.setSingBox(context.applicationContext, key, value)
+                            busy[key] = false
+                            val msg = r.exceptionOrNull()?.message?.let { if (it == "comments") context.getString(R.string.cs_comments) else it.lines().takeLast(2).joinToString(" ") }
+                            Toast.makeText(context, if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg), Toast.LENGTH_LONG).show()
+                            reload++
+                        }
+                    }
+                },
+                onClearCache = { run("cache") { com.skofqq.boxy.configs.CoreSettings.clearSingBoxCache() } },
+            )
         }
         item {
             SectionCard(stringResource(R.string.panel_settings_delay), stringResource(R.string.panel_settings_delay_sub)) {

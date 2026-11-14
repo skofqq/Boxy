@@ -138,7 +138,10 @@ object CoreSubscription {
         val name = "${host(url)}.json"
         val json = runCatching { JSONObject(body) }.getOrNull()
         if (json != null && json.has("outbounds")) {
-            install("sing-box", name, body + "\n")?.let { return Outcome(false, error = it, profile = r.profile) }
+            // The user's config-side settings ("⚡️ Fastest" probing, QUIC) apply to every new config.
+            val stored = CoreSettings.stored(context).keys.any { it in setOf(CoreSettings.S_URLTEST_URL, CoreSettings.S_URLTEST_INTERVAL, CoreSettings.S_URLTEST_TOLERANCE, CoreSettings.S_BLOCK_QUIC) }
+            val text = if (stored) { CoreSettings.applySingBoxStored(context, json); GeoRules.pretty(json) } else body + "\n"
+            install("sing-box", name, text)?.let { return Outcome(false, error = it, profile = r.profile) }
             BoxModule.writeSetting("subscription_url_singbox", url)
             val local = setOf("direct", "block", "dns", "selector", "urltest")
             val n = json.optJSONArray("outbounds")?.let { a -> (0 until a.length()).count { a.optJSONObject(it)?.optString("type") !in local } } ?: 0
@@ -200,6 +203,8 @@ object CoreSubscription {
             com.skofqq.boxy.ui.proxies.GroupIcons.setPanel(context, cfg.optJSONObject("boxy"))
             cfg.remove("boxy")
             directNotByFlag(cfg)
+            // The user's settings from the panel's Settings tab (log level, probing, QUIC…) apply to every new config.
+            CoreSettings.applyXrayStored(context, cfg)
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
             // The template's own lists (a White List balancer selecting "wl-…") come from subscription_extra_xray.

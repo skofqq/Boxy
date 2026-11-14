@@ -431,6 +431,16 @@ object XrayApi {
     }
 
     /** Points a balancer at [target], or back to its own choice with null (`xray api bo`). */
+    /** Every group of the active config back to its own choice: the pins are forgotten and the overrides cleared. */
+    suspend fun clearPins(): Boolean = withContext(Dispatchers.IO) {
+        val mine = pins()
+        mine.keys.forEach { savePin(it, null) }
+        val s = setup()
+        val api = s.api?.takeIf { s.apiRouting } ?: return@withContext true
+        s.balancers.forEach { overrideBalancer(api, it, null) }
+        true
+    }
+
     suspend fun overrideBalancer(api: String, balancer: String, target: String?): Boolean = withContext(Dispatchers.IO) {
         val server = api.let { if (it.startsWith(":")) "127.0.0.1$it" else it }
         val args = if (target == null) "-b ${q(balancer)} -r" else "-b ${q(balancer)} ${q(target)}"
