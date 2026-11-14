@@ -142,6 +142,13 @@ object CoreSubscription {
             BoxModule.writeSetting("subscription_url_singbox", url)
             val local = setOf("direct", "block", "dns", "selector", "urltest")
             val n = json.optJSONArray("outbounds")?.let { a -> (0 until a.length()).count { a.optJSONObject(it)?.optString("type") !in local } } ?: 0
+            // sing-box rejects unknown keys, so its template carries no icons: they come from the panel's Xray
+            // template (same group names), one more request.
+            runCatching {
+                SubClient.fetch(context, url, SubClient.Format.XRAY)?.takeIf { it.ok }?.body?.trim()?.takeIf { it.startsWith("[") }?.let { t ->
+                    com.skofqq.boxy.ui.proxies.GroupIcons.setPanel(context, org.json.JSONArray(t).optJSONObject(0)?.optJSONObject("boxy"))
+                }
+            }
             return Outcome(true, n, profile = r.profile)
         }
         // A link list: sing-box outbounds on the module's example (its inbounds / DNS / route), selector + urltest.
@@ -189,6 +196,9 @@ object CoreSubscription {
             }
             cfg.remove("remarks")
             cfg.remove("meta")
+            // Group icons the template carries for Boxy (Xray ignores the key; it is not kept in the file).
+            com.skofqq.boxy.ui.proxies.GroupIcons.setPanel(context, cfg.optJSONObject("boxy"))
+            cfg.remove("boxy")
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
             // The template's own lists (a White List balancer selecting "wl-…") come from subscription_extra_xray.

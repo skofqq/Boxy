@@ -23,13 +23,15 @@ import java.io.File
 object GroupIcons {
     private val auto = mutableStateMapOf<String, String>()
     private val user = mutableStateMapOf<String, String>()
+    /** From the panel's Xray template ("boxy": {"icons": {group: url}}), saved when a config is loaded from it. */
+    private val panel = mutableStateMapOf<String, String>()
     private var loaded = false
 
     /** "⚡️ Fastest" and "Fastest", "RU сайты" and "ru-сайты" are one group. */
     fun key(name: String): String = name.lowercase().filter { it.isLetterOrDigit() }
 
     /** The icon URL for group [name]: the one set by hand, else the one from the mihomo config. */
-    fun icon(name: String): String? = key(name).let { user[it] ?: auto[it] }
+    fun icon(name: String): String? = key(name).let { user[it] ?: panel[it] ?: auto[it] }
 
     fun isCustom(name: String) = key(name) in user
 
@@ -43,6 +45,7 @@ object GroupIcons {
             val o = JSONObject(file(context).readText())
             o.optJSONObject("user")?.let { u -> u.keys().forEach { k -> user[k] = u.getString(k) } }
             o.optJSONObject("auto")?.let { a -> a.keys().forEach { k -> auto[k] = a.getString(k) } }
+            o.optJSONObject("panel")?.let { a -> a.keys().forEach { k -> panel[k] = a.getString(k) } }
         }
         val fresh = fromMihomo()
         if (fresh.isNotEmpty()) {
@@ -52,6 +55,15 @@ object GroupIcons {
         }
     }
 
+    /** The icons of a panel template's "boxy" key ({"icons": {group: url}}): they replace the previous panel's. */
+    suspend fun setPanel(context: Context, boxy: JSONObject?) = withContext(Dispatchers.IO) {
+        val icons = boxy?.optJSONObject("icons") ?: return@withContext
+        load(context)
+        panel.clear()
+        icons.keys().forEach { k -> icons.optString(k).takeIf { it.startsWith("http") }?.let { panel[key(k)] = it } }
+        save(context)
+    }
+
     suspend fun set(context: Context, name: String, url: String?) = withContext(Dispatchers.IO) {
         val k = key(name)
         if (url.isNullOrBlank()) user.remove(k) else user[k] = url.trim()
@@ -59,7 +71,7 @@ object GroupIcons {
     }
 
     private fun save(context: Context) = runCatching {
-        val o = JSONObject().put("user", JSONObject(user.toMap())).put("auto", JSONObject(auto.toMap()))
+        val o = JSONObject().put("user", JSONObject(user.toMap())).put("auto", JSONObject(auto.toMap())).put("panel", JSONObject(panel.toMap()))
         file(context).writeText(o.toString())
     }
 

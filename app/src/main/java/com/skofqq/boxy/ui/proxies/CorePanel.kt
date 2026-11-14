@@ -54,16 +54,23 @@ private val BAR_ROOM = 12.dp + 68.dp
  */
 @Composable
 fun CorePanel(reloadKey: Int) {
-    // Xray has no clash-style API: its own panel works from the metrics endpoint.
+    // One panel for every core. Xray has no clash-style API: its tabs work from its metrics, API, log files and
+    // config (XrayTabs), and show only what Xray has.
     val state by produceState<com.skofqq.boxy.root.ServiceState?>(null, reloadKey) { value = runCatching { BoxModule.state() }.getOrNull() }
     val s = state ?: return
-    if (BoxModule.unquote(s.core) == "xray") return XrayPanel(16.dp, reloadKey, s.running)
+    val xray = BoxModule.unquote(s.core) == "xray"
     var tab by rememberSaveable { mutableIntStateOf(0) }
     // The tabs are recorded on their own for the bar: the panel's backdrop holds the bar and would draw it into itself.
     val barBackdrop = rememberBackdrop()
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().backdropSourceOf(barBackdrop)) {
-            when (tab) {
+            if (xray) when (tab) {
+                0 -> XrayPanel(BAR_ROOM, reloadKey, s.running)
+                1 -> XrayConnectionsTab(BAR_ROOM)
+                2 -> XrayLogsTab(BAR_ROOM, reloadKey)
+                3 -> XrayRulesTab(BAR_ROOM, reloadKey)
+                else -> XraySettingsTab(BAR_ROOM, reloadKey, s.running)
+            } else when (tab) {
                 0 -> ProxiesScreen(PaddingValues(bottom = BAR_ROOM), header = {}, embedded = true, reloadKey = reloadKey)
                 1 -> ConnectionsTab(BAR_ROOM, reloadKey)
                 2 -> CoreLogsTab(BAR_ROOM, reloadKey)

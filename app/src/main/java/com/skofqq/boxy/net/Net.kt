@@ -45,7 +45,11 @@ data class SubscriptionInfo(
     val remaining: Long get() = (total - used).coerceAtLeast(0)
 }
 
-data class ClashApi(val base: String, val secret: String?)
+/**
+ * A core's clash-style API. [order]: the groups' order of the config, when the core's GLOBAL does not keep it
+ * (sing-box lists its final outbound first).
+ */
+data class ClashApi(val base: String, val secret: String?, val order: List<String>? = null)
 
 data class CoreConnection(val id: String, val app: String?, val uid: Int?, val upload: Long, val download: Long, val direct: Boolean)
 
@@ -85,7 +89,11 @@ data class ProxySnapshot(val all: List<ProxyGroup>, val nodes: Map<String, Proxy
     private val byName = all.associateBy { it.name }
 
     /** Groups to show: the config's hidden ones are left out but still resolve as members. */
-    val groups: List<ProxyGroup> = all.filter { !it.hidden }
+    val groups: List<ProxyGroup> = all.filter { g ->
+        // A wrapper over direct outbounds only (the templates' "🇷🇺 Без VPN" urltest, there to be a choice in
+        // every group) is not a group to manage.
+        !g.hidden && !(g.all.isNotEmpty() && g.all.all { nodes[it]?.type?.equals("Direct", ignoreCase = true) == true })
+    }
 
     /** The proxy a group finally uses, following nested groups. */
     fun leaf(group: String): String? {
@@ -242,6 +250,7 @@ object Net {
     private const val API_TTL_MS = 10 * 60_000L
 
     private suspend fun readClashApi(core: String?): ClashApi? {
+        var order: List<String>? = null
         val (addr, secret) = when (core) {
             "sing-box" -> {
                 val name = BoxModule.readSetting("name_sing_config") ?: "config.json"
@@ -250,6 +259,9 @@ object Net {
                 val ov = com.skofqq.boxy.configs.SingBoxOverrides.read()?.let { o ->
                     runCatching { JSONObject(o).optJSONObject("experimental")?.optJSONObject("clash_api") }.getOrNull()
                 }
+                order = runCatching {
+                    JSONObject(text).optJSONArray("outbounds")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.optString("tag") } }
+                }.getOrNull()
                 runCatching {
                     val api = JSONObject(text).optJSONObject("experimental")?.optJSONObject("clash_api")
                     if (api == null && ov == null) return null
@@ -266,7 +278,7 @@ object Net {
         }
         if (addr.isNullOrBlank()) return null
         val hostPort = addr.trim().let { if (it.startsWith(":")) "127.0.0.1$it" else it.replace("0.0.0.0", "127.0.0.1") }
-        return ClashApi("http://$hostPort", secret?.takeIf { it.isNotBlank() })
+        return ClashApi("http://$hostPort", secret?.takeIf { it.isNotBlank() }, order)
     }
 
     private fun yamlValue(text: String, key: String): String? =
@@ -437,7 +449,7 @@ object Net {
                         pc.disconnect()
                     }
                 }
-                val order = groups["GLOBAL"]?.all.orEmpty()
+                val order = api.order ?: groups["GLOBAL"]?.all.orEmpty()
                 val sorted = groups.values.filter { it.name != "GLOBAL" }
                     .sortedWith(compareBy({ order.indexOf(it.name).let { i -> if (i < 0) Int.MAX_VALUE else i } }, { it.name }))
                 ProxySnapshot(sorted, nodes)

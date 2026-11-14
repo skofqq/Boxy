@@ -52,15 +52,7 @@ fun CoreSetupDialog(c: CoreChoice, path: String, onSwitch: () -> Unit, onDismiss
 
     val o = outcome
     if (o != null) {
-        val message = if (o.ok) {
-            buildList {
-                add(stringResource(R.string.core_setup_loaded, o.servers))
-                o.profile?.title?.let { add(it) }
-                if (o.skipped.isNotEmpty()) {
-                    add(stringResource(R.string.core_setup_skipped, o.skipped.size) + "\n" + o.skipped.take(8).joinToString("\n") { com.skofqq.boxy.ui.tools.skipText(context, it) })
-                }
-            }.joinToString("\n\n")
-        } else {
+        val problem = if (o.ok) "" else {
             when {
                 o.limit == SubClient.Limit.MAX_DEVICES -> stringResource(R.string.sub_limit_devices)
                 o.limit == SubClient.Limit.HWID_REQUIRED -> stringResource(R.string.sub_limit_hwid)
@@ -68,13 +60,13 @@ fun CoreSetupDialog(c: CoreChoice, path: String, onSwitch: () -> Unit, onDismiss
                 o.error == "empty" -> stringResource(R.string.core_setup_err_empty)
                 o.error == "format" -> stringResource(R.string.core_setup_err_format, c.title)
                 else -> stringResource(R.string.core_setup_err_check) + "\n\n" + (o.error ?: "")
-            } + (o.profile?.announce?.let { "\n\n$it" } ?: "")
+            }
         }
-        ConfirmDialog(
-            title = stringResource(if (o.ok) R.string.core_setup_done else R.string.core_setup_failed),
-            message = message,
-            confirm = stringResource(if (o.ok) R.string.core_setup_switch else R.string.action_done),
-            onConfirm = { if (o.ok) onSwitch() else outcome = null },
+        ImportResultDialog(
+            outcome = o,
+            problem = problem,
+            action = stringResource(if (o.ok) R.string.core_setup_switch else R.string.action_done),
+            onAction = { if (o.ok) onSwitch() else outcome = null },
             onDismiss = { if (o.ok) onDismiss() else outcome = null },
         )
         return

@@ -2,6 +2,9 @@ package com.skofqq.boxy.ui.proxies
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.toShape
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,7 +73,6 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
     var speed by remember { mutableStateOf(0L to 0L) }
     var withApi by remember { mutableStateOf(true) }
     var busy by remember { mutableStateOf(false) }
-    var showLog by remember { mutableStateOf(false) }
     // What each balancer is on, asked from Xray when the panel opens and after a pin (not polled).
     var balancerInfo by remember { mutableStateOf<Map<String, XrayApi.BalancerInfo>>(emptyMap()) }
     var infoKey by remember { mutableIntStateOf(0) }
@@ -85,6 +87,14 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
             val r = XrayApi.testDelays(tags)
             tested = XrayApi.Tested((tested?.delays.orEmpty()) + r.delays, r.at)
             testing = false
+        }
+    }
+
+    // One server's pill: tests that server only, next to a running group test.
+    fun testOne(tag: String) {
+        scope.launch {
+            val r = XrayApi.testDelays(listOf(tag))
+            tested = XrayApi.Tested((tested?.delays.orEmpty()) + r.delays, r.at)
         }
     }
 
@@ -130,23 +140,26 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
         }
     }
 
-    if (showLog) {
-        XrayAccessLog(bottom, onBack = { showLog = false })
-        return
-    }
-
     val s = setup
+    val poolTags = s?.outbounds.orEmpty().map { it.tag }.filter { t -> pooled.any { t.startsWith("$it-") } }
+    /** The outbounds a balancer's own selector picks from (not the ones a pin may add). */
+    fun own(b: String) = s?.outbounds.orEmpty().filter { o -> s?.selectors?.get(b).orEmpty().any { o.tag.startsWith(it) } }
+    fun view(b: String): BalancerView {
+        val mine = own(b)
+        return BalancerView(
+            b, s!!.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b],
+            metrics?.outbounds.orEmpty().associateBy { it.tag }, s.outbounds.associate { it.tag to it.protocol }, tested?.delays.orEmpty(),
+            pooled, poolTags, directOnly = mine.isNotEmpty() && mine.all { it.protocol == "freedom" },
+        )
+    }
     // The opened balancer sits outside the list, so scrolling never takes it away.
     val openApi = s?.api
     if (s != null && openApi != null && openBalancer != null && openBalancer in s.balancers) {
         val b = openBalancer!!
-        val v = BalancerView(
-            b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b],
-            metrics?.outbounds.orEmpty().associateBy { it.tag }, s.outbounds.associate { it.tag to it.protocol }, tested?.delays.orEmpty(), pooled,
-        )
+        val v = view(b)
         GroupDialog(
             content = { mod ->
-                OpenBalancer(v, testing, onClose = { openBalancer = null }, onTest = { runTest(v.targets) }, onPick = { t ->
+                OpenBalancer(v, testing, onClose = { openBalancer = null }, onTest = { runTest(v.targets.filterNot { v.isPooled(it) }) }, onTestOne = { testOne(it) }, onPick = { t ->
                     scope.launch {
                         if (XrayApi.overrideBalancer(openApi, b, t)) {
                             XrayApi.savePin(b, t)
@@ -207,9 +220,9 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                 if (api != null && s.apiRouting && s.balancers.isNotEmpty()) {
                     val states = m?.outbounds.orEmpty().associateBy { it.tag }
                     val protocols = s.outbounds.associate { it.tag to it.protocol }
-                    val views = s.balancers.map { b ->
-                        BalancerView(b, s.strategies[b] ?: "random", XrayApi.balancerTargets(s, b), balancerInfo[b], states, protocols, tested?.delays.orEmpty(), pooled)
-                    }
+                    // A balancer over an extra list only ("⚡️ White List") is not a group of its own here: every group
+                    // offers it as one choice.
+                    val views = s.balancers.filterNot { b -> own(b).let { o -> o.isNotEmpty() && o.all { x -> pooled.any { x.tag.startsWith("$it-") } } } }.map { view(it) }
                     item {
                         Column(Modifier.padding(horizontal = 20.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -219,7 +232,7 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                                     style = MaterialTheme.typography.titleMedium,
                                     color = Boxy.colors.text,
                                 )
-                                MsTestButton(testing) { runTest(XrayApi.proxyTags(s)) }
+                                MsTestButton(testing) { runTest(XrayApi.proxyTags(s).filterNot { t -> pooled.any { t.startsWith("$it-") } }) }
                             }
                             // Where the numbers come from and how fresh they are.
                             val probed = m?.outbounds?.mapNotNull { it.probedAt }?.maxOrNull()
@@ -242,115 +255,165 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
                         }
                     }
                 }
-                if (m != null) item {
-                    SectionCard(stringResource(R.string.xray_outbounds), stringResource(R.string.xray_outbounds_sub)) {
-                        val isPooled = { t: String -> pooled.any { t.startsWith("$it-") } }
-                        val list = m.outbounds.filterNot { isPooled(it.tag) }.sortedWith(compareBy({ it.alive != true }, { it.delayMs ?: Long.MAX_VALUE }, { it.tag }))
-                        // An extra list is one row: how many of its servers are alive and the fastest one.
-                        val pools = m.outbounds.filter { isPooled(it.tag) }.groupBy { o -> pooled.first { o.tag.startsWith("$it-") } }
-                        list.forEachIndexed { i, o -> OutboundRow(o, tested?.delays?.get(o.tag), i < list.size - 1 || pools.isNotEmpty()) }
-                        pools.entries.forEachIndexed { i, (prefix, items) -> PoolRow(prefix, items, i < pools.size - 1) }
+                if (m != null) {
+                    item {
+                        Text(
+                            stringResource(R.string.xray_outbounds),
+                            Modifier.padding(start = 20.dp, top = 8.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Boxy.colors.text,
+                        )
                     }
-                }
-                item {
-                    SectionCard(null) {
-                        Row(
-                            Modifier.fillMaxWidth().clickable { showLog = true }.padding(horizontal = 18.dp, vertical = 14.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.xray_access_log), style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text)
-                                Text(stringResource(R.string.xray_access_log_sub), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
-                            }
-                            Text("›", style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text2)
-                        }
-                    }
+                    outboundCards(m, tested?.delays.orEmpty(), pooled, s.outbounds.associate { it.tag to it.protocol }) { testOne(it) }
                 }
             }
         }
     }
 }
 
-@Composable
-private fun PoolRow(prefix: String, items: List<XrayApi.OutboundState>, divider: Boolean) {
-    val context = LocalContext.current
-    val live = items.filter { it.alive == true }
-    val best = live.minByOrNull { it.delayMs ?: Long.MAX_VALUE }
-    Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 10.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val color = when {
-                live.isNotEmpty() -> Tints.green.fg
-                items.any { it.alive == false } -> Tints.red.fg
-                else -> Tints.gray.fg
-            }
-            Box(Modifier.size(10.dp).clip(CircleShape).background(color))
-            Spacer(Modifier.width(12.dp))
-            Text(poolName(prefix), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text, maxLines = 1)
-            Text(
-                stringResource(R.string.xray_pool_alive, live.size, items.size),
-                style = MaterialTheme.typography.labelLarge,
-                color = color,
-            )
+/** Splits a server name into its leading flag (two regional-indicator letters) and the rest. */
+private fun flagOf(name: String): Pair<String?, String> {
+    if (name.length >= 4 && name.codePointAt(0) in 0x1F1E6..0x1F1FF) {
+        val second = Character.charCount(name.codePointAt(0))
+        if (name.codePointAt(second) in 0x1F1E6..0x1F1FF) {
+            val end = second + Character.charCount(name.codePointAt(second))
+            return name.substring(0, end) to name.substring(end).trim()
         }
-        Text(
-            listOfNotNull(
-                best?.let { XrayApi.displayName(it.tag) + (it.delayMs?.let { d -> " · " + context.getString(R.string.unit_ms, d.toInt()) } ?: "") },
-                "↑ ${Format.bytes(context, items.sumOf { it.up })}   ↓ ${Format.bytes(context, items.sumOf { it.down })}",
-            ).joinToString("   "),
-            Modifier.padding(start = 22.dp, top = 2.dp),
-            style = MaterialTheme.typography.bodySmall,
-            color = Boxy.colors.text2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
-    if (divider) Box(Modifier.fillMaxWidth().padding(start = 40.dp).height(1.dp).background(Boxy.colors.outline.copy(alpha = 0.3f)))
+    return null to name
+}
+
+/**
+ * Xray's outbounds, Material 3 Expressive: a card per server with its flag on a shape that shows the state (a
+ * cookie when it answers, a burst when it is down), its delay pill (tap: test this server) and traffic; an extra
+ * list (White List) as one card; Xray's own outbounds (direct, block, dns) as chips.
+ */
+internal fun androidx.compose.foundation.lazy.LazyListScope.outboundCards(
+    m: XrayApi.Metrics,
+    tested: Map<String, Int>,
+    pooled: Set<String>,
+    protocols: Map<String, String>,
+    onTest: (String) -> Unit,
+) {
+    val isPooled = { t: String -> pooled.any { t.startsWith("$it-") } }
+    val system = setOf("freedom", "blackhole", "dns", "loopback")
+    val servers = m.outbounds.filter { !isPooled(it.tag) && protocols[it.tag] !in system }
+        .sortedWith(compareBy({ it.alive != true }, { it.delayMs ?: Long.MAX_VALUE }, { it.tag }))
+    val pools = m.outbounds.filter { isPooled(it.tag) }.groupBy { o -> pooled.first { o.tag.startsWith("$it-") } }
+    val own = m.outbounds.filter { !isPooled(it.tag) && protocols[it.tag] in system }
+    servers.forEach { o -> item(key = "ob-" + o.tag) { ServerCard(o, protocols[o.tag].orEmpty(), tested[o.tag]) { onTest(o.tag) } } }
+    pools.forEach { (prefix, items) -> item(key = "pool-$prefix") { PoolCard(prefix, items) } }
+    if (own.isNotEmpty()) item(key = "ob-system") {
+        val context = LocalContext.current
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            own.forEach { o ->
+                Column(Modifier.clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card).padding(horizontal = 14.dp, vertical = 9.dp)) {
+                    Text(
+                        if (protocols[o.tag] == "freedom" && o.tag == "direct") stringResource(R.string.xray_no_vpn) else XrayApi.displayName(o.tag),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Boxy.colors.text,
+                        maxLines = 1,
+                    )
+                    Text("↑ ${Format.bytes(context, o.up)}  ↓ ${Format.bytes(context, o.down)}", style = MaterialTheme.typography.labelSmall, color = Boxy.colors.text2, maxLines = 1)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun StateShape(alive: Boolean?, content: @Composable () -> Unit) {
+    val shape = when (alive) {
+        true -> androidx.compose.material3.MaterialShapes.Cookie9Sided
+        false -> androidx.compose.material3.MaterialShapes.Burst
+        null -> androidx.compose.material3.MaterialShapes.Circle
+    }
+    val tint = when (alive) {
+        true -> Tints.green
+        false -> Tints.red
+        null -> Tints.gray
+    }
+    Box(Modifier.size(46.dp).clip(shape.toShape()).background(tint.bg), contentAlignment = Alignment.Center) { content() }
 }
 
 @Composable
-private fun OutboundRow(o: XrayApi.OutboundState, tested: Int?, divider: Boolean) {
+private fun ServerCard(o: XrayApi.OutboundState, protocol: String, tested: Int?, onTest: () -> Unit) {
     val context = LocalContext.current
     var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth().clickable(enabled = o.error != null) { open = !open }.padding(horizontal = 18.dp, vertical = 10.dp)) {
+    val (flag, rest) = flagOf(XrayApi.displayName(o.tag))
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(24.dp)).background(Boxy.colors.card)
+            .clickable(enabled = o.error != null) { open = !open }.padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            val color = when (o.alive) {
-                true -> Tints.green.fg
-                false -> Tints.red.fg
-                null -> Tints.gray.fg
+            StateShape(o.alive) {
+                if (flag != null) Text(flag, fontSize = 20.sp)
+                else androidx.compose.material3.Icon(BoxyIcons.Dns, null, Modifier.size(20.dp), tint = Boxy.colors.text)
             }
-            Box(Modifier.size(10.dp).clip(CircleShape).background(color))
             Spacer(Modifier.width(12.dp))
-            Text(XrayApi.displayName(o.tag), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (tested != null) {
-                MsPill(tested, busy = false, onTest = {})
-            } else {
+            Column(Modifier.weight(1f)) {
+                Text(rest.ifBlank { o.tag }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    when {
-                        o.alive == true && o.delayMs != null -> stringResource(R.string.unit_ms, o.delayMs.toInt())
-                        o.alive == false -> stringResource(R.string.xray_dead)
-                        else -> "—"
-                    },
-                    style = MaterialTheme.typography.labelLarge,
-                    color = color,
+                    listOf(protocol.uppercase(), "↑ ${Format.bytes(context, o.up)}  ↓ ${Format.bytes(context, o.down)}").filter { it.isNotBlank() }.joinToString("  ·  "),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Boxy.colors.text2,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
+            Spacer(Modifier.width(8.dp))
+            val delay = tested ?: when (o.alive) {
+                true -> o.delayMs?.toInt()?.coerceAtLeast(1)
+                false -> 0
+                null -> null
+            }
+            MsPill(delay, busy = false, onTest = onTest)
         }
-        Text(
-            "↑ ${Format.bytes(context, o.up)}   ↓ ${Format.bytes(context, o.down)}",
-            Modifier.padding(start = 22.dp, top = 2.dp),
-            style = MaterialTheme.typography.bodySmall,
-            color = Boxy.colors.text2,
-        )
         if (open && o.error != null) {
             Text(
                 o.error,
-                Modifier.padding(start = 22.dp, top = 4.dp).clip(RoundedCornerShape(10.dp)).background(Boxy.colors.surface2).padding(8.dp),
+                Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Boxy.colors.surface2).padding(10.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = Tints.red.fg,
             )
         }
     }
-    if (divider) Box(Modifier.fillMaxWidth().padding(start = 40.dp).height(1.dp).background(Boxy.colors.outline.copy(alpha = 0.3f)))
+}
+
+@Composable
+private fun PoolCard(prefix: String, items: List<XrayApi.OutboundState>) {
+    val context = LocalContext.current
+    val live = items.filter { it.alive == true }
+    val best = live.minByOrNull { it.delayMs ?: Long.MAX_VALUE }
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(24.dp)).background(Boxy.colors.card).padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        StateShape(if (live.isNotEmpty()) true else if (items.any { it.alive == false }) false else null) {
+            androidx.compose.material3.Icon(BoxyIcons.Bolt, null, Modifier.size(22.dp), tint = Boxy.colors.text)
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(poolName(prefix), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, maxLines = 1)
+            Text(
+                listOfNotNull(
+                    stringResource(R.string.xray_pool_alive, live.size, items.size),
+                    best?.let { XrayApi.displayName(it.tag) },
+                    "↑ ${Format.bytes(context, items.sumOf { it.up })}  ↓ ${Format.bytes(context, items.sumOf { it.down })}",
+                ).joinToString("  ·  "),
+                style = MaterialTheme.typography.bodySmall,
+                color = Boxy.colors.text2,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        MsPill(best?.delayMs?.toInt()?.coerceAtLeast(1) ?: if (items.any { it.alive == false }) 0 else null, busy = false, onTest = {})
+    }
 }
 
 /** "Test" next to the balancers' title: a spinner while it runs. */

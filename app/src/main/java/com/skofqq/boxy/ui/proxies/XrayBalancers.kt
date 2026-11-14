@@ -46,11 +46,19 @@ internal class BalancerView(
     private val tested: Map<String, Int> = emptyMap(),
     /** Prefixes of the extra lists (subscription_extra_xray, e.g. "wl"): their servers are shown as one entry. */
     private val pooled: Set<String> = emptySet(),
+    /** Every pooled server of the config: a group can be pinned to a list's fastest one even when it does not pick from it. */
+    private val poolTags: List<String> = emptyList(),
+    /** A group that goes direct by itself ("RU сайты"): no "⚡️ Fastest", its direct choice is the default. */
+    val directOnly: Boolean = false,
 ) {
     fun isPooled(tag: String) = pooled.any { tag.startsWith("$it-") }
 
-    /** The pooled servers among the choices, by prefix. */
-    fun pools(): Map<String, List<String>> = targets.filter { isPooled(it) }.groupBy { t -> pooled.first { t.startsWith("$it-") } }
+    /** The extra lists offered in this group, by prefix: its own pooled choices, else every list (not for a direct-only group). */
+    fun pools(): Map<String, List<String>> {
+        val own = targets.filter { isPooled(it) }
+        val list = own.ifEmpty { if (targets.any { protocols[it] != "freedom" && !isPooled(it) }) poolTags else emptyList() }
+        return list.groupBy { t -> pooled.first { t.startsWith("$it-") } }
+    }
 
     /** The live pooled server with the lowest delay. */
     fun best(list: List<String>): String? = list.filter { (delay(it) ?: 0) > 0 }.minByOrNull { delay(it)!! }
@@ -71,7 +79,8 @@ internal class BalancerView(
     /** How a tag reads: "No VPN" for a direct (freedom) outbound, else the name without the subscription prefix. */
     @Composable
     fun name(tag: String): String =
-        if (protocols[tag] == "freedom") stringResource(R.string.xray_no_vpn) else XrayApi.displayName(tag)
+        // A direct outbound named by the config ("🇷🇺 Без VPN") keeps its name; a plain "direct" reads "No VPN".
+        if (protocols[tag] == "freedom" && (tag == "direct" || tag == "freedom")) stringResource(R.string.xray_no_vpn) else XrayApi.displayName(tag)
     val pinned: String? get() = info?.override?.takeIf { it.isNotEmpty() }
     /** The outbound traffic goes through now: the pinned one, else the balancer's own pick. */
     val current: String? get() = pinned ?: info?.picks
@@ -142,7 +151,7 @@ private fun BalancerNow(b: BalancerView, long: Boolean, busy: Boolean = false, o
     val auto = stringResource(R.string.xray_balancer_auto)
     val text = when {
         b.pinned != null -> b.name(b.pinned!!)
-        b.info?.picks != null -> if (long) "$auto → ${b.name(b.info.picks)}" else b.name(b.info.picks)
+        b.info?.picks != null -> if (long && !b.directOnly) "$auto → ${b.name(b.info.picks)}" else b.name(b.info.picks)
         else -> auto
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -173,6 +182,8 @@ internal fun OpenBalancer(
     onTest: () -> Unit,
     onPick: (String?) -> Unit,
     modifier: Modifier,
+    /** A server's own pill tests only that server. */
+    onTestOne: (String) -> Unit = { onTest() },
 ) {
     Column(modifier) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onClose)) {
@@ -187,7 +198,7 @@ internal fun OpenBalancer(
         // An extra list (a White List of hundreds of servers) is one tile: its fastest live server.
         val pools = b.pools()
         val servers = b.targets.filter { it !in direct && !b.isPooled(it) }.sortedBy { t -> b.delay(t)?.takeIf { it > 0 } ?: Int.MAX_VALUE }
-        val tiles: List<String?> = listOf<String?>(null) + direct + pools.keys.map { POOL + it } + servers
+        val tiles: List<String?> = (if (b.directOnly) emptyList() else listOf<String?>(null)) + direct + pools.keys.map { POOL + it } + servers
         tiles.chunked(2).forEach { pair ->
             Row(
                 Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 10.dp),
@@ -214,18 +225,19 @@ internal fun OpenBalancer(
                             selected = b.pinned != null && b.isPooled(b.pinned!!) && list.contains(b.pinned),
                             busy = busy,
                             modifier = Modifier.weight(1f).fillMaxHeight(),
-                            onTest = onTest,
+                            onTest = { list.forEach(onTestOne) },
                         ) { if (best != null) onPick(best) }
                     } else {
                         ServerTile(
                             b.name(t),
                             b.protocol(t),
                             b.delay(t),
-                            selected = b.pinned == t,
+                            // A direct-only group's own direct choice is its default: picking it gives the choice back.
+                            selected = b.pinned == t || (b.directOnly && b.pinned == null && b.protocol(t) == "freedom" && (b.info?.picks ?: t) == t),
                             busy = busy,
                             modifier = Modifier.weight(1f).fillMaxHeight(),
-                            onTest = onTest,
-                        ) { onPick(t) }
+                            onTest = { onTestOne(t) },
+                        ) { onPick(if (b.directOnly && b.protocol(t) == "freedom" && (b.info?.picks ?: t) == t) null else t) }
                     }
                 }
                 if (pair.size == 1) Spacer(Modifier.weight(1f))

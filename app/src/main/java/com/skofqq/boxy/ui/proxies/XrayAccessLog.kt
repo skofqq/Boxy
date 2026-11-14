@@ -44,8 +44,8 @@ import kotlinx.coroutines.launch
 
 /** Xray's access log: which domain went through which inbound and outbound. Read when opened or refreshed. */
 @Composable
-internal fun XrayAccessLog(bottom: Dp, onBack: () -> Unit) {
-    BackHandler(onBack = onBack)
+internal fun XrayAccessLog(bottom: Dp, onBack: (() -> Unit)?) {
+    if (onBack != null) BackHandler(onBack = onBack)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var reload by remember { mutableIntStateOf(0) }
@@ -63,9 +63,15 @@ internal fun XrayAccessLog(bottom: Dp, onBack: () -> Unit) {
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
         Column {
             Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 16.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                HeaderAction(BoxyIcons.ArrowBack, stringResource(R.string.action_back), onClick = onBack)
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.xray_access_log), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text)
+                if (onBack != null) {
+                    HeaderAction(BoxyIcons.ArrowBack, stringResource(R.string.action_back), onClick = onBack)
+                    Spacer(Modifier.width(8.dp))
+                }
+                Column(Modifier.weight(1f).padding(start = if (onBack == null) 8.dp else 0.dp)) {
+                    Text(stringResource(R.string.xray_access_log), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text)
+                    // In the panel's Connections tab: what Xray cannot do there, said plainly.
+                    if (onBack == null) Text(stringResource(R.string.xray_conn_note), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+                }
                 if (path != null) HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh_page)) { reload++ }
             }
             if (path != null) {
