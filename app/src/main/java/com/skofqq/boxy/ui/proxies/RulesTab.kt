@@ -87,7 +87,7 @@ internal fun RulesTab(bottom: Dp, reloadKey: Int) {
         rules = rules?.map { if (it.index == r.index) it.copy(disabled = !r.disabled) else it }
         scope.launch {
             if (!CoreApi.setRuleDisabled(a, r.index, !r.disabled)) {
-                android.widget.Toast.makeText(context, R.string.op_failed, android.widget.Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             }
             reload++
         }
@@ -140,7 +140,7 @@ internal fun RulesTab(bottom: Dp, reloadKey: Int) {
         val a = api ?: return
         updating[p.name] = true
         if (!CoreApi.updateRuleProvider(a, p.name)) {
-            android.widget.Toast.makeText(context, context.getString(R.string.provider_update_failed, p.name), android.widget.Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.provider_update_failed, p.name), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
         updating[p.name] = false
     }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -137,11 +136,11 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
         if (applying) return
         applying = true
         scope.launch {
-            if (BoxModule.state().running) Toast.makeText(context, restarting, Toast.LENGTH_SHORT).show()
+            if (BoxModule.state().running) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, restarting, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             val ok = com.skofqq.boxy.service.BoxControl.applySettings(context.applicationContext, settings)
             moduleSetup = runCatching { BoxModule.moduleSetup() }.getOrNull()
             applying = false
-            if (!ok) Toast.makeText(context, applyFailed, Toast.LENGTH_LONG).show()
+            if (!ok) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, applyFailed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
         }
     }
 

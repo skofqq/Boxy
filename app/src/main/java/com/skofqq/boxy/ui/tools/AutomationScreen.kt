@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -78,7 +77,7 @@ fun AutomationScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     val copied = stringResource(R.string.auto_copied)
     fun copy(text: String) {
         context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Boxy", text))
-        if (Build.VERSION.SDK_INT < 33) Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
+        if (Build.VERSION.SDK_INT < 33) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, copied, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
     }
 
     PinnedLazyPage(contentPadding, header = {

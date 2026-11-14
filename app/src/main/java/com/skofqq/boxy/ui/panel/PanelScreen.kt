@@ -8,7 +8,6 @@ import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -307,7 +306,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                 WebStorage.getInstance().deleteAllData()
                 CookieManager.getInstance().removeAllCookies(null)
                 webView?.reload()
-                Toast.makeText(context, R.string.web_cache_cleared, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.web_cache_cleared, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             },
             onDismiss = { clearDialog = false },
         )

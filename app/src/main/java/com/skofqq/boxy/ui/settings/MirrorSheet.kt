@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.settings
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -58,7 +57,7 @@ fun MirrorSheet(prefs: Prefs, onDismiss: () -> Unit) {
         Mirrors.current = m
         scope.launch {
             val ok = Mirrors.applyToModule(m)
-            Toast.makeText(context, if (ok) R.string.mirror_applied else R.string.mirror_module_failed, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.mirror_applied else R.string.mirror_module_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 

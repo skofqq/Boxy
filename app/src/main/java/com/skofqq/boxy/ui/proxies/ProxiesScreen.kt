@@ -186,7 +186,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         val a = api ?: return
         scope.launch {
             if (Net.clashSetMode(a, m)) mode = m
-            else android.widget.Toast.makeText(context, R.string.op_failed, android.widget.Toast.LENGTH_SHORT).show()
+            else com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 
@@ -205,7 +205,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
             providerErrors.remove(p.name)
         } else {
             providerErrors[p.name] = com.skofqq.boxy.net.CoreApi.explainProviderError(context, core, error)
-            android.widget.Toast.makeText(context, context.getString(R.string.provider_update_failed, p.name), android.widget.Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.provider_update_failed, p.name), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
         updating[p.name] = false
     }

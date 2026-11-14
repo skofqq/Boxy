@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.apps
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -75,7 +74,7 @@ fun AppsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
 
     LaunchedEffect(vm.message) {
         vm.message?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, it, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             vm.message = null
         }
     }

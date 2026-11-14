@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,7 +72,7 @@ fun HomeScreen(
     }
     LaunchedEffect(vm.message) {
         vm.message?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, it, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             vm.message = null
         }
     }

@@ -204,12 +204,16 @@ object CoreSubscription {
             cfg.remove("boxy")
             directNotByFlag(cfg)
             // The user's settings from the panel's Settings tab (log level, probing, QUIC…) apply to every new config.
-            CoreSettings.applyXrayStored(context, cfg)
+            // The config as loaded is kept as the base; Boxy's settings and the active routing profile go over it.
+            val baseText = cfg.toString(2) + "\n"
+            RoutingProfiles.applyAll(context, cfg)
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
             // The template's own lists (a White List balancer selecting "wl-…") come from subscription_extra_xray.
             val extra = XraySubscription.refreshExtras(context)
-            install("xray", name, cfg.toString(2) + "\n")?.let { return Outcome(false, error = it, profile = reply.profile) }
+            val written = cfg.toString(2) + "\n"
+            install("xray", name, written)?.let { return Outcome(false, error = it, profile = reply.profile) }
+            RoutingProfiles.remember(context, "$BOX/xray/$name", baseText, written)
             val n = cfg.optJSONArray("outbounds")?.let { a -> (0 until a.length()).count { a.optJSONObject(it)?.optString("protocol") !in setOf("freedom", "blackhole", "dns", "loopback") } } ?: 0
             return Outcome(true, n + extra, profile = reply.profile)
         }

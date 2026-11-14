@@ -111,7 +111,7 @@ fun AppTrafficSection(reload: Int) {
                 scope.launch {
                     val ok = runCatching { CoreTools.setFindProcess(core, on) }.getOrDefault(false)
                     if (ok) findProcess = on
-                    else android.widget.Toast.makeText(context, R.string.find_process_failed, android.widget.Toast.LENGTH_LONG).show()
+                    else com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.find_process_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                     fpBusy = false
                 }
             }

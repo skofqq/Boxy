@@ -175,21 +175,18 @@ object CoreSettings {
     /** Applies the stored Xray values to a config Boxy is about to install. */
     fun applyXrayStored(context: Context, cfg: JSONObject) = applyXray(cfg, stored(context).filterKeys { it.startsWith("x.") })
 
-    /** Sets one Xray value: kept in the app, written to the active config, checked; Xray restarts when it runs. */
+    /**
+     * Sets one Xray value: kept in the app, then the active config is rebuilt from its base with every setting and
+     * the routing profile, checked by Xray (the old value comes back when rejected); Xray restarts when it runs.
+     */
     suspend fun setXray(context: Context, key: String, value: String): Result<Unit> = withContext(Dispatchers.IO) {
-        val path = CoreTools.activeConfig("xray")
-        val text = BoxModule.readFile(path) ?: return@withContext Result.failure(IllegalStateException(path))
-        if (text.split("\n").any { it.trimStart().startsWith("//") }) return@withContext Result.failure(IllegalStateException("comments"))
-        val cfg = runCatching { JSONObject(text) }.getOrNull() ?: return@withContext Result.failure(IllegalStateException("JSON"))
-        applyXray(cfg, mapOf(key to value))
-        if (!BoxModule.writeFile(path, GeoRules.pretty(cfg))) return@withContext Result.failure(IllegalStateException("write"))
-        val check = ConfigCheck.check("xray", path)
-        if (check is CheckResult.Failed) {
-            BoxModule.writeFile(path, text)
-            return@withContext Result.failure(IllegalStateException(check.output))
-        }
+        val old = prefs(context).getString(key, null)
         store(context, key, value)
-        if (BoxModule.state().running && BoxModule.unquote(BoxModule.state().core) == "xray") BoxModule.restart()
+        val r = RoutingProfiles.rebuildXray(context)
+        if (!r.ok) {
+            store(context, key, old)
+            return@withContext Result.failure(IllegalStateException(r.error ?: "check"))
+        }
         Result.success(Unit)
     }
 

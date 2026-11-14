@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.proxies
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -177,7 +176,7 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
             val r = CoreSettings.setXray(context.applicationContext, key, value)
             busy[key] = false
             val msg = r.exceptionOrNull()?.message?.let { if (it == "comments") commentsMsg else it.lines().takeLast(2).joinToString(" ") }
-            Toast.makeText(context, if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg), if (r.isSuccess) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg), if (r.isSuccess) com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT else com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
             reload++
         }
     }
@@ -187,7 +186,7 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
         scope.launch {
             val ok = block()
             busy[key] = false
-            Toast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             reload++
         }
     }
@@ -199,6 +198,11 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
         }
         val b = { k: String -> busy[k] == true }
         item { NoticeCard(stringResource(R.string.xray_settings_title), stringResource(R.string.cs_restart_note_xray), Modifier.padding(horizontal = 2.dp)) }
+        item {
+            SectionCard(null) {
+                TapRow(BoxyIcons.FilterList, stringResource(R.string.rt_title), stringResource(R.string.rt_edit_rules_sub), false, divider = false) { RoutingNav.open = true }
+            }
+        }
         item {
             SectionCard(stringResource(R.string.cs_section_log)) {
                 ChoiceRow(BoxyIcons.Description, stringResource(R.string.xray_settings_loglevel), stringResource(R.string.cs_loglevel_hint), m.getValue(CoreSettings.X_LOGLEVEL),

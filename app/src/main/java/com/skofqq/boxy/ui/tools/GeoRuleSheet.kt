@@ -167,7 +167,7 @@ fun GeoRuleSheet(core: String, configText: () -> String, onInsert: (GeoRules.Edi
 
 /** Filtered categories with a letter rail: a tap on a letter scrolls to the first name starting with it. */
 @Composable
-private fun CategoryList(
+internal fun CategoryList(
     all: List<GeoBase.Category>,
     query: String,
     showSource: Boolean,

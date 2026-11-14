@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.proxies
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,7 +91,7 @@ internal fun XrayAccessLog(bottom: Dp, onBack: (() -> Unit)?) {
                                 scope.launch {
                                     val r = XrayApi.setAccessLog(true)
                                     busy = false
-                                    if (r.isFailure) Toast.makeText(context, context.getString(R.string.xray_panel_failed, r.exceptionOrNull()?.message.orEmpty()), Toast.LENGTH_LONG).show()
+                                    if (r.isFailure) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.xray_panel_failed, r.exceptionOrNull()?.message.orEmpty()), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                                     reload++
                                 }
                             }

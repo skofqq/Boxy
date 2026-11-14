@@ -2,7 +2,6 @@ package com.skofqq.boxy.ui.tools
 
 import android.content.Context
 import android.graphics.Typeface
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -163,7 +162,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                 checked -> R.string.check_saved_ok
                 else -> R.string.editor_saved
             }
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, msg, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 
@@ -382,7 +381,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                             val r = com.skofqq.boxy.configs.SingBoxTools.compile(path, e.text.toString())
                             toolBusy = false
                             if (r.isSuccess) {
-                                Toast.makeText(context, context.getString(R.string.editor_sb_compiled, r.getOrThrow().substringAfterLast('/')), Toast.LENGTH_LONG).show()
+                                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.editor_sb_compiled, r.getOrThrow().substringAfterLast('/')), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                             } else {
                                 checkError = r.exceptionOrNull()?.message.orEmpty()
                             }
@@ -412,7 +411,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
     sections?.let { list ->
         if (list.isEmpty()) {
             LaunchedEffect(Unit) {
-                Toast.makeText(context, R.string.editor_no_sections, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.editor_no_sections, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 sections = null
             }
         } else {
@@ -450,9 +449,9 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                     c.replace(0, 0, last, c.getColumnCount(last), edit.text)
                     goTo(edit.line.coerceAtLeast(0))
                 }
-                Toast.makeText(context, R.string.geo_rule_inserted, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.geo_rule_inserted, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             },
-            onError = { msg -> Toast.makeText(context, context.getString(R.string.geo_rule_parse_failed, msg), Toast.LENGTH_LONG).show() },
+            onError = { msg -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.geo_rule_parse_failed, msg), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show() },
             onDismiss = { geoSheet = false },
         )
     }
@@ -526,7 +525,7 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
                             RootFiles.write(target, content) -> context.getString(R.string.editor_saved_as, target.substringAfterLast('/'))
                             else -> context.getString(R.string.op_failed)
                         }
-                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, msg, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     }
                 }
             },

@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.proxies
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -119,7 +118,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
         }
     }
 
-    fun toast(ok: Boolean) = Toast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, Toast.LENGTH_SHORT).show()
+    fun toast(ok: Boolean) = com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
 
     fun run(key: String, block: suspend () -> Boolean) {
         if (busy[key] == true) return
@@ -240,7 +239,7 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
                             val r = com.skofqq.boxy.configs.CoreSettings.setSingBox(context.applicationContext, key, value)
                             busy[key] = false
                             val msg = r.exceptionOrNull()?.message?.let { if (it == "comments") context.getString(R.string.cs_comments) else it.lines().takeLast(2).joinToString(" ") }
-                            Toast.makeText(context, if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg), Toast.LENGTH_LONG).show()
+                            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                             reload++
                         }
                     }

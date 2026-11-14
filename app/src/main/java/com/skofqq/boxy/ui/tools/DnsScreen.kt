@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -78,9 +77,9 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                             scope.launch {
                                 if (BoxModule.setDnsHijack(on)) {
                                     dnsHijack = on
-                                    Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
+                                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.saved, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                                 } else {
-                                    Toast.makeText(context, R.string.net_save_failed, Toast.LENGTH_SHORT).show()
+                                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.net_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -113,12 +112,12 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                                 if (BoxModule.setDnscrypt(on)) {
                                     // The service reads the setting on start: restart it when it runs.
                                     if (BoxModule.state().running) {
-                                        Toast.makeText(context, R.string.dnscrypt_restarting, Toast.LENGTH_SHORT).show()
+                                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.dnscrypt_restarting, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                                         com.skofqq.boxy.service.BoxControl.restart(context.applicationContext)
                                     }
                                     dnscryptReload++
                                 } else {
-                                    Toast.makeText(context, R.string.net_save_failed, Toast.LENGTH_SHORT).show()
+                                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.net_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -152,7 +151,7 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                             if (dc.running) {
                                 dnsCheck = true
                             } else {
-                                Toast.makeText(context, R.string.dnscheck_not_running, Toast.LENGTH_SHORT).show()
+                                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.dnscheck_not_running, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                             }
                         }
                         SettingsRow(

@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
@@ -203,10 +202,13 @@ class MainActivity : ComponentActivity() {
                     elements = prefs.glassElements,
                 )
                 CompositionLocalProvider(LocalDensity provides scaled, LocalGlass provides glass) {
-                    if (!prefs.onboardingDone) {
-                        OnboardingScreen(onFinish = { prefs.updateOnboardingDone(true) })
-                    } else {
-                        MainScreen(prefs, openPanel = firstLaunch && prefs.openPanelOnLaunch)
+                    // Boxy's own pop-up messages over every screen (BoxyToast).
+                    com.skofqq.boxy.ui.components.BoxyToastHost {
+                        if (!prefs.onboardingDone) {
+                            OnboardingScreen(onFinish = { prefs.updateOnboardingDone(true) })
+                        } else {
+                            MainScreen(prefs, openPanel = firstLaunch && prefs.openPanelOnLaunch)
+                        }
                     }
                 }
             }
@@ -276,7 +278,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             (context as? Activity)?.finish()
         } else {
             lastBack = now
-            Toast.makeText(context, backAgain, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, backAgain, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 

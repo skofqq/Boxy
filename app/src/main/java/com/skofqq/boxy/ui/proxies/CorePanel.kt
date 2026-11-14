@@ -64,7 +64,8 @@ fun CorePanel(reloadKey: Int) {
     val barBackdrop = rememberBackdrop()
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().backdropSourceOf(barBackdrop)) {
-            if (xray) when (tab) {
+            if (xray && RoutingNav.open) XrayRoutingScreen(BAR_ROOM) { RoutingNav.open = false }
+            else if (xray) when (tab) {
                 0 -> XrayPanel(BAR_ROOM, reloadKey, s.running)
                 1 -> XrayConnectionsTab(BAR_ROOM)
                 2 -> XrayLogsTab(BAR_ROOM, reloadKey)

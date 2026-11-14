@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,7 +79,7 @@ fun ProxyAuthScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     fun finish(r: ProxyAuth.Result, running: Boolean) {
         when (r) {
             ProxyAuth.Result.Ok -> {
-                Toast.makeText(context, if (running) R.string.proxy_auth_saved else R.string.proxy_auth_saved_stopped, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (running) R.string.proxy_auth_saved else R.string.proxy_auth_saved_stopped, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 reload++
             }
             is ProxyAuth.Result.Failed -> error = r.output
@@ -234,7 +233,7 @@ fun ProxyAuthScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
                         if (busy) return@SheetButtons
                         val list = if (enabled) users.toList() else emptyList()
                         if (enabled && (list.isEmpty() || !ProxyAuth.valid(list))) {
-                            Toast.makeText(context, R.string.proxy_auth_invalid, Toast.LENGTH_LONG).show()
+                            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.proxy_auth_invalid, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                             return@SheetButtons
                         }
                         busy = true

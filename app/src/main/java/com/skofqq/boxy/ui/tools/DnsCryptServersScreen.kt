@@ -1,7 +1,6 @@
 package com.skofqq.boxy.ui.tools
 
 import android.util.Base64
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -210,16 +209,16 @@ fun DnsCryptServersScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
         scope.launch {
             val toml = RootFiles.read(TOML)
             if (toml == null) {
-                Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 return@launch
             }
             val needDoh = list.orEmpty().any { it.name in names && it.protocol == "DoH" }
             if (RootFiles.write(TOML, DnsCryptList.withSelection(toml, names, needDoh))) {
                 saved = names.toSet()
-                Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.saved, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 if (BoxModule.dnscrypt().running) BoxControl.restart(context.applicationContext)
             } else {
-                Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.logs
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -132,7 +131,7 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
                 val name = current ?: return@HeaderAction
                 scope.launch {
                     if (!LogShare.share(context, "${BoxModule.RUN_DIR}/$name")) {
-                        Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -208,7 +207,7 @@ fun LogsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
             onConfirm = {
                 deleteDialog = false
                 scope.launch {
-                    if (!RootFiles.delete("${BoxModule.RUN_DIR}/$name")) Toast.makeText(context, R.string.logs_delete_failed, Toast.LENGTH_SHORT).show()
+                    if (!RootFiles.delete("${BoxModule.RUN_DIR}/$name")) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.logs_delete_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     current = null
                     reload++
                 }

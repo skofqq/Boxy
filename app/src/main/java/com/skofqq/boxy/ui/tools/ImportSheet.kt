@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -138,7 +137,7 @@ fun rememberQrLaunchers(): QrLaunchers {
     val notFound = stringResource(R.string.import_qr_not_found)
     val handle = { text: String? ->
         val r = ImportLinks.parse(text)
-        if (r != null) ImportBus.request = r else Toast.makeText(context, notFound, Toast.LENGTH_SHORT).show()
+        if (r != null) ImportBus.request = r else com.skofqq.boxy.ui.components.BoxyToast.makeText(context, notFound, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
     }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { result ->
         if (result.contents != null) handle(result.contents)
@@ -197,7 +196,7 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
 
     suspend fun makeActive(file: String) {
         if (BoxModule.writeSetting(coreConfig(c).second, file)) {
-            Toast.makeText(context, context.getString(R.string.config_selected, file), Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.config_selected, file), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 
@@ -237,14 +236,14 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
                         busy = false
                         when {
                             o.ok -> {
-                                Toast.makeText(context, context.getString(R.string.core_setup_loaded, o.servers), Toast.LENGTH_SHORT).show()
+                                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.core_setup_loaded, o.servers), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                                 onDismiss()
                             }
-                            o.limit == com.skofqq.boxy.net.SubClient.Limit.MAX_DEVICES -> Toast.makeText(context, R.string.sub_limit_devices, Toast.LENGTH_LONG).show()
-                            o.limit == com.skofqq.boxy.net.SubClient.Limit.HWID_REQUIRED -> Toast.makeText(context, R.string.sub_limit_hwid, Toast.LENGTH_LONG).show()
-                            o.error == "download" -> Toast.makeText(context, R.string.config_download_failed, Toast.LENGTH_SHORT).show()
-                            o.error == "empty" -> Toast.makeText(context, R.string.core_setup_err_empty, Toast.LENGTH_LONG).show()
-                            o.error == "format" -> Toast.makeText(context, context.getString(R.string.core_setup_err_format, c), Toast.LENGTH_LONG).show()
+                            o.limit == com.skofqq.boxy.net.SubClient.Limit.MAX_DEVICES -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.sub_limit_devices, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
+                            o.limit == com.skofqq.boxy.net.SubClient.Limit.HWID_REQUIRED -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.sub_limit_hwid, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
+                            o.error == "download" -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.config_download_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
+                            o.error == "empty" -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.core_setup_err_empty, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
+                            o.error == "format" -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.core_setup_err_format, c), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                             else -> checkError = file to (o.error ?: "")
                         }
                     }
@@ -255,10 +254,10 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
                     val saved = text != null && RootFiles.write("$dir/$file", text)
                     if (!saved) {
                         busy = false
-                        Toast.makeText(context, R.string.config_download_failed, Toast.LENGTH_SHORT).show()
+                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.config_download_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                         return@launch
                     }
-                    Toast.makeText(context, context.getString(R.string.config_download_ok, file), Toast.LENGTH_SHORT).show()
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.config_download_ok, file), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     if (!activate) {
                         busy = false
                         onDismiss()
@@ -279,7 +278,7 @@ fun ImportSheet(request: ImportRequest, onDismiss: () -> Unit) {
                 if (!validUrl || busy) return@SheetButtons
                 scope.launch {
                     val ok = addToSubscriptions(url, sanitize(name).ifBlank { "subscription.yaml" })
-                    Toast.makeText(context, if (ok) R.string.import_added else R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.import_added else R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     if (ok) onDismiss()
                 }
             },

@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -110,7 +109,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
                     val st = BoxModule.state()
                     if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
                 }
-                Toast.makeText(context, context.getString(R.string.config_selected, f.name), Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, context.getString(R.string.config_selected, f.name), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             }
         }
     }
@@ -420,7 +419,7 @@ SubPageHeader(
                 createKind = null
                 scope.launch {
                     val ok = if (folder) RootFiles.createDir("$dir/${v[0]}") else RootFiles.createFile("$dir/${v[0]}")
-                    if (!ok) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    if (!ok) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     reload++
                 }
             },
@@ -436,7 +435,7 @@ SubPageHeader(
             onConfirm = { v ->
                 renameTarget = null
                 scope.launch {
-                    if (!RootFiles.rename(f.path, v[0])) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    if (!RootFiles.rename(f.path, v[0])) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     reload++
                 }
             },
@@ -524,7 +523,7 @@ fun DownloadDialog(dir: String, onDone: () -> Unit, onDismiss: () -> Unit) {
                     }.getOrNull()
                 }
                 val ok = text != null && RootFiles.write("$dir/$name", text)
-                Toast.makeText(context, if (ok) context.getString(R.string.config_download_ok, name) else context.getString(R.string.config_download_failed), Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) context.getString(R.string.config_download_ok, name) else context.getString(R.string.config_download_failed), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 onDone()
             }
         },

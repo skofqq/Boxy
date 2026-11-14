@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -125,7 +124,7 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
                 scope.launch {
                     // Checked before it is written: a bad value would stop Hysteria at the restart.
                     HysteriaProfiles.problem(context, c)?.let { err ->
-                        Toast.makeText(context, err, Toast.LENGTH_LONG).show()
+                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, err, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                         return@launch
                     }
                     val ok = HysteriaProfiles.create(path.substringAfterLast('/'), c)
@@ -133,7 +132,7 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
                         val st = BoxModule.state()
                         if (st.running && BoxModule.unquote(st.core) == "hysteria") BoxModule.restart()
                     }
-                    Toast.makeText(context, if (ok) R.string.hy_profile_saved else R.string.hy_save_failed, Toast.LENGTH_SHORT).show()
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.hy_profile_saved else R.string.hy_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     form = false
                     reload++
                     onChanged()
@@ -164,7 +163,7 @@ fun HysteriaSection(activeName: String?, onChanged: () -> Unit) {
                     val path = active ?: return@ConfirmDialog
                     scope.launch {
                         val ok = HysteriaProfiles.create(path.substringAfterLast('/'), c.copy(up = up ?: c.up, down = down ?: c.down))
-                        Toast.makeText(context, if (ok) R.string.hy_speed_saved else R.string.hy_save_failed, Toast.LENGTH_SHORT).show()
+                        com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.hy_speed_saved else R.string.hy_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                         reload++
                     }
                 },
@@ -256,7 +255,7 @@ fun HysteriaImportSheet(initial: String, onDismiss: () -> Unit, onDone: () -> Un
                 val file = HysteriaProfiles.fileName(name.ifBlank { parsed.first })
                 scope.launch {
                     val ok = HysteriaProfiles.create(file, c, keepBandwidth = true) && (!activate || HysteriaProfiles.activate(file))
-                    Toast.makeText(context, if (ok) context.getString(R.string.hy_profile_added, file) else context.getString(R.string.hy_save_failed), Toast.LENGTH_SHORT).show()
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) context.getString(R.string.hy_profile_added, file) else context.getString(R.string.hy_save_failed), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     if (ok) {
                         onDone()
                         onDismiss()

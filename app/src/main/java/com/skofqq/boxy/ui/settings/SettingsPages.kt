@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -235,7 +234,7 @@ fun LatencyTargetsScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: ()
         val next = when {
             on -> active.filter { it.url != t.url }
             active.size >= MAX_LATENCY_TARGETS -> {
-                Toast.makeText(context, limit, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, limit, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                 return
             }
             else -> active + t
@@ -364,7 +363,7 @@ fun BackupScreen(contentPadding: PaddingValues, prefs: Prefs, onBack: () -> Unit
             scope.launch {
                 val ok = Backup.export(context, uri, prefs, exportScope)
                 busy = false
-                Toast.makeText(context, if (ok) R.string.backup_export_ok else R.string.backup_export_failed, Toast.LENGTH_SHORT).show()
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.backup_export_ok else R.string.backup_export_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             }
         }
     }
@@ -470,7 +469,7 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
             onConfirm = {
                 deleteBackup = null
                 scope.launch {
-                    if (!Backup.deleteModuleBackup(b.name)) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    if (!Backup.deleteModuleBackup(b.name)) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     backupsKey++
                 }
             },
@@ -489,7 +488,7 @@ SubPageHeader(stringResource(R.string.settings_backup), stringResource(R.string.
                 scope.launch {
                     val ok = Backup.restore(context, uri, scopeChoice, prefs)
                     busy = false
-                    Toast.makeText(context, if (ok) R.string.backup_restore_ok else R.string.backup_failed, Toast.LENGTH_SHORT).show()
+                    com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.backup_restore_ok else R.string.backup_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                     if (ok && scopeChoice != BackupScope.MODULES) {
                         (context.applicationContext as BoxyApp).reloadPrefs()
                         (context as? Activity)?.recreate()

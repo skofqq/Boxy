@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -118,7 +117,7 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
                 showDivider = core == "v2fly",
             ) { on ->
                 scope.launch {
-                    if (!XraySubscription.ensureBalancer(core, on)) Toast.makeText(context, R.string.xsub_default_failed, Toast.LENGTH_LONG).show()
+                    if (!XraySubscription.ensureBalancer(core, on)) com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.xsub_default_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                     reload++
                     onChanged()
                 }

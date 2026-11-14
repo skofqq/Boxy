@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -149,7 +148,7 @@ fun NetworkControlScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
             if (s.macs != null) ok = ok && BoxModule.writeSettingRaw("macs_list", BoxModule.toArray(s.macs.filter { it.isNotBlank() }))
             if (s.sims != null) ok = ok && BoxModule.writeSettingRaw("sim_operators_list", BoxModule.toArray(s.sims.filter { it.isNotBlank() }))
             if (ok) original = s
-            Toast.makeText(context, if (ok) R.string.saved else R.string.net_save_failed, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.saved else R.string.net_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 
@@ -242,9 +241,9 @@ SubPageHeader(stringResource(R.string.tools_network), stringResource(R.string.to
                         scope.launch {
                             if (BoxModule.setHotspotProxy(on)) {
                                 hotspotProxy = on
-                                Toast.makeText(context, R.string.saved, Toast.LENGTH_SHORT).show()
+                                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.saved, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, R.string.net_save_failed, Toast.LENGTH_SHORT).show()
+                                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.net_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                             }
                         }
                     }

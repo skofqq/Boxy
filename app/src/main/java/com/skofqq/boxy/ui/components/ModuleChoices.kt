@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.components
 
-import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -66,7 +65,7 @@ fun ModuleSettingSheet(
                 OptionRow(c.title, sub, selected) {
                     when {
                         selected -> onDismiss()
-                        !installed -> Toast.makeText(context, missingToast, Toast.LENGTH_LONG).show()
+                        !installed -> com.skofqq.boxy.ui.components.BoxyToast.makeText(context, missingToast, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                         checking != null -> Unit
                         else -> {
                             // The core, its config and the core's own check of it, before the switch is written.

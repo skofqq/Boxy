@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.tools
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -93,7 +92,7 @@ fun SubscriptionScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
                 // Apply the crontab change right away, like the module does on boot.
                 BoxModule.exec("${BoxModule.SCRIPTS}/box.service ${if (s.crontab) "cron" else "kcron"}")
             }
-            Toast.makeText(context, if (ok) R.string.saved else R.string.sub_save_failed, Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.saved else R.string.sub_save_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
         }
     }
 

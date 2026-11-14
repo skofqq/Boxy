@@ -1,6 +1,5 @@
 package com.skofqq.boxy.ui.proxies
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -181,6 +180,21 @@ internal fun XrayRulesTab(bottom: Dp, reloadKey: Int) {
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
         com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp))
     }, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        item {
+            // The rules are edited as routing profiles (lists per group, global proxy, DNS…).
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(20.dp)).background(Boxy.colors.accent.copy(alpha = 0.14f))
+                    .clickable { RoutingNav.open = true }.padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.material3.Icon(com.skofqq.boxy.ui.theme.BoxyIcons.Edit, null, Modifier.padding(end = 12.dp), tint = Boxy.colors.accent)
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.rt_edit_rules), style = MaterialTheme.typography.titleMedium, color = Boxy.colors.accent, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.rt_edit_rules_sub), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+                }
+                Text("›", style = MaterialTheme.typography.titleLarge, color = Boxy.colors.accent)
+            }
+        }
         val list = rules
         if (list == null) {
             item { Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }

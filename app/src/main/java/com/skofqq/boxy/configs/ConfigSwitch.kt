@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.widget.RemoteViews
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Row
@@ -201,7 +200,7 @@ private fun Chooser(onDone: () -> Unit) {
         applying = name
         scope.launch {
             val ok = BoxControl.setConfig(context.applicationContext, name)
-            Toast.makeText(context, if (ok) context.getString(R.string.config_selected, name) else context.getString(R.string.op_failed), Toast.LENGTH_SHORT).show()
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) context.getString(R.string.config_selected, name) else context.getString(R.string.op_failed), com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
             onDone()
         }
     }

@@ -261,7 +261,7 @@ fun TaskDialog(
                         .background(Boxy.colors.surface2)
                         .clickable {
                             clipboard.setText(androidx.compose.ui.text.AnnotatedString(lines.takeLast(200).joinToString("\n")))
-                            android.widget.Toast.makeText(context, R.string.task_copied, android.widget.Toast.LENGTH_SHORT).show()
+                            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.task_copied, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
                         },
                     contentAlignment = Alignment.Center,
                 ) {
