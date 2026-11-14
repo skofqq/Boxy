@@ -291,7 +291,8 @@ prepare_singbox() {
 
       # Sync tproxy port in sing-box configuration
       for file in "${box_dir}/sing-box/"*.json; do
-        [ -f "${file}" ] || continue
+        # Other configs in the folder: only the plain JSON ones (yq cannot read // comments, e.g. the module's example).
+        [ -f "${file}" ] && { [ "${file}" = "${sing_config}" ] || ! busybox grep -qE '^[[:space:]]*//' "${file}"; } || continue
         if busybox grep -qE '"type" *: *"tproxy"' "${file}"; then
           ${yq} '(.inbounds[] | select(.type == "tproxy") | .listen_port) = '"${tproxy_port}" -i --output-format=json "${file}"
         fi
@@ -325,7 +326,7 @@ prepare_singbox() {
 
       # Sync redir_port port in sing-box configuration
       for file in "${box_dir}/sing-box/"*.json; do
-        [ -f "${file}" ] || continue
+        [ -f "${file}" ] && { [ "${file}" = "${sing_config}" ] || ! busybox grep -qE '^[[:space:]]*//' "${file}"; } || continue
         if busybox grep -qE '"type" *: *"redirect"' "${file}"; then
           ${yq} '(.inbounds[] | select(.type == "redirect") | .listen_port) = '"${redir_port}" -i --output-format=json "${file}"
         fi
