@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">Observatory\'den durum ve gecikme, başlangıçtan beri trafik; nedenini görmek için ölü olana dokunun</string>
     <string name="xray_dead">kapalı</string>
     <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
+    <string name="cs_tools_title">Çekirdek ayarları</string>
+    <string name="cs_tools_sub">Etkin çekirdeğin günlüğü, sunucu denetimi, grupları, DNS’i…</string>
+    <string name="cs_hub_title">Etkin çekirdek</string>
+    <string name="cs_hub_sub">Dosyayı açmadan yapılandırmasındakiler</string>
     <string name="rt_title">Yönlendirme profilleri</string>
     <string name="rt_sub">Hangi site nereye gider; temel, panelin şablonu</string>
     <string name="rt_now">Şimdi</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Eklendi: %1$s</string>
     <string name="rt_applied_skipped">Uygulandı; atlandı (grup yok): %1$s</string>
     <string name="rt_edit_rules">Kuralları düzenle</string>
-    <string name="rt_edit_rules_sub">Yönlendirme profilleri: grup başına listeler, genel proxy, DNS</string>
+    <string name="rt_edit_rules_sub">Grup başına listeler, genel proxy, DNS, GEO dosyaları</string>
     <string name="cs_custom">Diğer…</string>
     <string name="cs_comments">yapılandırmada yorumlar var: “Dosyalar”da değiştirin</string>
     <string name="cs_applied">Uygulandı</string>

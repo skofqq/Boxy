@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">observatory による状態と遅延、起動以降の通信量。停止中のものをタップすると理由を表示</string>
     <string name="xray_dead">停止</string>
     <string name="xray_pool_alive">%2$d 件中 %1$d 件が稼働</string>
+    <string name="cs_tools_title">コア設定</string>
+    <string name="cs_tools_sub">有効なコアのログ、サーバーチェック、グループ、DNS など</string>
+    <string name="cs_hub_title">有効なコア</string>
+    <string name="cs_hub_sub">ファイルを開かずに設定内容を変更</string>
     <string name="rt_title">ルーティングプロファイル</string>
     <string name="rt_sub">どのサイトをどこへ送るか。基本はパネルのテンプレート</string>
     <string name="rt_now">現在</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">追加しました：%1$s</string>
     <string name="rt_applied_skipped">適用しました。スキップ（グループなし）：%1$s</string>
     <string name="rt_edit_rules">ルールを編集</string>
-    <string name="rt_edit_rules_sub">ルーティングプロファイル：グループ別リスト、グローバルプロキシ、DNS</string>
+    <string name="rt_edit_rules_sub">グループ別リスト、グローバルプロキシ、DNS、GEO ファイル</string>
     <string name="cs_custom">その他…</string>
     <string name="cs_comments">設定にコメントがあります：「ファイル」で変更してください</string>
     <string name="cs_applied">適用しました</string>

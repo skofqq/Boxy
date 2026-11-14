@@ -1019,6 +1019,10 @@
     <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
     <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
+    <string name="cs_tools_title">Core settings</string>
+    <string name="cs_tools_sub">Log, server checks, groups, DNS… of the active core</string>
+    <string name="cs_hub_title">Active core</string>
+    <string name="cs_hub_sub">What its config holds, without opening the file</string>
     <string name="rt_title">Routing profiles</string>
     <string name="rt_sub">Which sites go where; the panel template is the base</string>
     <string name="rt_now">Now</string>
@@ -1093,7 +1097,7 @@
     <string name="rt_added">Added: %1$s</string>
     <string name="rt_applied_skipped">Applied; skipped (no such group): %1$s</string>
     <string name="rt_edit_rules">Edit rules</string>
-    <string name="rt_edit_rules_sub">Routing profiles: lists per group, global proxy, DNS</string>
+    <string name="rt_edit_rules_sub">Lists per group, global proxy, DNS, GEO files</string>
     <string name="cs_custom">Other…</string>
     <string name="cs_comments">the config has comments: change it in Files</string>
     <string name="cs_applied">Applied</string>

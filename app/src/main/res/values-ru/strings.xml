@@ -1007,6 +1007,10 @@
     <string name="xray_outbounds_sub">Состояние и задержка от observatory, трафик с момента запуска; нажмите на недоступный, чтобы увидеть причину</string>
     <string name="xray_dead">недоступен</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
+    <string name="cs_tools_title">Настройки ядра</string>
+    <string name="cs_tools_sub">Журнал, проверка серверов, группы, DNS… активного ядра</string>
+    <string name="cs_hub_title">Активное ядро</string>
+    <string name="cs_hub_sub">Что задано в его конфиге — без открытия файла</string>
     <string name="rt_title">Профили маршрутизации</string>
     <string name="rt_sub">Какие сайты куда идут; основа — шаблон панели</string>
     <string name="rt_now">Сейчас</string>
@@ -1081,7 +1085,7 @@
     <string name="rt_added">Добавлено: %1$s</string>
     <string name="rt_applied_skipped">Применён; пропущены (нет такой группы): %1$s</string>
     <string name="rt_edit_rules">Изменить правила</string>
-    <string name="rt_edit_rules_sub">Профили маршрутизации: списки по группам, глобальный прокси, DNS</string>
+    <string name="rt_edit_rules_sub">Списки по группам, глобальный прокси, DNS, GEO-файлы</string>
     <string name="cs_custom">Другое…</string>
     <string name="cs_comments">в конфиге есть комментарии — измените его в «Файлах»</string>
     <string name="cs_applied">Применено</string>

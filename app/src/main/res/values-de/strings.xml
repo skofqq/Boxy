@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
+    <string name="cs_tools_title">Kern-Einstellungen</string>
+    <string name="cs_tools_sub">Protokoll, Serverprüfung, Gruppen, DNS… des aktiven Kerns</string>
+    <string name="cs_hub_title">Aktiver Kern</string>
+    <string name="cs_hub_sub">Was seine Konfiguration enthält, ohne die Datei zu öffnen</string>
     <string name="rt_title">Routing-Profile</string>
     <string name="rt_sub">Welche Seiten wohin gehen; die Basis ist die Panel-Vorlage</string>
     <string name="rt_now">Jetzt</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Hinzugefügt: %1$s</string>
     <string name="rt_applied_skipped">Angewendet; übersprungen (Gruppe fehlt): %1$s</string>
     <string name="rt_edit_rules">Regeln bearbeiten</string>
-    <string name="rt_edit_rules_sub">Routing-Profile: Listen je Gruppe, globaler Proxy, DNS</string>
+    <string name="rt_edit_rules_sub">Listen je Gruppe, globaler Proxy, DNS, GEO-Dateien</string>
     <string name="cs_custom">Andere…</string>
     <string name="cs_comments">die Konfiguration hat Kommentare: ändere sie unter „Dateien“</string>
     <string name="cs_applied">Übernommen</string>

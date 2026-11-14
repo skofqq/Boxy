@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">État et délai de l’observatory, trafic depuis le démarrage ; touchez un nœud mort pour la raison</string>
     <string name="xray_dead">hors ligne</string>
     <string name="xray_pool_alive">%1$d sur %2$d en ligne</string>
+    <string name="cs_tools_title">Réglages du cœur</string>
+    <string name="cs_tools_sub">Journal, vérification des serveurs, groupes, DNS… du cœur actif</string>
+    <string name="cs_hub_title">Cœur actif</string>
+    <string name="cs_hub_sub">Ce que contient sa configuration, sans ouvrir le fichier</string>
     <string name="rt_title">Profils de routage</string>
     <string name="rt_sub">Quels sites vont où ; la base est le modèle du panneau</string>
     <string name="rt_now">Actuel</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Ajouté : %1$s</string>
     <string name="rt_applied_skipped">Appliqué ; ignoré (groupe absent) : %1$s</string>
     <string name="rt_edit_rules">Modifier les règles</string>
-    <string name="rt_edit_rules_sub">Profils de routage : listes par groupe, proxy global, DNS</string>
+    <string name="rt_edit_rules_sub">Listes par groupe, proxy global, DNS, fichiers GEO</string>
     <string name="cs_custom">Autre…</string>
     <string name="cs_comments">la configuration contient des commentaires : modifiez-la dans Fichiers</string>
     <string name="cs_applied">Appliqué</string>

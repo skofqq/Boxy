@@ -81,6 +81,9 @@ fun ToolsScreen(contentPadding: PaddingValues, navExtra: NavExtra, active: Boole
                 r == ROUTE_TRAFFIC -> TrafficScreen(contentPadding, onBack = pop)
                 r == ROUTE_AUTOMATION -> AutomationScreen(contentPadding, onBack = pop)
                 r == ROUTE_PROXY_AUTH -> ProxyAuthScreen(contentPadding, onBack = pop)
+                // The same screens the panel's Rules / Settings tabs open, here next to the config files.
+                r == ROUTE_ROUTING -> com.skofqq.boxy.ui.proxies.XrayRoutingScreen(contentPadding.calculateBottomPadding(), onBack = pop)
+                r == ROUTE_CORE_SETTINGS -> com.skofqq.boxy.ui.proxies.CoreSettingsScreen(contentPadding, onBack = pop)
             }
         }
     }
@@ -98,6 +101,8 @@ const val ROUTE_AUTOMATION = "automation"
 const val ROUTE_DNSCRYPT = "dnscrypt"
 const val ROUTE_DNS = "dns"
 const val ROUTE_PROXY_AUTH = "proxy_auth"
+const val ROUTE_ROUTING = "routing"
+const val ROUTE_CORE_SETTINGS = "core_settings"
 
 /** Opens a Tools page from elsewhere: set [request] to a route and switch to the Tools tab. */
 object ToolsNav {
@@ -131,10 +136,20 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
 }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item {
             SectionCard(stringResource(R.string.tools_config), stringResource(R.string.tools_config_sub)) {
-                SettingsRow(BoxyIcons.Folder, stringResource(R.string.tools_row_manage), stringResource(R.string.tools_row_manage_sub)) { push(ROUTE_FILES) }
                 SettingsRow(BoxyIcons.Tune, stringResource(R.string.tools_row_select), stringResource(R.string.tools_row_select_sub)) { push(ROUTE_CONFIGS) }
+                SettingsRow(BoxyIcons.Folder, stringResource(R.string.tools_row_manage), stringResource(R.string.tools_row_manage_sub)) { push(ROUTE_FILES) }
                 SettingsRow(BoxyIcons.QrCode, stringResource(R.string.import_title), stringResource(R.string.import_row_sub)) { importChooser = true }
                 SettingsRow(BoxyIcons.Subscriptions, stringResource(R.string.tools_subscription), stringResource(R.string.tools_subscription_sub), showDivider = false) { push(ROUTE_SUBSCRIPTION) }
+            }
+        }
+        item {
+            // What the active core's config holds, edited without opening the file: settings, routing, ports' auth.
+            val core by androidx.compose.runtime.produceState<String?>(null) { value = runCatching { BoxModule.unquote(BoxModule.readSetting("bin_name")) }.getOrNull() }
+            val hasSettings = core == "xray" || core == "sing-box"
+            SectionCard(stringResource(R.string.cs_hub_title), stringResource(R.string.cs_hub_sub)) {
+                if (hasSettings) SettingsRow(BoxyIcons.Settings, stringResource(R.string.cs_tools_title), stringResource(R.string.cs_tools_sub)) { push(ROUTE_CORE_SETTINGS) }
+                if (core == "xray") SettingsRow(BoxyIcons.FilterList, stringResource(R.string.rt_title), stringResource(R.string.rt_edit_rules_sub)) { push(ROUTE_ROUTING) }
+                SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub), showDivider = false) { push(ROUTE_PROXY_AUTH) }
             }
         }
         item {
@@ -142,7 +157,6 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
                 SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
                 SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub)) { push(ROUTE_DNSCRYPT) }
-                SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub)) { push(ROUTE_PROXY_AUTH) }
                 SettingsRow(BoxyIcons.Speed, stringResource(R.string.tls_ping_title), stringResource(R.string.tls_ping_row_sub), showDivider = false) { tlsPing = true }
             }
         }

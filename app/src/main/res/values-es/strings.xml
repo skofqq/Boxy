@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">Estado y retardo del observatory, tráfico desde el inicio; toca uno caído para ver el motivo</string>
     <string name="xray_dead">caído</string>
     <string name="xray_pool_alive">%1$d de %2$d activos</string>
+    <string name="cs_tools_title">Ajustes del núcleo</string>
+    <string name="cs_tools_sub">Registro, comprobación de servidores, grupos, DNS… del núcleo activo</string>
+    <string name="cs_hub_title">Núcleo activo</string>
+    <string name="cs_hub_sub">Lo que tiene su configuración, sin abrir el archivo</string>
     <string name="rt_title">Perfiles de enrutamiento</string>
     <string name="rt_sub">Qué sitios van adónde; la base es la plantilla del panel</string>
     <string name="rt_now">Ahora</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Añadido: %1$s</string>
     <string name="rt_applied_skipped">Aplicado; omitido (no existe el grupo): %1$s</string>
     <string name="rt_edit_rules">Editar reglas</string>
-    <string name="rt_edit_rules_sub">Perfiles de enrutamiento: listas por grupo, proxy global, DNS</string>
+    <string name="rt_edit_rules_sub">Listas por grupo, proxy global, DNS, archivos GEO</string>
     <string name="cs_custom">Otro…</string>
     <string name="cs_comments">la configuración tiene comentarios: cámbiala en Archivos</string>
     <string name="cs_applied">Aplicado</string>

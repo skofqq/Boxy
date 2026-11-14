@@ -199,11 +199,6 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
         val b = { k: String -> busy[k] == true }
         item { NoticeCard(stringResource(R.string.xray_settings_title), stringResource(R.string.cs_restart_note_xray), Modifier.padding(horizontal = 2.dp)) }
         item {
-            SectionCard(null) {
-                TapRow(BoxyIcons.FilterList, stringResource(R.string.rt_title), stringResource(R.string.rt_edit_rules_sub), false, divider = false) { RoutingNav.open = true }
-            }
-        }
-        item {
             SectionCard(stringResource(R.string.cs_section_log)) {
                 ChoiceRow(BoxyIcons.Description, stringResource(R.string.xray_settings_loglevel), stringResource(R.string.cs_loglevel_hint), m.getValue(CoreSettings.X_LOGLEVEL),
                     listOf("debug", "info", "warning", "error", "none").map { it to it }, b(CoreSettings.X_LOGLEVEL)) { set(CoreSettings.X_LOGLEVEL, it) }
@@ -237,9 +232,6 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
         }
         item {
             SectionCard(stringResource(R.string.cs_section_routing)) {
-                ChoiceRow(BoxyIcons.FilterList, stringResource(R.string.cs_domain_strategy), stringResource(R.string.cs_domain_strategy_hint), m.getValue(CoreSettings.X_DOMAIN_STRATEGY), listOf(
-                    "AsIs" to stringResource(R.string.cs_ds_asis), "IPIfNonMatch" to stringResource(R.string.cs_ds_nonmatch), "IPOnDemand" to stringResource(R.string.cs_ds_ondemand),
-                ), b(CoreSettings.X_DOMAIN_STRATEGY)) { set(CoreSettings.X_DOMAIN_STRATEGY, it) }
                 ToggleRow(BoxyIcons.Block, stringResource(R.string.cs_block_quic), stringResource(R.string.cs_block_quic_hint), m[CoreSettings.X_BLOCK_QUIC] == "true", b(CoreSettings.X_BLOCK_QUIC), divider = false) {
                     set(CoreSettings.X_BLOCK_QUIC, it.toString())
                 }
@@ -269,9 +261,6 @@ internal fun XraySettingsTab(bottom: Dp, reloadKey: Int, running: Boolean) {
             SectionCard(stringResource(R.string.panel_settings_maintenance)) {
                 TapRow(BoxyIcons.Power, stringResource(R.string.panel_settings_restart), stringResource(R.string.panel_settings_restart_sub), b("restart")) {
                     task("restart") { !running || BoxModule.restart() }
-                }
-                TapRow(BoxyIcons.Download, stringResource(R.string.cs_geo), stringResource(R.string.cs_geo_hint), b("geo")) {
-                    task("geo") { BoxModule.exec("BOX_FORCE=1 BOX_BIN_NAME=xray ${BoxModule.SCRIPTS}/box.tool geox >/dev/null 2>&1").first }
                 }
                 TapRow(BoxyIcons.ArrowCircle, stringResource(R.string.cs_pins), stringResource(R.string.cs_pins_hint), b("pins"), divider = false) {
                     task("pins") { XrayApi.clearPins() }
@@ -331,6 +320,66 @@ internal fun LazyListScope.singBoxSettings(
         // auto_detect_interface is not offered: the module sets it for its tproxy / tun mode at every start.
         SectionCard(null) {
             TapRow(BoxyIcons.Delete, stringResource(R.string.cs_clear_cache), stringResource(R.string.cs_clear_cache_hint), b("cache"), divider = false, onClick = onClearCache)
+        }
+    }
+}
+
+/**
+ * The active core's settings as a page of Tools (next to the config files): Xray's or sing-box's, the same code the
+ * panel's Settings tab shows. mihomo's run-time settings stay on the panel.
+ */
+@Composable
+fun CoreSettingsScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
+    androidx.activity.compose.BackHandler(onBack = onBack)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val state by androidx.compose.runtime.produceState<com.skofqq.boxy.root.ServiceState?>(null) { value = runCatching { BoxModule.state() }.getOrNull() }
+    val s = state ?: return
+    val core = BoxModule.unquote(s.core)
+    Column(Modifier.padding(top = contentPadding.calculateTopPadding())) {
+        Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 16.dp, top = 6.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            com.skofqq.boxy.ui.components.HeaderAction(BoxyIcons.ArrowBack, stringResource(R.string.action_back), onClick = onBack)
+            Spacer(Modifier.width(10.dp))
+            Text(
+                stringResource(R.string.cs_tools_title) + " · " + (if (core == "xray") "Xray" else "Sing-box"),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                color = Boxy.colors.text,
+            )
+        }
+        if (core == "xray") {
+            XraySettingsTab(contentPadding.calculateBottomPadding(), 0, s.running)
+        } else {
+            var reload by remember { mutableIntStateOf(0) }
+            var v by remember { mutableStateOf<Map<String, String>?>(null) }
+            val busy = remember { mutableStateMapOf<String, Boolean>() }
+            LaunchedEffect(reload) { v = CoreSettings.singBoxValues(context) }
+            PinnedLazyPage(PaddingValues(bottom = contentPadding.calculateBottomPadding() + 16.dp), header = {}, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                item { NoticeCard("Sing-box", stringResource(R.string.cs_restart_note_sb), Modifier.padding(horizontal = 2.dp)) }
+                singBoxSettings(v, busy, onSet = { key, value ->
+                    if (busy[key] != true) {
+                        busy[key] = true
+                        scope.launch {
+                            val r = CoreSettings.setSingBox(context.applicationContext, key, value)
+                            busy[key] = false
+                            val msg = r.exceptionOrNull()?.message?.let { if (it == "comments") context.getString(R.string.cs_comments) else it.lines().takeLast(2).joinToString(" ") }
+                            com.skofqq.boxy.ui.components.BoxyToast.makeText(
+                                context,
+                                if (r.isSuccess) context.getString(R.string.cs_applied) else context.getString(R.string.cs_failed, msg),
+                                com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG,
+                            ).show()
+                            reload++
+                        }
+                    }
+                }, onClearCache = {
+                    busy["cache"] = true
+                    scope.launch {
+                        CoreSettings.clearSingBoxCache()
+                        busy["cache"] = false
+                        reload++
+                    }
+                })
+            }
         }
     }
 }

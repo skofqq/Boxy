@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">Стан і затрымка ад observatory, трафік з моманту запуску; націсніце на недаступны, каб убачыць прычыну</string>
     <string name="xray_dead">недаступны</string>
     <string name="xray_pool_alive">%1$d з %2$d даступныя</string>
+    <string name="cs_tools_title">Налады ядра</string>
+    <string name="cs_tools_sub">Журнал, праверка сервераў, групы, DNS… актыўнага ядра</string>
+    <string name="cs_hub_title">Актыўнае ядро</string>
+    <string name="cs_hub_sub">Што зададзена ў яго канфігу — без адкрыцця файла</string>
     <string name="rt_title">Профілі маршрутызацыі</string>
     <string name="rt_sub">Якія сайты куды ідуць; аснова — шаблон панэлі</string>
     <string name="rt_now">Цяпер</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Дададзена: %1$s</string>
     <string name="rt_applied_skipped">Ужыты; прапушчаны (няма такой групы): %1$s</string>
     <string name="rt_edit_rules">Змяніць правілы</string>
-    <string name="rt_edit_rules_sub">Профілі маршрутызацыі: спісы па групах, глабальны проксі, DNS</string>
+    <string name="rt_edit_rules_sub">Спісы па групах, глабальны проксі, DNS, GEO-файлы</string>
     <string name="cs_custom">Іншае…</string>
     <string name="cs_comments">у канфігу ёсць каментарыі — змяніце яго ў «Файлах»</string>
     <string name="cs_applied">Ужыта</string>

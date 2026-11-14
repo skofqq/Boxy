@@ -996,6 +996,10 @@
     <string name="xray_outbounds_sub">Observatory берген күй мен кідіріс, іске қосылғаннан бергі трафик; себебін көру үшін қолжетімсізін түртіңіз</string>
     <string name="xray_dead">қолжетімсіз</string>
     <string name="xray_pool_alive">%2$d ішінен %1$d қолжетімді</string>
+    <string name="cs_tools_title">Ядро баптаулары</string>
+    <string name="cs_tools_sub">Белсенді ядроның журналы, серверлерді тексеру, топтар, DNS…</string>
+    <string name="cs_hub_title">Белсенді ядро</string>
+    <string name="cs_hub_sub">Оның конфигінде не берілген — файлды ашпай</string>
     <string name="rt_title">Маршруттау профильдері</string>
     <string name="rt_sub">Қай сайт қайда барады; негізі — панель үлгісі</string>
     <string name="rt_now">Қазір</string>
@@ -1070,7 +1074,7 @@
     <string name="rt_added">Қосылды: %1$s</string>
     <string name="rt_applied_skipped">Қолданылды; өткізілді (мұндай топ жоқ): %1$s</string>
     <string name="rt_edit_rules">Ережелерді өзгерту</string>
-    <string name="rt_edit_rules_sub">Маршруттау профильдері: топ бойынша тізімдер, жаһандық прокси, DNS</string>
+    <string name="rt_edit_rules_sub">Топ бойынша тізімдер, жаһандық прокси, DNS, GEO файлдары</string>
     <string name="cs_custom">Басқа…</string>
     <string name="cs_comments">конфигте түсініктемелер бар — оны «Файлдар» бөлімінде өзгертіңіз</string>
     <string name="cs_applied">Қолданылды</string>
