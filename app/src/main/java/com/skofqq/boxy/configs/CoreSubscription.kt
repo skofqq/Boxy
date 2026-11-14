@@ -199,6 +199,7 @@ object CoreSubscription {
             // Group icons the template carries for Boxy (Xray ignores the key; it is not kept in the file).
             com.skofqq.boxy.ui.proxies.GroupIcons.setPanel(context, cfg.optJSONObject("boxy"))
             cfg.remove("boxy")
+            directNotByFlag(cfg)
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
             // The template's own lists (a White List balancer selecting "wl-…") come from subscription_extra_xray.
@@ -222,6 +223,38 @@ object CoreSubscription {
         return Outcome(true, servers, skipped, profile = reply.profile)
     }
 
+
+    /**
+     * A direct (freedom) outbound whose tag starts with a flag ("🇷🇺 Без VPN") is picked by balancers that select
+     * servers by flag letters, as if it were a server: "⚡️ Fastest" would go direct. It is renamed "direct" (Boxy
+     * shows it as "🇷🇺 Без VPN") in the outbounds, rules, balancers and observatories.
+     */
+    private fun directNotByFlag(cfg: JSONObject) {
+        val obs = cfg.optJSONArray("outbounds") ?: return
+        val tags = (0 until obs.length()).mapNotNull { obs.optJSONObject(it)?.optString("tag") }
+        if ("direct" in tags) return
+        val ob = (0 until obs.length()).mapNotNull { obs.optJSONObject(it) }.firstOrNull { o ->
+            o.optString("protocol") == "freedom" && o.optString("tag").let { t -> t.isNotEmpty() && t.codePointAt(0) in 0x1F1E6..0x1F1FF }
+        } ?: return
+        val old = ob.optString("tag")
+        ob.put("tag", "direct")
+        fun fix(a: org.json.JSONArray?) {
+            if (a == null) return
+            for (i in 0 until a.length()) if (a.optString(i) == old) a.put(i, "direct")
+        }
+        val routing = cfg.optJSONObject("routing")
+        routing?.optJSONArray("rules")?.let { r ->
+            (0 until r.length()).mapNotNull { r.optJSONObject(it) }.filter { it.optString("outboundTag") == old }.forEach { it.put("outboundTag", "direct") }
+        }
+        routing?.optJSONArray("balancers")?.let { b ->
+            (0 until b.length()).mapNotNull { b.optJSONObject(it) }.forEach { bal ->
+                fix(bal.optJSONArray("selector"))
+                if (bal.optString("fallbackTag") == old) bal.put("fallbackTag", "direct")
+            }
+        }
+        fix(cfg.optJSONObject("burstObservatory")?.optJSONArray("subjectSelector"))
+        fix(cfg.optJSONObject("observatory")?.optJSONArray("subjectSelector"))
+    }
 
     /** Remnawave's Xray JSON path of a subscription URL: <path>/json, null when it is one already. */
     private fun jsonUrl(url: String): String? {

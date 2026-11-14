@@ -84,9 +84,10 @@ internal class BalancerView(
     val pinned: String? get() = info?.override?.takeIf { it.isNotEmpty() }
     /** The outbound traffic goes through now: the pinned one, else the balancer's own pick. */
     val current: String? get() = pinned ?: info?.picks
-    val alive get() = targets.count { states[it]?.alive == true }
-    /** Servers among the choices: "No VPN" (freedom) is not one. */
-    val servers get() = targets.count { protocols[it] != "freedom" }
+    /** Servers among the choices: not "Без VPN" (freedom), not an extra list's (White List is one choice of its own). */
+    private val serverTargets get() = targets.filter { protocols[it] != "freedom" && !isPooled(it) }
+    val alive get() = serverTargets.count { states[it]?.alive == true }
+    val servers get() = serverTargets.size
 }
 
 private const val POOL = "\u0000pool:"

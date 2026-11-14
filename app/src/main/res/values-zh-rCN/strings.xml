@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
+    <string name="xray_search_outbounds">搜索出站</string>
     <string name="xray_conn_note">Xray 不记录当前打开的连接，也无法关闭连接：这里是它的访问日志，显示流量去了哪里。</string>
     <string name="xray_logs_empty">暂时没有内容。</string>
     <string name="xray_logs_pause">暂停</string>

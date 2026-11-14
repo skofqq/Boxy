@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
+    <string name="xray_search_outbounds">Ausgänge suchen</string>
     <string name="xray_conn_note">Xray führt keine Liste offener Verbindungen und kann sie nicht schließen: Hier ist sein Zugriffsprotokoll – was wohin ging.</string>
     <string name="xray_logs_empty">Noch nichts da.</string>
     <string name="xray_logs_pause">Pause</string>

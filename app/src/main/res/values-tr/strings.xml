@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Observatory\'den durum ve gecikme, başlangıçtan beri trafik; nedenini görmek için ölü olana dokunun</string>
     <string name="xray_dead">kapalı</string>
     <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
+    <string name="xray_search_outbounds">Çıkışlarda ara</string>
     <string name="xray_conn_note">Xray açık bağlantıların listesini tutmaz ve onları kapatamaz: burada erişim günlüğü var, ne nereye gitti.</string>
     <string name="xray_logs_empty">Henüz bir şey yok.</string>
     <string name="xray_logs_pause">Duraklat</string>
