@@ -77,6 +77,33 @@ object XraySubscription {
         return Status(sub, bal, def, skipped)
     }
 
+    /**
+     * Downloads the extra lists (subscription_extra_xray, e.g. a White List on GitHub) into xray/subs/<prefix>.txt
+     * and converts them into xray/subs/<prefix>.json ("<prefix>-…" outbounds), for a full config from a panel that
+     * selects them ("wl-"): it runs with every subs file its text names. A list that cannot be downloaded keeps its
+     * previous files. Returns the number of servers.
+     */
+    suspend fun refreshExtras(context: android.content.Context): Int = withContext(Dispatchers.IO) {
+        val byPrefix = extras().groupBy { it.prefix }
+        if (byPrefix.isEmpty()) return@withContext 0
+        Shell.cmd("mkdir -p ${CoreTools.XRAY_SUBS}").exec()
+        var servers = 0
+        for ((prefix, list) in byPrefix) {
+            val bodies = list.mapNotNull { e -> com.skofqq.boxy.net.SubClient.fetch(context, e.url, com.skofqq.boxy.net.SubClient.Format.LINKS)?.takeIf { it.ok }?.body }
+            if (bodies.size != list.size) continue
+            val text = bodies.joinToString("\n") { b ->
+                if ("://" in b) b else runCatching { String(android.util.Base64.decode(b.trim(), android.util.Base64.DEFAULT), Charsets.UTF_8) }.getOrDefault("")
+            }
+            val conv = ShareLinks.convert(text, "xray", "$prefix-")
+            if (conv.outbounds.isEmpty()) continue
+            XrayInsecureFix.pinOutbounds(conv.outbounds, conv.insecure)
+            BoxModule.writeFile("${CoreTools.XRAY_SUBS}/$prefix.txt", text)
+            BoxModule.writeFile("${CoreTools.XRAY_SUBS}/$prefix.json", GeoRules.pretty(JSONObject().put("outbounds", JSONArray(conv.outbounds))))
+            servers += conv.outbounds.size
+        }
+        servers
+    }
+
     /** Downloads with the module (its User-Agent and mirror), then applies; the module's event is not sent. */
     suspend fun downloadScript(core: String): String = "(export BOXY_NO_EVENT=1; " + BoxModule.toolCommand("subs", core, force = true) + ")"
 

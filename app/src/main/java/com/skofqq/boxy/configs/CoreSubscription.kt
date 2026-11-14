@@ -188,9 +188,11 @@ object CoreSubscription {
             cfg.remove("meta")
             val name = "profiles/${host(url)}.json"
             Shell.cmd("mkdir -p $BOX/xray/profiles").exec()
+            // The template's own lists (a White List balancer selecting "wl-…") come from subscription_extra_xray.
+            val extra = XraySubscription.refreshExtras(context)
             install("xray", name, cfg.toString(2) + "\n")?.let { return Outcome(false, error = it, profile = reply.profile) }
             val n = cfg.optJSONArray("outbounds")?.let { a -> (0 until a.length()).count { a.optJSONObject(it)?.optString("protocol") !in setOf("freedom", "blackhole", "dns", "loopback") } } ?: 0
-            return Outcome(true, n, profile = reply.profile)
+            return Outcome(true, n + extra, profile = reply.profile)
         }
         if (ShareLinks.links(text).isEmpty()) return Outcome(false, error = "format", profile = reply.profile)
         val prevUrl = XraySubscription.url()
