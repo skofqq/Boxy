@@ -99,7 +99,7 @@ boxy://import/<the subscription URL, URL-encoded>
 boxy://import?url=<URL-encoded subscription URL>&name=<name>&core=<clash|sing-box|xray|hysteria>
 ```
 
-For Remnawave, Boxy identifies itself as `Boxy/1.1 (sing-box; …)`, `Boxy/1.1 (xray; …)`, `Boxy/1.1 (mihomo; …)`: response rules
+For Remnawave, Boxy identifies itself as `SFA/1.1 (sing-box; …; Boxy/1.1; …)`, `Boxy/1.1 (xray; …)`, `clash.meta (mihomo; Boxy/1.1; …)`: response rules
 can serve it its own templates by User-Agent. It sends `x-hwid`, `x-device-os`, `x-ver-os`, `x-device-model` (a random id of the
 install; Settings → Send device ID).
 

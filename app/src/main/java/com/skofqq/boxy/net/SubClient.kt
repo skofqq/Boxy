@@ -21,12 +21,13 @@ import java.net.URL
  */
 object SubClient {
     /**
-     * Which format to ask for. Remnawave's default rules give sing-box JSON to "singbox" and YAML to mihomo / clash;
-     * a panel can also match "^Boxy/.*sing-box" / "^Boxy/.*xray" to serve Boxy's own templates (configs/remnawave-templates).
+     * Which format to ask for. The sing-box and mihomo agents start the way panels' default rules expect
+     * (Remnawave: "^sfa…" → sing-box JSON, "^clash.meta…" → mihomo YAML); a panel can match "Boxy/.*xray" (it has
+     * no default Xray JSON rule) or "Boxy/.*sing-box" to serve Boxy's own templates (configs/remnawave-templates).
      */
     enum class Format(val userAgent: String) {
-        SINGBOX("Boxy/1.1 (sing-box; singbox SFA; Android)"),
-        MIHOMO("Boxy/1.1 (mihomo; clash.meta; Android)"),
+        SINGBOX("SFA/1.1 (sing-box; singbox; Boxy/1.1; Android)"),
+        MIHOMO("clash.meta (mihomo; Boxy/1.1; Android)"),
         XRAY("Boxy/1.1 (xray; Android)"),
         LINKS("Boxy/1.1 (Android)"),
     }
