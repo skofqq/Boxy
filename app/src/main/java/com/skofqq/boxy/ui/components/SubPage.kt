@@ -53,6 +53,18 @@ fun BackPill(onClick: () -> Unit) {
 /** Back pill, then the page title with actions on the same row. */
 @Composable
 fun SubPageHeader(title: String, subtitle: String?, onBack: (() -> Unit)?, actions: @Composable RowScope.() -> Unit = {}) {
+    // Scrolled (M3 collapsing top app bar): the title moves next to the back pill on one line.
+    if (LocalHeaderCollapsed.current) {
+        Row(Modifier.fillMaxWidth().padding(end = 20.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (onBack != null) BackPill(onBack) else Spacer(Modifier.width(8.dp))
+            Text(
+                title, Modifier.weight(1f).padding(start = 12.dp, top = 8.dp),
+                style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically, content = actions)
+        }
+        return
+    }
     Column {
         if (onBack != null) BackPill(onBack)
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {

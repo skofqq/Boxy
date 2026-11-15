@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,8 @@ fun PinnedLazyPage(
     val backdrop = rememberBackdrop()
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(0.dp) }
+    // The list has moved: headers (SubPageHeader) collapse to one line, so the pinned part stays small.
+    val scrolled by remember(state) { derivedStateOf { state.firstVisibleItemIndex > 0 || state.firstVisibleItemScrollOffset > 0 } }
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             Modifier.fillMaxSize().backdropSource(backdrop),
@@ -49,12 +53,15 @@ fun PinnedLazyPage(
             verticalArrangement = verticalArrangement,
             content = content,
         )
-        CompositionLocalProvider(LocalBackdrop provides backdrop) {
+        CompositionLocalProvider(LocalBackdrop provides backdrop, LocalHeaderCollapsed provides scrolled) {
             GlassSurface(
                 RectangleShape,
                 Boxy.colors.page,
                 0.dp,
-                Modifier.fillMaxWidth().onSizeChanged { headerHeight = with(density) { it.height.toDp() } },
+                Modifier.fillMaxWidth().onSizeChanged {
+                    // The list keeps the full header's room: a collapsed header must not pull the list up under the finger.
+                    if (!scrolled || headerHeight == 0.dp) headerHeight = with(density) { it.height.toDp() }
+                },
                 element = true,
                 lens = false,
                 edge = false,
@@ -64,3 +71,6 @@ fun PinnedLazyPage(
         }
     }
 }
+
+/** True in the header of a [PinnedLazyPage] whose list is scrolled away from the top. */
+val LocalHeaderCollapsed = compositionLocalOf { false }
