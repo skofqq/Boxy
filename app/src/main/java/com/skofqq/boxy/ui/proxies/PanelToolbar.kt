@@ -178,12 +178,25 @@ internal fun PanelToolbar(
                         )
                     } else {
                         // Each button takes its share of the whole pill, top to bottom: no dead gaps between them.
+                        // The chosen section shows its name only when the name fits whole and the others keep a 44 dp target;
+                        // otherwise (a long name, two actions beside the pill) it is an icon on a tinted pill too.
+                        val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+                        val labelStyle = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+                        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().padding(4.dp)) {
+                        val count = sections.size + if (search != null) 1 else 0
+                        val label = with(density) { measurer.measure(sections[selected.coerceIn(sections.indices)].first, labelStyle).size.width.toDp() }
+                        val wide = 16.dp + 22.dp + 6.dp + label + 2.dp
+                        val showLabel = maxWidth - wide >= 44.dp * (count - 1)
                         Row(
-                            Modifier.fillMaxSize().padding(4.dp),
+                            Modifier.fillMaxSize(),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             sections.forEachIndexed { i, (name, icon) ->
-                                SectionButton(name, icon, i == selected, Modifier.weight(if (i == selected) 2.2f else 1f)) { onSelect(i) }
+                                val chosen = i == selected
+                                SectionButton(
+                                    name, icon, chosen, chosen && showLabel,
+                                    if (chosen && showLabel) Modifier.width(wide) else Modifier.weight(1f),
+                                ) { onSelect(i) }
                             }
                             if (search != null) {
                                 Box(
@@ -193,6 +206,7 @@ internal fun PanelToolbar(
                                     Icon(BoxyIcons.Search, search.hint, Modifier.size(22.dp), tint = if (search.query.isNotEmpty()) Boxy.colors.accent else Boxy.colors.text2)
                                 }
                             }
+                        }
                         }
                     }
                 }
@@ -204,22 +218,22 @@ internal fun PanelToolbar(
 
 /** A section on the toolbar: an icon, and the name next to it on a tinted pill when chosen. */
 @Composable
-private fun SectionButton(name: String, icon: ImageVector, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+private fun SectionButton(name: String, icon: ImageVector, selected: Boolean, showLabel: Boolean, modifier: Modifier, onClick: () -> Unit) {
     Row(
         modifier.fillMaxHeight().clip(RoundedCornerShape(50))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = if (showLabel) 8.dp else 0.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, if (selected) null else name, Modifier.size(22.dp), tint = if (selected) Boxy.colors.accent else Boxy.colors.text2)
-        if (selected) {
+        Icon(icon, if (showLabel) null else name, Modifier.size(22.dp), tint = if (selected) Boxy.colors.accent else Boxy.colors.text2)
+        if (showLabel) {
             Spacer(Modifier.width(6.dp))
             Text(
                 name,
                 style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold,
-                color = Boxy.colors.accent, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                color = Boxy.colors.accent, maxLines = 1, softWrap = false,
             )
         }
     }
