@@ -84,6 +84,7 @@ fun ToolsScreen(contentPadding: PaddingValues, navExtra: NavExtra, active: Boole
                 // The same screens the panel's Rules / Settings tabs open, here next to the config files.
                 r == ROUTE_ROUTING -> com.skofqq.boxy.ui.proxies.XrayRoutingScreen(contentPadding, onBack = pop)
                 r == ROUTE_CORE_SETTINGS -> com.skofqq.boxy.ui.proxies.CoreSettingsScreen(contentPadding, onBack = pop)
+                r == ROUTE_BUILDER -> ConfigBuilderScreen(contentPadding, onBack = pop, onRouting = { push(ROUTE_ROUTING) })
             }
         }
     }
@@ -103,6 +104,7 @@ const val ROUTE_DNS = "dns"
 const val ROUTE_PROXY_AUTH = "proxy_auth"
 const val ROUTE_ROUTING = "routing"
 const val ROUTE_CORE_SETTINGS = "core_settings"
+const val ROUTE_BUILDER = "builder"
 
 /** Opens a Tools page from elsewhere: set [request] to a route and switch to the Tools tab. */
 object ToolsNav {
@@ -153,7 +155,9 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
             SectionCard(stringResource(R.string.cs_hub_title), stringResource(R.string.cs_hub_sub)) {
                 if (hasSettings) SettingsRow(BoxyIcons.Settings, stringResource(R.string.cs_tools_title), stringResource(R.string.cs_tools_sub)) { push(ROUTE_CORE_SETTINGS) }
                 if (core == "xray") SettingsRow(BoxyIcons.FilterList, stringResource(R.string.rt_title), stringResource(R.string.rt_edit_rules_sub)) { push(ROUTE_ROUTING) }
-                SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub), showDivider = false) { push(ROUTE_PROXY_AUTH) }
+                SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub)) { push(ROUTE_PROXY_AUTH) }
+                // A config of one's own (Xray): servers, groups, routing profile, without a panel template.
+                SettingsRow(BoxyIcons.Add, stringResource(R.string.cb_title), stringResource(R.string.cb_row_sub), showDivider = false) { push(ROUTE_BUILDER) }
             }
         }
         item {
