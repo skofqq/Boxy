@@ -116,6 +116,8 @@ internal fun FloatingSearch(
     modifier: Modifier = Modifier,
     actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit,
 ) {
+    // In the panel tab the search lives on the sections' floating toolbar.
+    if (registerPanelSearch(query, onQuery, hint, actions)) return
     // The list fades into the page under the bar, so the pills stand apart from the cards behind them.
     val page = Boxy.colors.page
     // With the keyboard open the bar sits right on it: the keyboard covers the room kept for the bottom bar, so

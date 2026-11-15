@@ -1,5 +1,7 @@
 package com.skofqq.boxy.ui.proxies
 
+import kotlinx.coroutines.launch
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.core.animateFloat
@@ -64,7 +66,8 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
     val xray = BoxModule.unquote(s.core) == "xray"
     var tab by rememberSaveable { mutableIntStateOf(0) }
     // As a tab of the app's bar the sections switch on top (one bar at the bottom), else on a bar of their own.
-    val room = if (sectionsOnTop) 8.dp else BAR_ROOM
+    // As a tab: the room of the panel's floating toolbar under every list.
+    val room = if (sectionsOnTop) PANEL_TOOLBAR_ROOM else BAR_ROOM
     val sections = listOf(
         stringResource(R.string.proxies_tab_groups) to BoxyIcons.Language,
         stringResource(R.string.panel_tab_connections) to BoxyIcons.Link,
@@ -72,7 +75,7 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
         stringResource(R.string.panel_tab_rules) to BoxyIcons.FilterList,
         stringResource(R.string.tab_settings) to BoxyIcons.Settings,
     )
-    val page: @Composable () -> Unit = {
+    val pageAt: @Composable (Int) -> Unit = { tab ->
         if (xray) when (tab) {
             0 -> XrayPanel(room, reloadKey, s.running)
             1 -> XrayConnectionsTab(room)
@@ -87,10 +90,29 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
             else -> SettingsTab(room, reloadKey)
         }
     }
+    val page: @Composable () -> Unit = { pageAt(tab) }
     if (sectionsOnTop) {
-        Column(Modifier.fillMaxSize()) {
-            SectionSwitch(sections, tab) { tab = it }
-            Box(Modifier.fillMaxWidth().weight(1f)) { page() }
+        // Sections side by side: swiped, or picked on the floating toolbar at the bottom. A list's own sideways
+        // gestures (chip rows, node rows) take the swipe first, the pager only what they leave.
+        val pager = androidx.compose.foundation.pager.rememberPagerState(initialPage = tab) { sections.size }
+        val scope = androidx.compose.runtime.rememberCoroutineScope()
+        val nav = androidx.compose.runtime.remember { PanelNav() }
+        androidx.compose.runtime.LaunchedEffect(pager.currentPage) { tab = pager.currentPage; nav.visible = true }
+        val toolbarBackdrop = rememberBackdrop()
+        Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().backdropSourceOf(toolbarBackdrop).nestedScroll(nav.scroll)) {
+                androidx.compose.foundation.pager.HorizontalPager(pager, Modifier.fillMaxSize(), key = { it }) { i ->
+                    CompositionLocalProvider(LocalPanelNav provides nav, LocalPanelPage provides i) { pageAt(i) }
+                }
+            }
+            CompositionLocalProvider(LocalBackdrop provides toolbarBackdrop) {
+                PanelToolbar(
+                    nav, sections, pager.currentPage,
+                    onSelect = { i -> scope.launch { pager.animateScrollToPage(i) } },
+                    bottom = 0.dp,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
+            }
         }
         return
     }
@@ -111,30 +133,6 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
                 { tab = it },
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp),
             )
-        }
-    }
-}
-
-/** The panel's sections as pills on top (the panel as a tab of the app): icon and name, the chosen one tinted. */
-@Composable
-private fun SectionSwitch(sections: List<Pair<String, androidx.compose.ui.graphics.vector.ImageVector>>, selected: Int, onSelect: (Int) -> Unit) {
-    androidx.compose.foundation.layout.Row(
-        Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        sections.forEachIndexed { i, (name, icon) ->
-            val on = i == selected
-            androidx.compose.foundation.layout.Row(
-                Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
-                    .background(if (on) Boxy.colors.accent.copy(alpha = 0.18f) else Boxy.colors.card)
-                    .clickable { onSelect(i) }
-                    .padding(horizontal = 14.dp, vertical = 9.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                androidx.compose.material3.Icon(icon, null, Modifier.size(18.dp), tint = if (on) Boxy.colors.accent else Boxy.colors.text2)
-                Spacer(Modifier.width(6.dp))
-                Text(name, style = MaterialTheme.typography.labelLarge, color = if (on) Boxy.colors.accent else Boxy.colors.text, maxLines = 1)
-            }
         }
     }
 }
