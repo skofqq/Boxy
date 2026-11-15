@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -110,6 +111,7 @@ internal val LocalPanelPage = compositionLocalOf { -1 }
 /** Room the toolbar takes over the bottom of a section's list. */
 internal val PANEL_TOOLBAR_ROOM = 84.dp
 
+
 /** A section's search goes to the toolbar: true when it did (the section then draws no bar of its own). */
 @Composable
 internal fun registerPanelSearch(query: String, onQuery: (String) -> Unit, hint: String, actions: @Composable RowScope.() -> Unit): Boolean {
@@ -145,6 +147,15 @@ internal fun PanelToolbar(
         enter = slideInVertically { it } + fadeIn(),
         exit = slideOutVertically { it } + fadeOut(),
     ) {
+        androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.End) {
+        // The section's actions (⚡, pause, close all…): small floating buttons stacked at the right edge above the
+        // toolbar, swapped with a fade when the section changes.
+        androidx.compose.animation.AnimatedContent(
+            search?.actions,
+            Modifier.padding(end = 18.dp),
+            transitionSpec = { (fadeIn() + androidx.compose.animation.scaleIn(initialScale = 0.8f)) togetherWith (fadeOut() + androidx.compose.animation.scaleOut(targetScale = 0.8f)) },
+            label = "panelActions",
+        ) { actions -> if (actions != null) ActionStack(actions) }
         Box(
             Modifier
                 // Taps on the toolbar's strip (between and around the pills) never reach the list under it.
@@ -216,7 +227,32 @@ internal fun PanelToolbar(
                 }
             }
         }
+        }
     }
+}
+
+/** Lays the section's actions out top to bottom, right-aligned (they are written for a row). */
+@Composable
+private fun ActionStack(actions: @Composable RowScope.() -> Unit) {
+    androidx.compose.ui.layout.Layout(content = { StackRowScope.actions() }) { measurables, constraints ->
+        val gap = 12.dp.roundToPx()
+        val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
+        val w = placeables.maxOfOrNull { it.width } ?: 0
+        val h = placeables.sumOf { it.height } + gap * placeables.size
+        layout(w, h) {
+            var y = 0
+            placeables.forEach { p -> p.placeRelative(w - p.width, y); y += p.height + gap }
+        }
+    }
+}
+
+/** The row receiver the actions expect; they use none of its modifiers, so each leaves the modifier as it is. */
+private object StackRowScope : RowScope {
+    override fun Modifier.weight(weight: Float, fill: Boolean): Modifier = this
+    override fun Modifier.align(alignment: Alignment.Vertical): Modifier = this
+    override fun Modifier.alignBy(alignmentLine: androidx.compose.ui.layout.HorizontalAlignmentLine): Modifier = this
+    override fun Modifier.alignByBaseline(): Modifier = this
+    override fun Modifier.alignBy(alignmentLineBlock: (androidx.compose.ui.layout.Measured) -> Int): Modifier = this
 }
 
 /** A section on the toolbar: an icon, and the name next to it on a tinted pill when chosen. */

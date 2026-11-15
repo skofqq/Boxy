@@ -152,7 +152,7 @@ fun PanelScreen(
     }
 
     val backdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
-    // The built-in panel as a tab: its sections' actions come up to this row (see PanelToolbar).
+    // The built-in panel as a tab: its sections and their search / actions on a floating toolbar (PanelToolbar).
     val panelNav = remember { com.skofqq.boxy.ui.proxies.PanelNav() }
     androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides backdrop) {
     Column(Modifier.fillMaxSize().padding(contentPadding)) {
@@ -164,10 +164,6 @@ fun PanelScreen(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-            if (native && asTab) panelNav.searches[panelNav.current]?.let { section ->
-                Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) { section.actions(this) }
-                Spacer(Modifier.width(4.dp))
-            }
             if (kind == PanelKind.CORE) {
                 HeaderAction(BoxyIcons.Palette, stringResource(R.string.dashboard_title)) { dashboardSheet = true }
             }
