@@ -171,8 +171,8 @@
     <string name="action_refresh">Yenile</string>
     <string name="apps_whitelist">Beyaz liste</string>
     <string name="apps_blacklist">Kara liste</string>
-    <string name="apps_summary">%1$d öğe • %2$s • %3$d seçili</string>
-    <string name="apps_summary_core">%1$d öğe • Çekirdek • Uygulama kuralları yok sayılır</string>
+    <string name="apps_summary">%1$s • %2$s • %3$d seçili</string>
+    <string name="apps_summary_core">%1$s • Çekirdek • Uygulama kuralları yok sayılır</string>
     <string name="apps_sort_filter">Sırala ve filtrele</string>
     <string name="apps_select_all">Tümünü seç</string>
     <string name="apps_invert">Tersine çevir</string>
@@ -221,7 +221,7 @@
     <string name="tools_update_row_sub">Çekirdekler, abonelik, WebUI</string>
     <string name="tools_subscription">Abonelik</string>
     <string name="tools_subscription_sub">Sağlayıcı yolu ve adresler</string>
-    <string name="config_files_active_summary">%1$d dosya • Etkin: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Etkin: %2$s</string>
     <string name="config_download">URL’den yapılandırma indir</string>
     <string name="config_download_hint">Uzak bir adresten yapılandırma dosyası indir</string>
     <string name="config_active">Etkin yapılandırma</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">Ana</string>
     <string name="rt_mode_over">Şablonun üstünde</string>
     <string name="rt_mode_replace">Şablonun yerine</string>
-    <string name="rt_count">%1$d rota · %2$d girdi</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Uygula</string>
     <string name="rt_rename">Yeniden adlandır</string>
     <string name="rt_duplicate">Çoğalt</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Xray bu girdiyi kabul etmez</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">Her satıra bir girdi</string>
-    <string name="rt_text_ok">%1$d girdi</string>
     <string name="rt_text_bad">Kabul edilmedi: %1$s</string>
     <string name="rt_geo_pick_sub">Tüm etkin kaynakların cihazdaki dosyalarından; dokunmak etiketi ekler</string>
     <string name="rt_added">Eklendi: %1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Aboneliği güncelle</string>
     <string name="xsub_servers">Sunucular: %1$d</string>
-    <string name="xsub_applied">%1$d sunucu uygulandı, %2$d bağlantı atlandı</string>
+    <string name="xsub_applied">%1$s uygulandı, %2$s atlandı</string>
     <string name="xsub_default">Tüm trafik abonelik üzerinden</string>
     <string name="xsub_default_sub">«sub» dengeleyicisine son yönlendirme kuralı: ping\'e göre en hızlı sunucu</string>
     <string name="xsub_default_sub_v2">«sub» dengeleyicisine son yönlendirme kuralı (V2Ray rastgele seçer)</string>
@@ -1324,4 +1323,32 @@
     <string name="sub_support">Destek</string>
     <string name="import_from_clipboard">Panodaki bağlantı</string>
     <string name="xsub_skip_singbox">sing-box\'ta olmayanı kullanıyor (XHTTP, Xray finalmask)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d öğe</item>
+        <item quantity="other">%d öğe</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d dosya</item>
+        <item quantity="other">%d dosya</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d rota</item>
+        <item quantity="other">%d rota</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d girdi</item>
+        <item quantity="other">%d girdi</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d sunucu</item>
+        <item quantity="other">%d sunucu</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d bağlantı</item>
+        <item quantity="other">%d bağlantı</item>
+    </plurals>
+    <string name="settings_traffic_stats">Trafik istatistikleri</string>
+    <string name="settings_traffic_stats_on">Gün ve uygulama başına; kapatmak pil tasarrufu sağlar</string>
+    <string name="settings_traffic_stats_off">Kapalı: trafik sayılmaz</string>
+    <string name="traffic_off_hint">Trafik istatistikleri kapalı (Ayarlar › Davranış), yeni bir şey sayılmıyor. Trafiği gün ve uygulama başına saymak için açın.</string>
 </resources>

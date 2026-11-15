@@ -171,8 +171,8 @@
     <string name="action_refresh">Aktualisieren</string>
     <string name="apps_whitelist">Whitelist</string>
     <string name="apps_blacklist">Blacklist</string>
-    <string name="apps_summary">%1$d Einträge • %2$s • %3$d ausgewählt</string>
-    <string name="apps_summary_core">%1$d Einträge • Kern • App-Regeln ignoriert</string>
+    <string name="apps_summary">%1$s • %2$s • %3$d ausgewählt</string>
+    <string name="apps_summary_core">%1$s • Kern • App-Regeln ignoriert</string>
     <string name="apps_sort_filter">Sortieren &amp; filtern</string>
     <string name="apps_select_all">Alle auswählen</string>
     <string name="apps_invert">Umkehren</string>
@@ -221,7 +221,7 @@
     <string name="tools_update_row_sub">Kerne, Abo, WebUI</string>
     <string name="tools_subscription">Abo</string>
     <string name="tools_subscription_sub">Provider-Pfad &amp; URLs</string>
-    <string name="config_files_active_summary">%1$d Dateien • Aktiv: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Aktiv: %2$s</string>
     <string name="config_download">Konfiguration per URL laden</string>
     <string name="config_download_hint">Konfigurationsdatei von einer Remote-URL herunterladen</string>
     <string name="config_active">Aktive Konfiguration</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">Haupt</string>
     <string name="rt_mode_over">Über der Vorlage</string>
     <string name="rt_mode_replace">Statt der Vorlage</string>
-    <string name="rt_count">%1$d Routen · %2$d Einträge</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Anwenden</string>
     <string name="rt_rename">Umbenennen</string>
     <string name="rt_duplicate">Duplizieren</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Kein Eintrag, den Xray annimmt</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">Ein Eintrag pro Zeile</string>
-    <string name="rt_text_ok">%1$d Einträge</string>
     <string name="rt_text_bad">Nicht angenommen: %1$s</string>
     <string name="rt_geo_pick_sub">Aus den Dateien aller aktiven Quellen auf dem Gerät; Tippen fügt den Tag hinzu</string>
     <string name="rt_added">Hinzugefügt: %1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Abo aktualisieren</string>
     <string name="xsub_servers">Server: %1$d</string>
-    <string name="xsub_applied">%1$d Server übernommen, %2$d Links übersprungen</string>
+    <string name="xsub_applied">%1$s übernommen, %2$s übersprungen</string>
     <string name="xsub_default">Gesamter Traffic über das Abo</string>
     <string name="xsub_default_sub">Letzte Routing-Regel auf den Balancer „sub“: der schnellste Server nach Ping</string>
     <string name="xsub_default_sub_v2">Letzte Routing-Regel auf den Balancer „sub“ (V2Ray wählt zufällig)</string>
@@ -1324,4 +1323,32 @@
     <string name="sub_support">Support</string>
     <string name="import_from_clipboard">Link aus der Zwischenablage</string>
     <string name="xsub_skip_singbox">nutzt, was sing-box nicht hat (XHTTP, Xrays finalmask)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d Eintrag</item>
+        <item quantity="other">%d Einträge</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d Datei</item>
+        <item quantity="other">%d Dateien</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d Route</item>
+        <item quantity="other">%d Routen</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d Eintrag</item>
+        <item quantity="other">%d Einträge</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d Server</item>
+        <item quantity="other">%d Server</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d Link</item>
+        <item quantity="other">%d Links</item>
+    </plurals>
+    <string name="settings_traffic_stats">Traffic-Statistik</string>
+    <string name="settings_traffic_stats_on">Pro Tag und pro App; aus spart Akku</string>
+    <string name="settings_traffic_stats_off">Aus: kein Traffic wird gezählt</string>
+    <string name="traffic_off_hint">Die Traffic-Statistik ist aus (Einstellungen › Verhalten), nichts Neues wird gezählt. Einschalten, um Traffic pro Tag und App zu zählen.</string>
 </resources>

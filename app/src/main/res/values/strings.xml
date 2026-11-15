@@ -187,8 +187,8 @@
 
     <string name="apps_whitelist">Whitelist</string>
     <string name="apps_blacklist">Blacklist</string>
-    <string name="apps_summary">%1$d items • %2$s • %3$d selected</string>
-    <string name="apps_summary_core">%1$d items • Core • Ignore app rules</string>
+    <string name="apps_summary">%1$s • %2$s • %3$d selected</string>
+    <string name="apps_summary_core">%1$s • Core • Ignore app rules</string>
     <string name="apps_sort_filter">Sort &amp; filter</string>
     <string name="apps_select_all">Select all</string>
     <string name="apps_invert">Invert</string>
@@ -238,7 +238,7 @@
     <string name="tools_update_row_sub">Cores, subscription, WebUI</string>
     <string name="tools_subscription">Subscription</string>
     <string name="tools_subscription_sub">Core provide path &amp; URLs</string>
-    <string name="config_files_active_summary">%1$d files • Active: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Active: %2$s</string>
     <string name="config_download">Download config from URL</string>
     <string name="config_download_hint">Download a config file from a remote URL</string>
     <string name="config_active">Active configuration</string>
@@ -1005,7 +1005,7 @@
     <string name="rt_main">Main</string>
     <string name="rt_mode_over">Over the template</string>
     <string name="rt_mode_replace">Instead of the template</string>
-    <string name="rt_count">%1$d routes · %2$d entries</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Apply</string>
     <string name="rt_rename">Rename</string>
     <string name="rt_duplicate">Duplicate</string>
@@ -1064,7 +1064,6 @@
     <string name="rt_entry_invalid">Not an entry Xray takes</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">One entry per line</string>
-    <string name="rt_text_ok">%1$d entries</string>
     <string name="rt_text_bad">Not taken: %1$s</string>
     <string name="rt_geo_pick_sub">From the device’s files of every enabled source; a tap adds the tag</string>
     <string name="rt_added">Added: %1$s</string>
@@ -1171,7 +1170,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Update the subscription</string>
     <string name="xsub_servers">Servers: %1$d</string>
-    <string name="xsub_applied">%1$d servers applied, %2$d links skipped</string>
+    <string name="xsub_applied">%1$s applied, %2$s skipped</string>
     <string name="xsub_default">All traffic through the subscription</string>
     <string name="xsub_default_sub">A last routing rule to the balancer \"sub\": the fastest server by ping</string>
     <string name="xsub_default_sub_v2">A last routing rule to the balancer \"sub\" (V2Ray picks at random)</string>
@@ -1347,4 +1346,32 @@
     <string name="sub_support">Support</string>
     <string name="import_from_clipboard">Link from the clipboard</string>
     <string name="xsub_skip_singbox">uses what sing-box does not have (XHTTP, Xray\'s finalmask)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d route</item>
+        <item quantity="other">%d routes</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d server</item>
+        <item quantity="other">%d servers</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d link</item>
+        <item quantity="other">%d links</item>
+    </plurals>
+    <string name="settings_traffic_stats">Traffic statistics</string>
+    <string name="settings_traffic_stats_on">Per day and per app; off saves battery</string>
+    <string name="settings_traffic_stats_off">Off: no traffic is counted</string>
+    <string name="traffic_off_hint">Traffic statistics are off (Settings › Behavior), so nothing new is counted. Turn them on to count traffic per day and per app.</string>
 </resources>

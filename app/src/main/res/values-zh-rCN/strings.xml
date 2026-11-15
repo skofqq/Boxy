@@ -150,8 +150,8 @@
     <string name="action_refresh">刷新</string>
     <string name="apps_whitelist">白名单</string>
     <string name="apps_blacklist">黑名单</string>
-    <string name="apps_summary">%1$d 项 • %2$s • 已选 %3$d</string>
-    <string name="apps_summary_core">%1$d 项 • 核心 • 忽略应用规则</string>
+    <string name="apps_summary">%1$s • %2$s • 已选 %3$d</string>
+    <string name="apps_summary_core">%1$s • 核心 • 忽略应用规则</string>
     <string name="apps_sort_filter">排序与筛选</string>
     <string name="apps_select_all">全选</string>
     <string name="apps_invert">反选</string>
@@ -200,7 +200,7 @@
     <string name="tools_update_row_sub">核心、订阅、WebUI</string>
     <string name="tools_subscription">订阅</string>
     <string name="tools_subscription_sub">核心 provide 路径与链接</string>
-    <string name="config_files_active_summary">%1$d 个文件 • 当前：%2$s</string>
+    <string name="config_files_active_summary">%1$s • 当前：%2$s</string>
     <string name="config_download">从链接下载配置</string>
     <string name="config_download_hint">从远程链接下载配置文件</string>
     <string name="config_active">当前配置</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">主方案</string>
     <string name="rt_mode_over">叠加在模板之上</string>
     <string name="rt_mode_replace">替代模板</string>
-    <string name="rt_count">%1$d 条路由 · %2$d 个条目</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">应用</string>
     <string name="rt_rename">重命名</string>
     <string name="rt_duplicate">复制</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Xray 不接受此条目</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">每行一个条目</string>
-    <string name="rt_text_ok">%1$d 个条目</string>
     <string name="rt_text_bad">不接受：%1$s</string>
     <string name="rt_geo_pick_sub">来自设备上所有已启用来源的文件；点按即可添加标签</string>
     <string name="rt_added">已添加：%1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">更新订阅</string>
     <string name="xsub_servers">服务器：%1$d</string>
-    <string name="xsub_applied">已应用 %1$d 个服务器，跳过 %2$d 个链接</string>
+    <string name="xsub_applied">已应用 %1$s，跳过 %2$s</string>
     <string name="xsub_default">所有流量走订阅</string>
     <string name="xsub_default_sub">最后一条路由规则指向负载均衡“sub”：按延迟选最快的服务器</string>
     <string name="xsub_default_sub_v2">最后一条路由规则指向负载均衡“sub”（V2Ray 随机选择）</string>
@@ -1324,4 +1323,26 @@
     <string name="sub_support">支持</string>
     <string name="import_from_clipboard">剪贴板中的链接</string>
     <string name="xsub_skip_singbox">使用了 sing-box 不支持的功能（XHTTP、Xray 的 finalmask）</string>
+    <plurals name="pl_items">
+        <item quantity="other">%d 项</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="other">%d 个文件</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="other">%d 条路由</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="other">%d 个条目</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="other">%d 个服务器</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="other">%d 个链接</item>
+    </plurals>
+    <string name="settings_traffic_stats">流量统计</string>
+    <string name="settings_traffic_stats_on">按天和按应用；关闭可节省电量</string>
+    <string name="settings_traffic_stats_off">已关闭：不统计流量</string>
+    <string name="traffic_off_hint">流量统计已关闭（设置 › 行为），不会统计新的流量。开启后可按天和按应用统计流量。</string>
 </resources>

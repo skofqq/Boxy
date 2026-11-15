@@ -149,7 +149,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
     PinnedLazyPage(contentPadding, header = {
 SubPageHeader(
                 stringResource(R.string.tools_config),
-                files?.let { stringResource(R.string.config_files_active_summary, it.size, active ?: "—") },
+                files?.let { stringResource(R.string.config_files_active_summary, androidx.compose.ui.res.pluralStringResource(R.plurals.pl_files, it.size, it.size), active ?: "—") },
                 onBack,
             ) {
                 HeaderAction(BoxyIcons.Download, stringResource(R.string.config_download)) { downloadDialog = true }

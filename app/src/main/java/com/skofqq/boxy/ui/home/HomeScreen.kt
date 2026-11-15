@@ -60,6 +60,8 @@ fun HomeScreen(
     onOpenLogs: () -> Unit,
     onOpenSubStore: () -> Unit,
     onOpenDns: () -> Unit = {},
+    /** The Home tab is shown: its own polling of the module (every 2 s) runs only then. */
+    active: Boolean = true,
 ) {
     val vm: HomeViewModel = viewModel { HomeViewModel(prefs) }
     val context = LocalContext.current
@@ -67,7 +69,12 @@ fun HomeScreen(
     var sheet by remember { mutableStateOf(HomeSheet.NONE) }
     var envKey by remember { mutableStateOf(0) }
 
-    LaunchedEffect(owner, envKey) {
+    // Traffic statistics while the app is in front, whatever tab is shown.
+    LaunchedEffect(owner, prefs.trafficStats) {
+        owner.repeatOnLifecycle(Lifecycle.State.STARTED) { vm.pollTraffic() }
+    }
+    LaunchedEffect(owner, envKey, active) {
+        if (!active) return@LaunchedEffect
         owner.repeatOnLifecycle(Lifecycle.State.STARTED) { vm.poll() }
     }
     LaunchedEffect(vm.message) {

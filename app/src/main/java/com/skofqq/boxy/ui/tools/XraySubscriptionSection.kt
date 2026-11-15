@@ -87,7 +87,7 @@ fun XraySubscriptionSection(core: String, onChanged: () -> Unit) {
                     val downloaded = RootTask.run(XraySubscription.downloadScript(core)) { taskLines.addTaskLine(it) }
                     taskOk = downloaded && XraySubscription.apply(core).fold(
                         onSuccess = { (n, skipped) ->
-                            taskLines.add("✓ " + String.format(appliedText, n, skipped.size))
+                            taskLines.add("✓ " + String.format(appliedText, context.resources.getQuantityString(R.plurals.pl_servers, n, n), context.resources.getQuantityString(R.plurals.pl_links, skipped.size, skipped.size)))
                             skipped.forEach { taskLines.add("– " + skipText(context, it)) }
                             true
                         },

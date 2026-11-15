@@ -327,6 +327,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                             val i = tabs.indexOf(Tab.TOOLS)
                             if (i >= 0) scope.launch { pager.animateScrollToPage(i) }
                         },
+                        active = subPage == null && pager.currentPage == index,
                     )
                     Tab.APPS -> AppsScreen(padding)
                     Tab.TOOLS -> ToolsScreen(padding, NavExtra.NONE, active = subPage == null && pager.currentPage == index) {

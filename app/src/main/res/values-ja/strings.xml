@@ -171,8 +171,8 @@
     <string name="action_refresh">更新</string>
     <string name="apps_whitelist">ホワイトリスト</string>
     <string name="apps_blacklist">ブラックリスト</string>
-    <string name="apps_summary">%1$d 件 • %2$s • %3$d 件選択</string>
-    <string name="apps_summary_core">%1$d 件 • コア • アプリのルールは無視</string>
+    <string name="apps_summary">%1$s • %2$s • %3$d 件選択</string>
+    <string name="apps_summary_core">%1$s • コア • アプリのルールは無視</string>
     <string name="apps_sort_filter">並べ替えと絞り込み</string>
     <string name="apps_select_all">すべて選択</string>
     <string name="apps_invert">反転</string>
@@ -221,7 +221,7 @@
     <string name="tools_update_row_sub">コア、サブスクリプション、WebUI</string>
     <string name="tools_subscription">サブスクリプション</string>
     <string name="tools_subscription_sub">プロバイダのパスと URL</string>
-    <string name="config_files_active_summary">%1$d ファイル • 有効: %2$s</string>
+    <string name="config_files_active_summary">%1$s • 有効: %2$s</string>
     <string name="config_download">URL から設定をダウンロード</string>
     <string name="config_download_hint">リモート URL から設定ファイルをダウンロード</string>
     <string name="config_active">有効な設定</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">メイン</string>
     <string name="rt_mode_over">テンプレートの上に</string>
     <string name="rt_mode_replace">テンプレートの代わりに</string>
-    <string name="rt_count">ルート %1$d · 項目 %2$d</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">適用</string>
     <string name="rt_rename">名前を変更</string>
     <string name="rt_duplicate">複製</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Xray が受け付けない項目です</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">1 行に 1 項目</string>
-    <string name="rt_text_ok">%1$d 項目</string>
     <string name="rt_text_bad">受け付けられません：%1$s</string>
     <string name="rt_geo_pick_sub">有効なすべてのソースの端末内ファイルから。タップでタグを追加</string>
     <string name="rt_added">追加しました：%1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">サブスクリプションを更新</string>
     <string name="xsub_servers">サーバー: %1$d</string>
-    <string name="xsub_applied">サーバー %1$d 件を適用、リンク %2$d 件をスキップ</string>
+    <string name="xsub_applied">%1$s を適用、%2$s をスキップ</string>
     <string name="xsub_default">すべての通信をサブスクリプション経由に</string>
     <string name="xsub_default_sub">バランサー「sub」への最後のルーティングルール：ping が最速のサーバー</string>
     <string name="xsub_default_sub_v2">バランサー「sub」への最後のルーティングルール（V2Ray はランダムに選択）</string>
@@ -1324,4 +1323,26 @@
     <string name="sub_support">サポート</string>
     <string name="import_from_clipboard">クリップボードのリンク</string>
     <string name="xsub_skip_singbox">sing-box にない機能を使用（XHTTP、Xray の finalmask）</string>
+    <plurals name="pl_items">
+        <item quantity="other">%d 件</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="other">%d ファイル</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="other">ルート %d</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="other">項目 %d</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="other">サーバー %d 件</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="other">リンク %d 件</item>
+    </plurals>
+    <string name="settings_traffic_stats">通信量の統計</string>
+    <string name="settings_traffic_stats_on">日別・アプリ別。オフにするとバッテリーを節約できます</string>
+    <string name="settings_traffic_stats_off">オフ：通信量は記録されません</string>
+    <string name="traffic_off_hint">通信量の統計はオフです（設定 › 動作）。新しい通信量は記録されません。日別・アプリ別に記録するにはオンにしてください。</string>
 </resources>

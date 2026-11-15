@@ -179,8 +179,8 @@
 
     <string name="apps_whitelist">Белый список</string>
     <string name="apps_blacklist">Чёрный список</string>
-    <string name="apps_summary">%1$d шт. • %2$s • выбрано %3$d</string>
-    <string name="apps_summary_core">%1$d шт. • Ядро • Правила приложений не действуют</string>
+    <string name="apps_summary">%1$s • %2$s • выбрано %3$d</string>
+    <string name="apps_summary_core">%1$s • Ядро • Правила приложений не действуют</string>
     <string name="apps_sort_filter">Сортировка и фильтры</string>
     <string name="apps_select_all">Выбрать все</string>
     <string name="apps_invert">Инвертировать</string>
@@ -230,7 +230,7 @@
     <string name="tools_update_row_sub">Ядра, подписка, WebUI</string>
     <string name="tools_subscription">Подписка</string>
     <string name="tools_subscription_sub">Пути провайдеров и адреса</string>
-    <string name="config_files_active_summary">Файлов: %1$d • Активный: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Активный: %2$s</string>
     <string name="config_download">Загрузить конфиг по ссылке</string>
     <string name="config_download_hint">Скачать файл конфигурации по адресу</string>
     <string name="config_active">Активная конфигурация</string>
@@ -997,7 +997,7 @@
     <string name="rt_main">Основной</string>
     <string name="rt_mode_over">Поверх шаблона</string>
     <string name="rt_mode_replace">Вместо шаблона</string>
-    <string name="rt_count">%1$d маршрутов · %2$d записей</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Применить</string>
     <string name="rt_rename">Переименовать</string>
     <string name="rt_duplicate">Дублировать</string>
@@ -1056,7 +1056,6 @@
     <string name="rt_entry_invalid">Xray такую запись не примет</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">По одной записи в строке</string>
-    <string name="rt_text_ok">Записей: %1$d</string>
     <string name="rt_text_bad">Не принято: %1$s</string>
     <string name="rt_geo_pick_sub">Из файлов устройства всех включённых источников; нажатие добавляет тег</string>
     <string name="rt_added">Добавлено: %1$s</string>
@@ -1163,7 +1162,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Обновить подписку</string>
     <string name="xsub_servers">Серверов: %1$d</string>
-    <string name="xsub_applied">Применено серверов: %1$d, пропущено ссылок: %2$d</string>
+    <string name="xsub_applied">Применено: %1$s, пропущено: %2$s</string>
     <string name="xsub_default">Весь трафик через подписку</string>
     <string name="xsub_default_sub">Последнее правило маршрутизации на балансировщик «sub»: самый быстрый сервер по пингу</string>
     <string name="xsub_default_sub_v2">Последнее правило маршрутизации на балансировщик «sub» (V2Ray выбирает случайно)</string>
@@ -1339,4 +1338,44 @@
     <string name="sub_support">Поддержка</string>
     <string name="import_from_clipboard">Ссылка из буфера обмена</string>
     <string name="xsub_skip_singbox">использует то, чего нет в sing-box (XHTTP, finalmask Xray)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d шт.</item>
+        <item quantity="few">%d шт.</item>
+        <item quantity="many">%d шт.</item>
+        <item quantity="other">%d шт.</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d файл</item>
+        <item quantity="few">%d файла</item>
+        <item quantity="many">%d файлов</item>
+        <item quantity="other">%d файла</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d маршрут</item>
+        <item quantity="few">%d маршрута</item>
+        <item quantity="many">%d маршрутов</item>
+        <item quantity="other">%d маршрута</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d запись</item>
+        <item quantity="few">%d записи</item>
+        <item quantity="many">%d записей</item>
+        <item quantity="other">%d записи</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d сервер</item>
+        <item quantity="few">%d сервера</item>
+        <item quantity="many">%d серверов</item>
+        <item quantity="other">%d сервера</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d ссылка</item>
+        <item quantity="few">%d ссылки</item>
+        <item quantity="many">%d ссылок</item>
+        <item quantity="other">%d ссылки</item>
+    </plurals>
+    <string name="settings_traffic_stats">Статистика трафика</string>
+    <string name="settings_traffic_stats_on">По дням и по приложениям; выключите для экономии заряда</string>
+    <string name="settings_traffic_stats_off">Выключена: трафик не считается</string>
+    <string name="traffic_off_hint">Статистика трафика выключена (Настройки › Поведение), новое не считается. Включите её, чтобы считать трафик по дням и по приложениям.</string>
 </resources>

@@ -137,7 +137,9 @@ fun TrafficScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
                 Spacer(Modifier.height(6.dp))
             }
         }
-        item { AppTrafficSection(reload) }
+        if (!com.skofqq.boxy.BoxyApp.instance.prefs.trafficStats) item {
+            com.skofqq.boxy.ui.components.NoticeCard(stringResource(R.string.settings_traffic_stats), stringResource(R.string.traffic_off_hint), Modifier.padding(horizontal = 16.dp))
+        } else item { AppTrafficSection(reload) }
         item {
             SectionCard(stringResource(listOf(R.string.traffic_by_day, R.string.traffic_by_week, R.string.traffic_by_month)[period])) {
                 val rows: List<Pair<String, TrafficBucket>> = when (period) {

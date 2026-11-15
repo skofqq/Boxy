@@ -259,6 +259,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SwitchRow(BoxyIcons.Dashboard, stringResource(R.string.settings_open_panel), stringResource(R.string.settings_open_panel_sub), prefs.openPanelOnLaunch) {
                     prefs.updateOpenPanelOnLaunch(it)
                 }
+                SwitchRow(BoxyIcons.BarChart, stringResource(R.string.settings_traffic_stats), stringResource(if (prefs.trafficStats) R.string.settings_traffic_stats_on else R.string.settings_traffic_stats_off), prefs.trafficStats) {
+                    prefs.updateTrafficStats(it)
+                }
                 SwitchRow(BoxyIcons.TouchApp, stringResource(R.string.settings_tile_long_press), stringResource(R.string.settings_tile_long_press_sub), prefs.tileLongPressPanel) {
                     prefs.updateTileLongPressPanel(it)
                 }

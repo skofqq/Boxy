@@ -171,8 +171,8 @@
     <string name="action_refresh">Абнавіць</string>
     <string name="apps_whitelist">Белы спіс</string>
     <string name="apps_blacklist">Чорны спіс</string>
-    <string name="apps_summary">%1$d шт. • %2$s • выбрана %3$d</string>
-    <string name="apps_summary_core">%1$d шт. • Ядро • Правілы праграм ігнаруюцца</string>
+    <string name="apps_summary">%1$s • %2$s • выбрана %3$d</string>
+    <string name="apps_summary_core">%1$s • Ядро • Правілы праграм ігнаруюцца</string>
     <string name="apps_sort_filter">Сартаванне і фільтр</string>
     <string name="apps_select_all">Выбраць усе</string>
     <string name="apps_invert">Інвертаваць</string>
@@ -221,7 +221,7 @@
     <string name="tools_update_row_sub">Ядры, падпіска, WebUI</string>
     <string name="tools_subscription">Падпіска</string>
     <string name="tools_subscription_sub">Шлях правайдараў і адрасы</string>
-    <string name="config_files_active_summary">Файлаў: %1$d • Актыўны: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Актыўны: %2$s</string>
     <string name="config_download">Спампаваць канфігурацыю па URL</string>
     <string name="config_download_hint">Спампаваць файл канфігурацыі з аддаленага адраса</string>
     <string name="config_active">Актыўная канфігурацыя</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">Асноўны</string>
     <string name="rt_mode_over">Па-над шаблонам</string>
     <string name="rt_mode_replace">Замест шаблона</string>
-    <string name="rt_count">%1$d маршрутаў · %2$d запісаў</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Ужыць</string>
     <string name="rt_rename">Перайменаваць</string>
     <string name="rt_duplicate">Дубляваць</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Xray такі запіс не прыме</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">Па адным запісе ў радку</string>
-    <string name="rt_text_ok">Запісаў: %1$d</string>
     <string name="rt_text_bad">Не прынята: %1$s</string>
     <string name="rt_geo_pick_sub">З файлаў прылады ўсіх уключаных крыніц; націск дадае тэг</string>
     <string name="rt_added">Дададзена: %1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Абнавіць падпіску</string>
     <string name="xsub_servers">Сервераў: %1$d</string>
-    <string name="xsub_applied">Ужыта сервераў: %1$d, прапушчана спасылак: %2$d</string>
+    <string name="xsub_applied">Ужыта: %1$s, прапушчана: %2$s</string>
     <string name="xsub_default">Увесь трафік праз падпіску</string>
     <string name="xsub_default_sub">Апошняе правіла маршрутызацыі на балансавальнік «sub»: найхутчэйшы сервер па пінгу</string>
     <string name="xsub_default_sub_v2">Апошняе правіла маршрутызацыі на балансавальнік «sub» (V2Ray выбірае выпадкова)</string>
@@ -1324,4 +1323,44 @@
     <string name="sub_support">Падтрымка</string>
     <string name="import_from_clipboard">Спасылка з буфера абмену</string>
     <string name="xsub_skip_singbox">выкарыстоўвае тое, чаго няма ў sing-box (XHTTP, finalmask Xray)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d шт.</item>
+        <item quantity="few">%d шт.</item>
+        <item quantity="many">%d шт.</item>
+        <item quantity="other">%d шт.</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d файл</item>
+        <item quantity="few">%d файлы</item>
+        <item quantity="many">%d файлаў</item>
+        <item quantity="other">%d файла</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d маршрут</item>
+        <item quantity="few">%d маршруты</item>
+        <item quantity="many">%d маршрутаў</item>
+        <item quantity="other">%d маршрута</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d запіс</item>
+        <item quantity="few">%d запісы</item>
+        <item quantity="many">%d запісаў</item>
+        <item quantity="other">%d запісу</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d сервер</item>
+        <item quantity="few">%d серверы</item>
+        <item quantity="many">%d сервераў</item>
+        <item quantity="other">%d сервера</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d спасылка</item>
+        <item quantity="few">%d спасылкі</item>
+        <item quantity="many">%d спасылак</item>
+        <item quantity="other">%d спасылкі</item>
+    </plurals>
+    <string name="settings_traffic_stats">Статыстыка трафіку</string>
+    <string name="settings_traffic_stats_on">Па днях і праграмах; выключыце, каб зберагчы зарад</string>
+    <string name="settings_traffic_stats_off">Выключана: трафік не лічыцца</string>
+    <string name="traffic_off_hint">Статыстыка трафіку выключана (Налады › Паводзіны), новае не лічыцца. Уключыце яе, каб лічыць трафік па днях і праграмах.</string>
 </resources>

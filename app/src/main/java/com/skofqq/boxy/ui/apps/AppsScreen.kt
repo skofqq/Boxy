@@ -84,9 +84,9 @@ fun AppsScreen(contentPadding: PaddingValues, header: @Composable () -> Unit = {
     val others = visible.filter { it.key !in vm.selected }
     val modeName = stringResource(if (vm.mode == ProxyMode.WHITELIST) R.string.apps_whitelist else R.string.apps_blacklist)
     val summary = if (vm.coreRouting) {
-        stringResource(R.string.apps_summary_core, visible.size)
+        stringResource(R.string.apps_summary_core, androidx.compose.ui.res.pluralStringResource(R.plurals.pl_items, visible.size, visible.size))
     } else {
-        stringResource(R.string.apps_summary, visible.size, modeName, vm.selected.size)
+        stringResource(R.string.apps_summary, androidx.compose.ui.res.pluralStringResource(R.plurals.pl_items, visible.size, visible.size), modeName, vm.selected.size)
     }
 
     Box(Modifier.fillMaxSize()) {

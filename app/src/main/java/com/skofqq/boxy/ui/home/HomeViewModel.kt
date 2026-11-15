@@ -125,11 +125,19 @@ class HomeViewModel(private val prefs: Prefs) : ViewModel() {
             }
         }
         launch { while (true) { refreshState(); delay(2000) } }
-        launch { while (true) { TrafficStats.sample(BoxyApp.instance); delay(60_000) } }
         launch { speedLoop() }
         launch { systemLoop() }
         launch { while (true) { testLatency(); delay(60_000) } }
         launch { refreshSubscription() }
+    }
+
+    /**
+     * Traffic statistics while the app is open (on any tab), when they are on and the status notification's loop
+     * (which samples them too, with the screen on) does not run. The samples skip themselves when taken too often.
+     */
+    suspend fun pollTraffic() = coroutineScope {
+        if (!prefs.trafficStats) return@coroutineScope
+        launch { while (true) { TrafficStats.sample(BoxyApp.instance); delay(60_000) } }
         launch { while (true) { com.skofqq.boxy.data.AppTraffic.sample(BoxyApp.instance); delay(10_000) } }
     }
 

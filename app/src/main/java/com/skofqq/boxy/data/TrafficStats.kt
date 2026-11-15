@@ -39,6 +39,11 @@ object TrafficStats {
     suspend fun sample(context: Context): Boolean {
         val state = runCatching { BoxModule.state() }.getOrNull() ?: return false
         if (!state.running) return false
+        // Statistics off: only the widget follows the state.
+        if (!AppTraffic.enabled(context)) {
+            com.skofqq.boxy.widget.BoxWidget.refresh(context, state)
+            return false
+        }
         val api = Net.clashApi(state.core) ?: return false
         val (down, up) = Net.clashTotals(api) ?: return false
         add(context, state.pid ?: "", down, up)

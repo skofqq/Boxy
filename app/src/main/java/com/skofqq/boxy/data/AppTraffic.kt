@@ -62,6 +62,7 @@ object AppTraffic {
      * take the whole process down (widget and tile included).
      */
     suspend fun sample(context: Context) {
+        if (!enabled(context)) return
         try {
             sampleOnce(context)
         } catch (e: CancellationException) {
@@ -70,6 +71,9 @@ object AppTraffic {
             Log.w(TAG, "traffic sample failed", e)
         }
     }
+
+    /** The traffic statistics setting (Settings › Behaviour). */
+    fun enabled(context: Context): Boolean = (context.applicationContext as? com.skofqq.boxy.BoxyApp)?.prefs?.trafficStats ?: true
 
     private suspend fun sampleOnce(context: Context) = withContext(Dispatchers.IO) {
         val now = SystemClock.elapsedRealtime()

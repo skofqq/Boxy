@@ -120,6 +120,9 @@ class Prefs(context: Context) {
         private set
     /** Short vibration on taps. */
     var haptics by mutableStateOf(sp.getBoolean("haptics", true))
+
+    /** Traffic statistics (per day and per app): off, nothing is sampled (no core API polling for it). */
+    var trafficStats by mutableStateOf(sp.getBoolean("traffic_stats", true))
         private set
     /** Long press on the Quick Settings tile opens the panel instead of just the app. */
     var tileLongPressPanel by mutableStateOf(sp.getBoolean("tile_long_press_panel", false))
@@ -160,6 +163,7 @@ class Prefs(context: Context) {
     fun updateNotifySubsFailed(v: Boolean) { notifySubsFailed = v; sp.edit().putBoolean("notify_subs_failed", v).apply() }
     fun updateNotifySubsEnding(v: Boolean) { notifySubsEnding = v; sp.edit().putBoolean("notify_subs_ending", v).apply() }
     fun updateUpdateInterval(v: UpdateInterval) { updateInterval = v; sp.edit().putString("update_interval", v.name).apply() }
+    fun updateTrafficStats(v: Boolean) { trafficStats = v; sp.edit().putBoolean("traffic_stats", v).apply() }
     fun updateHaptics(v: Boolean) { haptics = v; com.skofqq.boxy.ui.components.Haptics.enabled = v; sp.edit().putBoolean("haptics", v).apply() }
     fun updateTileLongPressPanel(v: Boolean) { tileLongPressPanel = v; sp.edit().putBoolean("tile_long_press_panel", v).apply() }
     fun updateOnboardingDone(v: Boolean) { onboardingDone = v; sp.edit().putBoolean("onboarding_done", v).apply() }

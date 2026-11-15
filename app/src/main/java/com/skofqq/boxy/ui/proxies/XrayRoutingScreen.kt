@@ -226,7 +226,7 @@ private fun ProfileList(
                 val n = pr.routes.sumOf { it.entries.size }
                 val badges = listOf(
                     stringResource(if (pr.mode == RoutingProfiles.Mode.OVER) R.string.rt_mode_over else R.string.rt_mode_replace),
-                    stringResource(R.string.rt_count, pr.routes.size, n),
+                    stringResource(R.string.rt_count, androidx.compose.ui.res.pluralStringResource(R.plurals.pl_routes, pr.routes.size, pr.routes.size), androidx.compose.ui.res.pluralStringResource(R.plurals.pl_entries, n, n)),
                 )
                 ProfileCard(pr.name, null, badges, store.active == pr.id, onClick = { onOpen(pr.id) }) {
                     MoreMenu(
@@ -618,7 +618,7 @@ private fun RouteEditor(bottom: Dp, p: Profile, r: Route, base: JSONObject?, onB
                     val lines = text.lines().map { it.trim() }.filter { it.isNotEmpty() }
                     val bad = lines.filter { RoutingProfiles.kind(it) == null }
                     Text(
-                        if (bad.isEmpty()) stringResource(R.string.rt_text_ok, lines.size) else stringResource(R.string.rt_text_bad, bad.take(3).joinToString(", ")),
+                        if (bad.isEmpty()) androidx.compose.ui.res.pluralStringResource(R.plurals.pl_entries, lines.size, lines.size) else stringResource(R.string.rt_text_bad, bad.take(3).joinToString(", ")),
                         Modifier.padding(horizontal = 20.dp, vertical = 6.dp), style = MaterialTheme.typography.bodySmall, color = if (bad.isEmpty()) Boxy.colors.text2 else Tints.red.fg,
                         fontFamily = FontFamily.Default, fontSize = 12.sp,
                     )

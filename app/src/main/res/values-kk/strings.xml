@@ -171,8 +171,8 @@
     <string name="action_refresh">Жаңарту</string>
     <string name="apps_whitelist">Ақ тізім</string>
     <string name="apps_blacklist">Қара тізім</string>
-    <string name="apps_summary">%1$d дана • %2$s • %3$d таңдалды</string>
-    <string name="apps_summary_core">%1$d дана • Ядро • Қолданба ережелері еленбейді</string>
+    <string name="apps_summary">%1$s • %2$s • %3$d таңдалды</string>
+    <string name="apps_summary_core">%1$s • Ядро • Қолданба ережелері еленбейді</string>
     <string name="apps_sort_filter">Сұрыптау және сүзгі</string>
     <string name="apps_select_all">Барлығын таңдау</string>
     <string name="apps_invert">Керісінше</string>
@@ -221,7 +221,7 @@
     <string name="tools_update_row_sub">Ядролар, жазылым, WebUI</string>
     <string name="tools_subscription">Жазылым</string>
     <string name="tools_subscription_sub">Провайдерлер жолы және мекенжайлар</string>
-    <string name="config_files_active_summary">Файлдар: %1$d • Белсенді: %2$s</string>
+    <string name="config_files_active_summary">%1$s • Белсенді: %2$s</string>
     <string name="config_download">Конфигурацияны URL арқылы жүктеу</string>
     <string name="config_download_hint">Конфигурация файлын қашықтағы мекенжайдан жүктеу</string>
     <string name="config_active">Белсенді конфигурация</string>
@@ -982,7 +982,7 @@
     <string name="rt_main">Негізгі</string>
     <string name="rt_mode_over">Үлгінің үстінен</string>
     <string name="rt_mode_replace">Үлгінің орнына</string>
-    <string name="rt_count">%1$d маршрут · %2$d жазба</string>
+    <string name="rt_count">%1$s · %2$s</string>
     <string name="rt_apply">Қолдану</string>
     <string name="rt_rename">Атын өзгерту</string>
     <string name="rt_duplicate">Көшірме жасау</string>
@@ -1041,7 +1041,6 @@
     <string name="rt_entry_invalid">Xray мұндай жазбаны қабылдамайды</string>
     <string name="rt_entry_kinds">site.com · *.site.com · full:a.site.com · keyword:x · regexp:… · 1.2.3.0/24 · geosite: · geoip: · port:443/udp · network:udp</string>
     <string name="rt_text_hint">Әр жолда бір жазба</string>
-    <string name="rt_text_ok">Жазбалар: %1$d</string>
     <string name="rt_text_bad">Қабылданбады: %1$s</string>
     <string name="rt_geo_pick_sub">Барлық қосулы көздердің құрылғыдағы файлдарынан; басу тегті қосады</string>
     <string name="rt_added">Қосылды: %1$s</string>
@@ -1148,7 +1147,7 @@
     <string name="xsub_url_hint">https://…</string>
     <string name="xsub_update">Жазылымды жаңарту</string>
     <string name="xsub_servers">Серверлер: %1$d</string>
-    <string name="xsub_applied">Қолданылған серверлер: %1$d, өткізілген сілтемелер: %2$d</string>
+    <string name="xsub_applied">Қолданылды: %1$s, өткізілді: %2$s</string>
     <string name="xsub_default">Барлық трафик жазылым арқылы</string>
     <string name="xsub_default_sub">«sub» теңгергішіне соңғы маршрут ережесі: пинг бойынша ең жылдам сервер</string>
     <string name="xsub_default_sub_v2">«sub» теңгергішіне соңғы маршрут ережесі (V2Ray кездейсоқ таңдайды)</string>
@@ -1324,4 +1323,32 @@
     <string name="sub_support">Қолдау</string>
     <string name="import_from_clipboard">Алмасу буферіндегі сілтеме</string>
     <string name="xsub_skip_singbox">sing-box-та жоқ нәрсені қолданады (XHTTP, Xray finalmask)</string>
+    <plurals name="pl_items">
+        <item quantity="one">%d дана</item>
+        <item quantity="other">%d дана</item>
+    </plurals>
+    <plurals name="pl_files">
+        <item quantity="one">%d файл</item>
+        <item quantity="other">%d файл</item>
+    </plurals>
+    <plurals name="pl_routes">
+        <item quantity="one">%d маршрут</item>
+        <item quantity="other">%d маршрут</item>
+    </plurals>
+    <plurals name="pl_entries">
+        <item quantity="one">%d жазба</item>
+        <item quantity="other">%d жазба</item>
+    </plurals>
+    <plurals name="pl_servers">
+        <item quantity="one">%d сервер</item>
+        <item quantity="other">%d сервер</item>
+    </plurals>
+    <plurals name="pl_links">
+        <item quantity="one">%d сілтеме</item>
+        <item quantity="other">%d сілтеме</item>
+    </plurals>
+    <string name="settings_traffic_stats">Трафик статистикасы</string>
+    <string name="settings_traffic_stats_on">Күндер және қолданбалар бойынша; заряд үнемдеу үшін өшіріңіз</string>
+    <string name="settings_traffic_stats_off">Өшірулі: трафик есептелмейді</string>
+    <string name="traffic_off_hint">Трафик статистикасы өшірулі (Баптаулар › Әрекет), жаңасы есептелмейді. Трафикті күндер мен қолданбалар бойынша есептеу үшін қосыңыз.</string>
 </resources>
