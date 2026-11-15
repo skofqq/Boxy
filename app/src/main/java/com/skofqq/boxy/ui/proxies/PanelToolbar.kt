@@ -109,7 +109,7 @@ internal val LocalPanelNav = compositionLocalOf<PanelNav?> { null }
 internal val LocalPanelPage = compositionLocalOf { -1 }
 
 /** Room the toolbar takes over the bottom of a section's list. */
-internal val PANEL_TOOLBAR_ROOM = 84.dp
+internal val PANEL_TOOLBAR_ROOM = 100.dp
 
 
 /** A section's search goes to the toolbar: true when it did (the section then draws no bar of its own). */
@@ -148,35 +148,38 @@ internal fun PanelToolbar(
         exit = slideOutVertically { it } + fadeOut(),
     ) {
         androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.End) {
-        // The section's actions (⚡, pause, close all…): small floating buttons stacked at the right edge above the
-        // toolbar, swapped with a fade when the section changes.
+        // The section's search (🔍 on top) and actions (⚡, pause, close all…): small floating buttons stacked at the
+        // right edge above the bar, swapped with a fade when the section changes.
         androidx.compose.animation.AnimatedContent(
-            search?.actions,
+            selected,
             Modifier.padding(end = 18.dp),
             transitionSpec = { (fadeIn() + androidx.compose.animation.scaleIn(initialScale = 0.8f)) togetherWith (fadeOut() + androidx.compose.animation.scaleOut(targetScale = 0.8f)) },
             label = "panelActions",
-        ) { actions -> if (actions != null) ActionStack(actions) }
+        ) { sel ->
+            val s = nav.searches[sel]
+            if (s != null) ActionStack {
+                if (!open) GlassAction(BoxyIcons.Search, s.hint) { open = true }
+                s.actions(this)
+            }
+        }
         Box(
             Modifier
-                // Taps on the toolbar's strip (between and around the pills) never reach the list under it.
+                // Taps on the bar's strip (between and around the pills) never reach the list under it.
                 .pointerInput(Unit) { detectTapGestures { } }
                 .onGloballyPositioned { c -> below = (root.height - (c.positionInWindow().y + c.size.height)).toInt().coerceAtLeast(0) }
                 .fillMaxWidth()
-                .background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to page.copy(alpha = 0f), 0.45f to page.copy(alpha = 0.85f), 1f to page))
-                .padding(top = 20.dp, bottom = maxOf(bottom, keyboard)),
+                .background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to page.copy(alpha = 0f), 0.35f to page.copy(alpha = 0.85f), 1f to page))
+                .padding(top = 16.dp, bottom = maxOf(bottom, keyboard)),
         ) {
-            Row(
-                Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth().height(56.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val pill = RoundedCornerShape(50)
-                GlassSurface(
-                    pill, Boxy.colors.card, 28.dp,
-                    Modifier.weight(1f).fillMaxHeight().shadow(10.dp, pill, clip = false).border(1.dp, Boxy.colors.outline, pill),
-                    element = true,
-                ) {
-                    if (open && search != null) {
+            androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                if (open && search != null) {
+                    val pill = RoundedCornerShape(50)
+                    GlassSurface(
+                        pill, Boxy.colors.card, 26.dp,
+                        Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp).fillMaxWidth().height(52.dp)
+                            .shadow(10.dp, pill, clip = false).border(1.dp, Boxy.colors.outline, pill),
+                        element = true,
+                    ) {
                         val focus = remember { FocusRequester() }
                         LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
                         BoxyTextField(
@@ -191,40 +194,20 @@ internal fun PanelToolbar(
                             },
                             container = Color.Transparent,
                         )
-                    } else {
-                        // Each button takes its share of the whole pill, top to bottom: no dead gaps between them.
-                        // The chosen section shows its name only when the name fits whole and the others keep a 44 dp target;
-                        // otherwise (a long name, two actions beside the pill) it is an icon on a tinted pill too.
-                        val measurer = androidx.compose.ui.text.rememberTextMeasurer()
-                        val labelStyle = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
-                        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().padding(4.dp)) {
-                        val count = sections.size + if (search != null) 1 else 0
-                        val label = with(density) { measurer.measure(sections[selected.coerceIn(sections.indices)].first, labelStyle).size.width.toDp() }
-                        val wide = 16.dp + 22.dp + 6.dp + label + 2.dp
-                        val showLabel = maxWidth - wide >= 44.dp * (count - 1)
-                        Row(
-                            Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            sections.forEachIndexed { i, (name, icon) ->
-                                val chosen = i == selected
-                                SectionButton(
-                                    name, icon, chosen, chosen && showLabel,
-                                    if (chosen && showLabel) Modifier.width(wide) else Modifier.weight(1f),
-                                ) { onSelect(i) }
-                            }
-                            if (search != null) {
-                                Box(
-                                    Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(50)).clickable { open = true },
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(BoxyIcons.Search, search.hint, Modifier.size(22.dp), tint = if (search.query.isNotEmpty()) Boxy.colors.accent else Boxy.colors.text2)
-                                }
-                            }
-                        }
-                        }
                     }
                 }
+                // The sections as the app's own bottom bar: five equal items, icon and name, the chosen one on a pill.
+                val motions = listOf(
+                    com.skofqq.boxy.ui.components.TapMotion.SPIN, com.skofqq.boxy.ui.components.TapMotion.SHAKE,
+                    com.skofqq.boxy.ui.components.TapMotion.FLIP, com.skofqq.boxy.ui.components.TapMotion.DROP,
+                    com.skofqq.boxy.ui.components.TapMotion.GEAR,
+                )
+                com.skofqq.boxy.ui.components.BottomBar(
+                    sections.mapIndexed { i, (name, icon) -> com.skofqq.boxy.ui.components.BarItem(name, icon, motions.getOrElse(i) { com.skofqq.boxy.ui.components.TapMotion.POP }) },
+                    selected.toFloat(),
+                    onSelect,
+                    Modifier.padding(bottom = 12.dp),
+                )
             }
         }
         }
@@ -253,27 +236,4 @@ private object StackRowScope : RowScope {
     override fun Modifier.alignBy(alignmentLine: androidx.compose.ui.layout.HorizontalAlignmentLine): Modifier = this
     override fun Modifier.alignByBaseline(): Modifier = this
     override fun Modifier.alignBy(alignmentLineBlock: (androidx.compose.ui.layout.Measured) -> Int): Modifier = this
-}
-
-/** A section on the toolbar: an icon, and the name next to it on a tinted pill when chosen. */
-@Composable
-private fun SectionButton(name: String, icon: ImageVector, selected: Boolean, showLabel: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Row(
-        modifier.fillMaxHeight().clip(RoundedCornerShape(50))
-            .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Color.Transparent)
-            .clickable(onClick = onClick)
-            .padding(horizontal = if (showLabel) 8.dp else 0.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(icon, if (showLabel) null else name, Modifier.size(22.dp), tint = if (selected) Boxy.colors.accent else Boxy.colors.text2)
-        if (showLabel) {
-            Spacer(Modifier.width(6.dp))
-            Text(
-                name,
-                style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold,
-                color = Boxy.colors.accent, maxLines = 1, softWrap = false,
-            )
-        }
-    }
 }

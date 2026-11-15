@@ -70,7 +70,7 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false, nav: PanelNav? = n
     val room = if (sectionsOnTop) PANEL_TOOLBAR_ROOM else BAR_ROOM
     val sections = listOf(
         stringResource(R.string.proxies_tab_groups) to BoxyIcons.Language,
-        stringResource(R.string.panel_tab_connections) to BoxyIcons.Link,
+        stringResource(R.string.panel_tab_connections) to BoxyIcons.SwapHoriz,
         stringResource(R.string.panel_tab_logs) to BoxyIcons.Description,
         stringResource(R.string.panel_tab_rules) to BoxyIcons.FilterList,
         stringResource(R.string.tab_settings) to BoxyIcons.Settings,
