@@ -182,7 +182,20 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
 
     fun select(group: ProxyGroup, name: String) {
         val a = api ?: return
-        scope.launch { if (Net.clashSelect(a, group.name, name)) refresh() }
+        // The pick shows at once, the core is told right after.
+        val before = snapshot
+        snapshot = before?.let { sn -> sn.copy(all = sn.all.map { if (it.name == group.name) it.copy(now = name) else it }) }
+        scope.launch {
+            if (Net.clashSelect(a, group.name, name)) {
+                // As Zashboard does on a switch: connections through this group end, so apps reconnect over the new
+                // server at once instead of keeping the old one until they close by themselves.
+                com.skofqq.boxy.net.CoreApi.connections(a)?.filter { group.name in it.chain }?.forEach { com.skofqq.boxy.net.CoreApi.close(a, it.id) }
+            } else {
+                snapshot = before
+                com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
+            }
+            refresh()
+        }
     }
 
     fun setMode(m: String) {

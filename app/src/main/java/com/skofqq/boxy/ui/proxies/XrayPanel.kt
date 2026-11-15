@@ -161,12 +161,17 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
         GroupDialog(
             content = { mod ->
                 OpenBalancer(v, testing, onClose = { openBalancer = null }, onTest = { runTest(v.targets.filterNot { v.isPooled(it) }) }, onTestOne = { testOne(it) }, onPick = { t ->
+                    // Shown at once; Xray is asked about this balancer only afterwards (not all of them, one call each).
+                    val before = balancerInfo[b]
+                    balancerInfo = balancerInfo + (b to XrayApi.BalancerInfo(t.orEmpty(), before?.picks))
                     scope.launch {
                         if (XrayApi.overrideBalancer(openApi, b, t)) {
                             XrayApi.savePin(b, t)
-                            infoKey++
+                            XrayApi.balancerInfo(openApi, listOf(b))[b]?.let { balancerInfo = balancerInfo + (b to it) }
+                        } else {
+                            balancerInfo = if (before != null) balancerInfo + (b to before) else balancerInfo - b
+                            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.xray_balancer_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                         }
-                        else com.skofqq.boxy.ui.components.BoxyToast.makeText(context, R.string.xray_balancer_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_LONG).show()
                     }
                 }, modifier = mod)
             },
