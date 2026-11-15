@@ -152,6 +152,8 @@ fun PanelScreen(
     }
 
     val backdrop = com.skofqq.boxy.ui.components.rememberBackdrop()
+    // The built-in panel as a tab: its sections' actions come up to this row (see PanelToolbar).
+    val panelNav = remember { com.skofqq.boxy.ui.proxies.PanelNav() }
     androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides backdrop) {
     Column(Modifier.fillMaxSize().padding(contentPadding)) {
         Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -162,6 +164,10 @@ fun PanelScreen(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+            if (native && asTab) panelNav.searches[panelNav.current]?.let { section ->
+                Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) { section.actions(this) }
+                Spacer(Modifier.width(4.dp))
+            }
             if (kind == PanelKind.CORE) {
                 HeaderAction(BoxyIcons.Palette, stringResource(R.string.dashboard_title)) { dashboardSheet = true }
             }
@@ -190,7 +196,7 @@ fun PanelScreen(
                 // draws itself without end and RenderThread dies (glass chips in the built-in panel). Its own
                 // pages provide their own backdrops where they need one.
                 native -> androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides null) {
-                    com.skofqq.boxy.ui.proxies.CorePanel(nativeReload, sectionsOnTop = asTab)
+                    com.skofqq.boxy.ui.proxies.CorePanel(nativeReload, sectionsOnTop = asTab, nav = panelNav)
                 }
                 current == null && !localChecked -> CircularProgressIndicator()
                 current == null -> Text(

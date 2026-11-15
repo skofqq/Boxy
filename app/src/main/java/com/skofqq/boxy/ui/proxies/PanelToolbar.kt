@@ -71,12 +71,13 @@ import com.skofqq.boxy.ui.theme.BoxyIcons
 /*
  * The panel as a tab of the app: its sections switch on a floating toolbar at the bottom (M3 Expressive), under the
  * thumb, instead of a row of pills on top. The toolbar also holds the search of the shown section (a magnifier that
- * opens into the field) and its actions (⚡ on Proxies). A section's FloatingSearch hands its query, hint and
+ * opens into the field); the section's actions (⚡, pause, close all…) go to the panel's top row, so the toolbar keeps
+ * its full width in every section. A section's FloatingSearch hands its query, hint and
  * actions to the toolbar instead of drawing a bar of its own.
  */
 
 /** What a section puts on the toolbar. */
-internal class PanelSearch(
+class PanelSearch(
     val query: String,
     val onQuery: (String) -> Unit,
     val hint: String,
@@ -84,9 +85,12 @@ internal class PanelSearch(
 )
 
 @Stable
-internal class PanelNav {
+class PanelNav {
     val searches = mutableStateMapOf<Int, PanelSearch>()
     var visible by mutableStateOf(true)
+
+    /** The section shown; its actions sit in the panel's top row (PanelScreen), not on the toolbar. */
+    var current by mutableIntStateOf(0)
 
     /** Hides the toolbar while the list moves down, shows it as soon as it moves up. */
     val scroll = object : NestedScrollConnection {
@@ -210,7 +214,6 @@ internal fun PanelToolbar(
                         }
                     }
                 }
-                search?.actions?.invoke(this)
             }
         }
     }

@@ -58,7 +58,7 @@ private val BAR_ROOM = 12.dp + 68.dp
  * bottom bar.
  */
 @Composable
-fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
+fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false, nav: PanelNav? = null) {
     // One panel for every core. Xray has no clash-style API: its tabs work from its metrics, API, log files and
     // config (XrayTabs), and show only what Xray has.
     val state by produceState<com.skofqq.boxy.root.ServiceState?>(null, reloadKey) { value = runCatching { BoxModule.state() }.getOrNull() }
@@ -96,8 +96,8 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
         // gestures (chip rows, node rows) take the swipe first, the pager only what they leave.
         val pager = androidx.compose.foundation.pager.rememberPagerState(initialPage = tab) { sections.size }
         val scope = androidx.compose.runtime.rememberCoroutineScope()
-        val nav = androidx.compose.runtime.remember { PanelNav() }
-        androidx.compose.runtime.LaunchedEffect(pager.currentPage) { tab = pager.currentPage; nav.visible = true }
+        val nav = nav ?: androidx.compose.runtime.remember { PanelNav() }
+        androidx.compose.runtime.LaunchedEffect(pager.currentPage) { tab = pager.currentPage; nav.current = pager.currentPage; nav.visible = true }
         val toolbarBackdrop = rememberBackdrop()
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.fillMaxSize().backdropSourceOf(toolbarBackdrop).nestedScroll(nav.scroll)) {
