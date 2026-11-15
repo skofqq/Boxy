@@ -221,6 +221,11 @@ fun PanelScreen(
                         }
                     },
                     update = { w ->
+                        // As a tab next to the others the web panel takes focus only while it is shown: a focused
+                        // WebView on a page beside makes the tabs scroll to it (after a dialog closes elsewhere).
+                        w.isFocusable = active
+                        w.isFocusableInTouchMode = active
+                        if (!active && w.hasFocus()) w.clearFocus()
                         if (w.tag != current.url) {
                             w.tag = current.url
                             w.loadUrl(current.url)

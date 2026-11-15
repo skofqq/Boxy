@@ -41,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -312,6 +313,9 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                 key = { tabs[it] },
                 userScrollEnabled = !swipeLocked,
             ) { index ->
+                // Only the shown tab takes focus: a field on a tab beside (the panel's search) getting it back after
+                // a dialog with the keyboard closes would make the pager scroll to that tab.
+                Box(Modifier.fillMaxSize().focusProperties { canFocus = index == pager.currentPage }) {
                 when (tabs[index]) {
                     Tab.HOME -> HomeScreen(
                         padding,
@@ -333,6 +337,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                         subPage = if (it == NavExtra.LOGS) Overlay.LOGS else Overlay.APPS
                     }
                     Tab.SETTINGS -> SettingsScreen(padding, prefs, active = subPage == null && pager.currentPage == index)
+                }
                 }
             }
           }
