@@ -639,8 +639,10 @@
     <string name="dnscrypt_installed">Орнатылған: %1$s</string>
     <string name="dnscrypt_config">dnscrypt-proxy конфигурациясы</string>
     <string name="dnscrypt_config_sub">Серверлер, анонимді релелер, бұғаттау тізімдері</string>
-    <string name="dnscrypt_hint_clash">clash және sing-box ядроларында белсенді конфигурацияның DNS-і %1$s мекенжайына автоматты түрде ауысады және DNSCrypt өшірілгенде қайтарылады.</string>
-    <string name="dnscrypt_hint_other">xray және v2fly үшін %1$s мекенжайын конфигурацияның DNS серверлеріне қолмен қосыңыз.</string>
+    <string name="dnscrypt_hint_clash">clash, sing-box және xray ядроларында белсенді конфигурацияның DNS-і %1$s мекенжайына автоматты түрде ауысады және DNSCrypt өшірілгенде қайтарылады.</string>
+    <string name="dnscrypt_hint_other">v2fly және hysteria үшін %1$s мекенжайын конфигурацияның DNS серверлеріне қолмен қосыңыз.</string>
+    <string name="dnscrypt_core_on">%1$s: DNS DNSCrypt арқылы өтеді</string>
+    <string name="dnscrypt_core_next">%1$s: қызметтің келесі іске қосылуында DNSCrypt-ке ауысады</string>
     <string name="dnscrypt_servers">DNSCrypt серверлері</string>
     <string name="dnscrypt_servers_row_sub">Серверлерді таңдау: сүзгілер, кідіріс бойынша сұрыптау</string>
     <string name="dnscrypt_servers_summary">%2$d ішінен %1$d</string>

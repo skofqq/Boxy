@@ -639,8 +639,10 @@
     <string name="dnscrypt_installed">Усталяваны: %1$s</string>
     <string name="dnscrypt_config">Канфігурацыя dnscrypt-proxy</string>
     <string name="dnscrypt_config_sub">Серверы, ананімныя рэлеі, блок-лісты</string>
-    <string name="dnscrypt_hint_clash">З ядрамі clash і sing-box DNS актыўнай канфігурацыі пераключаецца на %1$s аўтаматычна і вяртаецца пры выключэнні DNSCrypt.</string>
-    <string name="dnscrypt_hint_other">Для xray і v2fly дадайце %1$s у DNS-серверы канфігурацыі ўручную.</string>
+    <string name="dnscrypt_hint_clash">З ядрамі clash, sing-box і xray DNS актыўнай канфігурацыі пераключаецца на %1$s аўтаматычна і вяртаецца пры выключэнні DNSCrypt.</string>
+    <string name="dnscrypt_hint_other">Для v2fly і hysteria дадайце %1$s у DNS-серверы канфігурацыі ўручную.</string>
+    <string name="dnscrypt_core_on">%1$s: DNS ідзе праз DNSCrypt</string>
+    <string name="dnscrypt_core_next">%1$s: пераключыцца на DNSCrypt пры наступным запуску сэрвісу</string>
     <string name="dnscrypt_servers">Серверы DNSCrypt</string>
     <string name="dnscrypt_servers_row_sub">Выбар сервераў: фільтры, сартаванне па затрымцы</string>
     <string name="dnscrypt_servers_summary">%1$d з %2$d</string>

@@ -35,6 +35,9 @@ import kotlinx.coroutines.launch
 import com.skofqq.boxy.ui.components.addTaskLine
 
 /** DNS of the module: the core's DNS hijack and the optional DNSCrypt (dnscrypt-proxy). */
+/** Cores whose DNS the module switches to DNSCrypt by itself (box.service dnscrypt_clash / _singbox / _xray). */
+private val DNSCRYPT_CORES = setOf("clash", "sing-box", "xray")
+
 @Composable
 fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String) -> Unit, onDnsServers: () -> Unit) {
     val context = LocalContext.current
@@ -92,7 +95,7 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                     SectionCard(stringResource(R.string.dnscrypt_title), stringResource(R.string.dnscrypt_sub)) {
                         com.skofqq.boxy.ui.components.NoticeCard(
                             stringResource(R.string.update_tip_title),
-                            stringResource(if (core == "clash" || core == "sing-box") R.string.dnscrypt_hint_clash else R.string.dnscrypt_hint_other, "127.0.0.1:${dc.port}"),
+                            stringResource(if (core in DNSCRYPT_CORES) R.string.dnscrypt_hint_clash else R.string.dnscrypt_hint_other, "127.0.0.1:${dc.port}"),
                         )
                         Spacer(Modifier.height(6.dp))
                         val installed = dc.version != null
@@ -101,6 +104,9 @@ fun DnsScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String
                             stringResource(R.string.dnscrypt_enable),
                             when {
                                 !installed -> stringResource(R.string.dnscrypt_state_missing)
+                                // Whether the active core really asks DNSCrypt, not just that dnscrypt-proxy runs.
+                                dc.running && core in DNSCRYPT_CORES -> stringResource(R.string.dnscrypt_state_on, "127.0.0.1:${dc.port}") + "\n" +
+                                    stringResource(if (dc.applied) R.string.dnscrypt_core_on else R.string.dnscrypt_core_next, core.orEmpty())
                                 dc.running -> stringResource(R.string.dnscrypt_state_on, "127.0.0.1:${dc.port}")
                                 dc.enabled -> stringResource(R.string.dnscrypt_state_pending)
                                 else -> stringResource(R.string.dnscrypt_state_off)

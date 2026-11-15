@@ -40,6 +40,8 @@ data class DnsCryptState(
     val version: String?,
     val running: Boolean,
     val port: String,
+    /** The module has switched the active core's DNS to DNSCrypt (clash, sing-box, xray). */
+    val applied: Boolean = false,
 )
 
 data class SystemEnvironment(
@@ -364,14 +366,19 @@ object BoxModule {
         val out = sh(
             "grep -E '^(dnscrypt|dnscrypt_port)=' $SETTINGS 2>/dev/null; " +
                 "[ -x $BOX_DIR/bin/dnscrypt-proxy ] && echo \"ver=$($BOX_DIR/bin/dnscrypt-proxy -version 2>/dev/null | head -n1)\"; " +
-                "p=$(cat $RUN_DIR/dnscrypt.pid 2>/dev/null); [ -n \"${'$'}p\" ] && [ -e /proc/${'$'}p ] && echo run=1",
+                "p=$(cat $RUN_DIR/dnscrypt.pid 2>/dev/null); [ -n \"${'$'}p\" ] && [ -e /proc/${'$'}p ] && echo run=1; " +
+                // What box.service leaves while the core's DNS points at DNSCrypt: Xray's extra file, the backup
+                // of the clash / sing-box DNS it replaced.
+                "ls $BOX_DIR/xray/zz-boxy-dnscrypt.json $BOX_DIR/clash/*.dnscrypt.bak $BOX_DIR/sing-box/*.dnscrypt.bak 2>/dev/null | awk -F/ '{ print \"applied_\" ${'$'}(NF - 1) \"=1\" }'",
         )
         val kv = parseKv(out)
+        val core = readSetting("bin_name")
         DnsCryptState(
             enabled = kv["dnscrypt"]?.let { unquote(it) == "true" },
             version = kv["ver"]?.takeIf { it.isNotBlank() },
             running = kv["run"] == "1",
             port = unquote(kv["dnscrypt_port"])?.takeIf { it.isNotBlank() } ?: "5354",
+            applied = core != null && kv["applied_$core"] == "1",
         )
     }
 

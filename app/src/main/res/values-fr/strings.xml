@@ -639,8 +639,10 @@
     <string name="dnscrypt_installed">Installé : %1$s</string>
     <string name="dnscrypt_config">Configuration de dnscrypt-proxy</string>
     <string name="dnscrypt_config_sub">Serveurs, relais anonymes, listes de blocage</string>
-    <string name="dnscrypt_hint_clash">Avec les cœurs clash et sing-box, le DNS de la configuration active passe à %1$s automatiquement et revient quand DNSCrypt est désactivé.</string>
-    <string name="dnscrypt_hint_other">Pour xray et v2fly, ajoutez %1$s aux serveurs DNS de la configuration vous-même.</string>
+    <string name="dnscrypt_hint_clash">Avec les cœurs clash, sing-box et xray, le DNS de la configuration active passe à %1$s automatiquement et revient quand DNSCrypt est désactivé.</string>
+    <string name="dnscrypt_hint_other">Pour v2fly et hysteria, ajoutez %1$s aux serveurs DNS de la configuration vous-même.</string>
+    <string name="dnscrypt_core_on">%1$s : le DNS passe par DNSCrypt</string>
+    <string name="dnscrypt_core_next">%1$s : passera à DNSCrypt au prochain démarrage du service</string>
     <string name="dnscrypt_servers">Serveurs DNSCrypt</string>
     <string name="dnscrypt_servers_row_sub">Choisir les serveurs : filtres, tri par latence</string>
     <string name="dnscrypt_servers_summary">%1$d sur %2$d</string>

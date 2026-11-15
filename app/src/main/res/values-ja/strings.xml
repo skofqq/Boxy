@@ -639,8 +639,10 @@
     <string name="dnscrypt_installed">インストール済み: %1$s</string>
     <string name="dnscrypt_config">dnscrypt-proxy の設定</string>
     <string name="dnscrypt_config_sub">サーバー、匿名リレー、ブロックリスト</string>
-    <string name="dnscrypt_hint_clash">clash と sing-box コアでは、アクティブな設定の DNS が自動的に %1$s に切り替わり、DNSCrypt をオフにすると元に戻ります。</string>
-    <string name="dnscrypt_hint_other">xray と v2fly では、%1$s を設定の DNS サーバーに手動で追加してください。</string>
+    <string name="dnscrypt_hint_clash">clash、sing-box、xray コアでは、アクティブな設定の DNS が自動的に %1$s に切り替わり、DNSCrypt をオフにすると元に戻ります。</string>
+    <string name="dnscrypt_hint_other">v2fly と hysteria では、%1$s を設定の DNS サーバーに手動で追加してください。</string>
+    <string name="dnscrypt_core_on">%1$s: DNS は DNSCrypt 経由です</string>
+    <string name="dnscrypt_core_next">%1$s: 次回のサービス起動時に DNSCrypt に切り替わります</string>
     <string name="dnscrypt_servers">DNSCrypt サーバー</string>
     <string name="dnscrypt_servers_row_sub">サーバーを選択: 絞り込み、遅延順の並べ替え</string>
     <string name="dnscrypt_servers_summary">%1$d / %2$d</string>

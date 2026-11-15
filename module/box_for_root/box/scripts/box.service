@@ -480,6 +480,33 @@ dnscrypt_singbox() {
   fi
 }
 
+# Xray: xray/zz-boxy-dnscrypt.json, read after the config, carries the config's own "dns" (hosts, query strategy,
+# cache…) with DNSCrypt as its only server. Xray takes the "dns" of the last file that has one, so the config
+# itself is not changed. "tcp+local" dials straight from Xray, past its routing, so the queries never go to a
+# proxy (dnscrypt-proxy listens on TCP too). The file is removed when DNSCrypt is off.
+dnscrypt_xray() {
+  local port="${dnscrypt_port:-5354}" out="${box_dir}/xray/zz-boxy-dnscrypt.json" yq="${box_dir}/bin/yq" f src=""
+  command -v yq >/dev/null 2>&1 && yq="yq"
+  if [ "${dnscrypt}" = "true" ] && kill -0 "$(cat "${dnscrypt_pid}" 2>/dev/null)" 2>/dev/null; then
+    rm -f "${out}"
+    # The file whose "dns" Xray would use: the last of the run's files that has one.
+    for f in $(xray_args | busybox awk '{ for (i = 1; i < NF; i++) if ($i == "-c") print $(i + 1); else if ($i == "-confdir") print $(i + 1) "/*.json" }'); do
+      [ -f "${f}" ] && busybox grep -q '"dns"' "${f}" && src="${f}"
+    done
+    if [ -n "${src}" ]; then
+      busybox sed -E 's#^[[:space:]]*//.*$##' "${src}" | ${yq} -p=json -o=json \
+        "{\"dns\": ((.dns // {}) | .servers = [\"tcp+local://127.0.0.1:${port}\"])}" > "${out}" 2>/dev/null
+    fi
+    if [ ! -s "${out}" ]; then
+      printf '{"dns": {"servers": ["tcp+local://127.0.0.1:%s"]}}\n' "${port}" > "${out}"
+    fi
+    log Info "DNSCrypt: xray DNS → 127.0.0.1:${port}"
+  elif [ -f "${out}" ]; then
+    rm -f "${out}"
+    log Info "DNSCrypt is off: xray uses the DNS of its config again"
+  fi
+}
+
 # Port 53 must stay free for Android's tethering DNS (dnsmasq): when the core holds it, turning on the
 # hotspot fails with "Address already in use" and the hotspot switches itself off. The DNS hijack
 # redirects port 53 to whatever port the core listens on, so moving the core to 1053 changes nothing else.
@@ -805,6 +832,7 @@ box_run_bin() {
         fi
         log Info "Configuration file located in ${xray_config}"
       fi
+      dnscrypt_xray
       # Pins made for allowInsecure servers follow their renewed certificates (box.tool repin).
       [ -s "${box_dir}/xray/.pins" ] && "${scripts_dir}/box.tool" repin >/dev/null 2>&1
       # Xray 26 removed allowInsecure: such files are migrated first (see box.tool fixinsecure).

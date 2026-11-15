@@ -17,7 +17,8 @@ Changes on top of v1.10.2:
 - Installer tests the active config with an installed core
 - `config_docs.yaml` comments in English
 - Optional DNSCrypt: `dnscrypt=true`, `box.tool updnscrypt`, config in `dnscrypt/dnscrypt-proxy.toml`;
-  with clash (`dns.nameserver`) and sing-box (`dns.final`) the active config is pointed at it and restored when it is off
+  with clash (`dns.nameserver`), sing-box (`dns.final`) and xray (`xray/zz-boxy-dnscrypt.json`: the config's `dns`
+  with DNSCrypt as its only server, `tcp+local`, past the routing) the active config is pointed at it and restored when it is off
 - `quic="disable"` in settings.ini blocks QUIC for apps only; the core and dnscrypt-proxy keep UDP 443
 - Fixes for upstream issues: `box.tool subs` exits with 0 on success (#219), sing-box formats only the active config (#203),
   `dns_hijack=false` leaves DNS to AdGuard Home and similar (#213), `user_agent` in settings.ini (#138)

@@ -639,8 +639,10 @@
     <string name="dnscrypt_installed">Yüklü: %1$s</string>
     <string name="dnscrypt_config">dnscrypt-proxy yapılandırması</string>
     <string name="dnscrypt_config_sub">Sunucular, anonim aktarıcılar, engel listeleri</string>
-    <string name="dnscrypt_hint_clash">clash ve sing-box çekirdeklerinde etkin yapılandırmanın DNS’i otomatik olarak %1$s adresine geçer ve DNSCrypt kapatıldığında geri alınır.</string>
-    <string name="dnscrypt_hint_other">xray ve v2fly için %1$s adresini yapılandırmanın DNS sunucularına kendiniz ekleyin.</string>
+    <string name="dnscrypt_hint_clash">clash, sing-box ve xray çekirdeklerinde etkin yapılandırmanın DNS’i otomatik olarak %1$s adresine geçer ve DNSCrypt kapatıldığında geri alınır.</string>
+    <string name="dnscrypt_hint_other">v2fly ve hysteria için %1$s adresini yapılandırmanın DNS sunucularına kendiniz ekleyin.</string>
+    <string name="dnscrypt_core_on">%1$s: DNS, DNSCrypt üzerinden gidiyor</string>
+    <string name="dnscrypt_core_next">%1$s: hizmetin bir sonraki başlatılmasında DNSCrypt’e geçer</string>
     <string name="dnscrypt_servers">DNSCrypt sunucuları</string>
     <string name="dnscrypt_servers_row_sub">Sunucu seç: filtreler, gecikmeye göre sıralama</string>
     <string name="dnscrypt_servers_summary">%2$d içinden %1$d</string>

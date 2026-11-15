@@ -14,6 +14,9 @@ New:
   certificate renews, the pin follows it. Servers that needed allowInsecure should get a valid certificate.
 - Subscription downloads send Boxy's device id (`x-hwid`, `x-device-os`, `x-ver-os`) when `.hwid` exists, for panels
   with a device limit (Remnawave).
+- Xray uses DNSCrypt too: with `dnscrypt=true` the module writes `xray/zz-boxy-dnscrypt.json` (the config's own `dns`,
+  hosts and query strategy kept, with `tcp+local://127.0.0.1:5354` as the only server, so the queries never go through
+  a proxy) and removes it when DNSCrypt is off. Before, Xray kept its own DNS servers and DNSCrypt ran unused.
 
 Fixes:
 - Problem: Xray did not start with configs that have `allowInsecure` ("migrated to pinnedPeerCertSha256"). Fix: migration at start.
@@ -35,6 +38,9 @@ Fixes:
   сервера обновляется, закрепление следует за ним. Серверам, которым был нужен allowInsecure, лучше получить нормальный сертификат.
 - Загрузка подписок отправляет ID устройства Boxy (`x-hwid`, `x-device-os`, `x-ver-os`), если есть `.hwid` — для панелей
   с лимитом устройств (Remnawave).
+- Xray тоже использует DNSCrypt: при `dnscrypt=true` модуль пишет `xray/zz-boxy-dnscrypt.json` (собственный `dns`
+  конфигурации с hosts и стратегией запросов, единственный сервер — `tcp+local://127.0.0.1:5354`, запросы не идут через
+  прокси) и удаляет его, когда DNSCrypt выключен. Раньше Xray оставался на своих DNS-серверах, а DNSCrypt работал впустую.
 
 Исправления:
 - Проблема: Xray не запускался с конфигурациями, где есть `allowInsecure`. Решение: перенос при запуске.

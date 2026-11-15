@@ -82,7 +82,7 @@ fun ToolsScreen(contentPadding: PaddingValues, navExtra: NavExtra, active: Boole
                 r == ROUTE_AUTOMATION -> AutomationScreen(contentPadding, onBack = pop)
                 r == ROUTE_PROXY_AUTH -> ProxyAuthScreen(contentPadding, onBack = pop)
                 // The same screens the panel's Rules / Settings tabs open, here next to the config files.
-                r == ROUTE_ROUTING -> com.skofqq.boxy.ui.proxies.XrayRoutingScreen(contentPadding.calculateBottomPadding(), onBack = pop)
+                r == ROUTE_ROUTING -> com.skofqq.boxy.ui.proxies.XrayRoutingScreen(contentPadding, onBack = pop)
                 r == ROUTE_CORE_SETTINGS -> com.skofqq.boxy.ui.proxies.CoreSettingsScreen(contentPadding, onBack = pop)
             }
         }

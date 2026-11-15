@@ -1,5 +1,7 @@
 package com.skofqq.boxy.ui.proxies
 
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.CompositionLocalProvider
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -101,7 +103,15 @@ private fun targetTint(t: String) = when (t) {
  * routes and options, a route's entries. Each change is saved at once; "Apply" rebuilds the active config.
  */
 @Composable
-fun XrayRoutingScreen(bottom: Dp, onBack: () -> Unit) {
+fun XrayRoutingScreen(padding: PaddingValues, onBack: () -> Unit) {
+    CompositionLocalProvider(LocalTopInset provides padding.calculateTopPadding()) { RoutingScreen(padding.calculateBottomPadding(), onBack) }
+}
+
+/** Status-bar inset of the screen, for the pinned headers of every level. */
+private val LocalTopInset = staticCompositionLocalOf { 0.dp }
+
+@Composable
+private fun RoutingScreen(bottom: Dp, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var store by remember { mutableStateOf(RoutingProfiles.load(context)) }
@@ -195,7 +205,7 @@ private fun ProfileList(
     var delete by remember { mutableStateOf<Profile?>(null) }
     var create by remember { mutableStateOf(false) }
     val active = store.profiles.firstOrNull { it.id == store.active }
-    PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
+    PinnedLazyPage(PaddingValues(top = LocalTopInset.current, bottom = bottom + 16.dp), header = {
         Header(stringResource(R.string.rt_title), stringResource(R.string.rt_sub), onBack)
     }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
@@ -226,8 +236,7 @@ private fun ProfileList(
                     stringResource(R.string.rt_count, pr.routes.size, n),
                 )
                 ProfileCard(pr.name, null, badges, store.active == pr.id, onClick = { onOpen(pr.id) }) {
-                    MenuChip(
-                        stringResource(R.string.rt_actions), false,
+                    MoreMenu(
                         listOfNotNull(
                             ("apply" to stringResource(R.string.rt_apply)).takeIf { store.active != pr.id },
                             "rename" to stringResource(R.string.rt_rename),
@@ -235,7 +244,6 @@ private fun ProfileList(
                             "export" to stringResource(R.string.rt_export),
                             "delete" to stringResource(R.string.rt_delete),
                         ),
-                        "",
                     ) { a ->
                         when (a) {
                             "apply" -> onActivate(pr.id)
@@ -298,29 +306,44 @@ private fun ProfileList(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileCard(name: String, sub: String?, badges: List<String>?, active: Boolean, onClick: () -> Unit, end: @Composable () -> Unit = {}) {
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(24.dp)).background(Boxy.colors.card)
             .then(if (active) Modifier.border(2.dp, Boxy.colors.accent, RoundedCornerShape(24.dp)) else Modifier)
-            .clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
+            .clickable(onClick = onClick).padding(start = 16.dp, end = 6.dp, top = 14.dp, bottom = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // A radio: a filled check when active, an outlined ring otherwise.
         Box(
-            Modifier.size(26.dp).clip(RoundedCornerShape(50)).background(if (active) Boxy.colors.accent else Boxy.colors.surface2),
+            Modifier.size(24.dp).clip(RoundedCornerShape(50))
+                .then(if (active) Modifier.background(Boxy.colors.accent) else Modifier.border(2.dp, Boxy.colors.text2.copy(alpha = 0.6f), RoundedCornerShape(50))),
             contentAlignment = Alignment.Center,
         ) { if (active) Icon(BoxyIcons.Check, null, Modifier.size(16.dp), tint = Color.White) }
         Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
+        Column(Modifier.weight(1f).padding(end = 6.dp)) {
             Text(name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (sub != null) Text(sub, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
-            if (!badges.isNullOrEmpty()) Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (!badges.isNullOrEmpty()) FlowRow(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 badges.forEach { b ->
-                    Text(b, Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.surface2).padding(horizontal = 8.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, color = Boxy.colors.text2)
+                    Text(b, Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.surface2).padding(horizontal = 8.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, color = Boxy.colors.text2, maxLines = 1)
                 }
             }
         }
         end()
+    }
+}
+
+/** The ⋮ button of a card with its menu of [options] (key to label). */
+@Composable
+private fun MoreMenu(options: List<Pair<String, String>>, onPick: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        Icon(BoxyIcons.MoreVert, stringResource(R.string.action_more), Modifier.size(40.dp).clip(RoundedCornerShape(50)).clickable { open = true }.padding(9.dp), tint = Boxy.colors.text2)
+        com.skofqq.boxy.ui.components.GlassMenu(open, { open = false }) {
+            options.forEach { (key, text) -> com.skofqq.boxy.ui.components.GlassMenuItem(text, { open = false; onPick(key) }) }
+        }
     }
 }
 
@@ -359,7 +382,7 @@ private fun ProfileEditor(
         }
     }
     Box {
-        PinnedLazyPage(PaddingValues(bottom = bottom + 96.dp), header = {
+        PinnedLazyPage(PaddingValues(top = LocalTopInset.current, bottom = bottom + 96.dp), header = {
             Header(p.name, stringResource(if (active) R.string.rt_active else R.string.rt_not_active), onBack) {
                 HeaderAction(BoxyIcons.Edit, stringResource(R.string.rt_rename)) { rename = true }
             }
@@ -545,7 +568,7 @@ private fun RouteEditor(bottom: Dp, p: Profile, r: Route, base: JSONObject?, onB
         if (e.isEmpty() || RoutingProfiles.kind(e) == null || e in r.entries) return
         onChange(r.copy(entries = r.entries + e))
     }
-    PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
+    PinnedLazyPage(PaddingValues(top = LocalTopInset.current, bottom = bottom + 16.dp), header = {
         Header(targetName(r.target), p.name, onBack) {
             HeaderAction(BoxyIcons.Delete, stringResource(R.string.rt_delete), tint = Tints.red.fg, onClick = onDelete)
         }
