@@ -231,6 +231,33 @@ internal fun SheetButton(text: String, bg: androidx.compose.ui.graphics.Color, f
     }
 }
 
+/**
+ * A button inside a card (M3 Expressive filled tonal): accent-tinted container, leading icon. A [SheetButton] in
+ * card colour would vanish on a card, so actions inside cards use this one.
+ */
+@Composable
+fun TonalButton(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    val fg = if (enabled) Boxy.colors.accent else Boxy.colors.text2
+    Row(
+        modifier.height(48.dp).clip(RoundedCornerShape(50)).background(fg.copy(alpha = 0.14f))
+            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon != null) {
+            Icon(icon, null, Modifier.size(20.dp), tint = fg)
+            Spacer(Modifier.width(8.dp))
+        }
+        Text(text, color = fg, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
 /** Round icon button used inside rows. */
 @Composable
 fun SmallIconButton(
