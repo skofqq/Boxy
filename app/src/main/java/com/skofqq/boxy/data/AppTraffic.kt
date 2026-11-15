@@ -210,7 +210,10 @@ object AppTraffic {
 
     private fun hasUsageAccess(context: Context): Boolean = runCatching {
         val ops = context.getSystemService(AppOpsManager::class.java)
-        ops.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName) == AppOpsManager.MODE_ALLOWED
+        // unsafeCheckOpNoThrow is Android 10+; Android 9 has the older (same) call.
+        val mode = if (android.os.Build.VERSION.SDK_INT >= 29) ops.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
+        else @Suppress("DEPRECATION") ops.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
+        mode == AppOpsManager.MODE_ALLOWED
     }.getOrDefault(false)
 
     /**

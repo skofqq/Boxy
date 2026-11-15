@@ -32,7 +32,7 @@ class BoxTileService : TileService() {
         val running = tile.state == Tile.STATE_ACTIVE
         busy = true
         tile.state = Tile.STATE_UNAVAILABLE
-        tile.subtitle = getString(if (running) R.string.status_stopping else R.string.status_starting)
+        if (android.os.Build.VERSION.SDK_INT >= 29) tile.subtitle = getString(if (running) R.string.status_stopping else R.string.status_starting)
         tile.updateTile()
         scope.launch {
             if (running) BoxControl.stop(applicationContext) else BoxControl.start(applicationContext)
@@ -51,7 +51,7 @@ class BoxTileService : TileService() {
                 s.running -> Tile.STATE_ACTIVE
                 else -> Tile.STATE_INACTIVE
             }
-            tile.subtitle = when {
+            if (android.os.Build.VERSION.SDK_INT >= 29) tile.subtitle = when {
                 s == null -> null
                 s.running -> s.core
                 else -> getString(R.string.status_stopped)

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Boxy</string>
+    <string name="home_title">Boxy</string>
+    <string name="home_ipv6">IPv6</string>
+    <string name="common_dash">—</string>
     <string name="tab_home">Главная</string>
     <string name="tab_apps">Приложения</string>
     <string name="tab_logs">Журнал</string>
-    <string name="tab_tools">Утилиты</string>
     <string name="tab_settings">Настройки</string>
 
     <string name="home_subtitle">Статус и метрики</string>
@@ -34,10 +37,7 @@
     <string name="logs_title">Журнал</string>
     <string name="logs_subtitle">Просмотр логов работы</string>
 
-    <string name="tools_title">Утилиты</string>
-    <string name="tools_subtitle">Параметры модуля</string>
     <string name="tools_config">Конфигурации</string>
-    <string name="tools_config_sub">Файлы, активная конфигурация и подписки</string>
     <string name="tools_network">Управление сетью</string>
     <string name="tools_network_sub">Управление модулем по Wi‑Fi</string>
     <string name="tools_update">Обновление</string>
@@ -45,7 +45,6 @@
     <string name="tools_row_manage_sub">Обзор / поиск / создание</string>
     <string name="tools_row_select">Активная конфигурация</string>
     <string name="tools_row_select_sub">С какой конфигурацией запускается модуль</string>
-    <string name="tools_row_apps_sub">Правила приложений</string>
     <string name="tools_row_logs_sub">Открыть просмотр логов</string>
 
     <string name="settings_title">Настройки</string>
@@ -65,14 +64,10 @@
     <string name="settings_true_black_sub">Делать фон тёмной темы полностью чёрным</string>
     <string name="settings_language">Язык</string>
     <string name="lang_system">Как в системе</string>
-    <string name="nav_apps_desc">Показывать страницу «Приложения» в панели навигации</string>
-    <string name="nav_logs_desc">Показывать страницу «Журнал» в панели навигации</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_about_sub">Приложение и модуль</string>
     <string name="settings_version">Версия</string>
     <string name="settings_module_version">Версия модуля</string>
-    <string name="tools_more">Ещё</string>
-    <string name="tools_more_sub">Страницы, скрытые из панели навигации</string>
     <string name="settings_author">Автор</string>
     <string name="action_cancel">Отмена</string>
     <string name="action_back">Назад</string>
@@ -340,16 +335,9 @@
     <string name="sub_crontab_sub">Разрешить задачи по расписанию</string>
     <string name="sub_renew_title">Перезаписывать конфиг</string>
     <string name="sub_renew_sub">Заменять конфиг первой ссылкой Mihomo</string>
-    <string name="sub_interval_title">Интервал</string>
-    <string name="sub_interval_sub">Расписание обновления (выражение crontab)</string>
     <string name="sub_interval_placeholder">0 0,6,12,18 * * *</string>
-    <string name="sub_clash_urls_title">Ссылки Clash</string>
     <string name="sub_clash_urls_sub">Адреса подписок Clash</string>
     <string name="sub_clash_configs_title">Файлы Clash</string>
-    <string name="sub_clash_configs_sub">Имена файлов провайдеров Clash</string>
-    <string name="sub_provide_path_title">Папка провайдеров Clash</string>
-    <string name="sub_provide_path_sub">Куда сохранять скачанных провайдеров</string>
-    <string name="sub_singbox_title">Ссылка Sing-box</string>
     <string name="sub_singbox_sub">Адрес подписки Sing-box</string>
     <string name="sub_url_placeholder">https://...</string>
     <string name="sub_filename_placeholder">Имя файла (например proxy.yaml)</string>
@@ -485,9 +473,7 @@
     <string name="qs_tile_label">Boxy</string>
     <string name="app_back_again">Нажмите «Назад» ещё раз для выхода</string>
 
-    <string name="onboarding_title">Добро пожаловать</string>
     <string name="onboarding_next">Далее</string>
-    <string name="onboarding_finish">Готово</string>
     <string name="onboarding_agreement_title">Соглашение и отказ от ответственности</string>
     <string name="onboarding_disclaimer">Приложение предназначено только для исследований и обучения. Оно может менять сетевое поведение устройства. Вы сами отвечаете за то, как его используете, и за соблюдение местных законов и правил.</string>
     <string name="onboarding_accept">Я прочитал(а) и принимаю условия выше</string>
@@ -502,10 +488,6 @@
     <string name="onboarding_perm_apps_desc">Необязательно. Для правил приложений (чёрный и белый список). В некоторых прошивках доступ к списку приложений нужно разрешить в настройках системы.</string>
     <string name="onboarding_perm_wifi">Сопоставление Wi-Fi</string>
     <string name="onboarding_perm_wifi_desc">Поиск сетей Wi-Fi и клиентов точки доступа работает через root, отдельное разрешение не нужно.</string>
-    <string name="onboarding_usage_title">Как пользоваться</string>
-    <string name="onboarding_usage_body">На главной в карточке сервиса справа есть мини-панель: там меняются ядро, режим и IPv6 (сервис должен быть остановлен).\n\nВ «Управлении сетью» нажмите значок в начале строки, чтобы найти сети Wi-Fi рядом или устройства, подключённые к вашей точке доступа.</string>
-    <string name="onboarding_tips_title">Советы</string>
-    <string name="onboarding_tips_body">Перед обновлением лучше остановить сервис.\n\nУтилиты → Обновление: нажмите значок загрузки справа от ядра, подписки или WebUI.\n\nНастройки → О приложении: проверка обновлений приложения и модуля.</string>
 
     <string name="settings_mirror">Зеркало GitHub</string>
     <string name="mirror_sub">Для загрузки ядер, WebUI, панелей и других файлов с GitHub. Если загрузка не удалась, пробуются другие зеркала и сам GitHub.</string>
@@ -559,7 +541,6 @@
     <string name="logs_level_debug">Отладка</string>
     <string name="import_title">Импорт подписки</string>
     <string name="import_subtitle">Ядро: %1$s</string>
-    <string name="import_row_sub">QR-код, картинка или ссылка</string>
     <string name="import_chooser_sub">Откуда взять ссылку на подписку</string>
     <string name="import_scan">Сканировать QR-код</string>
     <string name="import_scan_sub">Камерой телефона</string>
@@ -733,8 +714,6 @@
     <string name="tools_net_dns">Сеть и DNS</string>
     <string name="tools_net_dns_sub">Правила Wi‑Fi, перехват DNS и DNSCrypt</string>
     <string name="tools_row_wifi">Правила Wi‑Fi</string>
-    <string name="tools_maint">Обслуживание</string>
-    <string name="tools_maint_sub">Обновления, статистика и автоматизация</string>
     <string name="tools_row_update">Обновление компонентов</string>
     <string name="settings_home">Главный экран</string>
     <string name="settings_home_sub">Данные для карточек скорости, подписки и задержки</string>
@@ -754,11 +733,6 @@
     <string name="proxies_test">Проверить задержку</string>
     <string name="proxies_timeout">таймаут</string>
     <string name="proxies_auto_note">Эта группа выбирает узел сама; переключать узлы можно в группах выбора.</string>
-    <string name="proxies_type_select">Выбор</string>
-    <string name="proxies_type_auto">Авто (самый быстрый)</string>
-    <string name="proxies_type_fallback">Резерв</string>
-    <string name="proxies_type_balance">Балансировка</string>
-    <string name="proxies_type_other">Группа</string>
     <string name="config_switch_title">Конфигурация</string>
     <string name="config_switch_applying">Переключаю конфигурацию…</string>
     <string name="config_switch_current">Текущая</string>
@@ -814,7 +788,6 @@
     <string name="net_saved_empty">Сохранённых сетей нет</string>
     <string name="net_saved_added">добавлена</string>
     <string name="net_saved_add">Добавить (%1$d)</string>
-    <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_start">Начать</string>
     <string name="story_welcome_title">Привет, это Boxy</string>
     <string name="story_welcome_body">Boxy управляет модулем Box for Root. Модуль пропускает трафик всего телефона через прокси-ядра: mihomo, sing-box, xray и другие. Нужны root (Magisk, KernelSU или APatch) и установленный модуль.</string>
@@ -871,8 +844,6 @@
     <string name="panel_settings_restart">Перезапустить ядро</string>
     <string name="panel_settings_restart_sub">Соединения ненадолго прервутся</string>
     <string name="panel_settings_restart_confirm">Ядро перезапустится, все соединения ненадолго прервутся. Настройки, изменённые здесь, вернутся к значениям из конфига.</string>
-    <string name="panel_settings_geo">Обновить GEO-базы</string>
-    <string name="panel_settings_geo_sub">Скачать заново GeoIP, GeoSite и ASN</string>
     <string name="panel_settings_fakeip">Очистить кэш FakeIP</string>
     <string name="panel_settings_dns">Очистить кэш DNS</string>
     <string name="panel_settings_runtime">Работающее ядро</string>
@@ -892,11 +863,7 @@
     <string name="panel_settings_delay_timeout_field">Миллисекунды</string>
     <string name="panel_settings_delay_timeout_invalid">От 500 до 30000 мс</string>
     <string name="panel_settings_updates">Обновления</string>
-    <string name="panel_settings_update_core">Обновить ядро</string>
-    <string name="panel_settings_update_core_sub">Последняя версия ядра, выбранного в модуле; сервис перезапустится</string>
     <string name="panel_settings_update_subs">Обновить подписки</string>
-    <string name="panel_settings_update_webui">Обновить веб-панель</string>
-    <string name="panel_settings_update_webui_sub">Установлена: %1$s</string>
     <string name="rules_info">Статистика правила</string>
     <string name="rules_hits">Сработало: %1$d · не подошло: %2$d</string>
     <string name="rules_last_hit">последний раз %1$s</string>
@@ -1006,18 +973,12 @@
     <string name="xray_balancers_sub">Закрепите сервер или оставьте выбор балансировщику (без перезапуска)</string>
     <string name="xray_balancer_auto">⚡️ Fastest</string>
     <string name="xray_outbounds">Исходящие (outbounds)</string>
-    <string name="xray_outbounds_sub">Состояние и задержка от observatory, трафик с момента запуска; нажмите на недоступный, чтобы увидеть причину</string>
-    <string name="xray_dead">недоступен</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
     <string name="panel_config_link_sub">Журнал, проверка серверов, DNS… — в Конфигурация › Активное ядро</string>
-    <string name="settings_apps_list">Приложения: чёрный / белый список</string>
-    <string name="settings_apps_list_sub">Какие приложения идут через прокси — для всех ядер</string>
     <string name="config_hub_sub">Подписка, конфиги, активное ядро, сеть</string>
     <string name="config_files_sub">Активный конфиг и все файлы модуля</string>
-    <string name="config_net_sub">Приложения через прокси, правила Wi-Fi, DNS</string>
     <string name="config_more">Дополнительно</string>
     <string name="config_more_sub">Журналы, трафик, серверы DNSCrypt, проверка TLS, автоматизация</string>
-    <string name="tab_panel">Панель</string>
     <string name="tab_config">Конфигурация</string>
     <string name="sub_active_core">Активное</string>
     <string name="sub_hysteria_sub">Boxy загружает из неё конфиг Hysteria при переключении на Hysteria</string>
@@ -1037,7 +998,6 @@
     <string name="rt_mode_over">Поверх шаблона</string>
     <string name="rt_mode_replace">Вместо шаблона</string>
     <string name="rt_count">%1$d маршрутов · %2$d записей</string>
-    <string name="rt_actions">Ещё</string>
     <string name="rt_apply">Применить</string>
     <string name="rt_rename">Переименовать</string>
     <string name="rt_duplicate">Дублировать</string>
@@ -1154,8 +1114,6 @@
     <string name="cs_ip_prefer_v6">Сначала IPv6</string>
     <string name="cs_dns_nocache">Без кэша DNS</string>
     <string name="cs_dns_nocache_hint">Спрашивать каждый раз (медленнее)</string>
-    <string name="cs_geo">Обновить GEO-файлы</string>
-    <string name="cs_geo_hint">geosite.dat и geoip.dat из MetaCubeX</string>
     <string name="cs_pins">Снять все закрепления</string>
     <string name="cs_pins_hint">Все группы вернутся к своему выбору</string>
     <string name="cs_xray_more">Режимы, TUN, доступ из LAN и провайдеры правил — возможности mihomo. Параметры серверов (mux, fingerprint) задаёт панель, здесь они не меняются.</string>
@@ -1169,9 +1127,6 @@
     <string name="cs_independent_hint">Ответы одного DNS-сервера не используются для другого</string>
     <string name="cs_rdrc">Запоминать отклонённые DNS</string>
     <string name="cs_rdrc_hint">Повторные блокировки быстрее (файл кэша)</string>
-    <string name="cs_section_network">Сеть</string>
-    <string name="cs_auto_iface">Следовать за сменой сети</string>
-    <string name="cs_auto_iface_hint">Прямой трафик идёт через текущую сеть Wi-Fi или мобильную</string>
     <string name="cs_clear_cache">Сбросить сохранённый выбор</string>
     <string name="cs_clear_cache_hint">Группы вернутся к выбору по умолчанию, rule-set’ы скачаются заново; sing-box перезапустится</string>
     <string name="xray_search_outbounds">Поиск исходящих</string>
@@ -1181,20 +1136,15 @@
     <string name="xray_logs_resume">Продолжить</string>
     <string name="xray_rule_any">всё остальное</string>
     <string name="xray_settings_title">Xray</string>
-    <string name="xray_settings_note">Только то, что Xray умеет менять на ходу; значение пишется в файл, где оно задано, проверяется, и Xray перезапускается.</string>
     <string name="xray_settings_loglevel">Уровень журнала</string>
     <string name="xray_settings_probe_interval">Интервал проверки</string>
     <string name="xray_settings_probe_url">Адрес проверки</string>
-    <string name="xray_settings_saved">Сохранено, Xray перезапущен</string>
-    <string name="xray_settings_failed">Не сохранено: ядро отклонило изменение</string>
-    <string name="xray_settings_readonly">Задано в файле с комментариями: измените его в «Файлах».</string>
     <string name="xray_settings_more_title">Чего у Xray нет</string>
     <string name="xray_settings_more">Режимы, TUN, доступ из LAN, обновление GEO и провайдеры правил — возможности mihomo: у Xray нет для них API.</string>
     <string name="group_icon_title">Иконка: %1$s</string>
     <string name="group_icon_hint">Ссылка на картинку (PNG или SVG)</string>
     <string name="group_icon_message">Пусто — иконка из конфига mihomo для группы с тем же названием.</string>
     <string name="xray_access_log">Журнал доступа</string>
-    <string name="xray_access_log_sub">Какой домен через какой inbound и outbound прошёл</string>
     <string name="xray_access_search">Домен или outbound</string>
     <string name="xray_access_off_title">Журнал доступа выключен</string>
     <string name="xray_access_off_body">Xray пишет каждое соединение в run/xray-access.log; модуль очищает его при каждом запуске. Boxy читает его только при открытии этой страницы.</string>
@@ -1376,7 +1326,6 @@
     <string name="core_setup_failed">Не удалось загрузить конфигурацию</string>
     <string name="core_setup_switch">Переключить</string>
     <string name="core_setup_loaded">Серверов: %1$d</string>
-    <string name="core_setup_skipped">Пропущено ссылок: %1$d</string>
     <string name="core_setup_err_download">Не удалось скачать подписку.</string>
     <string name="core_setup_err_empty">Подписка ничего не вернула (панель может ограничивать число устройств, или подписка закончилась).</string>
     <string name="core_setup_err_format">В подписке нет серверов, которые может использовать %1$s.</string>

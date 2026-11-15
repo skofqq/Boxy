@@ -114,7 +114,8 @@ class ConfigTileService : TileService() {
             val running = runCatching { BoxModule.state().running }.getOrDefault(false)
             val tile = qsTile ?: return@launch
             tile.label = getString(R.string.config_switch_title)
-            tile.subtitle = ConfigSwitch.label(list?.active) ?: getString(R.string.common_dash)
+            // Tile subtitles exist since Android 10.
+            if (Build.VERSION.SDK_INT >= 29) tile.subtitle = ConfigSwitch.label(list?.active) ?: getString(R.string.common_dash)
             tile.state = if (list == null) Tile.STATE_UNAVAILABLE else if (running) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
             tile.updateTile()
         }

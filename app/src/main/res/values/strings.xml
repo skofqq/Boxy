@@ -6,7 +6,6 @@
     <string name="tab_home">Home</string>
     <string name="tab_apps">Apps</string>
     <string name="tab_logs">Logs</string>
-    <string name="tab_tools">Tools</string>
     <string name="tab_settings">Settings</string>
 
     <!-- Home -->
@@ -45,10 +44,7 @@
     <string name="logs_subtitle">Inspect runtime logs</string>
 
     <!-- Tools -->
-    <string name="tools_title">Tools</string>
-    <string name="tools_subtitle">Module preferences</string>
     <string name="tools_config">Configs</string>
-    <string name="tools_config_sub">Files, active config and subscriptions</string>
     <string name="tools_network">Network control</string>
     <string name="tools_network_sub">Wi‑Fi based module control</string>
     <string name="tools_update">Update</string>
@@ -56,7 +52,6 @@
     <string name="tools_row_manage_sub">Browse / search / create</string>
     <string name="tools_row_select">Active config</string>
     <string name="tools_row_select_sub">The config the module starts with</string>
-    <string name="tools_row_apps_sub">Manage app rules</string>
     <string name="tools_row_logs_sub">Open logs view</string>
 
     <!-- Settings -->
@@ -77,14 +72,10 @@
     <string name="settings_true_black_sub">Make dark theme backgrounds pure black</string>
     <string name="settings_language">Language</string>
     <string name="lang_system">Follow system</string>
-    <string name="nav_apps_desc">Show the Apps page in the navigation bar</string>
-    <string name="nav_logs_desc">Show the Logs page in the navigation bar</string>
     <string name="settings_about">About</string>
     <string name="settings_about_sub">App &amp; module info</string>
     <string name="settings_version">Version</string>
     <string name="settings_module_version">Module version</string>
-    <string name="tools_more">More</string>
-    <string name="tools_more_sub">Pages hidden from the navigation bar</string>
     <string name="settings_author">Author</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_back">Back</string>
@@ -352,16 +343,9 @@
     <string name="sub_crontab_sub">Allow scheduled tasks</string>
     <string name="sub_renew_title">Override config</string>
     <string name="sub_renew_sub">Overwrite with first Mihomo URL</string>
-    <string name="sub_interval_title">Interval</string>
-    <string name="sub_interval_sub">Update interval (crontab expression)</string>
     <string name="sub_interval_placeholder">0 0,6,12,18 * * *</string>
-    <string name="sub_clash_urls_title">Clash URLs</string>
     <string name="sub_clash_urls_sub">Clash subscription URLs</string>
     <string name="sub_clash_configs_title">Clash configs</string>
-    <string name="sub_clash_configs_sub">Clash provided config names</string>
-    <string name="sub_provide_path_title">Clash provide path</string>
-    <string name="sub_provide_path_sub">Folder for downloaded providers</string>
-    <string name="sub_singbox_title">Sing-box URL</string>
     <string name="sub_singbox_sub">Sing-box subscription URL</string>
     <string name="sub_url_placeholder">https://...</string>
     <string name="sub_filename_placeholder">Enter filename (e.g. proxy.yaml)</string>
@@ -497,9 +481,7 @@
     <string name="qs_tile_label">Boxy</string>
     <string name="app_back_again">Press back again to exit</string>
 
-    <string name="onboarding_title">Welcome</string>
     <string name="onboarding_next">Next</string>
-    <string name="onboarding_finish">Finish</string>
     <string name="onboarding_agreement_title">Agreement &amp; disclaimer</string>
     <string name="onboarding_disclaimer">This app is for research and learning purposes only. It may change device network behavior. You are responsible for how you use it and for complying with local laws and rules.</string>
     <string name="onboarding_accept">I have read and agree to the terms above</string>
@@ -514,10 +496,6 @@
     <string name="onboarding_perm_apps_desc">Optional. Used for app allow/block rules. On some systems you need to allow “installed apps list” access in system settings.</string>
     <string name="onboarding_perm_wifi">Wi-Fi matching</string>
     <string name="onboarding_perm_wifi_desc">Scanning nearby Wi-Fi and hotspot clients works through root, no extra permission is needed.</string>
-    <string name="onboarding_usage_title">How to use</string>
-    <string name="onboarding_usage_body">On the Home page, the service card has a small panel on the right where you can switch Core, Mode and IPv6 (the service must be stopped).\n\nIn Network control, tap the icon at the start of a row to scan nearby Wi-Fi or devices connected to your hotspot.</string>
-    <string name="onboarding_tips_title">Usage tips</string>
-    <string name="onboarding_tips_body">It is best to stop the service before updating.\n\nTools → Update: tap the download icon on the right of Core, Subscription or WebUI.\n\nSettings → About: check for app and module updates.</string>
 
     <string name="settings_mirror">GitHub mirror</string>
     <string name="mirror_sub">Used for cores, WebUI, dashboards and other downloads from GitHub. If a download fails, other mirrors and GitHub itself are tried.</string>
@@ -571,7 +549,6 @@
     <string name="logs_level_debug">Debug</string>
     <string name="import_title">Import subscription</string>
     <string name="import_subtitle">Core: %1$s</string>
-    <string name="import_row_sub">QR code, picture or link</string>
     <string name="import_chooser_sub">Where to take the subscription link from</string>
     <string name="import_scan">Scan QR code</string>
     <string name="import_scan_sub">With the camera</string>
@@ -745,8 +722,6 @@
     <string name="tools_net_dns">Network and DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi rules, DNS hijack and DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi rules</string>
-    <string name="tools_maint">Maintenance</string>
-    <string name="tools_maint_sub">Updates, statistics and automation</string>
     <string name="tools_row_update">Component updates</string>
     <string name="settings_home">Home screen</string>
     <string name="settings_home_sub">Data for the speed, subscription and latency cards</string>
@@ -766,11 +741,6 @@
     <string name="proxies_test">Test delay</string>
     <string name="proxies_timeout">timeout</string>
     <string name="proxies_auto_note">This group picks a node by itself; switch nodes in selector groups.</string>
-    <string name="proxies_type_select">Selector</string>
-    <string name="proxies_type_auto">Auto (fastest)</string>
-    <string name="proxies_type_fallback">Fallback</string>
-    <string name="proxies_type_balance">Load balance</string>
-    <string name="proxies_type_other">Group</string>
     <string name="config_switch_title">Config</string>
     <string name="config_switch_applying">Switching config…</string>
     <string name="config_switch_current">Current</string>
@@ -826,7 +796,6 @@
     <string name="net_saved_empty">No saved networks</string>
     <string name="net_saved_added">added</string>
     <string name="net_saved_add">Add (%1$d)</string>
-    <string name="onboarding_skip">Skip</string>
     <string name="onboarding_start">Get started</string>
     <string name="story_welcome_title">Hi, this is Boxy</string>
     <string name="story_welcome_body">Boxy manages the Box for Root module. The module sends the whole phone\'s traffic through proxy cores: mihomo, sing-box, xray and others. You need root (Magisk, KernelSU or APatch) and the module installed.</string>
@@ -883,8 +852,6 @@
     <string name="panel_settings_restart">Restart core</string>
     <string name="panel_settings_restart_sub">Connections drop for a moment</string>
     <string name="panel_settings_restart_confirm">The core restarts and every connection drops for a moment. Settings changed here go back to the config.</string>
-    <string name="panel_settings_geo">Update GEO databases</string>
-    <string name="panel_settings_geo_sub">Download GeoIP, GeoSite and ASN again</string>
     <string name="panel_settings_fakeip">Clear FakeIP cache</string>
     <string name="panel_settings_dns">Clear DNS cache</string>
     <string name="panel_settings_runtime">Running core</string>
@@ -904,11 +871,7 @@
     <string name="panel_settings_delay_timeout_field">Milliseconds</string>
     <string name="panel_settings_delay_timeout_invalid">From 500 to 30000 ms</string>
     <string name="panel_settings_updates">Updates</string>
-    <string name="panel_settings_update_core">Update core</string>
-    <string name="panel_settings_update_core_sub">Latest version of the core chosen in the module; the service restarts</string>
     <string name="panel_settings_update_subs">Update subscriptions</string>
-    <string name="panel_settings_update_webui">Update web panel</string>
-    <string name="panel_settings_update_webui_sub">Installed: %1$s</string>
     <string name="rules_info">Rule statistics</string>
     <string name="rules_hits">Matched: %1$d · not matched: %2$d</string>
     <string name="rules_last_hit">last %1$s</string>
@@ -1018,18 +981,12 @@
     <string name="xray_balancers_sub">Pin a server or leave the choice to the balancer (no restart)</string>
     <string name="xray_balancer_auto">⚡️ Fastest</string>
     <string name="xray_outbounds">Outbounds</string>
-    <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
-    <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
     <string name="panel_config_link_sub">Log, server checks, DNS… are set in Config › Active core</string>
-    <string name="settings_apps_list">Apps: black / white list</string>
-    <string name="settings_apps_list_sub">Which apps go through the proxy, for every core</string>
     <string name="config_hub_sub">Subscription, configs, the active core, network</string>
     <string name="config_files_sub">The active config and every file of the module</string>
-    <string name="config_net_sub">Apps through the proxy, Wi-Fi rules, DNS</string>
     <string name="config_more">More</string>
     <string name="config_more_sub">Logs, traffic, DNSCrypt servers, TLS check, automation</string>
-    <string name="tab_panel">Panel</string>
     <string name="tab_config">Config</string>
     <string name="sub_active_core">Active</string>
     <string name="sub_hysteria_sub">Boxy loads a Hysteria config from it when you switch to Hysteria</string>
@@ -1049,7 +1006,6 @@
     <string name="rt_mode_over">Over the template</string>
     <string name="rt_mode_replace">Instead of the template</string>
     <string name="rt_count">%1$d routes · %2$d entries</string>
-    <string name="rt_actions">More</string>
     <string name="rt_apply">Apply</string>
     <string name="rt_rename">Rename</string>
     <string name="rt_duplicate">Duplicate</string>
@@ -1166,8 +1122,6 @@
     <string name="cs_ip_prefer_v6">IPv6 first</string>
     <string name="cs_dns_nocache">No DNS cache</string>
     <string name="cs_dns_nocache_hint">Ask every time (slower)</string>
-    <string name="cs_geo">Update GEO files</string>
-    <string name="cs_geo_hint">geosite.dat and geoip.dat from MetaCubeX</string>
     <string name="cs_pins">Unpin all groups</string>
     <string name="cs_pins_hint">Every group goes back to its own choice</string>
     <string name="cs_xray_more">Mode switches, TUN, allow-LAN and rule providers are mihomo features. Per-server options (mux, fingerprint) come from the panel and are not changed here.</string>
@@ -1181,9 +1135,6 @@
     <string name="cs_independent_hint">Answers of one DNS server are not reused for another</string>
     <string name="cs_rdrc">Remember rejected DNS</string>
     <string name="cs_rdrc_hint">Faster repeated blocks (cache file)</string>
-    <string name="cs_section_network">Network</string>
-    <string name="cs_auto_iface">Follow network changes</string>
-    <string name="cs_auto_iface_hint">Direct traffic uses the current Wi-Fi or mobile network</string>
     <string name="cs_clear_cache">Forget saved choices</string>
     <string name="cs_clear_cache_hint">Groups return to their defaults, rule sets download again; sing-box restarts</string>
     <string name="xray_search_outbounds">Search outbounds</string>
@@ -1193,20 +1144,15 @@
     <string name="xray_logs_resume">Resume</string>
     <string name="xray_rule_any">everything else</string>
     <string name="xray_settings_title">Xray</string>
-    <string name="xray_settings_note">Only what Xray can change while it runs; each value is written to the file that sets it, checked and Xray restarts.</string>
     <string name="xray_settings_loglevel">Log level</string>
     <string name="xray_settings_probe_interval">Probe interval</string>
     <string name="xray_settings_probe_url">Probe URL</string>
-    <string name="xray_settings_saved">Saved, Xray restarted</string>
-    <string name="xray_settings_failed">Not saved: the core rejected the change</string>
-    <string name="xray_settings_readonly">Set in a file with comments: change it in Files.</string>
     <string name="xray_settings_more_title">What Xray does not have</string>
     <string name="xray_settings_more">Mode switches, TUN, allow-LAN, GEO updates and rule providers are mihomo features: Xray has no run-time API for them.</string>
     <string name="group_icon_title">Icon: %1$s</string>
     <string name="group_icon_hint">Image URL (PNG or SVG)</string>
     <string name="group_icon_message">Empty: the icon from the mihomo config with the same group name.</string>
     <string name="xray_access_log">Access log</string>
-    <string name="xray_access_log_sub">Which domain went through which inbound and outbound</string>
     <string name="xray_access_search">Domain or outbound</string>
     <string name="xray_access_off_title">The access log is off</string>
     <string name="xray_access_off_body">Xray writes each connection to run/xray-access.log; the module empties it at every start. Boxy reads it only when you open this page.</string>
@@ -1388,7 +1334,6 @@
     <string name="core_setup_failed">Could not load a config</string>
     <string name="core_setup_switch">Switch</string>
     <string name="core_setup_loaded">Servers: %1$d</string>
-    <string name="core_setup_skipped">Links skipped: %1$d</string>
     <string name="core_setup_err_download">The subscription could not be downloaded.</string>
     <string name="core_setup_err_empty">The subscription replied with nothing (the panel may limit devices or your subscription has ended).</string>
     <string name="core_setup_err_format">The subscription has no servers %1$s can use.</string>
