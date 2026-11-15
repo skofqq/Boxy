@@ -92,7 +92,10 @@ data class ProxySnapshot(val all: List<ProxyGroup>, val nodes: Map<String, Proxy
     val groups: List<ProxyGroup> = all.filter { g ->
         // A wrapper over direct outbounds only (the templates' "🇷🇺 Без VPN" urltest, there to be a choice in
         // every group) is not a group to manage.
-        !g.hidden && !(g.all.isNotEmpty() && g.all.all { nodes[it]?.type?.equals("Direct", ignoreCase = true) == true })
+        !g.hidden && !(g.all.isNotEmpty() && g.all.all { nodes[it]?.type?.equals("Direct", ignoreCase = true) == true }) &&
+            // An auto-pick group that other groups offer as a choice ("⚡️ Fastest" of sing-box) is a building block,
+            // hidden as mihomo's config hides it.
+            !(g.type.equals("URLTest", ignoreCase = true) && all.count { o -> o !== g && g.name in o.all } >= 2)
     }
 
     /** The proxy a group finally uses, following nested groups. */
