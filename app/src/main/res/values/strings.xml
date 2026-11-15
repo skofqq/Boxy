@@ -983,6 +983,10 @@
     <string name="xray_outbounds">Outbounds</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
     <string name="panel_config_link_sub">Log, server checks, DNS… are set in Config › Active core</string>
+    <string name="cb_icon_hint">Icon URL (PNG or SVG), optional</string>
+    <string name="cb_made">Your configs</string>
+    <string name="cb_made_sub">Made here; deleting the active one switches Xray to the module’s config.json</string>
+    <string name="cb_delete_confirm">Delete %1$s?</string>
     <string name="settings_apps_list">Apps: black / white list</string>
     <string name="settings_apps_list_sub">Which apps go through the proxy, for every core</string>
     <string name="cb_title">Create your own config</string>

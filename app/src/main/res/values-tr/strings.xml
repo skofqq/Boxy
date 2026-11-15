@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Outbound\'lar</string>
     <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
     <string name="panel_config_link_sub">Günlük, sunucu denetimi, DNS… Yapılandırma › Etkin çekirdek altında</string>
+    <string name="cb_icon_hint">Simge URL’si (PNG veya SVG), isteğe bağlı</string>
+    <string name="cb_made">Yapılandırmaların</string>
+    <string name="cb_made_sub">Burada oluşturuldu; etkin olanı silersen Xray modülün config.json dosyasına geçer</string>
+    <string name="cb_delete_confirm">%1$s silinsin mi?</string>
     <string name="settings_apps_list">Uygulamalar: kara / beyaz liste</string>
     <string name="settings_apps_list_sub">Hangi uygulamalar proxy üzerinden gider, tüm çekirdekler için</string>
     <string name="cb_title">Kendi yapılandırmanı oluştur</string>

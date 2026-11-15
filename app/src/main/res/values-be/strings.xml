@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Выходныя (outbounds)</string>
     <string name="xray_pool_alive">%1$d з %2$d даступныя</string>
     <string name="panel_config_link_sub">Журнал, праверка сервераў, DNS… — у Канфігурацыя › Актыўнае ядро</string>
+    <string name="cb_icon_hint">Спасылка на іконку (PNG або SVG), неабавязкова</string>
+    <string name="cb_made">Вашы канфігі</string>
+    <string name="cb_made_sub">Створаны тут; калі выдаліць актыўны, Xray пераключыцца на config.json модуля</string>
+    <string name="cb_delete_confirm">Выдаліць %1$s?</string>
     <string name="settings_apps_list">Праграмы: чорны / белы спіс</string>
     <string name="settings_apps_list_sub">Якія праграмы ідуць праз проксі — для ўсіх ядраў</string>
     <string name="cb_title">Стварыць свой канфіг</string>

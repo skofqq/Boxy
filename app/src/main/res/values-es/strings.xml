@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Outbounds</string>
     <string name="xray_pool_alive">%1$d de %2$d activos</string>
     <string name="panel_config_link_sub">Registro, comprobación de servidores, DNS… en Configuración › Núcleo activo</string>
+    <string name="cb_icon_hint">URL del icono (PNG o SVG), opcional</string>
+    <string name="cb_made">Tus configuraciones</string>
+    <string name="cb_made_sub">Creadas aquí; si borras la activa, Xray pasa al config.json del módulo</string>
+    <string name="cb_delete_confirm">¿Eliminar %1$s?</string>
     <string name="settings_apps_list">Apps: lista negra / blanca</string>
     <string name="settings_apps_list_sub">Qué apps pasan por el proxy, para todos los núcleos</string>
     <string name="cb_title">Crear tu configuración</string>

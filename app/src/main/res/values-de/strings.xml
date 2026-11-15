@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Outbounds</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
     <string name="panel_config_link_sub">Protokoll, Serverprüfung, DNS… unter Konfiguration › Aktiver Kern</string>
+    <string name="cb_icon_hint">Symbol-URL (PNG oder SVG), optional</string>
+    <string name="cb_made">Deine Konfigurationen</string>
+    <string name="cb_made_sub">Hier erstellt; wird die aktive gelöscht, wechselt Xray zur config.json des Moduls</string>
+    <string name="cb_delete_confirm">%1$s löschen?</string>
     <string name="settings_apps_list">Apps: Black- / Whitelist</string>
     <string name="settings_apps_list_sub">Welche Apps über den Proxy gehen, für jeden Kern</string>
     <string name="cb_title">Eigene Konfiguration erstellen</string>

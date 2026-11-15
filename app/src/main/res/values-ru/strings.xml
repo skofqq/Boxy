@@ -975,6 +975,10 @@
     <string name="xray_outbounds">Исходящие (outbounds)</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
     <string name="panel_config_link_sub">Журнал, проверка серверов, DNS… — в Конфигурация › Активное ядро</string>
+    <string name="cb_icon_hint">Ссылка на иконку (PNG или SVG), необязательно</string>
+    <string name="cb_made">Ваши конфиги</string>
+    <string name="cb_made_sub">Созданы здесь; если удалить активный, Xray переключится на config.json модуля</string>
+    <string name="cb_delete_confirm">Удалить %1$s?</string>
     <string name="settings_apps_list">Приложения: чёрный / белый список</string>
     <string name="settings_apps_list_sub">Какие приложения идут через прокси — для всех ядер</string>
     <string name="cb_title">Создать свой конфиг</string>

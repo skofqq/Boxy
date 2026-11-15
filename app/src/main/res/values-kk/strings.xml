@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Шығыс (outbounds)</string>
     <string name="xray_pool_alive">%2$d ішінен %1$d қолжетімді</string>
     <string name="panel_config_link_sub">Журнал, серверлерді тексеру, DNS… — Конфигурация › Белсенді ядро бөлімінде</string>
+    <string name="cb_icon_hint">Белгіше сілтемесі (PNG не SVG), міндетті емес</string>
+    <string name="cb_made">Сіздің конфигтеріңіз</string>
+    <string name="cb_made_sub">Осында жасалған; белсендісін жойсаңыз, Xray модульдің config.json-ына ауысады</string>
+    <string name="cb_delete_confirm">%1$s жою керек пе?</string>
     <string name="settings_apps_list">Қолданбалар: қара / ақ тізім</string>
     <string name="settings_apps_list_sub">Қай қолданбалар прокси арқылы өтеді — барлық ядролар үшін</string>
     <string name="cb_title">Өз конфигіңізді жасау</string>

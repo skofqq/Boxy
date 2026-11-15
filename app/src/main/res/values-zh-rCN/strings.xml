@@ -960,6 +960,10 @@
     <string name="xray_outbounds">出站</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
     <string name="panel_config_link_sub">日志、服务器检测、DNS 等在“配置 › 当前内核”中设置</string>
+    <string name="cb_icon_hint">图标地址（PNG 或 SVG，可选）</string>
+    <string name="cb_made">你的配置</string>
+    <string name="cb_made_sub">在此创建；删除当前配置后 Xray 会切换到模块的 config.json</string>
+    <string name="cb_delete_confirm">删除 %1$s？</string>
     <string name="settings_apps_list">应用：黑名单 / 白名单</string>
     <string name="settings_apps_list_sub">哪些应用走代理（适用于所有内核）</string>
     <string name="cb_title">创建自己的配置</string>

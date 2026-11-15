@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Outbound</string>
     <string name="xray_pool_alive">%1$d di %2$d attivi</string>
     <string name="panel_config_link_sub">Log, controllo server, DNS… in Configurazione › Core attivo</string>
+    <string name="cb_icon_hint">URL dell’icona (PNG o SVG), facoltativo</string>
+    <string name="cb_made">Le tue configurazioni</string>
+    <string name="cb_made_sub">Create qui; eliminando quella attiva Xray passa al config.json del modulo</string>
+    <string name="cb_delete_confirm">Eliminare %1$s?</string>
     <string name="settings_apps_list">App: lista nera / bianca</string>
     <string name="settings_apps_list_sub">Quali app passano dal proxy, per tutti i core</string>
     <string name="cb_title">Crea la tua configurazione</string>

@@ -960,6 +960,10 @@
     <string name="xray_outbounds">Outbounds</string>
     <string name="xray_pool_alive">%1$d sur %2$d en ligne</string>
     <string name="panel_config_link_sub">Journal, vérification des serveurs, DNS… dans Configuration › Cœur actif</string>
+    <string name="cb_icon_hint">URL de l’icône (PNG ou SVG), facultatif</string>
+    <string name="cb_made">Vos configurations</string>
+    <string name="cb_made_sub">Créées ici ; supprimer l’active fait passer Xray au config.json du module</string>
+    <string name="cb_delete_confirm">Supprimer %1$s ?</string>
     <string name="settings_apps_list">Applis : liste noire / blanche</string>
     <string name="settings_apps_list_sub">Quelles applis passent par le proxy, pour tous les cœurs</string>
     <string name="cb_title">Créer votre configuration</string>

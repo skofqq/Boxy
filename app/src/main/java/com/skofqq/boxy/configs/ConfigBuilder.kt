@@ -115,6 +115,39 @@ object ConfigBuilder {
             )
     }
 
+    /** The configs this builder made (xray/profiles/<name>.json listed in builder-made.txt). */
+    private fun madeFile(context: Context) = File(context.filesDir, "builder-made.txt")
+
+    fun made(context: Context): List<String> = runCatching { madeFile(context).readLines().filter { it.isNotBlank() } }.getOrDefault(emptyList())
+
+    private fun remember(context: Context, rel: String) {
+        madeFile(context).writeText((made(context).filter { it != rel } + rel).joinToString("\n"))
+    }
+
+    /** Deletes a config this builder made; the active one gives way to the module's config.json. */
+    suspend fun delete(context: Context, rel: String): Boolean = withContext(Dispatchers.IO) {
+        val active = BoxModule.unquote(BoxModule.readSetting("name_xray_config"))
+        BoxModule.exec("rm -f '${BoxModule.BOX_DIR}/xray/$rel'")
+        madeFile(context).writeText(made(context).filter { it != rel }.joinToString("\n"))
+        if (active == rel) {
+            BoxModule.writeSetting("name_xray_config", "config.json")
+            val st = BoxModule.state()
+            if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
+        }
+        true
+    }
+
+    /** Renames a config this builder made (the module follows when it is the active one). */
+    suspend fun rename(context: Context, rel: String, newName: String): String? = withContext(Dispatchers.IO) {
+        val to = fileName(Plan(newName))
+        if (to == rel) return@withContext rel
+        if (!BoxModule.exec("mv -f '${BoxModule.BOX_DIR}/xray/$rel' '${BoxModule.BOX_DIR}/xray/$to'").first) return@withContext null
+        madeFile(context).writeText(made(context).map { if (it == rel) to else it }.joinToString("\n"))
+        if (BoxModule.unquote(BoxModule.readSetting("name_xray_config")) == rel) BoxModule.writeSetting("name_xray_config", to)
+        load(context)?.takeIf { fileName(it) == rel }?.let { save(context, it.copy(name = newName)) }
+        to
+    }
+
     data class Outcome(val ok: Boolean, val servers: Int = 0, val skipped: Int = 0, val path: String? = null, val error: String? = null)
 
     /**
@@ -141,6 +174,7 @@ object ConfigBuilder {
             return@withContext Outcome(false, error = check.output)
         }
         RoutingProfiles.remember(context, path, baseText, written)
+        remember(context, rel)
         BoxModule.writeSetting("name_xray_config", rel)
         val st = BoxModule.state()
         if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
