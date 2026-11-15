@@ -964,13 +964,10 @@
     <string name="cb_made">Yapılandırmaların</string>
     <string name="cb_made_sub">Burada oluşturuldu; etkin olanı silersen Xray modülün config.json dosyasına geçer</string>
     <string name="cb_delete_confirm">%1$s silinsin mi?</string>
-    <string name="settings_apps_list">Uygulamalar: kara / beyaz liste</string>
-    <string name="settings_apps_list_sub">Hangi uygulamalar proxy üzerinden gider, tüm çekirdekler için</string>
     <string name="cb_title">Kendi yapılandırmanı oluştur</string>
     <string name="cb_sub">Xray: sunucular, gruplar, yönlendirme — panel şablonu olmadan</string>
     <string name="cb_row_sub">Sunucularından ve gruplarından Xray</string>
     <string name="cb_servers">Sunucular</string>
-    <string name="cb_servers_sub">Bağlantılı bir abonelik ya da buraya yapıştırılan bağlantılar</string>
     <string name="cb_from_url">Abonelik URL’si</string>
     <string name="cb_from_links">Bağlantılar</string>
     <string name="cb_load">Sunucuları yükle</string>
@@ -983,13 +980,9 @@
     <string name="cb_all_servers">Tüm sunucular</string>
     <string name="cb_add_group">Grup ekle</string>
     <string name="cb_new_group">Grup %1$d</string>
-    <string name="cb_routing_sub">Grup başına listeler, genel proxy, DNS: profiller bu grupları adıyla hedefler</string>
     <string name="cb_create">Oluştur ve etkinleştir</string>
-    <string name="cb_created">%1$s oluşturuldu: %2$d sunucu, artık etkin Xray yapılandırması</string>
-    <string name="cb_note">Yapılandırmaya modülün tproxy girişi, DNS ve sunucu denetimi eklenir; önce Xray denetler. Gruplarda seçmek için sunucuları yükleyin.</string>
     <string name="cb_group">Grup</string>
     <string name="cb_members">Grubun sunucuları</string>
-    <string name="cb_members_load">Seçmek için yukarıda sunucuları yükleyin</string>
     <string name="config_hub_sub">Abonelik, yapılandırmalar, etkin çekirdek, ağ</string>
     <string name="config_files_sub">Etkin yapılandırma ve modülün tüm dosyaları</string>
     <string name="config_more">Diğer</string>

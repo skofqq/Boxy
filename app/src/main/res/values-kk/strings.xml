@@ -964,13 +964,10 @@
     <string name="cb_made">Сіздің конфигтеріңіз</string>
     <string name="cb_made_sub">Осында жасалған; белсендісін жойсаңыз, Xray модульдің config.json-ына ауысады</string>
     <string name="cb_delete_confirm">%1$s жою керек пе?</string>
-    <string name="settings_apps_list">Қолданбалар: қара / ақ тізім</string>
-    <string name="settings_apps_list_sub">Қай қолданбалар прокси арқылы өтеді — барлық ядролар үшін</string>
     <string name="cb_title">Өз конфигіңізді жасау</string>
     <string name="cb_sub">Xray: серверлер, топтар, маршруттау — панель үлгісінсіз</string>
     <string name="cb_row_sub">Сіздің серверлеріңіз бен топтарыңыздан Xray</string>
     <string name="cb_servers">Серверлер</string>
-    <string name="cb_servers_sub">Сілтемелері бар жазылым немесе осында қойылған сілтемелер</string>
     <string name="cb_from_url">Жазылым мекенжайы</string>
     <string name="cb_from_links">Сілтемелер</string>
     <string name="cb_load">Серверлерді жүктеу</string>
@@ -983,13 +980,9 @@
     <string name="cb_all_servers">Барлық серверлер</string>
     <string name="cb_add_group">Топ қосу</string>
     <string name="cb_new_group">%1$d-топ</string>
-    <string name="cb_routing_sub">Топ бойынша тізімдер, жаһандық прокси, DNS: профильдер трафикті осы топтарға атымен бағыттайды</string>
     <string name="cb_create">Жасау және қосу</string>
-    <string name="cb_created">%1$s жасалды: %2$d сервер, енді бұл белсенді Xray конфигі</string>
-    <string name="cb_note">Конфигке модульдің tproxy кірісі, DNS және серверлерді тексеру қосылады; алдымен оны Xray тексереді. Топтарда таңдау үшін серверлерді жүктеңіз.</string>
     <string name="cb_group">Топ</string>
     <string name="cb_members">Топ серверлері</string>
-    <string name="cb_members_load">Таңдау үшін жоғарыда серверлерді жүктеңіз</string>
     <string name="config_hub_sub">Жазылым, конфигтер, белсенді ядро, желі</string>
     <string name="config_files_sub">Белсенді конфиг және модульдің барлық файлдары</string>
     <string name="config_more">Қосымша</string>

@@ -964,13 +964,10 @@
     <string name="cb_made">Вашы канфігі</string>
     <string name="cb_made_sub">Створаны тут; калі выдаліць актыўны, Xray пераключыцца на config.json модуля</string>
     <string name="cb_delete_confirm">Выдаліць %1$s?</string>
-    <string name="settings_apps_list">Праграмы: чорны / белы спіс</string>
-    <string name="settings_apps_list_sub">Якія праграмы ідуць праз проксі — для ўсіх ядраў</string>
     <string name="cb_title">Стварыць свой канфіг</string>
     <string name="cb_sub">Xray: серверы, групы, маршрутызацыя — без шаблона панэлі</string>
     <string name="cb_row_sub">Xray з вашых сервераў і груп</string>
     <string name="cb_servers">Серверы</string>
-    <string name="cb_servers_sub">Падпіска са спасылкамі або спасылкі, устаўленыя сюды</string>
     <string name="cb_from_url">Адрас падпіскі</string>
     <string name="cb_from_links">Спасылкі</string>
     <string name="cb_load">Загрузіць серверы</string>
@@ -983,13 +980,9 @@
     <string name="cb_all_servers">Усе серверы</string>
     <string name="cb_add_group">Дадаць групу</string>
     <string name="cb_new_group">Група %1$d</string>
-    <string name="cb_routing_sub">Спісы па групах, глабальны проксі, DNS: профілі накіроўваюць трафік у гэтыя групы па імені</string>
     <string name="cb_create">Стварыць і ўключыць</string>
-    <string name="cb_created">Створаны %1$s: сервераў %2$d, цяпер гэта актыўны канфіг Xray</string>
-    <string name="cb_note">У канфіг дадаюцца ўваход tproxy модуля, DNS і праверка сервераў; спачатку яго правярае Xray. Загрузіце серверы, каб выбраць іх у групах.</string>
     <string name="cb_group">Група</string>
     <string name="cb_members">Серверы групы</string>
-    <string name="cb_members_load">Загрузіце серверы вышэй, каб выбраць іх</string>
     <string name="config_hub_sub">Падпіска, канфігі, актыўнае ядро, сетка</string>
     <string name="config_files_sub">Актыўны канфіг і ўсе файлы модуля</string>
     <string name="config_more">Дадаткова</string>

@@ -964,13 +964,10 @@
     <string name="cb_made">あなたの設定</string>
     <string name="cb_made_sub">ここで作成したもの。有効な設定を削除すると Xray はモジュールの config.json に切り替わります</string>
     <string name="cb_delete_confirm">%1$s を削除しますか？</string>
-    <string name="settings_apps_list">アプリ：ブラック / ホワイトリスト</string>
-    <string name="settings_apps_list_sub">プロキシを通すアプリ（全コア共通）</string>
     <string name="cb_title">自分の設定を作成</string>
     <string name="cb_sub">Xray：サーバー、グループ、ルーティング — パネルのテンプレートなし</string>
     <string name="cb_row_sub">あなたのサーバーとグループから Xray を作成</string>
     <string name="cb_servers">サーバー</string>
-    <string name="cb_servers_sub">共有リンクのサブスクリプション、またはここに貼り付けたリンク</string>
     <string name="cb_from_url">サブスクリプション URL</string>
     <string name="cb_from_links">リンク</string>
     <string name="cb_load">サーバーを読み込む</string>
@@ -983,13 +980,9 @@
     <string name="cb_all_servers">すべてのサーバー</string>
     <string name="cb_add_group">グループを追加</string>
     <string name="cb_new_group">グループ %1$d</string>
-    <string name="cb_routing_sub">グループ別リスト、グローバルプロキシ、DNS：プロファイルは名前でこれらのグループを指定します</string>
     <string name="cb_create">作成して有効化</string>
-    <string name="cb_created">%1$s を作成：サーバー %2$d 台、有効な Xray 設定になりました</string>
-    <string name="cb_note">設定にはモジュールの tproxy 入口、DNS、サーバーチェックが含まれ、Xray が先に検証します。グループで選ぶにはサーバーを読み込んでください。</string>
     <string name="cb_group">グループ</string>
     <string name="cb_members">グループのサーバー</string>
-    <string name="cb_members_load">上でサーバーを読み込むと選択できます</string>
     <string name="config_hub_sub">サブスクリプション、設定、有効なコア、ネットワーク</string>
     <string name="config_files_sub">有効な設定とモジュールのすべてのファイル</string>
     <string name="config_more">その他</string>
