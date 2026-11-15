@@ -262,7 +262,7 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
     // Room under the last tiles for the floating search.
     val listPadding = if (!ready) contentPadding else PaddingValues(
         top = contentPadding.calculateTopPadding(),
-        bottom = contentPadding.calculateBottomPadding() + 136.dp,
+        bottom = contentPadding.calculateBottomPadding() + 16.dp,
     )
     // The list is recorded on its own for the floating search: sampling the panel's backdrop, which holds
     // the search itself, would draw the glass into itself without end.

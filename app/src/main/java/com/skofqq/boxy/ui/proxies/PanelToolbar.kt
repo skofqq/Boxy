@@ -109,7 +109,7 @@ internal val LocalPanelNav = compositionLocalOf<PanelNav?> { null }
 internal val LocalPanelPage = compositionLocalOf { -1 }
 
 /** Room the toolbar takes over the bottom of a section's list. */
-internal val PANEL_TOOLBAR_ROOM = 100.dp
+internal val PANEL_TOOLBAR_ROOM = 160.dp
 
 
 /** A section's search goes to the toolbar: true when it did (the section then draws no bar of its own). */
@@ -133,35 +133,18 @@ internal fun PanelToolbar(
     modifier: Modifier = Modifier,
 ) {
     val search = nav.searches[selected]
-    var open by remember { mutableStateOf(false) }
-    // Another section, or one without a search: the field closes.
-    LaunchedEffect(selected, search == null) { open = search != null && search.query.isNotEmpty() }
     val page = Boxy.colors.page
     val density = LocalDensity.current
     val root = LocalView.current.rootView
     var below by remember { mutableIntStateOf(0) }
     val keyboard = with(density) { (WindowInsets.ime.getBottom(density) - below).coerceAtLeast(0).toDp() }
     AnimatedVisibility(
-        nav.visible || open,
+        // A search in progress keeps the bar out.
+        nav.visible || !search?.query.isNullOrEmpty(),
         modifier,
         enter = slideInVertically { it } + fadeIn(),
         exit = slideOutVertically { it } + fadeOut(),
     ) {
-        androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.End) {
-        // The section's search (🔍 on top) and actions (⚡, pause, close all…): small floating buttons stacked at the
-        // right edge above the bar, swapped with a fade when the section changes.
-        androidx.compose.animation.AnimatedContent(
-            selected,
-            Modifier.padding(end = 18.dp),
-            transitionSpec = { (fadeIn() + androidx.compose.animation.scaleIn(initialScale = 0.8f)) togetherWith (fadeOut() + androidx.compose.animation.scaleOut(targetScale = 0.8f)) },
-            label = "panelActions",
-        ) { sel ->
-            val s = nav.searches[sel]
-            if (s != null) ActionStack {
-                if (!open) GlassAction(BoxyIcons.Search, s.hint) { open = true }
-                s.actions(this)
-            }
-        }
         Box(
             Modifier
                 // Taps on the bar's strip (between and around the pills) never reach the list under it.
@@ -172,29 +155,29 @@ internal fun PanelToolbar(
                 .padding(top = 16.dp, bottom = maxOf(bottom, keyboard)),
         ) {
             androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (open && search != null) {
+                // The section's search, stretched, and its actions (⚡, pause, close all…) beside it, above the bar.
+                if (search != null) Row(
+                    Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp).fillMaxWidth().height(52.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     val pill = RoundedCornerShape(50)
                     GlassSurface(
                         pill, Boxy.colors.card, 26.dp,
-                        Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp).fillMaxWidth().height(52.dp)
-                            .shadow(10.dp, pill, clip = false).border(1.dp, Boxy.colors.outline, pill),
+                        Modifier.weight(1f).fillMaxHeight().shadow(10.dp, pill, clip = false).border(1.dp, Boxy.colors.outline, pill),
                         element = true,
                     ) {
-                        val focus = remember { FocusRequester() }
-                        LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
                         BoxyTextField(
                             search.query, search.onQuery, search.hint,
-                            Modifier.fillMaxSize().focusRequester(focus),
+                            Modifier.fillMaxSize(),
                             leading = { Icon(BoxyIcons.Search, null, Modifier.size(20.dp), tint = Boxy.colors.text2) },
-                            trailing = {
-                                Icon(
-                                    BoxyIcons.Close, stringResource(R.string.action_cancel),
-                                    Modifier.size(22.dp).clickable { search.onQuery(""); open = false }, tint = Boxy.colors.text2,
-                                )
-                            },
+                            trailing = if (search.query.isEmpty()) null else ({
+                                Icon(BoxyIcons.Close, stringResource(R.string.action_cancel), Modifier.size(22.dp).clickable { search.onQuery("") }, tint = Boxy.colors.text2)
+                            }),
                             container = Color.Transparent,
                         )
                     }
+                    search.actions(this)
                 }
                 // The sections as the app's own bottom bar: five equal items, icon and name, the chosen one on a pill.
                 val motions = listOf(
@@ -210,30 +193,6 @@ internal fun PanelToolbar(
                 )
             }
         }
-        }
     }
 }
 
-/** Lays the section's actions out top to bottom, right-aligned (they are written for a row). */
-@Composable
-private fun ActionStack(actions: @Composable RowScope.() -> Unit) {
-    androidx.compose.ui.layout.Layout(content = { StackRowScope.actions() }) { measurables, constraints ->
-        val gap = 12.dp.roundToPx()
-        val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
-        val w = placeables.maxOfOrNull { it.width } ?: 0
-        val h = placeables.sumOf { it.height } + gap * placeables.size
-        layout(w, h) {
-            var y = 0
-            placeables.forEach { p -> p.placeRelative(w - p.width, y); y += p.height + gap }
-        }
-    }
-}
-
-/** The row receiver the actions expect; they use none of its modifiers, so each leaves the modifier as it is. */
-private object StackRowScope : RowScope {
-    override fun Modifier.weight(weight: Float, fill: Boolean): Modifier = this
-    override fun Modifier.align(alignment: Alignment.Vertical): Modifier = this
-    override fun Modifier.alignBy(alignmentLine: androidx.compose.ui.layout.HorizontalAlignmentLine): Modifier = this
-    override fun Modifier.alignByBaseline(): Modifier = this
-    override fun Modifier.alignBy(alignmentLineBlock: (androidx.compose.ui.layout.Measured) -> Int): Modifier = this
-}
