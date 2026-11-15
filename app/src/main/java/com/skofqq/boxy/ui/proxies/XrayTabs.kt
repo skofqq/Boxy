@@ -92,13 +92,15 @@ internal fun XrayLogsTab(bottom: Dp, reloadKey: Int) {
         }
     }
     val shown = XRAY_LEVELS.take(XRAY_LEVELS.indexOf(level) + 1)
+    // In the panel tab the search is on the floating toolbar.
+    val searchOnToolbar = registerPanelSearch(query, { query = it }, stringResource(R.string.xray_access_search)) {}
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 XRAY_LEVELS.forEach { l -> Chip(l.lowercase(), l == level) { level = l } }
                 Chip(stringResource(if (paused) R.string.xray_logs_resume else R.string.xray_logs_pause), paused) { paused = !paused }
             }
-            com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(top = 8.dp))
+            if (!searchOnToolbar) com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(top = 8.dp))
         }
     }, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         val list = lines
@@ -177,8 +179,9 @@ internal fun XrayRulesTab(bottom: Dp, reloadKey: Int) {
             out
         }
     }
+    val searchOnToolbar = registerPanelSearch(query, { query = it }, stringResource(R.string.xray_access_search)) {}
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
-        com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp))
+        if (!searchOnToolbar) com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp))
     }, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         val list = rules
         if (list == null) {

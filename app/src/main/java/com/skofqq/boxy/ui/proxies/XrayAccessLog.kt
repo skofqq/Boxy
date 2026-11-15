@@ -59,6 +59,8 @@ internal fun XrayAccessLog(bottom: Dp, onBack: (() -> Unit)?) {
         entries = path?.let { XrayApi.accessLog(it) }
     }
 
+    // In the panel tab the search is on the floating toolbar (only once there is a log to search).
+    val searchOnToolbar = path != null && registerPanelSearch(query, { query = it }, stringResource(R.string.xray_access_search)) {}
     PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {
         Column {
             Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 16.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -73,7 +75,7 @@ internal fun XrayAccessLog(bottom: Dp, onBack: (() -> Unit)?) {
                 }
                 if (path != null) HeaderAction(BoxyIcons.Refresh, stringResource(R.string.action_refresh_page)) { reload++ }
             }
-            if (path != null) {
+            if (path != null && !searchOnToolbar) {
                 // No autofocus: the log is read first, searched only on demand.
                 com.skofqq.boxy.ui.components.BoxyTextField(query, { query = it }, stringResource(R.string.xray_access_search), Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp))
             }
