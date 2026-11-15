@@ -181,15 +181,8 @@ private fun RoutingScreen(bottom: Dp, onBack: () -> Unit) {
 
 @Composable
 private fun Header(title: String, sub: String?, onBack: () -> Unit, end: @Composable () -> Unit = {}) {
-    Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 16.dp, top = 6.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        HeaderAction(BoxyIcons.ArrowBack, stringResource(R.string.action_back), onClick = onBack)
-        Spacer(Modifier.width(10.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (sub != null) Text(sub, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 2)
-        }
-        end()
-    }
+    // The same header as every other page in Config.
+    com.skofqq.boxy.ui.components.SubPageHeader(title, sub, onBack) { end() }
 }
 
 // ---------------------------------------------------------------- profiles
@@ -357,6 +350,7 @@ private fun share(context: Context, p: Profile) {
 
 // ---------------------------------------------------------------- one profile
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileEditor(
     bottom: Dp, p: Profile, base: JSONObject?, active: Boolean, applying: Boolean, dirty: Boolean,
@@ -389,7 +383,8 @@ private fun ProfileEditor(
         }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 SectionCard(stringResource(R.string.rt_mode), stringResource(if (p.mode == RoutingProfiles.Mode.OVER) R.string.rt_mode_over_hint else R.string.rt_mode_replace_hint)) {
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // A FlowRow: long names (ru, de) wrap instead of the second chip being cut off.
+                    FlowRow(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         GlassChip(stringResource(R.string.rt_mode_over), p.mode == RoutingProfiles.Mode.OVER) { onChange(p.copy(mode = RoutingProfiles.Mode.OVER)) }
                         GlassChip(stringResource(R.string.rt_mode_replace), p.mode == RoutingProfiles.Mode.REPLACE) { onChange(p.copy(mode = RoutingProfiles.Mode.REPLACE)) }
                     }

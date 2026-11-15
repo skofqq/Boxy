@@ -337,16 +337,8 @@ fun CoreSettingsScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     val s = state ?: return
     val core = BoxModule.unquote(s.core)
     Column(Modifier.padding(top = contentPadding.calculateTopPadding())) {
-        Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 16.dp, top = 6.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            com.skofqq.boxy.ui.components.HeaderAction(BoxyIcons.ArrowBack, stringResource(R.string.action_back), onClick = onBack)
-            Spacer(Modifier.width(10.dp))
-            Text(
-                stringResource(R.string.cs_tools_title) + " · " + (if (core == "xray") "Xray" else "Sing-box"),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
-                color = Boxy.colors.text,
-            )
-        }
+        // The same header as every other page in Config.
+        com.skofqq.boxy.ui.components.SubPageHeader(stringResource(R.string.cs_tools_title), if (core == "xray") "Xray" else "Sing-box", onBack)
         if (core == "xray") {
             XraySettingsTab(contentPadding.calculateBottomPadding(), 0, s.running)
         } else {
