@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">observatory による状態と遅延、起動以降の通信量。停止中のものをタップすると理由を表示</string>
     <string name="xray_dead">停止</string>
     <string name="xray_pool_alive">%2$d 件中 %1$d 件が稼働</string>
+    <string name="config_hub_sub">サブスクリプション、設定、有効なコア、ネットワーク</string>
+    <string name="config_files_sub">有効な設定とモジュールのすべてのファイル</string>
+    <string name="config_net_sub">プロキシ経由のアプリ、Wi-Fi ルール、DNS</string>
+    <string name="config_more">その他</string>
+    <string name="config_more_sub">ログ、トラフィック、DNSCrypt サーバー、TLS チェック、自動化</string>
+    <string name="tab_panel">パネル</string>
+    <string name="tab_config">構成</string>
+    <string name="sub_active_core">有効</string>
+    <string name="sub_hysteria_sub">Hysteria に切り替えると Boxy がここから設定を読み込みます</string>
+    <string name="sub_row_sub">全コアの URL、QR / リンクからインポート、自動更新</string>
     <string name="updates_link_sub">コア、GEO ファイル、サブスクリプション、Web パネル — ツールで</string>
     <string name="config_selected_restart">%1$s を選択しました。実行中のコアは再起動後に反映します</string>
     <string name="cs_tools_title">コア設定</string>

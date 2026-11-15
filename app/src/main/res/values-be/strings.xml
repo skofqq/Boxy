@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">Стан і затрымка ад observatory, трафік з моманту запуску; націсніце на недаступны, каб убачыць прычыну</string>
     <string name="xray_dead">недаступны</string>
     <string name="xray_pool_alive">%1$d з %2$d даступныя</string>
+    <string name="config_hub_sub">Падпіска, канфігі, актыўнае ядро, сетка</string>
+    <string name="config_files_sub">Актыўны канфіг і ўсе файлы модуля</string>
+    <string name="config_net_sub">Праграмы праз проксі, правілы Wi-Fi, DNS</string>
+    <string name="config_more">Дадаткова</string>
+    <string name="config_more_sub">Журналы, трафік, серверы DNSCrypt, праверка TLS, аўтаматызацыя</string>
+    <string name="tab_panel">Панэль</string>
+    <string name="tab_config">Канфігурацыя</string>
+    <string name="sub_active_core">Актыўнае</string>
+    <string name="sub_hysteria_sub">Boxy загружае з яе канфіг Hysteria пры пераключэнні на Hysteria</string>
+    <string name="sub_row_sub">Адрасы ўсіх ядраў, імпарт па QR або спасылцы, аўтаабнаўленне</string>
     <string name="updates_link_sub">Ядры, GEO-файлы, падпіскі, вэб-панэль — у Інструментах</string>
     <string name="config_selected_restart">%1$s выбраны; ядро, што працуе, падхопіць яго пасля перазапуску</string>
     <string name="cs_tools_title">Налады ядра</string>

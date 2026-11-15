@@ -132,14 +132,18 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
         }
     }
     PinnedLazyPage(contentPadding, header = {
-PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_subtitle))
-}, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        PageHeader(stringResource(R.string.tab_config), stringResource(R.string.config_hub_sub))
+    }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        // Ordered by how often it is used: the subscription and configs first, the rare tools last.
         item {
-            SectionCard(stringResource(R.string.tools_config), stringResource(R.string.tools_config_sub)) {
+            SectionCard(null) {
+                SettingsRow(BoxyIcons.Subscriptions, stringResource(R.string.tools_subscription), stringResource(R.string.sub_row_sub), showDivider = false) { push(ROUTE_SUBSCRIPTION) }
+            }
+        }
+        item {
+            SectionCard(stringResource(R.string.tools_config), stringResource(R.string.config_files_sub)) {
                 SettingsRow(BoxyIcons.Tune, stringResource(R.string.tools_row_select), stringResource(R.string.tools_row_select_sub)) { push(ROUTE_CONFIGS) }
-                SettingsRow(BoxyIcons.Folder, stringResource(R.string.tools_row_manage), stringResource(R.string.tools_row_manage_sub)) { push(ROUTE_FILES) }
-                SettingsRow(BoxyIcons.QrCode, stringResource(R.string.import_title), stringResource(R.string.import_row_sub)) { importChooser = true }
-                SettingsRow(BoxyIcons.Subscriptions, stringResource(R.string.tools_subscription), stringResource(R.string.tools_subscription_sub), showDivider = false) { push(ROUTE_SUBSCRIPTION) }
+                SettingsRow(BoxyIcons.Folder, stringResource(R.string.tools_row_manage), stringResource(R.string.tools_row_manage_sub), showDivider = false) { push(ROUTE_FILES) }
             }
         }
         item {
@@ -153,37 +157,24 @@ PageHeader(stringResource(R.string.tools_title), stringResource(R.string.tools_s
             }
         }
         item {
-            SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
+            SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.config_net_sub)) {
+                SettingsRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.tools_row_apps_sub)) { onOpenPage(NavExtra.APPS) }
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
-                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
-                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub)) { push(ROUTE_DNSCRYPT) }
-                SettingsRow(BoxyIcons.Speed, stringResource(R.string.tls_ping_title), stringResource(R.string.tls_ping_row_sub), showDivider = false) { tlsPing = true }
+                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub), showDivider = false) { push(ROUTE_DNS) }
             }
         }
         item {
-            SectionCard(stringResource(R.string.tools_maint), stringResource(R.string.tools_maint_sub)) {
-                SettingsRow(BoxyIcons.Download, stringResource(R.string.tools_row_update), stringResource(R.string.tools_update_row_sub)) { push(ROUTE_UPDATE) }
-                SettingsRow(BoxyIcons.BarChart, stringResource(R.string.traffic_title), stringResource(R.string.traffic_row_sub)) { push(ROUTE_TRAFFIC) }
-                SettingsRow(BoxyIcons.Schedule, stringResource(R.string.auto_title), stringResource(R.string.auto_row_sub), showDivider = false) { push(ROUTE_AUTOMATION) }
+            SectionCard(null) {
+                SettingsRow(BoxyIcons.Download, stringResource(R.string.tools_row_update), stringResource(R.string.tools_update_row_sub), showDivider = false) { push(ROUTE_UPDATE) }
             }
         }
-        val hidden = listOf(NavExtra.APPS, NavExtra.LOGS).filter { it != navExtra }
-        if (hidden.isNotEmpty()) {
-            item {
-                val sectionTitle = when {
-                    hidden.size > 1 -> stringResource(R.string.tools_more)
-                    hidden.first() == NavExtra.APPS -> stringResource(R.string.tab_apps)
-                    else -> stringResource(R.string.tab_logs)
-                }
-                SectionCard(sectionTitle, stringResource(R.string.tools_more_sub)) {
-                    hidden.forEachIndexed { i, page ->
-                        val last = i == hidden.lastIndex
-                        when (page) {
-                            NavExtra.APPS -> SettingsRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.tools_row_apps_sub), showDivider = !last) { onOpenPage(page) }
-                            else -> SettingsRow(BoxyIcons.Description, stringResource(R.string.tab_logs), stringResource(R.string.tools_row_logs_sub), showDivider = !last) { onOpenPage(page) }
-                        }
-                    }
-                }
+        item {
+            SectionCard(stringResource(R.string.config_more), stringResource(R.string.config_more_sub)) {
+                SettingsRow(BoxyIcons.Description, stringResource(R.string.tab_logs), stringResource(R.string.tools_row_logs_sub)) { onOpenPage(NavExtra.LOGS) }
+                SettingsRow(BoxyIcons.BarChart, stringResource(R.string.traffic_title), stringResource(R.string.traffic_row_sub)) { push(ROUTE_TRAFFIC) }
+                SettingsRow(BoxyIcons.Dns, stringResource(R.string.dnscrypt_servers), stringResource(R.string.dnscrypt_servers_row_sub)) { push(ROUTE_DNSCRYPT) }
+                SettingsRow(BoxyIcons.Speed, stringResource(R.string.tls_ping_title), stringResource(R.string.tls_ping_row_sub)) { tlsPing = true }
+                SettingsRow(BoxyIcons.Schedule, stringResource(R.string.auto_title), stringResource(R.string.auto_row_sub), showDivider = false) { push(ROUTE_AUTOMATION) }
             }
         }
     }

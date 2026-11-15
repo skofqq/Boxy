@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">Observatory\'den durum ve gecikme, başlangıçtan beri trafik; nedenini görmek için ölü olana dokunun</string>
     <string name="xray_dead">kapalı</string>
     <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
+    <string name="config_hub_sub">Abonelik, yapılandırmalar, etkin çekirdek, ağ</string>
+    <string name="config_files_sub">Etkin yapılandırma ve modülün tüm dosyaları</string>
+    <string name="config_net_sub">Proxy üzerinden uygulamalar, Wi-Fi kuralları, DNS</string>
+    <string name="config_more">Diğer</string>
+    <string name="config_more_sub">Günlükler, trafik, DNSCrypt sunucuları, TLS denetimi, otomasyon</string>
+    <string name="tab_panel">Panel</string>
+    <string name="tab_config">Yapılandırma</string>
+    <string name="sub_active_core">Etkin</string>
+    <string name="sub_hysteria_sub">Hysteria’ya geçince Boxy buradan Hysteria yapılandırması yükler</string>
+    <string name="sub_row_sub">Tüm çekirdeklerin URL’leri, QR veya bağlantıyla içe aktarma, otomatik güncelleme</string>
     <string name="updates_link_sub">Çekirdekler, GEO dosyaları, abonelikler, web paneli — Araçlar’da</string>
     <string name="config_selected_restart">%1$s etkin; çalışan çekirdek yeniden başlatınca kullanır</string>
     <string name="cs_tools_title">Çekirdek ayarları</string>

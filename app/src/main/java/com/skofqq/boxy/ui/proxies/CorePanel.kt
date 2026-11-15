@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -53,45 +56,86 @@ private val BAR_ROOM = 12.dp + 68.dp
  * bottom bar.
  */
 @Composable
-fun CorePanel(reloadKey: Int) {
+fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
     // One panel for every core. Xray has no clash-style API: its tabs work from its metrics, API, log files and
     // config (XrayTabs), and show only what Xray has.
     val state by produceState<com.skofqq.boxy.root.ServiceState?>(null, reloadKey) { value = runCatching { BoxModule.state() }.getOrNull() }
     val s = state ?: return
     val xray = BoxModule.unquote(s.core) == "xray"
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    // As a tab of the app's bar the sections switch on top (one bar at the bottom), else on a bar of their own.
+    val room = if (sectionsOnTop) 8.dp else BAR_ROOM
+    val sections = listOf(
+        stringResource(R.string.proxies_tab_groups) to BoxyIcons.Language,
+        stringResource(R.string.panel_tab_connections) to BoxyIcons.Link,
+        stringResource(R.string.panel_tab_logs) to BoxyIcons.Description,
+        stringResource(R.string.panel_tab_rules) to BoxyIcons.FilterList,
+        stringResource(R.string.tab_settings) to BoxyIcons.Settings,
+    )
+    val page: @Composable () -> Unit = {
+        if (xray && RoutingNav.open) XrayRoutingScreen(room) { RoutingNav.open = false }
+        else if (xray) when (tab) {
+            0 -> XrayPanel(room, reloadKey, s.running)
+            1 -> XrayConnectionsTab(room)
+            2 -> XrayLogsTab(room, reloadKey)
+            3 -> XrayRulesTab(room, reloadKey)
+            else -> XraySettingsTab(room, reloadKey, s.running)
+        } else when (tab) {
+            0 -> ProxiesScreen(PaddingValues(bottom = room), header = {}, embedded = true, reloadKey = reloadKey)
+            1 -> ConnectionsTab(room, reloadKey)
+            2 -> CoreLogsTab(room, reloadKey)
+            3 -> RulesTab(room, reloadKey)
+            else -> SettingsTab(room, reloadKey)
+        }
+    }
+    if (sectionsOnTop) {
+        Column(Modifier.fillMaxSize()) {
+            SectionSwitch(sections, tab) { tab = it; RoutingNav.open = false }
+            Box(Modifier.fillMaxWidth().weight(1f)) { page() }
+        }
+        return
+    }
     // The tabs are recorded on their own for the bar: the panel's backdrop holds the bar and would draw it into itself.
     val barBackdrop = rememberBackdrop()
     Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize().backdropSourceOf(barBackdrop)) {
-            if (xray && RoutingNav.open) XrayRoutingScreen(BAR_ROOM) { RoutingNav.open = false }
-            else if (xray) when (tab) {
-                0 -> XrayPanel(BAR_ROOM, reloadKey, s.running)
-                1 -> XrayConnectionsTab(BAR_ROOM)
-                2 -> XrayLogsTab(BAR_ROOM, reloadKey)
-                3 -> XrayRulesTab(BAR_ROOM, reloadKey)
-                else -> XraySettingsTab(BAR_ROOM, reloadKey, s.running)
-            } else when (tab) {
-                0 -> ProxiesScreen(PaddingValues(bottom = BAR_ROOM), header = {}, embedded = true, reloadKey = reloadKey)
-                1 -> ConnectionsTab(BAR_ROOM, reloadKey)
-                2 -> CoreLogsTab(BAR_ROOM, reloadKey)
-                3 -> RulesTab(BAR_ROOM, reloadKey)
-                else -> SettingsTab(BAR_ROOM, reloadKey)
-            }
-        }
+        Box(Modifier.fillMaxSize().backdropSourceOf(barBackdrop)) { page() }
         CompositionLocalProvider(LocalBackdrop provides barBackdrop) {
             BottomBar(
                 listOf(
-                    BarItem(stringResource(R.string.proxies_tab_groups), BoxyIcons.Language, TapMotion.SPIN),
-                    BarItem(stringResource(R.string.panel_tab_connections), BoxyIcons.Link, TapMotion.SHAKE),
-                    BarItem(stringResource(R.string.panel_tab_logs), BoxyIcons.Description, TapMotion.FLIP),
-                    BarItem(stringResource(R.string.panel_tab_rules), BoxyIcons.FilterList, TapMotion.DROP),
-                    BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings, TapMotion.GEAR),
+                    BarItem(sections[0].first, sections[0].second, TapMotion.SPIN),
+                    BarItem(sections[1].first, sections[1].second, TapMotion.SHAKE),
+                    BarItem(sections[2].first, sections[2].second, TapMotion.FLIP),
+                    BarItem(sections[3].first, sections[3].second, TapMotion.DROP),
+                    BarItem(sections[4].first, sections[4].second, TapMotion.GEAR),
                 ),
                 tab.toFloat(),
                 { tab = it },
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp),
             )
+        }
+    }
+}
+
+/** The panel's sections as pills on top (the panel as a tab of the app): icon and name, the chosen one tinted. */
+@Composable
+private fun SectionSwitch(sections: List<Pair<String, androidx.compose.ui.graphics.vector.ImageVector>>, selected: Int, onSelect: (Int) -> Unit) {
+    androidx.compose.foundation.layout.Row(
+        Modifier.fillMaxWidth().horizontalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        sections.forEachIndexed { i, (name, icon) ->
+            val on = i == selected
+            androidx.compose.foundation.layout.Row(
+                Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                    .background(if (on) Boxy.colors.accent.copy(alpha = 0.18f) else Boxy.colors.card)
+                    .clickable { onSelect(i) }
+                    .padding(horizontal = 14.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.material3.Icon(icon, null, Modifier.size(18.dp), tint = if (on) Boxy.colors.accent else Boxy.colors.text2)
+                Spacer(Modifier.width(6.dp))
+                Text(name, style = MaterialTheme.typography.labelLarge, color = if (on) Boxy.colors.accent else Boxy.colors.text, maxLines = 1)
+            }
         }
     }
 }

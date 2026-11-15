@@ -220,12 +220,6 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     prefs.glassElements && prefs.blurEffects && Build.VERSION.SDK_INT >= 31,
                     enabled = prefs.blurEffects && Build.VERSION.SDK_INT >= 31,
                 ) { prefs.updateGlassElements(it) }
-                SwitchRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.nav_apps_desc), checked = prefs.navExtra == NavExtra.APPS) {
-                    prefs.setNavPage(NavExtra.APPS, it)
-                }
-                SwitchRow(BoxyIcons.Description, stringResource(R.string.tab_logs), stringResource(R.string.nav_logs_desc), checked = prefs.navExtra == NavExtra.LOGS) {
-                    prefs.setNavPage(NavExtra.LOGS, it)
-                }
                 SettingsRow(BoxyIcons.Tune, stringResource(R.string.settings_appearance_more), stringResource(R.string.settings_appearance_more_sub), showDivider = false) {
                     push(ROUTE_APPEARANCE)
                 }

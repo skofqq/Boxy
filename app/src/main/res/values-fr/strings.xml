@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">État et délai de l’observatory, trafic depuis le démarrage ; touchez un nœud mort pour la raison</string>
     <string name="xray_dead">hors ligne</string>
     <string name="xray_pool_alive">%1$d sur %2$d en ligne</string>
+    <string name="config_hub_sub">Abonnement, configurations, cœur actif, réseau</string>
+    <string name="config_files_sub">La configuration active et tous les fichiers du module</string>
+    <string name="config_net_sub">Applis via le proxy, règles Wi-Fi, DNS</string>
+    <string name="config_more">Plus</string>
+    <string name="config_more_sub">Journaux, trafic, serveurs DNSCrypt, vérification TLS, automatisation</string>
+    <string name="tab_panel">Panneau</string>
+    <string name="tab_config">Configuration</string>
+    <string name="sub_active_core">Actif</string>
+    <string name="sub_hysteria_sub">Boxy en charge une configuration Hysteria lors du passage à Hysteria</string>
+    <string name="sub_row_sub">URL de tous les cœurs, import par QR ou lien, mise à jour auto</string>
     <string name="updates_link_sub">Cœurs, fichiers GEO, abonnements, panneau web — dans Outils</string>
     <string name="config_selected_restart">%1$s est actif ; le cœur en marche le prendra après un redémarrage</string>
     <string name="cs_tools_title">Réglages du cœur</string>

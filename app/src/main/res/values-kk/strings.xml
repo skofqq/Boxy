@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">Observatory берген күй мен кідіріс, іске қосылғаннан бергі трафик; себебін көру үшін қолжетімсізін түртіңіз</string>
     <string name="xray_dead">қолжетімсіз</string>
     <string name="xray_pool_alive">%2$d ішінен %1$d қолжетімді</string>
+    <string name="config_hub_sub">Жазылым, конфигтер, белсенді ядро, желі</string>
+    <string name="config_files_sub">Белсенді конфиг және модульдің барлық файлдары</string>
+    <string name="config_net_sub">Прокси арқылы қолданбалар, Wi-Fi ережелері, DNS</string>
+    <string name="config_more">Қосымша</string>
+    <string name="config_more_sub">Журналдар, трафик, DNSCrypt серверлері, TLS тексеру, автоматтандыру</string>
+    <string name="tab_panel">Панель</string>
+    <string name="tab_config">Конфигурация</string>
+    <string name="sub_active_core">Белсенді</string>
+    <string name="sub_hysteria_sub">Hysteria-ға ауысқанда Boxy одан Hysteria конфигін жүктейді</string>
+    <string name="sub_row_sub">Барлық ядролардың мекенжайлары, QR не сілтеме арқылы импорт, автожаңарту</string>
     <string name="updates_link_sub">Ядролар, GEO файлдары, жазылымдар, веб-панель — Құралдарда</string>
     <string name="config_selected_restart">%1$s таңдалды; жұмыс істеп тұрған ядро оны қайта іске қосылғаннан кейін алады</string>
     <string name="cs_tools_title">Ядро баптаулары</string>

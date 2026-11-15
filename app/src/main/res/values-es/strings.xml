@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">Estado y retardo del observatory, tráfico desde el inicio; toca uno caído para ver el motivo</string>
     <string name="xray_dead">caído</string>
     <string name="xray_pool_alive">%1$d de %2$d activos</string>
+    <string name="config_hub_sub">Suscripción, configuraciones, núcleo activo, red</string>
+    <string name="config_files_sub">La configuración activa y todos los archivos del módulo</string>
+    <string name="config_net_sub">Apps por el proxy, reglas Wi-Fi, DNS</string>
+    <string name="config_more">Más</string>
+    <string name="config_more_sub">Registros, tráfico, servidores DNSCrypt, comprobación TLS, automatización</string>
+    <string name="tab_panel">Panel</string>
+    <string name="tab_config">Configuración</string>
+    <string name="sub_active_core">Activo</string>
+    <string name="sub_hysteria_sub">Boxy carga de ella una configuración de Hysteria al cambiar a Hysteria</string>
+    <string name="sub_row_sub">URL de todos los núcleos, importar por QR o enlace, actualización automática</string>
     <string name="updates_link_sub">Núcleos, archivos GEO, suscripciones, panel web — en Herramientas</string>
     <string name="config_selected_restart">%1$s está activo; el núcleo en marcha lo usará tras reiniciar</string>
     <string name="cs_tools_title">Ajustes del núcleo</string>

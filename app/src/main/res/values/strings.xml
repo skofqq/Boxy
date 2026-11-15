@@ -1019,6 +1019,16 @@
     <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
     <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
+    <string name="config_hub_sub">Subscription, configs, the active core, network</string>
+    <string name="config_files_sub">The active config and every file of the module</string>
+    <string name="config_net_sub">Apps through the proxy, Wi-Fi rules, DNS</string>
+    <string name="config_more">More</string>
+    <string name="config_more_sub">Logs, traffic, DNSCrypt servers, TLS check, automation</string>
+    <string name="tab_panel">Panel</string>
+    <string name="tab_config">Config</string>
+    <string name="sub_active_core">Active</string>
+    <string name="sub_hysteria_sub">Boxy loads a Hysteria config from it when you switch to Hysteria</string>
+    <string name="sub_row_sub">Every core’s URLs, import by QR or link, auto-update</string>
     <string name="updates_link_sub">Cores, GEO files, subscriptions, web panel — in Tools</string>
     <string name="config_selected_restart">%1$s is active; the running core picks it up after a restart</string>
     <string name="cs_tools_title">Core settings</string>

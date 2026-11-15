@@ -112,7 +112,16 @@ private suspend fun localUrl(kind: PanelKind): String? = when (kind) {
 /** Web UI of the running core (metacubexd / zashboard / yacd) or SubStore, plus user panels. */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, kind: PanelKind = PanelKind.CORE, onClose: () -> Unit) {
+fun PanelScreen(
+    contentPadding: PaddingValues,
+    header: @Composable () -> Unit,
+    kind: PanelKind = PanelKind.CORE,
+    /** A tab of the bottom bar (no back pill; its sections switch on top, the app's bar stays below). */
+    asTab: Boolean = false,
+    /** Back is handled only while the page is shown (a tab stays composed next to the others). */
+    active: Boolean = true,
+    onClose: () -> Unit,
+) {
     val context = LocalContext.current
     val store = remember(kind) { PanelStore(context, kind) }
     var local by remember { mutableStateOf<String?>(null) }
@@ -137,7 +146,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
     val native = current?.id == BOXY_ID
     var nativeReload by remember { mutableStateOf(0) }
 
-    BackHandler {
+    BackHandler(enabled = active) {
         val w = webView
         if (w != null && w.canGoBack()) w.goBack() else onClose()
     }
@@ -181,7 +190,7 @@ fun PanelScreen(contentPadding: PaddingValues, header: @Composable () -> Unit, k
                 // draws itself without end and RenderThread dies (glass chips in the built-in panel). Its own
                 // pages provide their own backdrops where they need one.
                 native -> androidx.compose.runtime.CompositionLocalProvider(com.skofqq.boxy.ui.components.LocalBackdrop provides null) {
-                    com.skofqq.boxy.ui.proxies.CorePanel(nativeReload)
+                    com.skofqq.boxy.ui.proxies.CorePanel(nativeReload, sectionsOnTop = asTab)
                 }
                 current == null && !localChecked -> CircularProgressIndicator()
                 current == null -> Text(

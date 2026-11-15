@@ -996,6 +996,16 @@
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
+    <string name="config_hub_sub">订阅、配置、当前内核、网络</string>
+    <string name="config_files_sub">当前配置和模块的所有文件</string>
+    <string name="config_net_sub">走代理的应用、Wi-Fi 规则、DNS</string>
+    <string name="config_more">更多</string>
+    <string name="config_more_sub">日志、流量、DNSCrypt 服务器、TLS 检查、自动化</string>
+    <string name="tab_panel">面板</string>
+    <string name="tab_config">配置</string>
+    <string name="sub_active_core">当前</string>
+    <string name="sub_hysteria_sub">切换到 Hysteria 时 Boxy 会从这里加载配置</string>
+    <string name="sub_row_sub">所有内核的地址、扫码或链接导入、自动更新</string>
     <string name="updates_link_sub">内核、GEO 文件、订阅、网页面板 — 在“工具”中</string>
     <string name="config_selected_restart">已选择 %1$s；运行中的内核重启后生效</string>
     <string name="cs_tools_title">内核设置</string>

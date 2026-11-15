@@ -218,10 +218,7 @@ SubPageHeader(
         }
         // Hysteria: profiles from hysteria2:// links, the form editor and the speed test.
         if (core == "hysteria") item(key = "hysteria") { HysteriaSection(active) { reload++ } }
-        // Xray / V2Ray: subscription of share links, and moving V2Ray's config to Xray.
-        core?.takeIf { it == "xray" || it == "v2fly" }?.let { c ->
-            item(key = "xsub-$c") { XraySubscriptionSection(c) { reload++ } }
-        }
+        // Xray / V2Ray subscriptions are on Tools > Subscription with every other core's.
         // sing-box: the user's own settings over the config, kept through subscription updates.
         overrides?.let { present ->
             item {

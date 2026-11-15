@@ -1007,6 +1007,16 @@
     <string name="xray_outbounds_sub">Состояние и задержка от observatory, трафик с момента запуска; нажмите на недоступный, чтобы увидеть причину</string>
     <string name="xray_dead">недоступен</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
+    <string name="config_hub_sub">Подписка, конфиги, активное ядро, сеть</string>
+    <string name="config_files_sub">Активный конфиг и все файлы модуля</string>
+    <string name="config_net_sub">Приложения через прокси, правила Wi-Fi, DNS</string>
+    <string name="config_more">Дополнительно</string>
+    <string name="config_more_sub">Журналы, трафик, серверы DNSCrypt, проверка TLS, автоматизация</string>
+    <string name="tab_panel">Панель</string>
+    <string name="tab_config">Конфигурация</string>
+    <string name="sub_active_core">Активное</string>
+    <string name="sub_hysteria_sub">Boxy загружает из неё конфиг Hysteria при переключении на Hysteria</string>
+    <string name="sub_row_sub">Адреса всех ядер, импорт по QR или ссылке, автообновление</string>
     <string name="updates_link_sub">Ядра, GEO-файлы, подписки, веб-панель — в Инструментах</string>
     <string name="config_selected_restart">%1$s выбран; работающее ядро подхватит его после перезапуска</string>
     <string name="cs_tools_title">Настройки ядра</string>
