@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">Observatory\'den durum ve gecikme, başlangıçtan beri trafik; nedenini görmek için ölü olana dokunun</string>
     <string name="xray_dead">kapalı</string>
     <string name="xray_pool_alive">%2$d sunucudan %1$d açık</string>
+    <string name="settings_apps_list">Uygulamalar: kara / beyaz liste</string>
+    <string name="settings_apps_list_sub">Hangi uygulamalar proxy üzerinden gider, tüm çekirdekler için</string>
     <string name="config_hub_sub">Abonelik, yapılandırmalar, etkin çekirdek, ağ</string>
     <string name="config_files_sub">Etkin yapılandırma ve modülün tüm dosyaları</string>
     <string name="config_net_sub">Proxy üzerinden uygulamalar, Wi-Fi kuralları, DNS</string>

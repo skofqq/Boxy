@@ -259,6 +259,12 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             if (i >= 0) pager.animateScrollToPage(i)
         }
     }
+    LaunchedEffect(com.skofqq.boxy.ui.components.AppsNav.open) {
+        if (com.skofqq.boxy.ui.components.AppsNav.open) {
+            com.skofqq.boxy.ui.components.AppsNav.open = false
+            subPage = Overlay.APPS
+        }
+    }
     LaunchedEffect(PanelBus.settings) {
         if (PanelBus.settings) {
             PanelBus.settings = false

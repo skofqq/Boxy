@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">Стан і затрымка ад observatory, трафік з моманту запуску; націсніце на недаступны, каб убачыць прычыну</string>
     <string name="xray_dead">недаступны</string>
     <string name="xray_pool_alive">%1$d з %2$d даступныя</string>
+    <string name="settings_apps_list">Праграмы: чорны / белы спіс</string>
+    <string name="settings_apps_list_sub">Якія праграмы ідуць праз проксі — для ўсіх ядраў</string>
     <string name="config_hub_sub">Падпіска, канфігі, актыўнае ядро, сетка</string>
     <string name="config_files_sub">Актыўны канфіг і ўсе файлы модуля</string>
     <string name="config_net_sub">Праграмы праз проксі, правілы Wi-Fi, DNS</string>

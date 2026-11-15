@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">observatory による状態と遅延、起動以降の通信量。停止中のものをタップすると理由を表示</string>
     <string name="xray_dead">停止</string>
     <string name="xray_pool_alive">%2$d 件中 %1$d 件が稼働</string>
+    <string name="settings_apps_list">アプリ：ブラック / ホワイトリスト</string>
+    <string name="settings_apps_list_sub">プロキシを通すアプリ（全コア共通）</string>
     <string name="config_hub_sub">サブスクリプション、設定、有効なコア、ネットワーク</string>
     <string name="config_files_sub">有効な設定とモジュールのすべてのファイル</string>
     <string name="config_net_sub">プロキシ経由のアプリ、Wi-Fi ルール、DNS</string>

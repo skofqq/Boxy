@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">État et délai de l’observatory, trafic depuis le démarrage ; touchez un nœud mort pour la raison</string>
     <string name="xray_dead">hors ligne</string>
     <string name="xray_pool_alive">%1$d sur %2$d en ligne</string>
+    <string name="settings_apps_list">Applis : liste noire / blanche</string>
+    <string name="settings_apps_list_sub">Quelles applis passent par le proxy, pour tous les cœurs</string>
     <string name="config_hub_sub">Abonnement, configurations, cœur actif, réseau</string>
     <string name="config_files_sub">La configuration active et tous les fichiers du module</string>
     <string name="config_net_sub">Applis via le proxy, règles Wi-Fi, DNS</string>

@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">Stato e ritardo dall’observatory, traffico dall’avvio; tocca uno non disponibile per il motivo</string>
     <string name="xray_dead">giù</string>
     <string name="xray_pool_alive">%1$d di %2$d attivi</string>
+    <string name="settings_apps_list">App: lista nera / bianca</string>
+    <string name="settings_apps_list_sub">Quali app passano dal proxy, per tutti i core</string>
     <string name="config_hub_sub">Abbonamento, configurazioni, core attivo, rete</string>
     <string name="config_files_sub">La configurazione attiva e tutti i file del modulo</string>
     <string name="config_net_sub">App tramite proxy, regole Wi-Fi, DNS</string>

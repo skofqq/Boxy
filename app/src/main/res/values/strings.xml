@@ -1019,6 +1019,8 @@
     <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
     <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
+    <string name="settings_apps_list">Apps: black / white list</string>
+    <string name="settings_apps_list_sub">Which apps go through the proxy, for every core</string>
     <string name="config_hub_sub">Subscription, configs, the active core, network</string>
     <string name="config_files_sub">The active config and every file of the module</string>
     <string name="config_net_sub">Apps through the proxy, Wi-Fi rules, DNS</string>

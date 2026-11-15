@@ -197,9 +197,12 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     BoxyIcons.IpAddress,
                     stringResource(R.string.sheet_ipv6_title),
                     m?.ipv6?.let { stringResource(if (it) R.string.common_on else R.string.common_off) } ?: dash,
-                    showDivider = false,
                 ) {
                     if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.IPV6
+                }
+                // Which apps go through the proxy (the module's black / white list), the same page Config opens.
+                SettingsRow(BoxyIcons.Apps, stringResource(R.string.settings_apps_list), stringResource(R.string.settings_apps_list_sub), showDivider = false) {
+                    com.skofqq.boxy.ui.components.AppsNav.open = true
                 }
             }
         }

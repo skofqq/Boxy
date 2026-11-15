@@ -1007,6 +1007,8 @@
     <string name="xray_outbounds_sub">Состояние и задержка от observatory, трафик с момента запуска; нажмите на недоступный, чтобы увидеть причину</string>
     <string name="xray_dead">недоступен</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
+    <string name="settings_apps_list">Приложения: чёрный / белый список</string>
+    <string name="settings_apps_list_sub">Какие приложения идут через прокси — для всех ядер</string>
     <string name="config_hub_sub">Подписка, конфиги, активное ядро, сеть</string>
     <string name="config_files_sub">Активный конфиг и все файлы модуля</string>
     <string name="config_net_sub">Приложения через прокси, правила Wi-Fi, DNS</string>

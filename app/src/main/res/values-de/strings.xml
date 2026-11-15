@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
+    <string name="settings_apps_list">Apps: Black- / Whitelist</string>
+    <string name="settings_apps_list_sub">Welche Apps über den Proxy gehen, für jeden Kern</string>
     <string name="config_hub_sub">Abo, Konfigurationen, aktiver Kern, Netzwerk</string>
     <string name="config_files_sub">Aktive Konfiguration und alle Dateien des Moduls</string>
     <string name="config_net_sub">Apps über den Proxy, WLAN-Regeln, DNS</string>

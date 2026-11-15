@@ -996,6 +996,8 @@
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
+    <string name="settings_apps_list">应用：黑名单 / 白名单</string>
+    <string name="settings_apps_list_sub">哪些应用走代理（适用于所有内核）</string>
     <string name="config_hub_sub">订阅、配置、当前内核、网络</string>
     <string name="config_files_sub">当前配置和模块的所有文件</string>
     <string name="config_net_sub">走代理的应用、Wi-Fi 规则、DNS</string>
