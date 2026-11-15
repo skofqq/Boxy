@@ -175,6 +175,13 @@ internal fun XrayPanel(bottom: Dp, reloadKey: Int, running: Boolean) {
     }
     // As on the other cores' Proxies tab: a switch between the groups and the outbounds, search and test at the bottom.
     val isPooledTag = { t: String -> pooled.any { t.startsWith("$it-") } }
+    // Delays like mihomo's unified-delay: Boxy's own test (a request over an open connection) runs once when the
+    // panel opens. The observatory times a whole new connection (TCP + TLS / REALITY + the request), which reads
+    // many times higher; it is shown only until this test is back, and balancers still pick by it.
+    LaunchedEffect(s != null, running) {
+        val st = s ?: return@LaunchedEffect
+        if (running && tested == null) runTest(XrayApi.proxyTags(st).filterNot(isPooledTag))
+    }
     val shownBalancers = s?.balancers.orEmpty().filterNot { b -> own(b).let { o -> o.isNotEmpty() && o.all { x -> isPooledTag(x.tag) } } }
     val protocolsAll = s?.outbounds.orEmpty().associate { it.tag to it.protocol }
     val m0 = metrics

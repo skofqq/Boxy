@@ -139,7 +139,9 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         if (testing[group.name] == true) return
         testing[group.name] = true
         scope.launch {
-            val result = Net.clashGroupDelay(a, group.name) ?: run {
+            // sing-box times a new connection per test; Boxy's own test reads like mihomo's unified-delay.
+            val result = (if (core == "sing-box") com.skofqq.boxy.net.SingBoxDelay.test(group.all) else null)
+                ?: Net.clashGroupDelay(a, group.name) ?: run {
                 // Cores without a group test (sing-box): every member on its own, a few at a time.
                 val gate = Semaphore(6)
                 coroutineScope {
@@ -157,7 +159,8 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
         if (testing[name] == true) return
         testing[name] = true
         scope.launch {
-            delays[name] = Net.clashProxyDelay(a, name) ?: 0
+            delays[name] = (if (core == "sing-box") com.skofqq.boxy.net.SingBoxDelay.test(listOf(name))?.get(name) else null)
+                ?: Net.clashProxyDelay(a, name) ?: 0
             testing[name] = false
         }
     }
@@ -233,7 +236,30 @@ fun ProxiesScreen(contentPadding: PaddingValues, header: @Composable () -> Unit,
     }
 
     fun testAllGroups() {
-        snapshot?.groups?.forEach { test(it) }
+        val snap = snapshot ?: return
+        if (core == "sing-box") {
+            // One short-lived sing-box for every member of every group, instead of one per group.
+            if (bulk) return
+            bulk = true
+            scope.launch {
+                val all = snap.groups.flatMap { it.all }.distinct()
+                val r = com.skofqq.boxy.net.SingBoxDelay.test(all)
+                if (r != null) all.forEach { n -> delays[n] = r[n] ?: 0 }
+                bulk = false
+                if (r == null) snap.groups.forEach { test(it) }
+            }
+            return
+        }
+        snap.groups.forEach { test(it) }
+    }
+
+    // sing-box: its urltest history times whole new connections; the panel shows Boxy's own test once it opens.
+    var autoTested by remember { mutableStateOf(false) }
+    LaunchedEffect(state, core) {
+        if (!autoTested && state == LoadState.READY && core == "sing-box") {
+            autoTested = true
+            testAllGroups()
+        }
     }
 
     val q = query.trim()
