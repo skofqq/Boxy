@@ -106,7 +106,7 @@
     <string name="details_current_cpu">Geçerli CPU</string>
     <string name="details_cpu_affinity">CPU bağlılığı</string>
     <string name="quick_panel">Panel</string>
-    <string name="quick_panel_sub">Web arayüzü</string>
+    <string name="quick_panel_sub">Proxy’ler, bağlantılar, günlükler</string>
     <string name="quick_logs">Günlükler</string>
     <string name="quick_logs_sub">İncele</string>
     <string name="quick_subs">Abonelikler</string>

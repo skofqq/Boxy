@@ -106,7 +106,7 @@
     <string name="details_current_cpu">CPU actuel</string>
     <string name="details_cpu_affinity">Affinité CPU</string>
     <string name="quick_panel">Panneau</string>
-    <string name="quick_panel_sub">Interface web</string>
+    <string name="quick_panel_sub">Proxys, connexions, journaux</string>
     <string name="quick_logs">Journaux</string>
     <string name="quick_logs_sub">Consulter</string>
     <string name="quick_subs">Abonnements</string>

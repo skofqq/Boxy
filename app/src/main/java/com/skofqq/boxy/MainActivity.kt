@@ -78,7 +78,7 @@ import com.skofqq.boxy.util.withAppLocale
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 
-private enum class Tab { HOME, PANEL, TOOLS, SETTINGS }
+private enum class Tab { HOME, APPS, TOOLS, SETTINGS }
 
 /** Full-screen pages opened on top of the tabs. */
 private enum class Overlay { APPS, LOGS, PANEL, SUBSTORE }
@@ -227,11 +227,11 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             PanelBus.request = false
         }
     }
-    // Four places: Home, the core's Panel, Configuration (the Tools page stack) and the app's Settings.
-    // Apps and Logs open over the tabs (from Home and Configuration).
-    val tabs = listOf(Tab.HOME, Tab.PANEL, Tab.TOOLS, Tab.SETTINGS)
-    var current by rememberSaveable { mutableStateOf(if (openPanel) Tab.PANEL else Tab.HOME) }
-    var subPage by rememberSaveable { mutableStateOf<Overlay?>(null) }
+    // Four places: Home, Apps (which apps go through the proxy), Configuration (the Tools page stack) and the
+    // app's Settings. The core's Panel, Logs and Sub-Store open over the tabs (from Home and Configuration).
+    val tabs = listOf(Tab.HOME, Tab.APPS, Tab.TOOLS, Tab.SETTINGS)
+    var current by rememberSaveable { mutableStateOf(Tab.HOME) }
+    var subPage by rememberSaveable { mutableStateOf<Overlay?>(if (openPanel) Overlay.PANEL else null) }
     var lastSub by rememberSaveable { mutableStateOf(Overlay.APPS) }
     subPage?.let { lastSub = it }
     val pager = rememberPagerState(initialPage = tabs.indexOf(current).coerceAtLeast(0)) { tabs.size }
@@ -239,8 +239,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     var lastBack by remember { mutableLongStateOf(0L) }
     LaunchedEffect(panelRequest) {
         if (panelRequest) {
-            subPage = null
-            pager.animateScrollToPage(tabs.indexOf(Tab.PANEL))
+            subPage = Overlay.PANEL
             panelRequest = false
         }
     }
@@ -263,7 +262,8 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     LaunchedEffect(com.skofqq.boxy.ui.components.AppsNav.open) {
         if (com.skofqq.boxy.ui.components.AppsNav.open) {
             com.skofqq.boxy.ui.components.AppsNav.open = false
-            subPage = Overlay.APPS
+            subPage = null
+            pager.animateScrollToPage(tabs.indexOf(Tab.APPS))
         }
     }
     LaunchedEffect(PanelBus.settings) {
@@ -303,8 +303,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
             // Where you read logs or edit text a slanted scroll would flip the tab, so swiping is off there
             // (the bar still switches tabs): the Logs tab, the config editor, and pages opened on top.
             val onTab = tabs.getOrNull(pager.currentPage)
-            // The panel has its own sections and web panels with their own gestures.
-            val swipeLocked = subPage != null || onTab == Tab.PANEL ||
+            val swipeLocked = subPage != null ||
                 (onTab == Tab.TOOLS && com.skofqq.boxy.ui.tools.ToolsNav.editorOpen)
             HorizontalPager(
                 pager,
@@ -320,7 +319,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                     Tab.HOME -> HomeScreen(
                         padding,
                         prefs,
-                        onOpenPanel = { scope.launch { pager.animateScrollToPage(tabs.indexOf(Tab.PANEL)) } },
+                        onOpenPanel = { subPage = Overlay.PANEL },
                         onOpenLogs = { subPage = Overlay.LOGS },
                         onOpenSubStore = { subPage = Overlay.SUBSTORE },
                         onOpenDns = {
@@ -329,12 +328,9 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                             if (i >= 0) scope.launch { pager.animateScrollToPage(i) }
                         },
                     )
-                    Tab.PANEL -> PanelScreen(
-                        padding, {}, PanelKind.CORE, asTab = true,
-                        active = subPage == null && pager.currentPage == index,
-                    ) { scope.launch { pager.animateScrollToPage(0) } }
+                    Tab.APPS -> AppsScreen(padding)
                     Tab.TOOLS -> ToolsScreen(padding, NavExtra.NONE, active = subPage == null && pager.currentPage == index) {
-                        subPage = if (it == NavExtra.LOGS) Overlay.LOGS else Overlay.APPS
+                        if (it == NavExtra.LOGS) subPage = Overlay.LOGS else scope.launch { pager.animateScrollToPage(tabs.indexOf(Tab.APPS)) }
                     }
                     Tab.SETTINGS -> SettingsScreen(padding, prefs, active = subPage == null && pager.currentPage == index)
                 }
@@ -344,7 +340,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
         }
         val labels = mapOf(
             Tab.HOME to BarItem(stringResource(R.string.tab_home), BoxyIcons.Home, com.skofqq.boxy.ui.components.TapMotion.JUMP),
-            Tab.PANEL to BarItem(stringResource(R.string.tab_panel), BoxyIcons.Dashboard, com.skofqq.boxy.ui.components.TapMotion.SPIN),
+            Tab.APPS to BarItem(stringResource(R.string.tab_apps), BoxyIcons.Apps, com.skofqq.boxy.ui.components.TapMotion.SPIN),
             Tab.TOOLS to BarItem(stringResource(R.string.tab_config), BoxyIcons.Build, com.skofqq.boxy.ui.components.TapMotion.WIGGLE),
             Tab.SETTINGS to BarItem(stringResource(R.string.tab_settings), BoxyIcons.Settings, com.skofqq.boxy.ui.components.TapMotion.GEAR),
         )
@@ -372,7 +368,8 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
                 when (lastSub) {
                     Overlay.LOGS -> LogsScreen(subPadding, header)
                     Overlay.APPS -> AppsScreen(subPadding, header)
-                    Overlay.PANEL -> Unit
+                    // The core's panel over the tabs: its sections on its own floating toolbar at the bottom.
+                    Overlay.PANEL -> PanelScreen(subPadding, header, PanelKind.CORE, asTab = true, active = subPage == Overlay.PANEL) { subPage = null }
                     Overlay.SUBSTORE -> PanelScreen(subPadding, header, PanelKind.SUBSTORE) { subPage = null }
                 }
               }

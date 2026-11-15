@@ -106,7 +106,7 @@
     <string name="details_current_cpu">現在の CPU</string>
     <string name="details_cpu_affinity">CPU アフィニティ</string>
     <string name="quick_panel">パネル</string>
-    <string name="quick_panel_sub">Web UI</string>
+    <string name="quick_panel_sub">プロキシ・接続・ログ</string>
     <string name="quick_logs">ログ</string>
     <string name="quick_logs_sub">確認</string>
     <string name="quick_subs">サブスク</string>

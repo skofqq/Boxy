@@ -157,8 +157,7 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
             }
         }
         item {
-            SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.config_net_sub)) {
-                SettingsRow(BoxyIcons.Apps, stringResource(R.string.tab_apps), stringResource(R.string.tools_row_apps_sub)) { onOpenPage(NavExtra.APPS) }
+            SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
                 SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub), showDivider = false) { push(ROUTE_DNS) }
             }

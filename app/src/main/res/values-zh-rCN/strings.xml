@@ -95,7 +95,7 @@
     <string name="details_current_cpu">当前 CPU</string>
     <string name="details_cpu_affinity">CPU 亲和性</string>
     <string name="quick_panel">面板</string>
-    <string name="quick_panel_sub">Web UI</string>
+    <string name="quick_panel_sub">代理、连接、日志</string>
     <string name="quick_logs">日志</string>
     <string name="quick_logs_sub">查看</string>
     <string name="quick_subs">订阅</string>

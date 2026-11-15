@@ -119,7 +119,7 @@
     <string name="details_current_cpu">Current CPU</string>
     <string name="details_cpu_affinity">CPU affinity</string>
     <string name="quick_panel">Panel</string>
-    <string name="quick_panel_sub">Web UI</string>
+    <string name="quick_panel_sub">Proxies, connections, logs</string>
     <string name="quick_logs">Logs</string>
     <string name="quick_logs_sub">Inspect</string>
     <string name="quick_subs">Subs</string>

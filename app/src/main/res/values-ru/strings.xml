@@ -107,7 +107,7 @@
     <string name="details_current_cpu">Текущий CPU</string>
     <string name="details_cpu_affinity">Привязка к CPU</string>
     <string name="quick_panel">Панель</string>
-    <string name="quick_panel_sub">Веб-интерфейс</string>
+    <string name="quick_panel_sub">Прокси, соединения, логи</string>
     <string name="quick_logs">Журнал</string>
     <string name="quick_logs_sub">Посмотреть</string>
     <string name="quick_subs">Подписки</string>
