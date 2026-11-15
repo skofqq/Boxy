@@ -73,13 +73,12 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
         stringResource(R.string.tab_settings) to BoxyIcons.Settings,
     )
     val page: @Composable () -> Unit = {
-        if (xray && RoutingNav.open) XrayRoutingScreen(room) { RoutingNav.open = false }
-        else if (xray) when (tab) {
+        if (xray) when (tab) {
             0 -> XrayPanel(room, reloadKey, s.running)
             1 -> XrayConnectionsTab(room)
             2 -> XrayLogsTab(room, reloadKey)
             3 -> XrayRulesTab(room, reloadKey)
-            else -> XraySettingsTab(room, reloadKey, s.running)
+            else -> XrayPanelSettings(room, s.running)
         } else when (tab) {
             0 -> ProxiesScreen(PaddingValues(bottom = room), header = {}, embedded = true, reloadKey = reloadKey)
             1 -> ConnectionsTab(room, reloadKey)
@@ -90,7 +89,7 @@ fun CorePanel(reloadKey: Int, sectionsOnTop: Boolean = false) {
     }
     if (sectionsOnTop) {
         Column(Modifier.fillMaxSize()) {
-            SectionSwitch(sections, tab) { tab = it; RoutingNav.open = false }
+            SectionSwitch(sections, tab) { tab = it }
             Box(Modifier.fillMaxWidth().weight(1f)) { page() }
         }
         return

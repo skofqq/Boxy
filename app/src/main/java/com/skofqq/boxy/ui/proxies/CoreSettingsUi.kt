@@ -383,3 +383,48 @@ fun CoreSettingsScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
         }
     }
 }
+
+/** A link from the panel to the config's own settings in Config › Active core (the panel only runs the core). */
+@Composable
+internal fun ConfigSettingsLink() {
+    SectionCard(null) {
+        TapRow(BoxyIcons.Tune, stringResource(R.string.cs_tools_title), stringResource(R.string.panel_config_link_sub), false, divider = false) {
+            com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_CORE_SETTINGS
+            com.skofqq.boxy.ui.tools.ToolsNav.showTools = true
+        }
+    }
+}
+
+/** Xray's Settings tab of the panel: what acts on the running core; its config settings are a link to Config. */
+@Composable
+internal fun XrayPanelSettings(bottom: Dp, running: Boolean) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val busy = remember { mutableStateMapOf<String, Boolean>() }
+    fun task(key: String, block: suspend () -> Boolean) {
+        if (busy[key] == true) return
+        busy[key] = true
+        scope.launch {
+            val ok = block()
+            busy[key] = false
+            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
+        }
+    }
+    PinnedLazyPage(PaddingValues(bottom = bottom + 16.dp), header = {}, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { ConfigSettingsLink() }
+        item {
+            SectionCard(stringResource(R.string.panel_settings_maintenance)) {
+                TapRow(BoxyIcons.Power, stringResource(R.string.panel_settings_restart), stringResource(R.string.panel_settings_restart_sub), busy["restart"] == true) {
+                    task("restart") { !running || BoxModule.restart() }
+                }
+                TapRow(BoxyIcons.ArrowCircle, stringResource(R.string.cs_pins), stringResource(R.string.cs_pins_hint), busy["pins"] == true) {
+                    task("pins") { XrayApi.clearPins() }
+                }
+                TapRow(BoxyIcons.SystemUpdate, stringResource(R.string.panel_settings_updates), stringResource(R.string.updates_link_sub), false, divider = false) {
+                    com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_UPDATE
+                    com.skofqq.boxy.ui.tools.ToolsNav.showTools = true
+                }
+            }
+        }
+    }
+}

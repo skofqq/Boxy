@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
+    <string name="panel_config_link_sub">日志、服务器检测、DNS 等在“配置 › 当前内核”中设置</string>
     <string name="settings_apps_list">应用：黑名单 / 白名单</string>
     <string name="settings_apps_list_sub">哪些应用走代理（适用于所有内核）</string>
     <string name="config_hub_sub">订阅、配置、当前内核、网络</string>
@@ -1008,7 +1009,7 @@
     <string name="sub_active_core">当前</string>
     <string name="sub_hysteria_sub">切换到 Hysteria 时 Boxy 会从这里加载配置</string>
     <string name="sub_row_sub">所有内核的地址、扫码或链接导入、自动更新</string>
-    <string name="updates_link_sub">内核、GEO 文件、订阅、网页面板 — 在“工具”中</string>
+    <string name="updates_link_sub">内核、GEO 文件、订阅、网页面板 — 在“配置”中</string>
     <string name="config_selected_restart">已选择 %1$s；运行中的内核重启后生效</string>
     <string name="cs_tools_title">内核设置</string>
     <string name="cs_tools_sub">当前内核的日志、服务器检测、分组、DNS 等</string>

@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Stato e ritardo dall’observatory, traffico dall’avvio; tocca uno non disponibile per il motivo</string>
     <string name="xray_dead">giù</string>
     <string name="xray_pool_alive">%1$d di %2$d attivi</string>
+    <string name="panel_config_link_sub">Log, controllo server, DNS… in Configurazione › Core attivo</string>
     <string name="settings_apps_list">App: lista nera / bianca</string>
     <string name="settings_apps_list_sub">Quali app passano dal proxy, per tutti i core</string>
     <string name="config_hub_sub">Abbonamento, configurazioni, core attivo, rete</string>
@@ -1008,7 +1009,7 @@
     <string name="sub_active_core">Attivo</string>
     <string name="sub_hysteria_sub">Boxy ne carica una configurazione Hysteria al passaggio a Hysteria</string>
     <string name="sub_row_sub">URL di tutti i core, importazione da QR o link, aggiornamento automatico</string>
-    <string name="updates_link_sub">Core, file GEO, abbonamenti, pannello web — in Strumenti</string>
+    <string name="updates_link_sub">Core, file GEO, abbonamenti, pannello web — in Configurazione</string>
     <string name="config_selected_restart">%1$s è attivo; il core in esecuzione lo userà dopo il riavvio</string>
     <string name="cs_tools_title">Impostazioni del core</string>
     <string name="cs_tools_sub">Log, controllo server, gruppi, DNS… del core attivo</string>

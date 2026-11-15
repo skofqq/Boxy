@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Status und Verzögerung vom Observatory, Traffic seit dem Start; tippe auf einen ausgefallenen für den Grund</string>
     <string name="xray_dead">aus</string>
     <string name="xray_pool_alive">%1$d von %2$d an</string>
+    <string name="panel_config_link_sub">Protokoll, Serverprüfung, DNS… unter Konfiguration › Aktiver Kern</string>
     <string name="settings_apps_list">Apps: Black- / Whitelist</string>
     <string name="settings_apps_list_sub">Welche Apps über den Proxy gehen, für jeden Kern</string>
     <string name="config_hub_sub">Abo, Konfigurationen, aktiver Kern, Netzwerk</string>
@@ -1008,7 +1009,7 @@
     <string name="sub_active_core">Aktiv</string>
     <string name="sub_hysteria_sub">Boxy lädt daraus eine Hysteria-Konfiguration beim Wechsel zu Hysteria</string>
     <string name="sub_row_sub">URLs aller Kerne, Import per QR oder Link, Auto-Update</string>
-    <string name="updates_link_sub">Kerne, GEO-Dateien, Abos, Web-Panel – unter Werkzeuge</string>
+    <string name="updates_link_sub">Kerne, GEO-Dateien, Abos, Web-Panel – unter Konfiguration</string>
     <string name="config_selected_restart">%1$s ist aktiv; der laufende Kern übernimmt sie nach einem Neustart</string>
     <string name="cs_tools_title">Kern-Einstellungen</string>
     <string name="cs_tools_sub">Protokoll, Serverprüfung, Gruppen, DNS… des aktiven Kerns</string>
