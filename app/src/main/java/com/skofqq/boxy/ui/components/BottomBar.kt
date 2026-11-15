@@ -1,5 +1,7 @@
 package com.skofqq.boxy.ui.components
 
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -139,7 +141,9 @@ fun BottomBar(items: List<BarItem>, selected: Float, onSelect: (Int) -> Unit, mo
         modifier = modifier
             .fillMaxWidth(if (items.size > 4) 0.96f else 0.92f)
             .height(68.dp)
-            .shadow(12.dp, shape, clip = false),
+            .shadow(12.dp, shape, clip = false)
+            // The pill's rim (between the items and its edge) takes taps too: they never reach the page under it.
+            .pointerInput(Unit) { detectTapGestures { } },
     ) {
         BoxWithConstraints(Modifier.fillMaxSize().border(1.dp, colors.outline, shape).padding(4.dp)) {
             val itemWidth = maxWidth / items.size

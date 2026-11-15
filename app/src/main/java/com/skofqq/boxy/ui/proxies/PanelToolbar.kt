@@ -52,6 +52,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -141,6 +143,8 @@ internal fun PanelToolbar(
     ) {
         Box(
             Modifier
+                // Taps on the toolbar's strip (between and around the pills) never reach the list under it.
+                .pointerInput(Unit) { detectTapGestures { } }
                 .onGloballyPositioned { c -> below = (root.height - (c.positionInWindow().y + c.size.height)).toInt().coerceAtLeast(0) }
                 .fillMaxWidth()
                 .background(androidx.compose.ui.graphics.Brush.verticalGradient(0f to page.copy(alpha = 0f), 0.45f to page.copy(alpha = 0.85f), 1f to page))
@@ -173,15 +177,17 @@ internal fun PanelToolbar(
                             container = Color.Transparent,
                         )
                     } else {
+                        // Each button takes its share of the whole pill, top to bottom: no dead gaps between them.
                         Row(
-                            Modifier.fillMaxSize().padding(horizontal = 6.dp).animateContentSize(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            Modifier.fillMaxSize().padding(4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            sections.forEachIndexed { i, (name, icon) -> SectionButton(name, icon, i == selected) { onSelect(i) } }
+                            sections.forEachIndexed { i, (name, icon) ->
+                                SectionButton(name, icon, i == selected, Modifier.weight(if (i == selected) 2.2f else 1f)) { onSelect(i) }
+                            }
                             if (search != null) {
                                 Box(
-                                    Modifier.size(44.dp).clip(RoundedCornerShape(50)).clickable { open = true },
+                                    Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(50)).clickable { open = true },
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(BoxyIcons.Search, search.hint, Modifier.size(22.dp), tint = if (search.query.isNotEmpty()) Boxy.colors.accent else Boxy.colors.text2)
@@ -198,19 +204,20 @@ internal fun PanelToolbar(
 
 /** A section on the toolbar: an icon, and the name next to it on a tinted pill when chosen. */
 @Composable
-private fun SectionButton(name: String, icon: ImageVector, selected: Boolean, onClick: () -> Unit) {
+private fun SectionButton(name: String, icon: ImageVector, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     Row(
-        Modifier.height(44.dp).clip(RoundedCornerShape(50))
+        modifier.fillMaxHeight().clip(RoundedCornerShape(50))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = if (selected) 12.dp else 10.dp),
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, if (selected) null else name, Modifier.size(22.dp), tint = if (selected) Boxy.colors.accent else Boxy.colors.text2)
         if (selected) {
             Spacer(Modifier.width(6.dp))
             Text(
-                name, Modifier.widthIn(max = 96.dp),
+                name,
                 style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold,
                 color = Boxy.colors.accent, maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
