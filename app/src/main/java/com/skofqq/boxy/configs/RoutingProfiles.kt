@@ -309,9 +309,24 @@ object RoutingProfiles {
         return if (same && saved.isFile) saved.readText() else current
     }
 
+    /**
+     * Configs with their own routing (made in "Create your own config" with a preset): the active profile is not laid
+     * over them; every other config keeps it. One absolute path per line.
+     */
+    private fun ownFile(context: Context) = File(context.filesDir, "routing-own.txt")
+
+    fun ownRouting(context: Context): Set<String> = runCatching { ownFile(context).readLines().filter { it.isNotBlank() }.toSet() }.getOrDefault(emptySet())
+
+    fun setOwnRouting(context: Context, path: String, own: Boolean) {
+        val now = ownRouting(context)
+        val next = if (own) now + path else now - path
+        if (next != now) ownFile(context).writeText(next.joinToString("\n", postfix = if (next.isEmpty()) "" else "\n"))
+    }
+
     /** Boxy's settings and the active profile over a config being installed (the base is the config as loaded). */
-    fun applyAll(context: Context, cfg: JSONObject): List<String> {
+    fun applyAll(context: Context, cfg: JSONObject, path: String? = null): List<String> {
         CoreSettings.applyXrayStored(context, cfg)
+        if (path != null && path in ownRouting(context)) return emptyList()
         return active(context)?.let { applyXray(cfg, it) }.orEmpty()
     }
 
@@ -327,7 +342,7 @@ object RoutingProfiles {
         if (current.split("\n").any { it.trimStart().startsWith("//") }) return@withContext Outcome(false, "comments")
         val baseText = base(context, path, current)
         val cfg = runCatching { JSONObject(baseText) }.getOrNull() ?: return@withContext Outcome(false, "JSON")
-        val skipped = applyAll(context, cfg)
+        val skipped = applyAll(context, cfg, path)
         val out = GeoRules.pretty(cfg)
         if (!BoxModule.writeFile(path, out)) return@withContext Outcome(false, "write")
         val check = ConfigCheck.check("xray", path)

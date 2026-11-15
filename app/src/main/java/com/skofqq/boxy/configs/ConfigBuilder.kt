@@ -150,6 +150,7 @@ object ConfigBuilder {
         val active = BoxModule.unquote(BoxModule.readSetting("name_xray_config"))
         BoxModule.exec("rm -f '${BoxModule.BOX_DIR}/xray/$rel'")
         madeFile(context).writeText(made(context).filter { it != rel }.joinToString("\n"))
+        RoutingProfiles.setOwnRouting(context, "${BoxModule.BOX_DIR}/xray/$rel", false)
         if (active == rel) {
             BoxModule.writeSetting("name_xray_config", "config.json")
             val st = BoxModule.state()
@@ -164,6 +165,11 @@ object ConfigBuilder {
         if (to == rel) return@withContext rel
         if (!BoxModule.exec("mv -f '${BoxModule.BOX_DIR}/xray/$rel' '${BoxModule.BOX_DIR}/xray/$to'").first) return@withContext null
         madeFile(context).writeText(made(context).map { if (it == rel) to else it }.joinToString("\n"))
+        // Own routing (a preset) follows the file.
+        if ("${BoxModule.BOX_DIR}/xray/$rel" in RoutingProfiles.ownRouting(context)) {
+            RoutingProfiles.setOwnRouting(context, "${BoxModule.BOX_DIR}/xray/$rel", false)
+            RoutingProfiles.setOwnRouting(context, "${BoxModule.BOX_DIR}/xray/$to", true)
+        }
         if (BoxModule.unquote(BoxModule.readSetting("name_xray_config")) == rel) BoxModule.writeSetting("name_xray_config", to)
         load(context)?.takeIf { fileName(it) == rel }?.let { save(context, it.copy(name = newName)) }
         to
@@ -181,14 +187,15 @@ object ConfigBuilder {
         if (all.error != null) return@withContext Outcome(false, error = all.error)
         val s = all.copy(outbounds = all.outbounds.filter { it.optString("tag") !in p.exclude })
         if (s.outbounds.isEmpty()) return@withContext Outcome(false, error = "empty")
-        // Routing: a profile is the routing profiles' active one (they apply to every Xray config); the presets
-        // are the config's own rules, so no profile goes over them.
-        val store = RoutingProfiles.load(context)
-        val profile = store.profiles.firstOrNull { it.id == p.routing }
-        RoutingProfiles.save(context, store.copy(active = profile?.id))
         val port = BoxModule.unquote(BoxModule.readSetting("tproxy_port"))?.toIntOrNull() ?: 9898
         val rel = fileName(p)
         val path = "${BoxModule.BOX_DIR}/xray/$rel"
+        // Routing: a preset is this config's own (the active profile is not laid over it, other configs keep it);
+        // a chosen profile becomes the active one, as in Routing profiles.
+        val store = RoutingProfiles.load(context)
+        val profile = store.profiles.firstOrNull { it.id == p.routing }
+        RoutingProfiles.setOwnRouting(context, path, profile == null)
+        if (profile != null) RoutingProfiles.save(context, store.copy(active = profile.id))
         val old = BoxModule.readFile(path)
         BoxModule.exec("mkdir -p '${BoxModule.BOX_DIR}/xray/profiles'")
         var baseText = ""
@@ -199,7 +206,7 @@ object ConfigBuilder {
             if (!geo && p.routing != ROUTE_RU) break
             val cfg = build(p, s.outbounds, port, ruGeoIp = geo)
             baseText = GeoRules.pretty(cfg)
-            RoutingProfiles.applyAll(context, cfg)
+            RoutingProfiles.applyAll(context, cfg, path)
             written = GeoRules.pretty(cfg)
             if (!BoxModule.writeFile(path, written)) return@withContext Outcome(false, error = "write")
             check = ConfigCheck.check("xray", path)
