@@ -972,7 +972,6 @@
     <string name="cb_from_links">Bağlantılar</string>
     <string name="cb_load">Sunucuları yükle</string>
     <string name="cb_no_servers">Xray’in kullanabileceği sunucu yok</string>
-    <string name="cb_servers_loaded">Sunucu: %1$d</string>
     <string name="cb_servers_empty">Henüz bir şey yüklenmedi: sunucuları görmek ve gruplarda seçmek için aboneliği ya da bağlantıları yükleyin.</string>
     <string name="cb_groups">Gruplar</string>
     <string name="cb_groups_sub">Her grup kendi sunucularından birini seçer; ilki hiçbir rotaya uymayan her şeyi alır</string>
@@ -1398,7 +1397,6 @@
     <string name="cb_activate">Etkin yapılandırma yap</string>
     <string name="cb_activate_sub">Xray çalışıyorsa bununla yeniden başlar</string>
     <string name="cb_done_title">Yapılandırma oluşturuldu</string>
-    <string name="cb_done_sub">%1$s: %2$d sunucu</string>
     <string name="cb_done_active">Artık etkin Xray yapılandırması.</string>
     <string name="cb_open_panel">Paneli aç</string>
     <string name="cb_finish">Tamam</string>

@@ -972,7 +972,6 @@
     <string name="cb_from_links">Links</string>
     <string name="cb_load">Server laden</string>
     <string name="cb_no_servers">Keine Server, die Xray nutzen kann</string>
-    <string name="cb_servers_loaded">Server: %1$d</string>
     <string name="cb_servers_empty">Noch nichts geladen: Abo oder Links laden, um die Server zu sehen und in Gruppen auszuwählen.</string>
     <string name="cb_groups">Gruppen</string>
     <string name="cb_groups_sub">Jede Gruppe wählt einen ihrer Server; die erste bekommt alles, was keine Route trifft</string>
@@ -1398,7 +1397,6 @@
     <string name="cb_activate">Als aktive Konfiguration setzen</string>
     <string name="cb_activate_sub">Xray startet damit neu, wenn es läuft</string>
     <string name="cb_done_title">Konfiguration erstellt</string>
-    <string name="cb_done_sub">%1$s: %2$d Server</string>
     <string name="cb_done_active">Sie ist jetzt die aktive Xray-Konfiguration.</string>
     <string name="cb_open_panel">Panel öffnen</string>
     <string name="cb_finish">Fertig</string>

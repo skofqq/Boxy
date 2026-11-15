@@ -972,7 +972,6 @@
     <string name="cb_from_links">链接</string>
     <string name="cb_load">加载服务器</string>
     <string name="cb_no_servers">没有 Xray 可用的服务器</string>
-    <string name="cb_servers_loaded">服务器：%1$d</string>
     <string name="cb_servers_empty">尚未加载：加载订阅或链接后即可查看服务器并在分组中选择。</string>
     <string name="cb_groups">分组</string>
     <string name="cb_groups_sub">每个分组从自己的服务器中选一个；第一个分组接收未匹配任何路由的流量</string>
@@ -1392,7 +1391,6 @@
     <string name="cb_activate">设为当前配置</string>
     <string name="cb_activate_sub">Xray 运行时会用它重启</string>
     <string name="cb_done_title">配置已创建</string>
-    <string name="cb_done_sub">%1$s：%2$d 个服务器</string>
     <string name="cb_done_active">现在它是当前的 Xray 配置。</string>
     <string name="cb_open_panel">打开面板</string>
     <string name="cb_finish">完成</string>

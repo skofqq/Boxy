@@ -409,7 +409,7 @@ private fun BuilderWizard(contentPadding: PaddingValues, onExit: () -> Unit, onR
                     }
                     item {
                         SectionCard(null) {
-                            SummaryRow(BoxyIcons.Dns, stringResource(R.string.cb_servers), stringResource(R.string.cb_servers_loaded, chosen.size)) { step = 0 }
+                            SummaryRow(BoxyIcons.Dns, stringResource(R.string.cb_servers), androidx.compose.ui.res.pluralStringResource(R.plurals.pl_servers, chosen.size, chosen.size)) { step = 0 }
                             SummaryRow(BoxyIcons.Bolt, stringResource(R.string.cb_groups), groups.joinToString(", ") { it.name }) { step = 1 }
                             SummaryRow(
                                 BoxyIcons.FilterList, stringResource(R.string.rt_title),
@@ -615,7 +615,7 @@ private fun BuilderDone(contentPadding: PaddingValues, r: ConfigBuilder.Outcome,
         Text(stringResource(R.string.cb_done_title), style = MaterialTheme.typography.headlineMedium, color = Boxy.colors.text)
         Spacer(Modifier.height(8.dp))
         Text(
-            stringResource(R.string.cb_done_sub, r.path?.substringAfterLast('/').orEmpty(), r.servers) +
+            r.path?.substringAfterLast('/').orEmpty() + ": " + androidx.compose.ui.res.pluralStringResource(R.plurals.pl_servers, r.servers, r.servers) +
                 if (p.activate) "\n" + stringResource(R.string.cb_done_active) else "",
             style = MaterialTheme.typography.bodyLarge, color = Boxy.colors.text2, textAlign = TextAlign.Center,
         )

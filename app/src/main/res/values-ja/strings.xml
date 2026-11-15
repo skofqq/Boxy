@@ -972,7 +972,6 @@
     <string name="cb_from_links">リンク</string>
     <string name="cb_load">サーバーを読み込む</string>
     <string name="cb_no_servers">Xray で使えるサーバーがありません</string>
-    <string name="cb_servers_loaded">サーバー：%1$d</string>
     <string name="cb_servers_empty">まだ何も読み込まれていません。サブスクリプションまたはリンクを読み込むと、サーバーを確認してグループで選べます。</string>
     <string name="cb_groups">グループ</string>
     <string name="cb_groups_sub">各グループは自身のサーバーから 1 つを選び、最初のグループはどのルートにも一致しない通信を受け持ちます</string>
@@ -1392,7 +1391,6 @@
     <string name="cb_activate">有効な設定にする</string>
     <string name="cb_activate_sub">Xray が実行中なら再起動します</string>
     <string name="cb_done_title">設定を作成しました</string>
-    <string name="cb_done_sub">%1$s：サーバー %2$d 台</string>
     <string name="cb_done_active">現在の Xray の有効な設定です。</string>
     <string name="cb_open_panel">パネルを開く</string>
     <string name="cb_finish">完了</string>
