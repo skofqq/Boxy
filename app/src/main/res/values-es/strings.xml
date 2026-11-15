@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">Estado y retardo del observatory, tráfico desde el inicio; toca uno caído para ver el motivo</string>
     <string name="xray_dead">caído</string>
     <string name="xray_pool_alive">%1$d de %2$d activos</string>
+    <string name="updates_link_sub">Núcleos, archivos GEO, suscripciones, panel web — en Herramientas</string>
     <string name="config_selected_restart">%1$s está activo; el núcleo en marcha lo usará tras reiniciar</string>
     <string name="cs_tools_title">Ajustes del núcleo</string>
     <string name="cs_tools_sub">Registro, comprobación de servidores, grupos, DNS… del núcleo activo</string>

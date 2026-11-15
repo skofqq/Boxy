@@ -1019,6 +1019,7 @@
     <string name="xray_outbounds_sub">Status and delay from the observatory, traffic since the start; tap a dead one for the reason</string>
     <string name="xray_dead">down</string>
     <string name="xray_pool_alive">%1$d of %2$d live</string>
+    <string name="updates_link_sub">Cores, GEO files, subscriptions, web panel — in Tools</string>
     <string name="config_selected_restart">%1$s is active; the running core picks it up after a restart</string>
     <string name="cs_tools_title">Core settings</string>
     <string name="cs_tools_sub">Log, server checks, groups, DNS… of the active core</string>

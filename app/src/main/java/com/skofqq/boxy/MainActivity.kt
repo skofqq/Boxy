@@ -259,6 +259,8 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
     LaunchedEffect(com.skofqq.boxy.ui.tools.ToolsNav.showTools) {
         if (com.skofqq.boxy.ui.tools.ToolsNav.showTools) {
             com.skofqq.boxy.ui.tools.ToolsNav.showTools = false
+            // A page opened over the tabs (the panel) closes, so the Tools page is seen.
+            subPage = null
             val i = tabs.indexOf(Tab.TOOLS)
             if (i >= 0) pager.animateScrollToPage(i)
         }

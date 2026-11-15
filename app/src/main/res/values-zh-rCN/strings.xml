@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">来自 observatory 的状态和延迟，以及启动以来的流量；点按不可用的节点查看原因</string>
     <string name="xray_dead">不可用</string>
     <string name="xray_pool_alive">%2$d 个中 %1$d 个可用</string>
+    <string name="updates_link_sub">内核、GEO 文件、订阅、网页面板 — 在“工具”中</string>
     <string name="config_selected_restart">已选择 %1$s；运行中的内核重启后生效</string>
     <string name="cs_tools_title">内核设置</string>
     <string name="cs_tools_sub">当前内核的日志、服务器检测、分组、DNS 等</string>

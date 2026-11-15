@@ -1007,6 +1007,7 @@
     <string name="xray_outbounds_sub">Состояние и задержка от observatory, трафик с момента запуска; нажмите на недоступный, чтобы увидеть причину</string>
     <string name="xray_dead">недоступен</string>
     <string name="xray_pool_alive">%1$d из %2$d живы</string>
+    <string name="updates_link_sub">Ядра, GEO-файлы, подписки, веб-панель — в Инструментах</string>
     <string name="config_selected_restart">%1$s выбран; работающее ядро подхватит его после перезапуска</string>
     <string name="cs_tools_title">Настройки ядра</string>
     <string name="cs_tools_sub">Журнал, проверка серверов, группы, DNS… активного ядра</string>

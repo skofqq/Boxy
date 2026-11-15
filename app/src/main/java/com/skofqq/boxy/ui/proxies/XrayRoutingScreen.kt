@@ -420,14 +420,10 @@ private fun ProfileEditor(
                             }
                         }
                     }
-                    TapRow(BoxyIcons.Refresh, stringResource(R.string.cs_geo), stringResource(R.string.rt_geo_hint), geoBusy, divider = false) {
-                        geoBusy = true
-                        scope.launch {
-                            val ok = BoxModule.exec("BOX_FORCE=1 BOX_BIN_NAME=xray ${BoxModule.SCRIPTS}/box.tool geox >/dev/null 2>&1").first
-                            geoBusy = false
-                            geoKey++
-                            com.skofqq.boxy.ui.components.BoxyToast.makeText(context, if (ok) R.string.panel_done else R.string.op_failed, com.skofqq.boxy.ui.components.BoxyToast.LENGTH_SHORT).show()
-                        }
+                    // Updated with the other components in Tools → Updates (one place for every update).
+                    TapRow(BoxyIcons.SystemUpdate, stringResource(R.string.panel_settings_updates), stringResource(R.string.rt_geo_hint), false, divider = false) {
+                        com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_UPDATE
+                        com.skofqq.boxy.ui.tools.ToolsNav.showTools = true
                     }
                 }
             }

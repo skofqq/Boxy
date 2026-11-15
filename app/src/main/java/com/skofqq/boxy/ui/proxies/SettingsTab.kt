@@ -160,24 +160,12 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
             }
         }
         item {
-            // The module's own updaters, as on the Tools page: the core as chosen in its settings (the module restarts
-            // the service afterwards), the subscriptions, and the web panel the core serves.
-            val coreTitle = stringResource(R.string.panel_settings_update_core)
-            val subsTitle = stringResource(R.string.panel_settings_update_subs)
-            SectionCard(stringResource(R.string.panel_settings_updates)) {
-                ActionRow(BoxyIcons.SystemUpdate, coreTitle, stringResource(R.string.panel_settings_update_core_sub), taskTitle == coreName && !taskDone) {
-                    launchTask(coreName, "${BoxModule.SCRIPTS}/box.tool upkernel")
+            // Every update (cores, GEO files, subscriptions, web panel) lives in Tools → Updates: one place.
+            SectionCard(null) {
+                ActionRow(BoxyIcons.SystemUpdate, stringResource(R.string.panel_settings_updates), stringResource(R.string.updates_link_sub), false, divider = false) {
+                    com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_UPDATE
+                    com.skofqq.boxy.ui.tools.ToolsNav.showTools = true
                 }
-                ActionRow(BoxyIcons.Subscriptions, subsTitle, stringResource(R.string.update_subscription_sub), taskTitle == subsTitle && !taskDone) {
-                    launchTask(subsTitle, "${BoxModule.SCRIPTS}/box.tool subs")
-                }
-                ActionRow(
-                    BoxyIcons.Language,
-                    stringResource(R.string.panel_settings_update_webui),
-                    webUi?.let { stringResource(R.string.panel_settings_update_webui_sub, it.title) } ?: stringResource(R.string.update_webui_sub),
-                    false,
-                    divider = false,
-                ) { dashboardSheet = true }
             }
         }
         item {
@@ -190,11 +178,6 @@ internal fun SettingsTab(bottom: Dp, reloadKey: Int) {
                 }
                 ActionRow(BoxyIcons.Power, stringResource(R.string.panel_settings_restart), stringResource(R.string.panel_settings_restart_sub), busy["restart"] == true) {
                     confirmRestart = true
-                }
-                if (core.mihomo) {
-                    ActionRow(BoxyIcons.Download, stringResource(R.string.panel_settings_geo), stringResource(R.string.panel_settings_geo_sub), busy["geo"] == true) {
-                        if (a != null) run("geo") { CoreApi.maintain(a, CoreApi.Maintenance.UPDATE_GEO) }
-                    }
                 }
                 ActionRow(BoxyIcons.Delete, stringResource(R.string.panel_settings_fakeip), null, busy["fakeip"] == true, divider = core.mihomo) {
                     if (a != null) run("fakeip") { CoreApi.maintain(a, CoreApi.Maintenance.FLUSH_FAKEIP) }

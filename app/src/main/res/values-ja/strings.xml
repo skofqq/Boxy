@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">observatory による状態と遅延、起動以降の通信量。停止中のものをタップすると理由を表示</string>
     <string name="xray_dead">停止</string>
     <string name="xray_pool_alive">%2$d 件中 %1$d 件が稼働</string>
+    <string name="updates_link_sub">コア、GEO ファイル、サブスクリプション、Web パネル — ツールで</string>
     <string name="config_selected_restart">%1$s を選択しました。実行中のコアは再起動後に反映します</string>
     <string name="cs_tools_title">コア設定</string>
     <string name="cs_tools_sub">有効なコアのログ、サーバーチェック、グループ、DNS など</string>

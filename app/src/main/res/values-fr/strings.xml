@@ -996,6 +996,7 @@
     <string name="xray_outbounds_sub">État et délai de l’observatory, trafic depuis le démarrage ; touchez un nœud mort pour la raison</string>
     <string name="xray_dead">hors ligne</string>
     <string name="xray_pool_alive">%1$d sur %2$d en ligne</string>
+    <string name="updates_link_sub">Cœurs, fichiers GEO, abonnements, panneau web — dans Outils</string>
     <string name="config_selected_restart">%1$s est actif ; le cœur en marche le prendra après un redémarrage</string>
     <string name="cs_tools_title">Réglages du cœur</string>
     <string name="cs_tools_sub">Journal, vérification des serveurs, groupes, DNS… du cœur actif</string>
