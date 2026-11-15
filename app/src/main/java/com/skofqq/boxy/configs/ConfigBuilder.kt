@@ -29,7 +29,18 @@ object ConfigBuilder {
         val url: String = "",
         val links: String = "",
         val groups: List<Group> = emptyList(),
+        /** Servers left out (their tags). */
+        val exclude: List<String> = emptyList(),
+        /** How sites are routed: [ROUTE_PROXY], [ROUTE_RU] or a routing profile's id. */
+        val routing: String = ROUTE_PROXY,
+        /** Made the active Xray config at once. */
+        val activate: Boolean = true,
     )
+
+    /** Everything through the first group. */
+    const val ROUTE_PROXY = "proxy"
+    /** Russian domains (.ru, .su, .рф) and addresses direct, the rest through the first group. */
+    const val ROUTE_RU = "ru"
 
     data class Servers(val outbounds: List<JSONObject>, val skipped: Int, val error: String? = null)
 
@@ -44,6 +55,9 @@ object ConfigBuilder {
                 val m = x.optJSONArray("members") ?: JSONArray()
                 Group(x.optString("name"), (0 until m.length()).map { m.optString(it) }, x.optString("strategy", "leastPing"))
             },
+            o.optJSONArray("exclude")?.let { a -> (0 until a.length()).map { a.optString(it) } }.orEmpty(),
+            o.optString("routing", ROUTE_PROXY),
+            o.optBoolean("activate", true),
         )
     }.getOrNull()
 
@@ -51,6 +65,7 @@ object ConfigBuilder {
         file(context).writeText(
             JSONObject().put("name", p.name).put("url", p.url).put("links", p.links)
                 .put("groups", JSONArray(p.groups.map { JSONObject().put("name", it.name).put("members", JSONArray(it.members)).put("strategy", it.strategy) }))
+                .put("exclude", JSONArray(p.exclude)).put("routing", p.routing).put("activate", p.activate)
                 .toString(2),
         )
     }
@@ -70,7 +85,7 @@ object ConfigBuilder {
     fun fileName(p: Plan) = "profiles/" + p.name.trim().lowercase().replace(Regex("[^a-z0-9а-яё_-]+"), "-").trim('-').ifBlank { "my-config" } + ".json"
 
     /** The whole Xray config for [p] with [servers]. */
-    fun build(p: Plan, servers: List<JSONObject>, tproxyPort: Int): JSONObject {
+    fun build(p: Plan, servers: List<JSONObject>, tproxyPort: Int, ruGeoIp: Boolean = true): JSONObject {
         val tags = servers.map { it.optString("tag") }
         val groups = p.groups.ifEmpty { listOf(Group("⚡️ Fastest")) }
         val balancers = JSONArray()
@@ -92,6 +107,12 @@ object ConfigBuilder {
         val rules = JSONArray()
             .put(JSONObject().put("inboundTag", JSONArray(listOf("tproxy-in"))).put("port", 53).put("outboundTag", "dns-out"))
             .put(JSONObject().put("ip", JSONArray(listOf("geoip:private"))).put("outboundTag", "direct"))
+            .apply {
+                if (p.routing == ROUTE_RU) {
+                    put(JSONObject().put("domain", JSONArray(listOf("domain:ru", "domain:su", "domain:xn--p1ai"))).put("outboundTag", "direct"))
+                    if (ruGeoIp) put(JSONObject().put("ip", JSONArray(listOf("geoip:ru"))).put("outboundTag", "direct"))
+                }
+            }
             // Everything else: the first group (a routing profile puts its lists above this).
             .put(JSONObject().put("network", "tcp,udp").put("balancerTag", groups.first().name))
         return JSONObject()
@@ -156,28 +177,45 @@ object ConfigBuilder {
      */
     suspend fun create(context: Context, p: Plan): Outcome = withContext(Dispatchers.IO) {
         save(context, p)
-        val s = servers(context, p)
-        if (s.error != null) return@withContext Outcome(false, error = s.error)
+        val all = servers(context, p)
+        if (all.error != null) return@withContext Outcome(false, error = all.error)
+        val s = all.copy(outbounds = all.outbounds.filter { it.optString("tag") !in p.exclude })
+        if (s.outbounds.isEmpty()) return@withContext Outcome(false, error = "empty")
+        // Routing: a profile is the routing profiles' active one (they apply to every Xray config); the presets
+        // are the config's own rules, so no profile goes over them.
+        val store = RoutingProfiles.load(context)
+        val profile = store.profiles.firstOrNull { it.id == p.routing }
+        RoutingProfiles.save(context, store.copy(active = profile?.id))
         val port = BoxModule.unquote(BoxModule.readSetting("tproxy_port"))?.toIntOrNull() ?: 9898
-        val cfg = build(p, s.outbounds, port)
-        val baseText = GeoRules.pretty(cfg)
-        RoutingProfiles.applyAll(context, cfg)
         val rel = fileName(p)
         val path = "${BoxModule.BOX_DIR}/xray/$rel"
         val old = BoxModule.readFile(path)
-        val written = GeoRules.pretty(cfg)
         BoxModule.exec("mkdir -p '${BoxModule.BOX_DIR}/xray/profiles'")
-        if (!BoxModule.writeFile(path, written)) return@withContext Outcome(false, error = "write")
-        val check = ConfigCheck.check("xray", path)
+        var baseText = ""
+        var written = ""
+        var check: CheckResult = CheckResult.Failed("")
+        // geoip:ru needs a geoip.dat that has it: without, the Russian domains alone.
+        for (geo in listOf(true, false)) {
+            if (!geo && p.routing != ROUTE_RU) break
+            val cfg = build(p, s.outbounds, port, ruGeoIp = geo)
+            baseText = GeoRules.pretty(cfg)
+            RoutingProfiles.applyAll(context, cfg)
+            written = GeoRules.pretty(cfg)
+            if (!BoxModule.writeFile(path, written)) return@withContext Outcome(false, error = "write")
+            check = ConfigCheck.check("xray", path)
+            if (check !is CheckResult.Failed) break
+        }
         if (check is CheckResult.Failed) {
             if (old != null) BoxModule.writeFile(path, old) else BoxModule.exec("rm -f '$path'")
-            return@withContext Outcome(false, error = check.output)
+            return@withContext Outcome(false, error = (check as CheckResult.Failed).output)
         }
         RoutingProfiles.remember(context, path, baseText, written)
         remember(context, rel)
-        BoxModule.writeSetting("name_xray_config", rel)
-        val st = BoxModule.state()
-        if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
+        if (p.activate) {
+            BoxModule.writeSetting("name_xray_config", rel)
+            val st = BoxModule.state()
+            if (st.running && BoxModule.unquote(st.core) == "xray") BoxModule.restart()
+        }
         Outcome(true, s.outbounds.size, s.skipped, path)
     }
 }
