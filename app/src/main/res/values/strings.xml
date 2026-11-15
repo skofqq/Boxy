@@ -999,6 +999,7 @@
     <string name="cb_load">Load servers</string>
     <string name="cb_no_servers">No servers Xray can use</string>
     <string name="cb_servers_loaded">Servers: %1$d</string>
+    <string name="cb_servers_empty">Nothing loaded yet: load the subscription or the links to see the servers and pick them in groups.</string>
     <string name="cb_groups">Groups</string>
     <string name="cb_groups_sub">Each group picks one of its servers; the first one takes everything no route matched</string>
     <string name="cb_default">default</string>

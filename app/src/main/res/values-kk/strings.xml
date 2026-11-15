@@ -976,6 +976,7 @@
     <string name="cb_load">Серверлерді жүктеу</string>
     <string name="cb_no_servers">Xray қолдана алатын сервер жоқ</string>
     <string name="cb_servers_loaded">Серверлер: %1$d</string>
+    <string name="cb_servers_empty">Әзірге ештеңе жүктелмеген: серверлерді көріп, топтарда таңдау үшін жазылымды немесе сілтемелерді жүктеңіз.</string>
     <string name="cb_groups">Топтар</string>
     <string name="cb_groups_sub">Әр топ өз серверлерінің бірін таңдайды; біріншісі маршруттарға кірмегеннің бәрін алады</string>
     <string name="cb_default">әдепкі</string>

@@ -976,6 +976,7 @@
     <string name="cb_load">サーバーを読み込む</string>
     <string name="cb_no_servers">Xray で使えるサーバーがありません</string>
     <string name="cb_servers_loaded">サーバー：%1$d</string>
+    <string name="cb_servers_empty">まだ何も読み込まれていません。サブスクリプションまたはリンクを読み込むと、サーバーを確認してグループで選べます。</string>
     <string name="cb_groups">グループ</string>
     <string name="cb_groups_sub">各グループは自身のサーバーから 1 つを選び、最初のグループはどのルートにも一致しない通信を受け持ちます</string>
     <string name="cb_default">既定</string>

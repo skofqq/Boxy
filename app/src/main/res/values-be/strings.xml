@@ -976,6 +976,7 @@
     <string name="cb_load">Загрузіць серверы</string>
     <string name="cb_no_servers">Няма сервераў, якія Xray можа выкарыстаць</string>
     <string name="cb_servers_loaded">Сервераў: %1$d</string>
+    <string name="cb_servers_empty">Пакуль нічога не загружана: загрузіце падпіску або спасылкі, каб убачыць серверы і выбраць іх у групах.</string>
     <string name="cb_groups">Групы</string>
     <string name="cb_groups_sub">Кожная група выбірае адзін са сваіх сервераў; першая атрымлівае ўсё, што не трапіла ў маршруты</string>
     <string name="cb_default">па змаўчанні</string>

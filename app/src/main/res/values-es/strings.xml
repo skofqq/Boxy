@@ -976,6 +976,7 @@
     <string name="cb_load">Cargar servidores</string>
     <string name="cb_no_servers">No hay servidores que Xray pueda usar</string>
     <string name="cb_servers_loaded">Servidores: %1$d</string>
+    <string name="cb_servers_empty">Aún no hay nada cargado: carga la suscripción o los enlaces para ver los servidores y elegirlos en los grupos.</string>
     <string name="cb_groups">Grupos</string>
     <string name="cb_groups_sub">Cada grupo elige uno de sus servidores; el primero recibe todo lo que no coincide con ninguna ruta</string>
     <string name="cb_default">por defecto</string>

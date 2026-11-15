@@ -976,6 +976,7 @@
     <string name="cb_load">Carica server</string>
     <string name="cb_no_servers">Nessun server utilizzabile da Xray</string>
     <string name="cb_servers_loaded">Server: %1$d</string>
+    <string name="cb_servers_empty">Ancora nulla di caricato: carica l’abbonamento o i link per vedere i server e sceglierli nei gruppi.</string>
     <string name="cb_groups">Gruppi</string>
     <string name="cb_groups_sub">Ogni gruppo sceglie uno dei suoi server; il primo riceve tutto ciò che nessun percorso copre</string>
     <string name="cb_default">predefinito</string>

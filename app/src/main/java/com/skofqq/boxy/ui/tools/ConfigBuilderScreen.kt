@@ -1,5 +1,10 @@
 package com.skofqq.boxy.ui.tools
 
+import com.skofqq.boxy.configs.RoutingProfiles
+import com.skofqq.boxy.ui.components.TonalButton
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -97,46 +102,66 @@ fun ConfigBuilderScreen(contentPadding: PaddingValues, onBack: () -> Unit, onRou
         }
     }
     val tags = servers.orEmpty().map { it.optString("tag") }
-    PinnedLazyPage(PaddingValues(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding() + 16.dp), header = {
+    val routing = remember { RoutingProfiles.load(context).let { s -> s.profiles.firstOrNull { it.id == s.active }?.name } }
+    fun create() {
+        if (creating || name.isBlank()) return
+        creating = true
+        scope.launch {
+            val r = ConfigBuilder.create(context.applicationContext, plan())
+            creating = false
+            madeKey++
+            val msg = when {
+                r.ok -> context.getString(R.string.cb_created, r.path?.substringAfterLast('/').orEmpty(), r.servers)
+                r.error == "download" -> context.getString(R.string.core_setup_err_download)
+                r.error == "empty" -> context.getString(R.string.cb_no_servers)
+                else -> context.getString(R.string.cs_failed, r.error?.lines()?.takeLast(2)?.joinToString(" "))
+            }
+            BoxyToast.makeText(context, msg, BoxyToast.LENGTH_LONG, if (r.ok) BoxyToast.Kind.SUCCESS else BoxyToast.Kind.ERROR).show()
+        }
+    }
+    Box(Modifier.fillMaxSize()) {
+    // Room at the bottom for the pinned "Create" button.
+    PinnedLazyPage(PaddingValues(top = contentPadding.calculateTopPadding(), bottom = contentPadding.calculateBottomPadding() + 88.dp), header = {
         SubPageHeader(stringResource(R.string.cb_title), stringResource(R.string.cb_sub), onBack)
     }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // 1 · Servers
         item {
-            SectionCard(stringResource(R.string.rt_name)) {
-                BoxyTextField(name, { name = it }, "my-config", Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 14.dp))
-            }
-        }
-        item {
-            SectionCard(stringResource(R.string.cb_servers), stringResource(R.string.cb_servers_sub)) {
+            val list = servers
+            StepCard(1, stringResource(R.string.cb_servers), stringResource(R.string.cb_servers_sub), done = !list.isNullOrEmpty()) {
                 Row(Modifier.padding(horizontal = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     GlassChip(stringResource(R.string.cb_from_url), fromUrl) { fromUrl = true }
                     GlassChip(stringResource(R.string.cb_from_links), !fromUrl) { fromUrl = false }
                 }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(12.dp))
                 if (fromUrl) BoxyTextField(url, { url = it }, "https://…", Modifier.fillMaxWidth().padding(horizontal = 18.dp))
                 else BoxyTextField(links, { links = it }, "vless://… vmess://… trojan://… ss://… hy2://…", Modifier.fillMaxWidth().padding(horizontal = 18.dp).heightIn(min = 140.dp), singleLine = false)
-                Spacer(Modifier.height(10.dp))
-                Box(Modifier.padding(horizontal = 18.dp)) {
-                    SheetButton(stringResource(if (loading) R.string.check_running else R.string.cb_load), Boxy.colors.card, Boxy.colors.text, Modifier.fillMaxWidth()) { loadServers() }
+                Spacer(Modifier.height(12.dp))
+                Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TonalButton(stringResource(if (loading) R.string.check_running else R.string.cb_load), BoxyIcons.Download, enabled = !loading) { loadServers() }
+                    Spacer(Modifier.weight(1f))
+                    if (!list.isNullOrEmpty()) Badge(stringResource(R.string.cb_servers_loaded, list.size), accent = true)
                 }
-                val list = servers
-                if (list != null && list.isNotEmpty()) {
-                    FlowRow(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        list.forEach { o ->
-                            Text(
-                                XrayApi.displayName(o.optString("tag")),
-                                Modifier.clip(RoundedCornerShape(50)).background(Boxy.colors.surface2).padding(horizontal = 10.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelMedium, color = Boxy.colors.text, maxLines = 1,
-                            )
-                        }
+                if (list.isNullOrEmpty()) {
+                    Text(stringResource(R.string.cb_servers_empty), Modifier.padding(horizontal = 18.dp).padding(top = 10.dp), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2)
+                } else {
+                    var all by remember { mutableStateOf(false) }
+                    FlowRow(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        (if (all) list else list.take(12)).forEach { o -> Badge(XrayApi.displayName(o.optString("tag"))) }
+                        if (!all && list.size > 12) Text(
+                            "+${list.size - 12}",
+                            Modifier.clip(RoundedCornerShape(50)).clickable { all = true }.background(Boxy.colors.accent.copy(alpha = 0.14f)).padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium, color = Boxy.colors.accent,
+                        )
                     }
-                } else Spacer(Modifier.height(14.dp))
+                }
             }
         }
+        // 2 · Groups
         item {
-            SectionCard(stringResource(R.string.cb_groups), stringResource(R.string.cb_groups_sub)) {
+            StepCard(2, stringResource(R.string.cb_groups), stringResource(R.string.cb_groups_sub), done = true) {
                 groups.forEachIndexed { i, g ->
                     Row(
-                        Modifier.fillMaxWidth().clickable { editing = i }.padding(horizontal = 18.dp, vertical = 10.dp),
+                        Modifier.fillMaxWidth().clickable { editing = i }.padding(start = 18.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(Tints.purple.bg), contentAlignment = Alignment.Center) {
@@ -146,47 +171,41 @@ fun ConfigBuilderScreen(contentPadding: PaddingValues, onBack: () -> Unit, onRou
                         }
                         Spacer(Modifier.width(14.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(g.name + if (i == 0) "  · " + stringResource(R.string.cb_default) else "", style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(g.name, Modifier.weight(1f, fill = false), style = MaterialTheme.typography.titleMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (i == 0) {
+                                    Spacer(Modifier.width(8.dp))
+                                    Badge(stringResource(R.string.cb_default), accent = true)
+                                }
+                            }
                             Text(
                                 (if (g.members.isEmpty()) stringResource(R.string.cb_all_servers) else g.members.joinToString(", ") { XrayApi.displayName(it) }) + " · " + strategyName(g.strategy),
                                 style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 2, overflow = TextOverflow.Ellipsis,
                             )
                         }
+                        Icon(BoxyIcons.Edit, stringResource(R.string.rt_rename), Modifier.size(40.dp).clip(RoundedCornerShape(50)).clickable { editing = i }.padding(10.dp), tint = Boxy.colors.text2)
                     }
                 }
-                Box(Modifier.padding(horizontal = 18.dp).padding(bottom = 14.dp)) {
-                    SheetButton(stringResource(R.string.cb_add_group), Boxy.colors.card, Boxy.colors.text, Modifier.fillMaxWidth()) {
-                        groups = groups + Group(context.getString(R.string.cb_new_group, groups.size + 1))
-                        editing = groups.size - 1
-                    }
+                TonalButton(stringResource(R.string.cb_add_group), BoxyIcons.Add, Modifier.padding(horizontal = 18.dp).padding(top = 8.dp)) {
+                    groups = groups + Group(context.getString(R.string.cb_new_group, groups.size + 1))
+                    editing = groups.size - 1
                 }
             }
         }
+        // 3 · Routing: the active routing profile, edited in Routing profiles.
         item {
-            SectionCard(stringResource(R.string.rt_title), stringResource(R.string.cb_routing_sub)) {
-                Box(Modifier.padding(horizontal = 18.dp).padding(bottom = 14.dp)) {
-                    SheetButton(stringResource(R.string.rt_edit_rules), Boxy.colors.card, Boxy.colors.text, Modifier.fillMaxWidth(), onRouting)
+            StepCard(3, stringResource(R.string.rt_title), stringResource(R.string.cb_routing_sub), done = routing != null) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TonalButton(stringResource(R.string.rt_edit_rules), BoxyIcons.FilterList, onClick = onRouting)
+                    Spacer(Modifier.weight(1f))
+                    Badge(stringResource(R.string.rt_now) + ": " + (routing ?: stringResource(R.string.rt_template)), Modifier.widthIn(max = 160.dp))
                 }
             }
         }
+        // 4 · Name of the file; the button below creates it.
         item {
-            Box(Modifier.padding(horizontal = 16.dp)) {
-                SheetButton(stringResource(if (creating) R.string.check_running else R.string.cb_create), Boxy.colors.accent, Color.White, Modifier.fillMaxWidth()) {
-                    if (creating || name.isBlank()) return@SheetButton
-                    creating = true
-                    scope.launch {
-                        val r = ConfigBuilder.create(context.applicationContext, plan())
-                        creating = false
-                        madeKey++
-                        val msg = when {
-                            r.ok -> context.getString(R.string.cb_created, r.path?.substringAfterLast('/').orEmpty(), r.servers)
-                            r.error == "download" -> context.getString(R.string.core_setup_err_download)
-                            r.error == "empty" -> context.getString(R.string.cb_no_servers)
-                            else -> context.getString(R.string.cs_failed, r.error?.lines()?.takeLast(2)?.joinToString(" "))
-                        }
-                        BoxyToast.makeText(context, msg, BoxyToast.LENGTH_LONG, if (r.ok) BoxyToast.Kind.SUCCESS else BoxyToast.Kind.ERROR).show()
-                    }
-                }
+            StepCard(4, stringResource(R.string.rt_name), null, done = name.isNotBlank()) {
+                BoxyTextField(name, { name = it }, "my-config", Modifier.fillMaxWidth().padding(horizontal = 18.dp))
             }
         }
         item {
@@ -236,6 +255,11 @@ fun ConfigBuilderScreen(contentPadding: PaddingValues, onBack: () -> Unit, onRou
             }
         }
         item { Text(stringResource(R.string.cb_note), Modifier.padding(horizontal = 20.dp), style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2) }
+    }
+    // Pinned above the navigation bar: the last step, always in reach.
+    Box(Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = contentPadding.calculateBottomPadding() + 12.dp)) {
+        SheetButton(stringResource(if (creating) R.string.check_running else R.string.cb_create), if (name.isBlank()) Boxy.colors.surface2 else Boxy.colors.accent, if (name.isBlank()) Boxy.colors.text2 else Color.White, Modifier.fillMaxWidth()) { create() }
+    }
     }
     editing?.let { i ->
         val g = groups.getOrNull(i) ?: return@let
@@ -296,4 +320,40 @@ private fun GroupSheet(g: Group, tags: List<String>, canDelete: Boolean, onSave:
         }
         Spacer(Modifier.height(12.dp))
     }
+}
+
+/** A numbered step of the builder (M3 Expressive): the number turns into a check when the step has what it needs. */
+@Composable
+private fun StepCard(n: Int, title: String, subtitle: String?, done: Boolean, content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(28.dp)).background(Boxy.colors.card).padding(vertical = 18.dp)) {
+        Row(Modifier.padding(horizontal = 18.dp), verticalAlignment = Alignment.Top) {
+            Box(
+                Modifier.size(32.dp).clip(RoundedCornerShape(50)).background(if (done) Boxy.colors.accent else Boxy.colors.surface2),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (done) Icon(BoxyIcons.Check, null, Modifier.size(18.dp), tint = Color.White)
+                else Text("$n", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = Boxy.colors.text2)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f).padding(top = 2.dp)) {
+                Text(title, style = MaterialTheme.typography.titleLarge, color = Boxy.colors.text)
+                if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text2)
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        content()
+    }
+}
+
+/** A small pill: a server, the count, "default". */
+@Composable
+private fun Badge(text: String, modifier: Modifier = Modifier, accent: Boolean = false) {
+    Text(
+        text,
+        modifier.clip(RoundedCornerShape(50)).background(if (accent) Boxy.colors.accent.copy(alpha = 0.14f) else Boxy.colors.surface2).padding(horizontal = 10.dp, vertical = 4.dp),
+        style = MaterialTheme.typography.labelMedium,
+        color = if (accent) Boxy.colors.accent else Boxy.colors.text,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
