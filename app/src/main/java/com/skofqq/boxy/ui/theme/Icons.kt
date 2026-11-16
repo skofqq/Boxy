@@ -331,6 +331,25 @@ object BoxyIcons {
     val Play = strokeIcon("Play", "M7,4.5l12,7.5 -12,7.5z")
     /** Power symbol: start the service. */
     val Power = strokeIcon("Power", "M12,3v8M7.05,6.05a7,7 0 1 0 9.9,0")
+    val Star = icon("Star", "M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z")
+    val StarOutline = icon(
+        "StarOutline",
+        "M22,9.24l-7.19,-0.62L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21 12,17.27 18.18,21l-1.63,-7.03L22,9.24zM12,15.4l-3.76,2.27 1,-4.28 -3.32,-2.88 4.38,-0.38L12,6.1l1.71,4.04 4.38,0.38 -3.32,2.88 1,4.28L12,15.4z",
+    )
+    val Sort = icon("Sort", "M3,18h6v-2L3,16v2zM3,6v2h18L21,6L3,6zM3,13h12v-2L3,11v2z")
+    val Compare = icon(
+        "Compare",
+        "M10,3H5C3.89,3 3,3.89 3,5v14c0,1.1 0.89,2 2,2h5v2h2V1h-2V3zM10,18H5l5,-6V18zM19,3h-5v2h5v13l-5,-6v9h5c1.1,0 2,-0.9 2,-2V5C21,3.89 20.1,3 19,3z",
+    )
+    val Copy = icon(
+        "Copy",
+        "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z",
+    )
+    val Flag = icon("Flag", "M14.4,6L14,4H5v17h2v-7h5.6l0.4,2h7V6z")
+    val Merge = icon(
+        "Merge",
+        "M17,20.41L18.41,19 15,15.59 13.59,17 17,20.41zM7.5,8H11v5.59L5.59,19 7,20.41l6,-6V8h3.5L12,3.5 7.5,8z",
+    )
 
     /** Outline icon: the path is stroked (2px, round caps and joins) instead of filled. */
     private fun strokeIcon(name: String, path: String): ImageVector =

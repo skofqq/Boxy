@@ -155,6 +155,8 @@ fun EditorScreen(contentPadding: PaddingValues, path: String, onBack: () -> Unit
 
     fun write(content: String, checked: Boolean) {
         scope.launch {
+            // A config keeps its version before this save, for "Compare with previous version".
+            if (ConfigCheck.coreFor(path) != null) com.skofqq.boxy.configs.ConfigEdits.keepPrevious(path)
             val ok = RootFiles.write(path, content)
             if (ok) modified = false
             val msg = when {

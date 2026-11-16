@@ -106,6 +106,8 @@ object CoreSubscription {
         val (dir, key) = coreConfig(core)
         val path = "$BOX/$dir/$name"
         val old = BoxModule.readFile(path)
+        // Blocking and node groups set in Boxy for this file survive the new version from the subscription.
+        val text = runCatching { ConfigEdits.reapply(dir, path, text) }.getOrDefault(text)
         if (!BoxModule.writeFile(path, text)) return "write"
         val check = ConfigCheck.check(core, path)
         if (check is CheckResult.Failed) {

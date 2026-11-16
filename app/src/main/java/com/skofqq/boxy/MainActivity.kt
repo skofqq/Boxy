@@ -224,6 +224,9 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
     LaunchedEffect(Unit) {
         if (checkUpdate) updateOffer = com.skofqq.boxy.net.Updates.launchOffer(context, prefs)
     }
+    // What changed since the last version shown (only after an update; one request at most).
+    var whatsNew by remember { mutableStateOf<List<com.skofqq.boxy.ui.settings.ChangeEntry>>(emptyList()) }
+    LaunchedEffect(Unit) { whatsNew = com.skofqq.boxy.ui.settings.WhatsNew.pending(context, prefs) }
     var panelRequest by remember { mutableStateOf(false) }
     LaunchedEffect(PanelBus.request) {
         if (PanelBus.request) {
@@ -390,6 +393,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
                 updateOffer = null
             }
         }
+        if (updateOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
 
         // Opaque system bars: a solid strip instead of content showing through.
         if (prefs.opaqueStatusBar) {

@@ -60,6 +60,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.Image
 import com.skofqq.boxy.R
+import com.skofqq.boxy.data.NodeSort
+import androidx.compose.foundation.combinedClickable
 import com.skofqq.boxy.net.ClashApi
 import com.skofqq.boxy.net.Net
 import com.skofqq.boxy.net.ProxyGroup
@@ -590,7 +592,7 @@ private fun GroupNow(group: ProxyGroup, snap: ProxySnapshot, delays: Map<String,
         Icon(BoxyIcons.ArrowCircle, null, Modifier.size(16.dp), tint = Boxy.colors.text2)
         Spacer(Modifier.width(6.dp))
         Text(
-            group.now ?: "—",
+            group.now?.let { nodeLabel(it, com.skofqq.boxy.BoxyApp.instance.prefs.nodeFlags) } ?: "—",
             Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
             color = Boxy.colors.text,
@@ -645,8 +647,11 @@ internal fun OpenGroup(
             Spacer(Modifier.height(10.dp))
             GroupNow(group, snap, delays, testing[group.name] == true, onTestGroup)
         }
-        Spacer(Modifier.height(12.dp))
-        group.all.chunked(2).forEach { pair ->
+        Spacer(Modifier.height(10.dp))
+        val prefs = com.skofqq.boxy.BoxyApp.instance.prefs
+        NodeSortBar(prefs.nodeSort, prefs::updateNodeSort)
+        Spacer(Modifier.height(10.dp))
+        sortedNodes(group.all, snap, delays, prefs.nodeSort, prefs.favoriteNodes).chunked(2).forEach { pair ->
             Row(
                 Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -672,6 +677,49 @@ internal fun OpenGroup(
     }
 }
 
+/**
+ * Nodes of a group in the chosen order, starred ones first. Untested and timed-out nodes go to the end of
+ * the delay order, so the fastest working node is always on top.
+ */
+internal fun sortedNodes(names: List<String>, snap: ProxySnapshot, delays: Map<String, Int>, sort: NodeSort, favorites: Set<String>): List<String> {
+    val ordered = when (sort) {
+        NodeSort.CONFIG -> names
+        NodeSort.NAME -> names.sortedBy { n -> n.dropWhile { !it.isLetterOrDigit() }.lowercase() }
+        NodeSort.DELAY -> names.sortedBy { n -> delayOf(n, snap, delays)?.takeIf { it > 0 } ?: Int.MAX_VALUE }
+    }
+    return ordered.filter { it in favorites } + ordered.filter { it !in favorites }
+}
+
+/** Order of the nodes in an opened group: as in the config, by delay, by name. */
+@Composable
+private fun NodeSortBar(sort: NodeSort, onSort: (NodeSort) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(BoxyIcons.Sort, null, Modifier.size(16.dp), tint = Boxy.colors.text2)
+        Spacer(Modifier.width(2.dp))
+        listOf(
+            NodeSort.CONFIG to R.string.node_sort_config,
+            NodeSort.DELAY to R.string.node_sort_delay,
+            NodeSort.NAME to R.string.node_sort_name,
+        ).forEach { (s, label) ->
+            val on = s == sort
+            Text(
+                stringResource(label),
+                Modifier.clip(RoundedCornerShape(50))
+                    .background(if (on) Boxy.colors.accent.copy(alpha = 0.16f) else Boxy.colors.surface2)
+                    .clickable { onSort(s) }
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                color = if (on) Boxy.colors.accent else Boxy.colors.text2,
+                fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
+            )
+        }
+    }
+}
+
+/** A node's name as shown: with the country flag in front when the name has none (Settings can turn it off). */
+internal fun nodeLabel(name: String, flags: Boolean): String = if (flags) com.skofqq.boxy.util.Countries.withFlag(name) else name
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 internal fun NodeTile(
     name: String,
@@ -683,6 +731,8 @@ internal fun NodeTile(
     onClick: (() -> Unit)?,
     onTest: () -> Unit,
 ) {
+    val prefs = com.skofqq.boxy.BoxyApp.instance.prefs
+    val favorite = name in prefs.favoriteNodes
     val node = snap.nodes[name]
     val proto = node?.let { n ->
         val transport = when {
@@ -695,18 +745,29 @@ internal fun NodeTile(
     Column(
         modifier.clip(RoundedCornerShape(16.dp))
             .background(if (selected) Boxy.colors.accent.copy(alpha = 0.16f) else Boxy.colors.surface2)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            // A long press stars the node (only real nodes: a group is not a server).
+            .combinedClickable(
+                onClick = onClick ?: {},
+                onLongClick = if (snap.group(name) == null) ({ prefs.toggleFavoriteNode(name) }) else null,
+            )
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            name,
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
-            color = if (selected) Boxy.colors.accent else Boxy.colors.text,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                nodeLabel(name, prefs.nodeFlags),
+                Modifier.weight(1f, fill = false),
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
+                color = if (selected) Boxy.colors.accent else Boxy.colors.text,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (favorite) {
+                Spacer(Modifier.width(4.dp))
+                Icon(BoxyIcons.Star, stringResource(R.string.node_favorite), Modifier.size(14.dp), tint = Tints.amber.fg)
+            }
+        }
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(proto.orEmpty(), Modifier.weight(1f), style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = Boxy.colors.text2, maxLines = 1, overflow = TextOverflow.Ellipsis)

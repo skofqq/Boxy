@@ -64,7 +64,16 @@ fun ToolsScreen(contentPadding: PaddingValues, navExtra: NavExtra, active: Boole
         Box(Modifier.fillMaxSize().background(Boxy.colors.page)) {
             when {
                 r == ROUTE_HUB -> ToolsHub(contentPadding, navExtra, onOpenPage, push)
-                r == ROUTE_CONFIGS -> ConfigListScreen(contentPadding, onBack = pop, onEdit = { push("$ROUTE_EDIT$it") }, onManage = { push(ROUTE_FILES + it) })
+                r == ROUTE_CONFIGS -> ConfigListScreen(
+                    contentPadding,
+                    onBack = pop,
+                    onEdit = { push("$ROUTE_EDIT$it") },
+                    onManage = { push(ROUTE_FILES + it) },
+                    onDiff = { a, b -> push("$ROUTE_DIFF$a|$b") },
+                    onTools = { push(ROUTE_PROFILE_TOOLS) },
+                )
+                r.startsWith(ROUTE_DIFF) -> r.removePrefix(ROUTE_DIFF).split('|').let { p -> DiffScreen(contentPadding, p[0], p.getOrElse(1) { p[0] }, onBack = pop) }
+                r == ROUTE_PROFILE_TOOLS -> ProfileToolsScreen(contentPadding, onBack = pop, onDiff = { a, b -> push("$ROUTE_DIFF$a|$b") })
                 r.startsWith(ROUTE_FILES) -> FileManagerScreen(
                     contentPadding,
                     dir = r.removePrefix(ROUTE_FILES).ifEmpty { BoxModule.BOX_DIR },
@@ -105,6 +114,8 @@ const val ROUTE_PROXY_AUTH = "proxy_auth"
 const val ROUTE_ROUTING = "routing"
 const val ROUTE_CORE_SETTINGS = "core_settings"
 const val ROUTE_BUILDER = "builder"
+const val ROUTE_DIFF = "diff:"
+const val ROUTE_PROFILE_TOOLS = "profile-tools"
 
 /** Opens a Tools page from elsewhere: set [request] to a route and switch to the Tools tab. */
 object ToolsNav {
@@ -157,6 +168,10 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
             SectionCard(stringResource(R.string.cs_hub_title), stringResource(R.string.cs_hub_sub)) {
                 if (hasSettings) SettingsRow(BoxyIcons.Settings, stringResource(R.string.cs_tools_title), stringResource(R.string.cs_tools_sub)) { push(ROUTE_CORE_SETTINGS) }
                 if (core == "xray") SettingsRow(BoxyIcons.FilterList, stringResource(R.string.rt_title), stringResource(R.string.rt_edit_rules_sub)) { push(ROUTE_ROUTING) }
+                // Ad blocking and merged node groups: mihomo and sing-box configs.
+                if (core == "clash" || core == "sing-box") {
+                    SettingsRow(BoxyIcons.Block, stringResource(R.string.profile_tools_title), stringResource(R.string.profile_tools_row_sub)) { push(ROUTE_PROFILE_TOOLS) }
+                }
                 SettingsRow(BoxyIcons.Lock, stringResource(R.string.proxy_auth_title), stringResource(R.string.proxy_auth_row_sub)) { push(ROUTE_PROXY_AUTH) }
                 // A config of one's own (Xray): servers, groups, routing profile, without a panel template.
                 SettingsRow(BoxyIcons.Add, stringResource(R.string.cb_title), stringResource(R.string.cb_row_sub), showDivider = false) { push(ROUTE_BUILDER) }

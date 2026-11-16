@@ -32,6 +32,9 @@ enum class NavExtra { NONE, APPS, LOGS }
 /** Blocks of the home page, top to bottom. */
 enum class HomeSection { HERO, QUICK, LATENCY, LEAKS, GRID }
 
+/** Order of nodes in an opened proxy group (favourites always come first). */
+enum class NodeSort { CONFIG, DELAY, NAME }
+
 /** Small cards of the home metrics grid. */
 enum class MetricCard { IP, SPEED, SUBSCRIPTION, SYSTEM }
 
@@ -276,6 +279,41 @@ class Prefs(context: Context) {
         subscriptionSource = source
         sp.edit().putString(KEY_SUB_SOURCE, source.name).apply()
     }
+
+    /** Nodes starred in the Proxies tab; shown first in every group. Kept as text so backups carry them. */
+    var favoriteNodes by mutableStateOf(sp.getString("favorite_nodes", "").orEmpty().split('\n').filter { it.isNotEmpty() }.toSet())
+        private set
+
+    fun toggleFavoriteNode(name: String) {
+        favoriteNodes = if (name in favoriteNodes) favoriteNodes - name else favoriteNodes + name
+        sp.edit().putString("favorite_nodes", favoriteNodes.joinToString("\n")).apply()
+    }
+
+    /** Order of nodes inside an opened group. */
+    var nodeSort by mutableStateOf(enumOf(sp.getString("node_sort", null), NodeSort.CONFIG))
+        private set
+
+    fun updateNodeSort(v: NodeSort) { nodeSort = v; sp.edit().putString("node_sort", v.name).apply() }
+
+    /** Country flags in front of node names that have none. */
+    var nodeFlags by mutableStateOf(sp.getBoolean("node_flags", true))
+        private set
+
+    fun updateNodeFlags(v: Boolean) { nodeFlags = v; sp.edit().putBoolean("node_flags", v).apply() }
+
+    /** Show what changed after Boxy or the module was updated. */
+    var showChangelog by mutableStateOf(sp.getBoolean("show_changelog", true))
+        private set
+
+    fun updateShowChangelog(v: Boolean) { showChangelog = v; sp.edit().putBoolean("show_changelog", v).apply() }
+
+    /** Last app / module version whose changes were shown (0 / empty: nothing recorded yet). */
+    var seenAppVersion: Long
+        get() = sp.getLong("seen_app_version", 0)
+        set(v) { sp.edit().putLong("seen_app_version", v).apply() }
+    var seenModuleVersion: String
+        get() = sp.getString("seen_module_version", "").orEmpty()
+        set(v) { sp.edit().putString("seen_module_version", v).apply() }
 
     /** Last known subscription numbers, shown until a fresh request finishes. */
     var subscriptionCache: String?

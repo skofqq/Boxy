@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skofqq.boxy.R
+import com.skofqq.boxy.ui.components.BoxyToast as Toast
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.root.BoxModule
 import com.skofqq.boxy.root.CheckResult
@@ -83,7 +84,14 @@ suspend fun xrayProfiles(): List<RootFile> =
 
 /** Choose the active config of the current core. */
 @Composable
-fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: (String) -> Unit, onManage: (String) -> Unit) {
+fun ConfigListScreen(
+    contentPadding: PaddingValues,
+    onBack: () -> Unit,
+    onEdit: (String) -> Unit,
+    onManage: (String) -> Unit,
+    onDiff: (String, String) -> Unit = { _, _ -> },
+    onTools: () -> Unit = {},
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var core by remember { mutableStateOf<String?>(null) }
@@ -97,7 +105,14 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
     var checkError by remember { mutableStateOf<Pair<RootFile, String>?>(null) }
     var xrayFix by remember { mutableStateOf<RootFile?>(null) }
     var overrides by remember { mutableStateOf<Boolean?>(null) }
+    var menuFor by remember { mutableStateOf<RootFile?>(null) }
+    var compareFrom by remember { mutableStateOf<RootFile?>(null) }
+    var duplicateOf by remember { mutableStateOf<RootFile?>(null) }
+    var renameOf by remember { mutableStateOf<RootFile?>(null) }
+    var deleteOf by remember { mutableStateOf<RootFile?>(null) }
+    var previous by remember { mutableStateOf<Set<String>>(emptySet()) }
 
+    // Switching profiles: a running service restarts with the new one (as from the tile and the widget).
     fun select(f: RootFile) {
         scope.launch {
             val c = core ?: return@launch
@@ -143,6 +158,7 @@ fun ConfigListScreen(contentPadding: PaddingValues, onBack: () -> Unit, onEdit: 
             // Xray profiles: configs that run on their own, not merged with the rest of xray/.
             (if (c == "xray") xrayProfiles() else emptyList())
         overrides = if (c == "sing-box") RootFiles.exists(SingBoxOverrides.FILE) else null
+        previous = RootFiles.list("${BoxModule.BOX_DIR}/$dir/.boxy").map { it.name.removeSuffix(".prev") }.toSet()
     }
     val dir = "${BoxModule.BOX_DIR}/${coreConfig(core ?: "clash").first}"
 
@@ -209,7 +225,21 @@ SubPageHeader(
                                         checkAndSelect(f)
                                     }
                                 },
-                                onLongClick = { onEdit(f.path) },
+                                onLongClick = { menuFor = f },
+                                menu = {
+                                    GlassMenu(menuFor == f, { menuFor = null }) {
+                                        val close = { menuFor = null }
+                                        GlassMenuItem(stringResource(R.string.config_edit), { close(); onEdit(f.path) }, BoxyIcons.Edit)
+                                        if (!isActive) GlassMenuItem(stringResource(R.string.profile_make_active), { close(); checkAndSelect(f) }, BoxyIcons.Check)
+                                        GlassMenuItem(stringResource(R.string.profile_duplicate), { close(); duplicateOf = f }, BoxyIcons.Copy)
+                                        if (list.size > 1) GlassMenuItem(stringResource(R.string.profile_compare), { close(); compareFrom = f }, BoxyIcons.Compare)
+                                        if (f.name in previous) {
+                                            GlassMenuItem(stringResource(R.string.profile_compare_prev), { close(); onDiff(com.skofqq.boxy.configs.ConfigEdits.previousPath(f.path), f.path) }, BoxyIcons.Undo)
+                                        }
+                                        GlassMenuItem(stringResource(R.string.config_rename), { close(); renameOf = f }, BoxyIcons.Rename)
+                                        if (!isActive) GlassMenuItem(stringResource(R.string.action_delete), { close(); deleteOf = f }, BoxyIcons.Delete, destructive = true)
+                                    }
+                                },
                             )
                         }
                     }
@@ -237,6 +267,19 @@ SubPageHeader(
                             }
                         },
                         onLongClick = {},
+                    )
+                }
+            }
+        }
+        if (core == "clash" || core == "sing-box") {
+            item {
+                SectionCard(null) {
+                    com.skofqq.boxy.ui.components.SettingsRow(
+                        BoxyIcons.FilterList,
+                        stringResource(R.string.profile_tools_title),
+                        stringResource(R.string.profile_tools_row_sub),
+                        showDivider = false,
+                        onClick = onTools,
                     )
                 }
             }
@@ -270,6 +313,78 @@ SubPageHeader(
     if (downloadDialog) {
         DownloadDialog(dir, onDone = { downloadDialog = false; reload++ }, onDismiss = { downloadDialog = false })
     }
+    compareFrom?.let { from ->
+        com.skofqq.boxy.ui.components.ChoiceDialog(
+            stringResource(R.string.profile_compare_with, from.name),
+            files.orEmpty().filter { it.path != from.path }.map { com.skofqq.boxy.ui.components.Choice(it.path, it.name) },
+            "",
+            onSelect = { compareFrom = null; onDiff(from.path, it) },
+            onDismiss = { compareFrom = null },
+        )
+    }
+    duplicateOf?.let { f ->
+        val invalid = stringResource(R.string.config_name_invalid)
+        val exists = stringResource(R.string.profile_name_exists)
+        val base = f.name.substringBeforeLast('.')
+        InputDialog(
+            stringResource(R.string.profile_duplicate),
+            listOf(stringResource(R.string.config_new_name) to "$base-copy.${f.extension}"),
+            validate = { v ->
+                when {
+                    v[0].isBlank() || v[0].contains('/') -> invalid
+                    files.orEmpty().any { it.name == v[0].trim() } -> exists
+                    else -> null
+                }
+            },
+            onConfirm = { v ->
+                duplicateOf = null
+                scope.launch {
+                    val text = RootFiles.read(f.path)
+                    if (text == null || !RootFiles.write("$dir/${v[0]}", text)) Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    reload++
+                }
+            },
+            onDismiss = { duplicateOf = null },
+        )
+    }
+    renameOf?.let { f ->
+        val invalid = stringResource(R.string.config_name_invalid)
+        InputDialog(
+            stringResource(R.string.config_rename),
+            listOf(stringResource(R.string.config_new_name) to f.name),
+            validate = { if (it[0].isBlank() || it[0].contains('/')) invalid else null },
+            onConfirm = { v ->
+                renameOf = null
+                scope.launch {
+                    val wasActive = f.name == active
+                    if (!RootFiles.rename(f.path, v[0])) {
+                        Toast.makeText(context, R.string.op_failed, Toast.LENGTH_SHORT).show()
+                    } else if (wasActive) {
+                        // The module still points at the old name: follow the file.
+                        core?.let { BoxModule.writeSetting(coreConfig(it).second, v[0]) }
+                    }
+                    reload++
+                }
+            },
+            onDismiss = { renameOf = null },
+        )
+    }
+    deleteOf?.let { f ->
+        ConfirmDialog(
+            stringResource(R.string.config_delete_title, f.name),
+            stringResource(R.string.config_delete_file_warning),
+            stringResource(R.string.action_delete),
+            danger = true,
+            onConfirm = {
+                deleteOf = null
+                scope.launch {
+                    RootFiles.delete(f.path)
+                    reload++
+                }
+            },
+            onDismiss = { deleteOf = null },
+        )
+    }
     checkError?.let { (f, output) ->
         ConfigErrorDialog(
             output,
@@ -302,8 +417,10 @@ private fun ConfigRow(
     divider: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    menu: (@Composable () -> Unit)? = null,
 ) {
     Column {
+        Box {
         Row(
             Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(horizontal = 18.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -325,7 +442,18 @@ private fun ConfigRow(
                 )
                 Spacer(Modifier.width(6.dp))
             }
-            Icon(BoxyIcons.ChevronRight, null, Modifier.size(20.dp), tint = Boxy.colors.text2.copy(alpha = 0.75f))
+            if (menu != null) {
+                Icon(
+                    BoxyIcons.MoreVert,
+                    stringResource(R.string.action_more),
+                    Modifier.size(36.dp).clip(RoundedCornerShape(50)).clickable(onClick = onLongClick).padding(8.dp),
+                    tint = Boxy.colors.text2,
+                )
+            } else {
+                Icon(BoxyIcons.ChevronRight, null, Modifier.size(20.dp), tint = Boxy.colors.text2.copy(alpha = 0.75f))
+            }
+        }
+        menu?.let { Box(Modifier.align(Alignment.TopEnd)) { it() } }
         }
         if (divider) androidx.compose.material3.HorizontalDivider(Modifier.padding(start = 76.dp, end = 18.dp), color = Boxy.colors.outline)
     }

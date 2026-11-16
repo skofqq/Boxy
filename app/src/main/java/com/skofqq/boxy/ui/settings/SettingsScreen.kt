@@ -265,6 +265,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SwitchRow(BoxyIcons.TouchApp, stringResource(R.string.settings_tile_long_press), stringResource(R.string.settings_tile_long_press_sub), prefs.tileLongPressPanel) {
                     prefs.updateTileLongPressPanel(it)
                 }
+                SwitchRow(BoxyIcons.Flag, stringResource(R.string.settings_node_flags), stringResource(R.string.settings_node_flags_sub), prefs.nodeFlags) {
+                    prefs.updateNodeFlags(it)
+                }
                 var systemHaptics by remember { mutableStateOf(com.skofqq.boxy.ui.components.Haptics.systemEnabled(context)) }
                 androidx.lifecycle.compose.LifecycleResumeEffect(Unit) {
                     systemHaptics = com.skofqq.boxy.ui.components.Haptics.systemEnabled(context)
@@ -290,6 +293,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 }
                 SwitchRow(BoxyIcons.Update, stringResource(R.string.settings_update_launch), stringResource(R.string.settings_update_launch_sub), checked = prefs.updateAtLaunch) {
                     prefs.updateUpdateAtLaunch(it)
+                }
+                SwitchRow(BoxyIcons.Description, stringResource(R.string.settings_whats_new), stringResource(R.string.settings_whats_new_sub), checked = prefs.showChangelog) {
+                    prefs.updateShowChangelog(it)
                 }
                 SettingsRow(
                     BoxyIcons.Link,
