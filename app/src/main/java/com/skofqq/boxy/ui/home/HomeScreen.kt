@@ -68,6 +68,7 @@ fun HomeScreen(
     val owner = LocalLifecycleOwner.current
     var sheet by remember { mutableStateOf(HomeSheet.NONE) }
     var envKey by remember { mutableStateOf(0) }
+    var leakSheet by remember { mutableStateOf(false) }
 
     // Traffic statistics while the app is in front, whatever tab is shown.
     LaunchedEffect(owner, prefs.trafficStats) {
@@ -142,6 +143,9 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                             val results = vm.latency.ifEmpty { prefs.latencyTargets.map { LatencyResult(it.name, null) } }
                             LatencyCard(results, vm.latencyBadge, vm::testLatency)
                         }
+                        HomeSection.LEAKS -> item(key = "leaks") {
+                            LeakCard(com.skofqq.boxy.net.LeakCheck.last) { leakSheet = true }
+                        }
                         HomeSection.GRID -> {
                             val cards = prefs.metricOrder.filter { it !in prefs.hiddenMetrics }
                             cards.chunked(2).forEachIndexed { i, pair ->
@@ -172,6 +176,7 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
     }
 
     HomeSheets(sheet, vm, prefs) { sheet = HomeSheet.NONE }
+    if (leakSheet) com.skofqq.boxy.ui.tools.LeakCheckSheet { leakSheet = false }
     moduleSheet?.let { target ->
         com.skofqq.boxy.ui.components.ModuleSettingSheet(target, vm.setup, onApply = vm::applySettings) { moduleSheet = null }
     }

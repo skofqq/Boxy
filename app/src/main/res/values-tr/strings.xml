@@ -1406,4 +1406,27 @@
     <string name="cb_move_up">Yukarı taşı</string>
     <string name="cb_move_down">Aşağı taşı</string>
     <string name="action_edit">Düzenle</string>
+    <string name="leak_title">Sızıntı denetimi</string>
+    <string name="leak_row_sub">Sitelerin gördükleri: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Sitelerin bu bağlantı hakkında öğrenebilecekleri</string>
+    <string name="leak_ok">Sızıntı bulunamadı</string>
+    <string name="leak_found">Sızıntı bulundu: verilerin bir kısmı proxy dışından gidiyor</string>
+    <string name="leak_dns_home">DNS sunucusu ülkenizde, trafik ise başka yerden çıkıyor</string>
+    <string name="leak_unknown">Gerçek adresiniz bulunamadı, karşılaştırılacak bir şey yok</string>
+    <string name="leak_service_off">Hizmet kapalı, bu doğrudan bağlantınız</string>
+    <string name="leak_boxy_excluded">Boxy uygulama listesinde proxy dışında bırakılmış, bu doğrudan bir bağlantı</string>
+    <string name="leak_dns">DNS sunucuları</string>
+    <string name="leak_real">Gerçek adres, proxy dışından</string>
+    <string name="leak_no_ipv6">Kullanılamıyor</string>
+    <string name="leak_no_webrtc">Adres açığa çıkmadı</string>
+    <string name="leak_state_ok">Gizli</string>
+    <string name="leak_state_warn">Denetle</string>
+    <string name="leak_state_leak">Sızıntı</string>
+    <string name="settings_update_launch">Açılışta denetle</string>
+    <string name="settings_update_launch_sub">Yeni sürümü bir kez önerir, arka planda çalışmaz</string>
+    <string name="leak_card_run">Denetle</string>
+    <string name="leak_card_direct">Doğrudan</string>
+    <string name="leak_hint_redirect">Redirect modu yalnızca TCP’yi yakalar, bu yüzden UDP üzerinden WebRTC proxy’yi atlar. tproxy, tun, mixed veya enhance seçin.</string>
+    <string name="leak_hint_udp">WebRTC UDP üzerinden proxy’yi atlıyor. Düğümün UDP desteklediğini ve hiçbir kuralın UDP’yi DIRECT’e göndermediğini denetleyin.</string>
+    <string name="leak_hint_ipv6">Modülde IPv6 kapalı ama ağ sunuyor, bu bağlantılar proxy’yi atlıyor. Modülde IPv6’yı açın veya telefonda kapatın.</string>
 </resources>

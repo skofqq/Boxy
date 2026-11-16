@@ -593,10 +593,11 @@ SubPageHeader(stringResource(R.string.settings_licenses), stringResource(R.strin
 }
 
 /** Latest app builds from GitHub releases. */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AppUpdateSheet(currentVersion: String, onDismiss: () -> Unit) {
+fun AppUpdateSheet(currentVersion: String, loaded: List<AppRelease>? = null, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    var releases by remember { mutableStateOf<List<AppRelease>?>(null) }
+    var releases by remember { mutableStateOf(loaded) }
     var failed by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var installing by remember { mutableStateOf<String?>(null) }
@@ -605,6 +606,7 @@ fun AppUpdateSheet(currentVersion: String, onDismiss: () -> Unit) {
     var installFailed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
+        if (loaded != null) return@LaunchedEffect
         val r = Updates.appReleases()
         if (r == null) failed = true else releases = r
     }
@@ -613,7 +615,7 @@ fun AppUpdateSheet(currentVersion: String, onDismiss: () -> Unit) {
         when {
             failed -> Text(stringResource(R.string.about_check_failed), color = Tints.red.fg)
             list == null -> Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(Modifier.padding(end = 12.dp))
+                androidx.compose.material3.LoadingIndicator(Modifier.padding(end = 12.dp), color = Boxy.colors.accent)
                 Text(stringResource(R.string.about_checking), color = Boxy.colors.text2)
             }
             list.isEmpty() -> Text(stringResource(R.string.about_no_releases), color = Boxy.colors.text2)
@@ -651,9 +653,9 @@ fun AppUpdateSheet(currentVersion: String, onDismiss: () -> Unit) {
                         if (installing == r.version) {
                             Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                                 if (progress >= 0f) {
-                                    androidx.compose.material3.LinearProgressIndicator(progress = { progress }, Modifier.fillMaxWidth(), color = Boxy.colors.accent)
+                                    androidx.compose.material3.LinearWavyProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth(), color = Boxy.colors.accent)
                                 } else {
-                                    androidx.compose.material3.LinearProgressIndicator(Modifier.fillMaxWidth(), color = Boxy.colors.accent)
+                                    androidx.compose.material3.LinearWavyProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Boxy.colors.accent)
                                 }
                                 Text(installLog, style = MaterialTheme.typography.bodySmall, color = Boxy.colors.text2, maxLines = 2)
                             }

@@ -153,6 +153,19 @@ object Net {
     /** Details (country, provider) of any address, e.g. the resolver seen by the DNSCrypt check. */
     suspend fun geoIpOf(ip: String): GeoIp? = geoIpFrom("https://api.ip.sb/geoip/$ip")
 
+    /** The resolver that looked up a never-used name, as the authoritative server saw it (edns.ip-api.com). */
+    suspend fun dnsResolverSeen(): String? = withContext(Dispatchers.IO) {
+        val label = java.util.UUID.randomUUID().toString().replace("-", "")
+        runCatching {
+            val c = open("http://$label.edns.ip-api.com/json")
+            try {
+                JSONObject(c.inputStream.bufferedReader().readText()).optJSONObject("dns")?.optString("ip")?.ifBlank { null }
+            } finally {
+                c.disconnect()
+            }
+        }.getOrNull()
+    }
+
     private suspend fun geoIpFrom(url: String): GeoIp? = withContext(Dispatchers.IO) {
         runCatching {
             val c = open(url)

@@ -288,6 +288,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                 SettingsRow(BoxyIcons.Update, stringResource(R.string.settings_update_check), updateChoices.first { it.value == prefs.updateInterval }.title) {
                     updateDialog = true
                 }
+                SwitchRow(BoxyIcons.Update, stringResource(R.string.settings_update_launch), stringResource(R.string.settings_update_launch_sub), checked = prefs.updateAtLaunch) {
+                    prefs.updateUpdateAtLaunch(it)
+                }
                 SettingsRow(
                     BoxyIcons.Link,
                     stringResource(R.string.settings_mirror),

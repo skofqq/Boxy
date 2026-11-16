@@ -477,3 +477,55 @@ private fun maskIp(ip: String): String = if (':' in ip) {
 } else {
     "•••.•••.•••.•••"
 }
+
+// ---------- Leaks ----------
+
+/**
+ * What websites see, from the last check in this process (nothing is kept across restarts).
+ * A tap opens the check, which runs only then.
+ */
+@Composable
+fun LeakCard(last: com.skofqq.boxy.net.LeakResult?, onClick: () -> Unit) {
+    val judged = last?.scope == com.skofqq.boxy.net.LeakScope.PROXIED
+    val (badgeText, badgeTint) = when {
+        last == null -> stringResource(R.string.leak_card_run) to Tints.blue
+        !judged -> stringResource(R.string.leak_card_direct) to Tints.amber
+        else -> verdictLabel(last.overall)
+    }
+    HomeCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp), onClick = onClick) {
+        CardTitle(stringResource(R.string.leak_title), badgeText, badgeTint)
+        Spacer(Modifier.height(14.dp))
+        val items = listOf(
+            "IP" to last?.ipv4Verdict,
+            "IPv6" to last?.ipv6Verdict,
+            "DNS" to last?.dnsVerdict,
+            "WebRTC" to last?.webRtcVerdict,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            items.forEach { (name, v) ->
+                val (text, tint) = if (v == null || !judged) "—" to null else verdictLabel(v)
+                Column(
+                    Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(Boxy.colors.surface2)
+                        .padding(horizontal = 9.dp, vertical = 12.dp),
+                ) {
+                    Text(name, style = MaterialTheme.typography.bodyMedium, color = Boxy.colors.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        text,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                        color = tint?.fg ?: Boxy.colors.text2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun verdictLabel(v: com.skofqq.boxy.net.LeakVerdict): Pair<String, Tint> = when (v) {
+    com.skofqq.boxy.net.LeakVerdict.OK -> stringResource(R.string.leak_state_ok) to Tints.green
+    com.skofqq.boxy.net.LeakVerdict.WARN -> stringResource(R.string.leak_state_warn) to Tints.amber
+    com.skofqq.boxy.net.LeakVerdict.LEAK -> stringResource(R.string.leak_state_leak) to Tints.red
+    com.skofqq.boxy.net.LeakVerdict.UNKNOWN -> "—" to Tints.gray
+}

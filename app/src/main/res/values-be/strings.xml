@@ -1418,4 +1418,27 @@
     <string name="cb_move_up">Вышэй</string>
     <string name="cb_move_down">Ніжэй</string>
     <string name="action_edit">Змяніць</string>
+    <string name="leak_title">Праверка ўцечак</string>
+    <string name="leak_row_sub">Што бачаць сайты: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Што сайты могуць даведацца пра гэта падключэнне</string>
+    <string name="leak_ok">Уцечак не знойдзена</string>
+    <string name="leak_found">Знойдзена ўцечка: частка даных ідзе міма проксі</string>
+    <string name="leak_dns_home">DNS-сервер у вашай краіне, а трафік выходзіць у іншай</string>
+    <string name="leak_unknown">Не ўдалося даведацца сапраўдны адрас, няма з чым параўноўваць</string>
+    <string name="leak_service_off">Сэрвіс выключаны, таму паказана прамое падключэнне</string>
+    <string name="leak_boxy_excluded">Сам Boxy выключаны з проксі ў спісе праграм, таму паказана прамое падключэнне</string>
+    <string name="leak_dns">DNS-серверы</string>
+    <string name="leak_real">Сапраўдны адрас, міма проксі</string>
+    <string name="leak_no_ipv6">Недаступны</string>
+    <string name="leak_no_webrtc">Адрас не раскрыты</string>
+    <string name="leak_state_ok">Схаваны</string>
+    <string name="leak_state_warn">Праверце</string>
+    <string name="leak_state_leak">Уцечка</string>
+    <string name="settings_update_launch">Правяраць пры адкрыцці</string>
+    <string name="settings_update_launch_sub">Адзін раз прапануе новую версію, без работы ў фоне</string>
+    <string name="leak_card_run">Праверыць</string>
+    <string name="leak_card_direct">Напрамую</string>
+    <string name="leak_hint_redirect">Рэжым redirect перахоплівае толькі TCP, таму WebRTC па UDP ідзе міма проксі. Выберыце tproxy, tun, mixed або enhance.</string>
+    <string name="leak_hint_udp">WebRTC ідзе міма проксі па UDP. Праверце, што вузел падтрымлівае UDP і правілы не адпраўляюць UDP у DIRECT.</string>
+    <string name="leak_hint_ipv6">IPv6 у модулі выключаны, а сетка яго дае, таму такія злучэнні ідуць міма проксі. Уключыце IPv6 у модулі або выключыце яго на тэлефоне.</string>
 </resources>

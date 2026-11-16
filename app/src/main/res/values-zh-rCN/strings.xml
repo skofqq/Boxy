@@ -1400,4 +1400,27 @@
     <string name="cb_move_up">上移</string>
     <string name="cb_move_down">下移</string>
     <string name="action_edit">编辑</string>
+    <string name="leak_title">检查泄漏</string>
+    <string name="leak_row_sub">网站能看到什么：IP、DNS、IPv6、WebRTC</string>
+    <string name="leak_sub">网站能从此连接了解到的信息</string>
+    <string name="leak_ok">未发现泄漏</string>
+    <string name="leak_found">发现泄漏：部分数据绕过了代理</string>
+    <string name="leak_dns_home">DNS 服务器位于您所在的国家，而流量从其他地方出口</string>
+    <string name="leak_unknown">无法获取真实地址，没有可比较的对象</string>
+    <string name="leak_service_off">服务已关闭，这是您的直连</string>
+    <string name="leak_boxy_excluded">Boxy 本身在应用列表中被排除于代理之外，这是直连</string>
+    <string name="leak_dns">DNS 服务器</string>
+    <string name="leak_real">真实地址（绕过代理）</string>
+    <string name="leak_no_ipv6">不可用</string>
+    <string name="leak_no_webrtc">未暴露地址</string>
+    <string name="leak_state_ok">已隐藏</string>
+    <string name="leak_state_warn">请检查</string>
+    <string name="leak_state_leak">泄漏</string>
+    <string name="settings_update_launch">打开应用时检查</string>
+    <string name="settings_update_launch_sub">仅提示一次新版本，不在后台运行</string>
+    <string name="leak_card_run">检查</string>
+    <string name="leak_card_direct">直连</string>
+    <string name="leak_hint_redirect">redirect 模式只拦截 TCP，因此通过 UDP 的 WebRTC 会绕过代理。请选择 tproxy、tun、mixed 或 enhance。</string>
+    <string name="leak_hint_udp">WebRTC 通过 UDP 绕过了代理。请确认节点支持 UDP，且没有规则把 UDP 发往 DIRECT。</string>
+    <string name="leak_hint_ipv6">模块中 IPv6 已关闭，但网络提供 IPv6，这些连接会绕过代理。请在模块中开启 IPv6，或在手机上关闭它。</string>
 </resources>

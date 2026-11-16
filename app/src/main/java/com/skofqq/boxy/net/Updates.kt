@@ -99,6 +99,21 @@ object Updates {
         return false
     }
 
+    /**
+     * Releases to offer when the app opens: a stable build newer than the installed one that was not
+     * declined. At most one request per [LAUNCH_CHECK_MS], so reopening the app stays off GitHub's rate limit.
+     */
+    suspend fun launchOffer(context: android.content.Context, prefs: com.skofqq.boxy.data.Prefs): List<AppRelease>? {
+        if (!prefs.updateAtLaunch || System.currentTimeMillis() - prefs.lastLaunchCheck < LAUNCH_CHECK_MS) return null
+        val current = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: return null
+        val releases = appReleases() ?: return null
+        prefs.lastLaunchCheck = System.currentTimeMillis()
+        val latest = releases.firstOrNull { !it.prerelease }?.version ?: return null
+        return releases.takeIf { isNewer(latest, current) && latest != prefs.declinedUpdate }
+    }
+
+    private const val LAUNCH_CHECK_MS = 60 * 60_000L
+
     /** Reads updateJson from module.prop and returns the offered version when it is newer. */
     suspend fun moduleUpdate(): Pair<ModuleUpdate?, Long>? = withContext(Dispatchers.IO) {
         val (_, out) = BoxModule.exec("grep -E '^(updateJson|versionCode)=' ${BoxModule.MODULE_DIR}/module.prop")

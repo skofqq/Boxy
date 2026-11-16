@@ -1406,4 +1406,27 @@
     <string name="cb_move_up">Жоғары</string>
     <string name="cb_move_down">Төмен</string>
     <string name="action_edit">Өзгерту</string>
+    <string name="leak_title">Ағып кетуді тексеру</string>
+    <string name="leak_row_sub">Сайттар не көреді: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Сайттар осы қосылым туралы не біле алады</string>
+    <string name="leak_ok">Ағып кету табылмады</string>
+    <string name="leak_found">Ағып кету табылды: деректердің бір бөлігі проксиді айналып өтеді</string>
+    <string name="leak_dns_home">DNS сервері сіздің елде, ал трафик басқа елден шығады</string>
+    <string name="leak_unknown">Нақты мекенжай анықталмады, салыстыруға ештеңе жоқ</string>
+    <string name="leak_service_off">Қызмет өшірулі, сондықтан тікелей қосылым көрсетілген</string>
+    <string name="leak_boxy_excluded">Boxy қолданбалар тізімінде проксиден шығарылған, сондықтан тікелей қосылым көрсетілген</string>
+    <string name="leak_dns">DNS серверлері</string>
+    <string name="leak_real">Нақты мекенжай, проксиден тыс</string>
+    <string name="leak_no_ipv6">Қолжетімсіз</string>
+    <string name="leak_no_webrtc">Мекенжай ашылмаған</string>
+    <string name="leak_state_ok">Жасырын</string>
+    <string name="leak_state_warn">Тексеріңіз</string>
+    <string name="leak_state_leak">Ағып кету</string>
+    <string name="settings_update_launch">Ашқанда тексеру</string>
+    <string name="settings_update_launch_sub">Жаңа нұсқаны бір рет ұсынады, фондық жұмыссыз</string>
+    <string name="leak_card_run">Тексеру</string>
+    <string name="leak_card_direct">Тікелей</string>
+    <string name="leak_hint_redirect">Redirect режимі тек TCP-ны ұстайды, сондықтан UDP арқылы WebRTC проксиді айналып өтеді. tproxy, tun, mixed немесе enhance таңдаңыз.</string>
+    <string name="leak_hint_udp">WebRTC UDP арқылы проксиді айналып өтеді. Түйіннің UDP қолдайтынын және ережелер UDP-ны DIRECT-ке жібермейтінін тексеріңіз.</string>
+    <string name="leak_hint_ipv6">Модульде IPv6 өшірулі, ал желі оны береді, сондықтан мұндай қосылымдар проксиді айналып өтеді. Модульде IPv6 қосыңыз немесе телефонда өшіріңіз.</string>
 </resources>

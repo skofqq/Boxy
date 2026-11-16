@@ -1406,4 +1406,27 @@
     <string name="cb_move_up">Subir</string>
     <string name="cb_move_down">Bajar</string>
     <string name="action_edit">Editar</string>
+    <string name="leak_title">Comprobar fugas</string>
+    <string name="leak_row_sub">Lo que ven los sitios web: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Lo que los sitios web pueden saber de esta conexión</string>
+    <string name="leak_ok">No se encontraron fugas</string>
+    <string name="leak_found">Fuga encontrada: parte de los datos no pasa por el proxy</string>
+    <string name="leak_dns_home">El servidor DNS está en tu país, pero el tráfico sale por otro</string>
+    <string name="leak_unknown">No se pudo averiguar tu dirección real, no hay con qué comparar</string>
+    <string name="leak_service_off">El servicio está apagado, así que esta es tu conexión directa</string>
+    <string name="leak_boxy_excluded">Boxy está excluido del proxy en la lista de apps, así que esta es una conexión directa</string>
+    <string name="leak_dns">Servidores DNS</string>
+    <string name="leak_real">Dirección real, sin proxy</string>
+    <string name="leak_no_ipv6">No disponible</string>
+    <string name="leak_no_webrtc">Ninguna dirección expuesta</string>
+    <string name="leak_state_ok">Oculta</string>
+    <string name="leak_state_warn">Revisar</string>
+    <string name="leak_state_leak">Fuga</string>
+    <string name="settings_update_launch">Comprobar al abrir</string>
+    <string name="settings_update_launch_sub">Ofrece una versión nueva una vez, sin trabajo en segundo plano</string>
+    <string name="leak_card_run">Comprobar</string>
+    <string name="leak_card_direct">Directo</string>
+    <string name="leak_hint_redirect">El modo redirect solo intercepta TCP, así que WebRTC por UDP no pasa por el proxy. Elige tproxy, tun, mixed o enhance.</string>
+    <string name="leak_hint_udp">WebRTC no pasa por el proxy vía UDP. Comprueba que el nodo admita UDP y que ninguna regla envíe UDP a DIRECT.</string>
+    <string name="leak_hint_ipv6">IPv6 está apagado en el módulo pero la red lo ofrece, así que esas conexiones evitan el proxy. Activa IPv6 en el módulo o desactívalo en el teléfono.</string>
 </resources>

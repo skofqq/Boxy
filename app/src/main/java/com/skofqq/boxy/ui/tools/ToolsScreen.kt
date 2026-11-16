@@ -118,6 +118,8 @@ object ToolsNav {
 @Composable
 private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPage: (NavExtra) -> Unit, push: (String) -> Unit) {
     var importChooser by remember { mutableStateOf(false) }
+    var leakCheck by remember { mutableStateOf(false) }
+    if (leakCheck) LeakCheckSheet { leakCheck = false }
     var tlsPing by remember { mutableStateOf(false) }
     if (tlsPing) TlsPingSheet { tlsPing = false }
     val qr = rememberQrLaunchers()
@@ -163,7 +165,8 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
         item {
             SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
-                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub), showDivider = false) { push(ROUTE_DNS) }
+                SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
+                SettingsRow(BoxyIcons.Language, stringResource(R.string.leak_title), stringResource(R.string.leak_row_sub), showDivider = false) { leakCheck = true }
             }
         }
         item {

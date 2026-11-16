@@ -1406,4 +1406,27 @@
     <string name="cb_move_up">Sposta su</string>
     <string name="cb_move_down">Sposta giù</string>
     <string name="action_edit">Modifica</string>
+    <string name="leak_title">Controlla le perdite</string>
+    <string name="leak_row_sub">Cosa vedono i siti: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Cosa possono sapere i siti su questa connessione</string>
+    <string name="leak_ok">Nessuna perdita trovata</string>
+    <string name="leak_found">Perdita trovata: parte dei dati aggira il proxy</string>
+    <string name="leak_dns_home">Il server DNS è nel tuo paese, mentre il traffico esce altrove</string>
+    <string name="leak_unknown">Impossibile trovare il tuo indirizzo reale, niente da confrontare</string>
+    <string name="leak_service_off">Il servizio è spento, quindi questa è la tua connessione diretta</string>
+    <string name="leak_boxy_excluded">Boxy è escluso dal proxy nell’elenco app, quindi questa è una connessione diretta</string>
+    <string name="leak_dns">Server DNS</string>
+    <string name="leak_real">Indirizzo reale, senza proxy</string>
+    <string name="leak_no_ipv6">Non disponibile</string>
+    <string name="leak_no_webrtc">Nessun indirizzo esposto</string>
+    <string name="leak_state_ok">Nascosto</string>
+    <string name="leak_state_warn">Controlla</string>
+    <string name="leak_state_leak">Perdita</string>
+    <string name="settings_update_launch">Controlla all’apertura</string>
+    <string name="settings_update_launch_sub">Propone una nuova versione una volta, senza lavoro in background</string>
+    <string name="leak_card_run">Controlla</string>
+    <string name="leak_card_direct">Diretto</string>
+    <string name="leak_hint_redirect">La modalità redirect intercetta solo TCP, quindi WebRTC su UDP aggira il proxy. Scegli tproxy, tun, mixed o enhance.</string>
+    <string name="leak_hint_udp">WebRTC aggira il proxy via UDP. Verifica che il nodo supporti UDP e che nessuna regola mandi UDP a DIRECT.</string>
+    <string name="leak_hint_ipv6">IPv6 è spento nel modulo ma la rete lo offre, quindi queste connessioni aggirano il proxy. Attiva IPv6 nel modulo o disattivalo sul telefono.</string>
 </resources>

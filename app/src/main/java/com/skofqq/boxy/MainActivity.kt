@@ -208,7 +208,7 @@ class MainActivity : ComponentActivity() {
                         if (!prefs.onboardingDone) {
                             OnboardingScreen(onFinish = { prefs.updateOnboardingDone(true) })
                         } else {
-                            MainScreen(prefs, openPanel = firstLaunch && prefs.openPanelOnLaunch)
+                            MainScreen(prefs, openPanel = firstLaunch && prefs.openPanelOnLaunch, checkUpdate = firstLaunch)
                         }
                     }
                 }
@@ -218,8 +218,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
+private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
     val context = LocalContext.current
+    var updateOffer by remember { mutableStateOf<List<com.skofqq.boxy.net.AppRelease>?>(null) }
+    LaunchedEffect(Unit) {
+        if (checkUpdate) updateOffer = com.skofqq.boxy.net.Updates.launchOffer(context, prefs)
+    }
     var panelRequest by remember { mutableStateOf(false) }
     LaunchedEffect(PanelBus.request) {
         if (PanelBus.request) {
@@ -378,6 +382,14 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean) {
         }
 
         ImportBus.request?.let { r -> ImportSheet(r) { ImportBus.request = null } }
+
+        updateOffer?.let { releases ->
+            val version = remember { context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty() }
+            com.skofqq.boxy.ui.settings.AppUpdateSheet(version, releases) {
+                prefs.declinedUpdate = releases.firstOrNull { !it.prerelease }?.version.orEmpty()
+                updateOffer = null
+            }
+        }
 
         // Opaque system bars: a solid strip instead of content showing through.
         if (prefs.opaqueStatusBar) {

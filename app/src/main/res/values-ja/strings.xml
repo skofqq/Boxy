@@ -1400,4 +1400,27 @@
     <string name="cb_move_up">上へ</string>
     <string name="cb_move_down">下へ</string>
     <string name="action_edit">編集</string>
+    <string name="leak_title">漏えいチェック</string>
+    <string name="leak_row_sub">サイトから見える情報：IP、DNS、IPv6、WebRTC</string>
+    <string name="leak_sub">この接続についてサイトが知り得る情報</string>
+    <string name="leak_ok">漏えいは見つかりませんでした</string>
+    <string name="leak_found">漏えいを検出：一部のデータがプロキシを通っていません</string>
+    <string name="leak_dns_home">DNS サーバーはお住まいの国にあり、通信の出口は別の場所です</string>
+    <string name="leak_unknown">実際のアドレスを取得できず、比較できません</string>
+    <string name="leak_service_off">サービスが停止中のため、直接接続の結果です</string>
+    <string name="leak_boxy_excluded">Boxy 自体がアプリ一覧でプロキシから除外されているため、直接接続の結果です</string>
+    <string name="leak_dns">DNS サーバー</string>
+    <string name="leak_real">実際のアドレス（プロキシなし）</string>
+    <string name="leak_no_ipv6">利用不可</string>
+    <string name="leak_no_webrtc">アドレスの露出なし</string>
+    <string name="leak_state_ok">非公開</string>
+    <string name="leak_state_warn">要確認</string>
+    <string name="leak_state_leak">漏えい</string>
+    <string name="settings_update_launch">起動時に確認</string>
+    <string name="settings_update_launch_sub">新しいバージョンを一度だけ案内します。バックグラウンド動作なし</string>
+    <string name="leak_card_run">チェック</string>
+    <string name="leak_card_direct">直接</string>
+    <string name="leak_hint_redirect">redirect モードは TCP だけを捕捉するため、UDP の WebRTC はプロキシを通りません。tproxy、tun、mixed、enhance のいずれかを選んでください。</string>
+    <string name="leak_hint_udp">WebRTC が UDP でプロキシを迂回しています。ノードが UDP に対応し、UDP を DIRECT に送るルールがないか確認してください。</string>
+    <string name="leak_hint_ipv6">モジュールで IPv6 がオフですが、ネットワークは IPv6 を提供しているため、その接続はプロキシを通りません。モジュールで IPv6 をオンにするか、端末でオフにしてください。</string>
 </resources>

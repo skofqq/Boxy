@@ -30,7 +30,7 @@ enum class AppLanguage(val tag: String?, val flag: String, val nativeName: Strin
 enum class NavExtra { NONE, APPS, LOGS }
 
 /** Blocks of the home page, top to bottom. */
-enum class HomeSection { HERO, QUICK, LATENCY, GRID }
+enum class HomeSection { HERO, QUICK, LATENCY, LEAKS, GRID }
 
 /** Small cards of the home metrics grid. */
 enum class MetricCard { IP, SPEED, SUBSCRIPTION, SYSTEM }
@@ -118,6 +118,16 @@ class Prefs(context: Context) {
         private set
     var updateInterval by mutableStateOf(enumOf(sp.getString("update_interval", null), UpdateInterval.OFF))
         private set
+    /** Offer a new version when the app opens; no background work. */
+    var updateAtLaunch by mutableStateOf(sp.getBoolean("update_at_launch", true))
+        private set
+    var lastLaunchCheck: Long
+        get() = sp.getLong("update_launch_checked", 0)
+        set(v) { sp.edit().putLong("update_launch_checked", v).apply() }
+    /** The version whose offer the user closed; a newer one is offered again. */
+    var declinedUpdate: String
+        get() = sp.getString("update_declined", "") ?: ""
+        set(v) { sp.edit().putString("update_declined", v).apply() }
     /** Short vibration on taps. */
     var haptics by mutableStateOf(sp.getBoolean("haptics", true))
 
@@ -164,6 +174,7 @@ class Prefs(context: Context) {
     fun updateNotifySubsEnding(v: Boolean) { notifySubsEnding = v; sp.edit().putBoolean("notify_subs_ending", v).apply() }
     fun updateUpdateInterval(v: UpdateInterval) { updateInterval = v; sp.edit().putString("update_interval", v.name).apply() }
     fun updateTrafficStats(v: Boolean) { trafficStats = v; sp.edit().putBoolean("traffic_stats", v).apply() }
+    fun updateUpdateAtLaunch(v: Boolean) { updateAtLaunch = v; sp.edit().putBoolean("update_at_launch", v).apply() }
     fun updateHaptics(v: Boolean) { haptics = v; com.skofqq.boxy.ui.components.Haptics.enabled = v; sp.edit().putBoolean("haptics", v).apply() }
     fun updateTileLongPressPanel(v: Boolean) { tileLongPressPanel = v; sp.edit().putBoolean("tile_long_press_panel", v).apply() }
     fun updateOnboardingDone(v: Boolean) { onboardingDone = v; sp.edit().putBoolean("onboarding_done", v).apply() }

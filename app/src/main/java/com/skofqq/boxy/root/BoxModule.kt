@@ -414,6 +414,28 @@ object BoxModule {
         DnsWhoami(kv["core"]?.ifBlank { null }, kv["crypt"]?.ifBlank { null }, kv["direct"]?.ifBlank { null })
     }
 
+    /** The addresses websites see past the proxy: requests from the group the module leaves out of it. */
+    suspend fun directAddresses(): List<String> = withContext(Dispatchers.IO) {
+        val out = sh(
+            "BB=; for b in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox; do [ -x \$b ] && BB=\$b && break; done; " +
+                "[ -z \"\$BB\" ] && exit 0; " +
+                "ug=\$(grep -m1 '^box_user_group=' $SETTINGS | cut -d= -f2 | tr -d '\"'); " +
+                "q() { \$BB timeout 8 \$BB setuidgid \${ug:-root:net_admin} \$BB wget -qO- -T 6 \$1 2>/dev/null; }; " +
+                "(echo ip=\$(q http://api4.ipify.org)) & (echo ip=\$(q http://api6.ipify.org)) & wait",
+        )
+        out.map { it.substringAfter("ip=", "").trim() }.filter { IP_LITERAL.matches(it) }.distinct()
+    }
+
+    private val IP_LITERAL = Regex("[0-9a-fA-F:.]{2,45}")
+
+    /** Whether the module's app list leaves [packageName] out of the proxy. */
+    suspend fun packageExcluded(packageName: String): Boolean = withContext(Dispatchers.IO) {
+        val lines = readFile("$BOX_DIR/package.list.cfg").orEmpty().lines().map { it.trim() }
+        val whitelist = lines.firstOrNull { it.startsWith("mode:") }?.substringAfter("mode:")?.trim()?.lowercase() == "whitelist"
+        val listed = lines.any { !it.startsWith("#") && it.substringAfterLast(':') == packageName }
+        listed != whitelist
+    }
+
     suspend fun subStoreInstalled(): Boolean = withContext(Dispatchers.IO) { exists("/data/adb/modules/sub_store") }
 
     suspend fun readFile(path: String): String? = withContext(Dispatchers.IO) {

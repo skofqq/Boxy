@@ -20,8 +20,8 @@ android {
         applicationId = "com.skofqq.boxy"
         minSdk = 28
         targetSdk = 36
-        versionCode = 67
-        versionName = "2.0.0"
+        versionCode = 68
+        versionName = "2.0.1"
     }
 
     signingConfigs {

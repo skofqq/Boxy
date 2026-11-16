@@ -1433,4 +1433,27 @@
     <string name="cb_move_up">Выше</string>
     <string name="cb_move_down">Ниже</string>
     <string name="action_edit">Изменить</string>
+    <string name="leak_title">Проверка утечек</string>
+    <string name="leak_row_sub">Что видят сайты: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">Что сайты могут узнать об этом подключении</string>
+    <string name="leak_ok">Утечек не найдено</string>
+    <string name="leak_found">Найдена утечка: часть данных идёт мимо прокси</string>
+    <string name="leak_dns_home">DNS-сервер находится в вашей стране, а трафик выходит в другой</string>
+    <string name="leak_unknown">Не удалось узнать настоящий адрес, сравнивать не с чем</string>
+    <string name="leak_service_off">Сервис выключен, поэтому показано прямое подключение</string>
+    <string name="leak_boxy_excluded">Сам Boxy исключён из прокси в списке приложений, поэтому показано прямое подключение</string>
+    <string name="leak_dns">DNS-серверы</string>
+    <string name="leak_real">Настоящий адрес, мимо прокси</string>
+    <string name="leak_no_ipv6">Недоступен</string>
+    <string name="leak_no_webrtc">Адрес не раскрыт</string>
+    <string name="leak_state_ok">Скрыт</string>
+    <string name="leak_state_warn">Проверьте</string>
+    <string name="leak_state_leak">Утечка</string>
+    <string name="settings_update_launch">Проверять при открытии</string>
+    <string name="settings_update_launch_sub">Один раз предложит новую версию, без работы в фоне</string>
+    <string name="leak_card_run">Проверить</string>
+    <string name="leak_card_direct">Напрямую</string>
+    <string name="leak_hint_redirect">Режим redirect перехватывает только TCP, поэтому WebRTC по UDP идёт мимо прокси. Выберите tproxy, tun, mixed или enhance.</string>
+    <string name="leak_hint_udp">WebRTC идёт мимо прокси по UDP. Проверьте, что узел поддерживает UDP и правила не отправляют UDP в DIRECT.</string>
+    <string name="leak_hint_ipv6">IPv6 в модуле выключен, а сеть его даёт, поэтому такие соединения идут мимо прокси. Включите IPv6 в модуле или отключите его на телефоне.</string>
 </resources>

@@ -1429,4 +1429,27 @@
     <string name="cb_move_up">Move up</string>
     <string name="cb_move_down">Move down</string>
     <string name="action_edit">Edit</string>
+    <string name="leak_title">Check for leaks</string>
+    <string name="leak_row_sub">What websites see: IP, DNS, IPv6, WebRTC</string>
+    <string name="leak_sub">What websites can learn about this connection</string>
+    <string name="leak_ok">No leaks found</string>
+    <string name="leak_found">Leak found: some of the data goes past the proxy</string>
+    <string name="leak_dns_home">The DNS server is in your home country, while traffic exits elsewhere</string>
+    <string name="leak_unknown">Could not find your real address, so there is nothing to compare with</string>
+    <string name="leak_service_off">The service is off, so this is your direct connection</string>
+    <string name="leak_boxy_excluded">Boxy itself is left out of the proxy in the app list, so this is a direct connection</string>
+    <string name="leak_dns">DNS servers</string>
+    <string name="leak_real">Real address, past the proxy</string>
+    <string name="leak_no_ipv6">Not available</string>
+    <string name="leak_no_webrtc">No address exposed</string>
+    <string name="leak_state_ok">Hidden</string>
+    <string name="leak_state_warn">Check</string>
+    <string name="leak_state_leak">Leak</string>
+    <string name="settings_update_launch">Check when the app opens</string>
+    <string name="settings_update_launch_sub">Offers a new version once, with no background work</string>
+    <string name="leak_card_run">Check</string>
+    <string name="leak_card_direct">Direct</string>
+    <string name="leak_hint_redirect">Redirect mode intercepts only TCP, so WebRTC over UDP goes past the proxy. Pick tproxy, tun, mixed or enhance.</string>
+    <string name="leak_hint_udp">WebRTC goes past the proxy over UDP. Check that the node supports UDP and that no rule sends UDP to DIRECT.</string>
+    <string name="leak_hint_ipv6">IPv6 is off in the module while the network offers it, so those connections skip the proxy. Turn IPv6 on in the module or off on the phone.</string>
 </resources>

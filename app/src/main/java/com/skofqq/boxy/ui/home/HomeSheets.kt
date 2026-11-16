@@ -218,6 +218,7 @@ private fun LayoutSheet(prefs: Prefs, onDismiss: () -> Unit) {
                     HomeSection.HERO -> R.string.layout_section_hero to BoxyIcons.Home
                     HomeSection.QUICK -> R.string.layout_section_quick to BoxyIcons.Apps
                     HomeSection.LATENCY -> R.string.layout_section_latency to BoxyIcons.Router
+                    HomeSection.LEAKS -> R.string.leak_title to BoxyIcons.Language
                     HomeSection.GRID -> R.string.layout_section_grid to BoxyIcons.Tune
                 }
                 SwitchRow(
