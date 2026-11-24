@@ -713,7 +713,6 @@
     <string name="core_update_failed">Impossible de mettre à jour le cœur.</string>
     <string name="core_update_up_to_date">La dernière version est installée.</string>
     <string name="core_update_install">Installer</string>
-    <string name="core_update_reinstall">Réinstaller</string>
     <string name="core_update_close">Fermer</string>
     <string name="tools_net_dns">Réseau et DNS</string>
     <string name="tools_net_dns_sub">Règles Wi‑Fi, interception DNS et DNSCrypt</string>

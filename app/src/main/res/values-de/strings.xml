@@ -713,7 +713,6 @@
     <string name="core_update_failed">Der Kern konnte nicht aktualisiert werden.</string>
     <string name="core_update_up_to_date">Die neueste Version ist installiert.</string>
     <string name="core_update_install">Installieren</string>
-    <string name="core_update_reinstall">Neu installieren</string>
     <string name="core_update_close">Schließen</string>
     <string name="tools_net_dns">Netzwerk und DNS</string>
     <string name="tools_net_dns_sub">WLAN-Regeln, DNS-Umleitung und DNSCrypt</string>

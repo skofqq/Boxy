@@ -737,7 +737,6 @@
     <string name="core_update_failed">Could not update the core.</string>
     <string name="core_update_up_to_date">The latest version is installed.</string>
     <string name="core_update_install">Install</string>
-    <string name="core_update_reinstall">Reinstall</string>
     <string name="core_update_close">Close</string>
     <string name="tools_net_dns">Network and DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi rules, DNS hijack and DNSCrypt</string>

@@ -713,7 +713,6 @@
     <string name="core_update_failed">Ядроны жаңарту мүмкін болмады.</string>
     <string name="core_update_up_to_date">Соңғы нұсқа орнатылған.</string>
     <string name="core_update_install">Орнату</string>
-    <string name="core_update_reinstall">Қайта орнату</string>
     <string name="core_update_close">Жабу</string>
     <string name="tools_net_dns">Желі және DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi ережелері, DNS ұстау және DNSCrypt</string>

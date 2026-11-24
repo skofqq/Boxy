@@ -145,18 +145,14 @@ fun CoreUpdateDialog(update: CoreUpdate, onLater: () -> Unit, onClose: () -> Uni
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (phase) {
                     Phase.OFFER -> {
-                        val action = when {
-                            update.installed.isEmpty() -> R.string.core_update_install
-                            update.upToDate -> R.string.core_update_reinstall
-                            else -> R.string.core_update_action
+                        // An update is offered only when there is one: the latest build gets no Reinstall.
+                        if (update.upToDate) {
+                            DialogButton(stringResource(R.string.core_update_close), Boxy.colors.accent, Color.White, onClose)
+                        } else {
+                            val action = if (update.installed.isEmpty()) R.string.core_update_install else R.string.core_update_action
+                            DialogButton(stringResource(action), Boxy.colors.accent, Color.White) { runUpdate() }
+                            DialogButton(stringResource(R.string.core_update_later), Boxy.colors.surface2, Boxy.colors.text, onLater)
                         }
-                        DialogButton(stringResource(action), Boxy.colors.accent, Color.White) { runUpdate() }
-                        DialogButton(
-                            stringResource(if (update.upToDate) R.string.core_update_close else R.string.core_update_later),
-                            Boxy.colors.surface2,
-                            Boxy.colors.text,
-                            if (update.upToDate) onClose else onLater,
-                        )
                     }
                     Phase.RUNNING -> Unit
                     Phase.FAILED -> {
@@ -184,7 +180,7 @@ fun CoreUpdateDialog(update: CoreUpdate, onLater: () -> Unit, onClose: () -> Uni
 
 /**
  * The same window for a core picked on the Update page: loads its latest release first, then offers to update,
- * install (missing core) or reinstall (already the latest).
+ * install (missing core) or says the latest is installed.
  */
 @Composable
 fun CoreReleaseDialog(title: String, binName: String, xclash: String?, onClose: () -> Unit) {
