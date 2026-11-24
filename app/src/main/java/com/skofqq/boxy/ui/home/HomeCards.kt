@@ -485,7 +485,7 @@ private fun maskIp(ip: String): String = if (':' in ip) {
  * A tap opens the check, which runs only then.
  */
 @Composable
-fun LeakCard(last: com.skofqq.boxy.net.LeakResult?, onClick: () -> Unit) {
+fun LeakCard(last: com.skofqq.boxy.net.LeakResult?, moduleIpv6: Boolean?, onClick: () -> Unit) {
     val judged = last?.scope == com.skofqq.boxy.net.LeakScope.PROXIED
     val (badgeText, badgeTint) = when {
         last == null -> stringResource(R.string.leak_card_run) to Tints.blue
@@ -495,9 +495,13 @@ fun LeakCard(last: com.skofqq.boxy.net.LeakResult?, onClick: () -> Unit) {
     HomeCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp), onClick = onClick) {
         CardTitle(stringResource(R.string.leak_title), badgeText, badgeTint)
         Spacer(Modifier.height(14.dp))
-        val items = listOf(
+        // IPv6 only when it is in use: on in the module and, after a check, seen on the connection. A leak over
+        // IPv6 stays visible even with IPv6 off in the module.
+        val ipv6Shown = last?.ipv6Verdict == com.skofqq.boxy.net.LeakVerdict.LEAK ||
+            (moduleIpv6 != false && (last == null || last.ipv6 != null))
+        val items = listOfNotNull(
             "IP" to last?.ipv4Verdict,
-            "IPv6" to last?.ipv6Verdict,
+            ("IPv6" to last?.ipv6Verdict).takeIf { ipv6Shown },
             "DNS" to last?.dnsVerdict,
             "WebRTC" to last?.webRtcVerdict,
         )

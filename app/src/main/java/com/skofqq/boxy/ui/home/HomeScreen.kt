@@ -144,7 +144,7 @@ PageHeader(stringResource(R.string.home_title), stringResource(R.string.home_sub
                             LatencyCard(results, vm.latencyBadge, vm::testLatency)
                         }
                         HomeSection.LEAKS -> item(key = "leaks") {
-                            LeakCard(com.skofqq.boxy.net.LeakCheck.last) { leakSheet = true }
+                            LeakCard(com.skofqq.boxy.net.LeakCheck.last, state?.ipv6) { leakSheet = true }
                         }
                         HomeSection.GRID -> {
                             val cards = prefs.metricOrder.filter { it !in prefs.hiddenMetrics }
