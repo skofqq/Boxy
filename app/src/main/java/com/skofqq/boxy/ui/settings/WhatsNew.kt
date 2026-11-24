@@ -35,7 +35,13 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** What changed in one updated part: "Boxy 0.8.2" or "Box for Root v1.10.10", with its notes (Markdown). */
-data class ChangeEntry(val title: String, val notes: String)
+data class ChangeEntry(
+    val title: String,
+    val notes: String,
+    /** The version this entry shows, recorded as seen only when the sheet is closed (see [WhatsNew.markSeen]). */
+    val appCode: Long? = null,
+    val moduleVersion: String? = null,
+)
 
 /**
  * "What's new" after Boxy or the module was updated. It runs once when the app opens: the installed versions
@@ -66,9 +72,9 @@ object WhatsNew {
         val body = get("https://api.github.com/repos/${Updates.REPO}/releases/tags/v$name")
             ?.let { runCatching { JSONObject(it).optString("body") }.getOrNull() }
             ?: return null // Offline: try again next time the app opens.
-        prefs.seenAppVersion = code
         val notes = languageSection(body, russian).trim()
-        return notes.takeIf { it.isNotEmpty() }?.let { ChangeEntry("Boxy $name", it) }
+        if (notes.isEmpty()) prefs.seenAppVersion = code
+        return notes.takeIf { it.isNotEmpty() }?.let { ChangeEntry("Boxy $name", it, appCode = code) }
     }
 
     private suspend fun moduleEntry(prefs: Prefs, russian: Boolean): ChangeEntry? {
@@ -79,9 +85,20 @@ object WhatsNew {
             return null
         }
         val text = get(Mirrors.wrap(MODULE_CHANGELOG)) ?: get(MODULE_CHANGELOG) ?: return null
-        prefs.seenModuleVersion = current
         val notes = moduleSections(text, seen, current, russian).trim()
-        return notes.takeIf { it.isNotEmpty() }?.let { ChangeEntry("Box for Root $current", it) }
+        if (notes.isEmpty()) prefs.seenModuleVersion = current
+        return notes.takeIf { it.isNotEmpty() }?.let { ChangeEntry("Box for Root $current", it, moduleVersion = current) }
+    }
+
+    /**
+     * Records the shown versions once the sheet is closed by the user. Marking them when the notes were fetched lost
+     * them when the window went away by itself (the system restarts Boxy right after an in-app update).
+     */
+    fun markSeen(prefs: Prefs, entries: List<ChangeEntry>) {
+        entries.forEach { e ->
+            e.appCode?.let { prefs.seenAppVersion = it }
+            e.moduleVersion?.let { prefs.seenModuleVersion = it }
+        }
     }
 
     /** Release notes hold "## English" and "## Русский": the one for the app's language, else all of it. */

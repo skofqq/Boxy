@@ -420,7 +420,10 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
                 onClose = { coreOffer = null },
             )
         }
-        if (launchChecked && updateOffer == null && coreOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
+        if (launchChecked && updateOffer == null && coreOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) {
+            com.skofqq.boxy.ui.settings.WhatsNew.markSeen(prefs, whatsNew)
+            whatsNew = emptyList()
+        }
 
         // Opaque system bars: a solid strip instead of content showing through.
         if (prefs.opaqueStatusBar) {
