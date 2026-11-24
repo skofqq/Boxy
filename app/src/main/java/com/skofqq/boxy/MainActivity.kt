@@ -227,13 +227,17 @@ class MainActivity : ComponentActivity() {
 private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
     val context = LocalContext.current
     var updateOffer by remember { mutableStateOf<List<com.skofqq.boxy.net.AppRelease>?>(null) }
-    LaunchedEffect(Unit) {
-        if (checkUpdate) updateOffer = com.skofqq.boxy.net.Updates.launchOffer(context, prefs)
-    }
+    // Pop-ups at launch come one after another: the app's offer, the core's offer, then What's new. Each waits until
+    // the checks before it have finished, or a later answer would replace a window already on screen.
+    var launchChecked by remember { mutableStateOf(!checkUpdate) }
     // A newer release of the active core, offered over the app once the app's own offer is closed.
     var coreOffer by remember { mutableStateOf<com.skofqq.boxy.net.CoreUpdate?>(null) }
     LaunchedEffect(Unit) {
-        if (checkUpdate) coreOffer = com.skofqq.boxy.net.Updates.coreLaunchOffer(prefs)
+        if (checkUpdate) {
+            updateOffer = com.skofqq.boxy.net.Updates.launchOffer(context, prefs)
+            coreOffer = com.skofqq.boxy.net.Updates.coreLaunchOffer(prefs)
+        }
+        launchChecked = true
     }
     // What changed since the last version shown (only after an update; one request at most).
     var whatsNew by remember { mutableStateOf<List<com.skofqq.boxy.ui.settings.ChangeEntry>>(emptyList()) }
@@ -416,7 +420,7 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
                 onClose = { coreOffer = null },
             )
         }
-        if (updateOffer == null && coreOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
+        if (launchChecked && updateOffer == null && coreOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
 
         // Opaque system bars: a solid strip instead of content showing through.
         if (prefs.opaqueStatusBar) {
