@@ -26,7 +26,18 @@ data class ModuleUpdate(
 )
 
 /** A newer stable release of the core the module runs now ([title] is how the app names it). */
-data class CoreUpdate(val binName: String, val title: String, val installed: String, val latest: String)
+data class CoreUpdate(
+    val binName: String,
+    /** xclash_option for Mihomo (box.tool upkernel needs it), null for the other cores. */
+    val xclash: String?,
+    val title: String,
+    val installed: String,
+    val latest: String,
+    /** Release notes (Markdown) and page of the release on GitHub. */
+    val notes: String = "",
+    val pageUrl: String? = null,
+    val date: String = "",
+)
 
 /** Update checks: the app's GitHub releases, the module's own updateJson and the active core. */
 object Updates {
@@ -158,9 +169,12 @@ object Updates {
     suspend fun coreUpdate(): CoreUpdate? = withContext(Dispatchers.IO) {
         val bin = BoxModule.unquote(BoxModule.readSetting("bin_name"))?.takeIf { it.isNotBlank() } ?: return@withContext null
         val (title, repo) = CORE_REPOS[bin] ?: return@withContext null
-        if (bin == "clash") {
+        val xclash = if (bin == "clash") {
             val option = BoxModule.unquote(BoxModule.readSetting("xclash_option"))
             if (!option.isNullOrBlank() && option != "mihomo") return@withContext null
+            "mihomo"
+        } else {
+            null
         }
         val b = "${BoxModule.BOX_DIR}/bin/$bin"
         val (_, out) = BoxModule.exec(
@@ -174,7 +188,29 @@ object Updates {
         if ("alpha" in raw.lowercase()) return@withContext null
         val installed = parseVersion(raw) ?: return@withContext null
         val body = get("https://api.github.com/repos/$repo/releases/latest") ?: return@withContext null
-        val latest = runCatching { parseVersion(JSONObject(body).optString("tag_name")) }.getOrNull() ?: return@withContext null
-        if (isNewer(latest, installed)) CoreUpdate(bin, title, installed, latest) else null
+        val j = runCatching { JSONObject(body) }.getOrNull() ?: return@withContext null
+        val latest = parseVersion(j.optString("tag_name")) ?: return@withContext null
+        if (!isNewer(latest, installed)) return@withContext null
+        CoreUpdate(
+            binName = bin,
+            xclash = xclash,
+            title = title,
+            installed = installed,
+            latest = latest,
+            notes = j.optString("body").replace("\r\n", "\n").trim(),
+            pageUrl = j.optString("html_url").ifBlank { null },
+            date = j.optString("published_at").take(10),
+        )
+    }
+
+    /**
+     * The core update to offer when the app opens: on with "Offer updates at launch", at most one request per
+     * [LAUNCH_CHECK_MS], and not a version whose offer was closed with "Later".
+     */
+    suspend fun coreLaunchOffer(prefs: com.skofqq.boxy.data.Prefs): CoreUpdate? {
+        if (!prefs.updateAtLaunch || System.currentTimeMillis() - prefs.lastCoreCheck < LAUNCH_CHECK_MS) return null
+        val u = runCatching { coreUpdate() }.getOrNull()
+        prefs.lastCoreCheck = System.currentTimeMillis()
+        return u?.takeIf { prefs.declinedCore != "${it.binName}:${it.latest}" }
     }
 }

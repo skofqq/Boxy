@@ -230,6 +230,11 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
     LaunchedEffect(Unit) {
         if (checkUpdate) updateOffer = com.skofqq.boxy.net.Updates.launchOffer(context, prefs)
     }
+    // A newer release of the active core, offered over the app once the app's own offer is closed.
+    var coreOffer by remember { mutableStateOf<com.skofqq.boxy.net.CoreUpdate?>(null) }
+    LaunchedEffect(Unit) {
+        if (checkUpdate) coreOffer = com.skofqq.boxy.net.Updates.coreLaunchOffer(prefs)
+    }
     // What changed since the last version shown (only after an update; one request at most).
     var whatsNew by remember { mutableStateOf<List<com.skofqq.boxy.ui.settings.ChangeEntry>>(emptyList()) }
     LaunchedEffect(Unit) { whatsNew = com.skofqq.boxy.ui.settings.WhatsNew.pending(context, prefs) }
@@ -401,7 +406,17 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
                 updateOffer = null
             }
         }
-        if (updateOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
+        if (updateOffer == null) coreOffer?.let { u ->
+            com.skofqq.boxy.ui.tools.CoreUpdateDialog(
+                u,
+                onLater = {
+                    prefs.declinedCore = "${u.binName}:${u.latest}"
+                    coreOffer = null
+                },
+                onClose = { coreOffer = null },
+            )
+        }
+        if (updateOffer == null && coreOffer == null && whatsNew.isNotEmpty()) com.skofqq.boxy.ui.settings.WhatsNewSheet(whatsNew) { whatsNew = emptyList() }
 
         // Opaque system bars: a solid strip instead of content showing through.
         if (prefs.opaqueStatusBar) {

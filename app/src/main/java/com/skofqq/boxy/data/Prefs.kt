@@ -131,6 +131,14 @@ class Prefs(context: Context) {
     var declinedUpdate: String
         get() = sp.getString("update_declined", "") ?: ""
         set(v) { sp.edit().putString("update_declined", v).apply() }
+    /** Last launch check of the active core's releases (its own hour, apart from the app's). */
+    var lastCoreCheck: Long
+        get() = sp.getLong("core_launch_checked", 0)
+        set(v) { sp.edit().putLong("core_launch_checked", v).apply() }
+    /** "bin_name:version" of the core update whose offer was closed with "Later". */
+    var declinedCore: String
+        get() = sp.getString("core_update_declined", "") ?: ""
+        set(v) { sp.edit().putString("core_update_declined", v).apply() }
     /** Short vibration on taps. */
     var haptics by mutableStateOf(sp.getBoolean("haptics", true))
 
