@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">サブスクリプションの形式が不明です。以前の設定を保持しています。</string>
     <string name="settings_module">モジュール</string>
     <string name="settings_module_sub">コア、ネットワークモード、IPv6</string>
+    <string name="settings_block_webrtc">WebRTC をブロック</string>
+    <string name="settings_block_webrtc_sub">プロキシを通らない STUN を遮断し、サイトにはプロキシのアドレスだけが見えます</string>
+    <string name="settings_block_webrtc_old">モジュール v1.12.1 以降が必要です</string>
     <string name="module_core_missing">未インストール</string>
     <string name="module_core_missing_toast">このコアはインストールされていません。ツール → 更新 → コア からダウンロードしてください。</string>
     <string name="module_applying">適用してサービスを再起動しています…</string>
@@ -1442,6 +1445,8 @@
     <string name="leak_hint_redirect">redirect モードは TCP だけを捕捉するため、UDP の WebRTC はプロキシを通りません。tproxy、tun、mixed、enhance のいずれかを選んでください。</string>
     <string name="leak_hint_udp">WebRTC が UDP でプロキシを迂回しています。ノードが UDP に対応し、UDP を DIRECT に送るルールがないか確認してください。</string>
     <string name="leak_hint_ipv6">モジュールで IPv6 がオフですが、ネットワークは IPv6 を提供しているため、その接続はプロキシを通りません。モジュールで IPv6 をオンにするか、端末でオフにしてください。</string>
+    <string name="leak_hint_webrtc_block">設定で「WebRTC をブロック」をオンにすると、プロキシを通らない STUN をモジュールが遮断します。</string>
+    <string name="leak_hint_webrtc_other">WebRTC にプロキシの出口とは別の海外アドレスが表示されています。おそらく別のノードです。ルールが IP チェックと STUN サーバーを別のグループに振り分けています。</string>
     <string name="node_sort_config">設定どおり</string>
     <string name="node_sort_delay">遅延順</string>
     <string name="node_sort_name">名前順</string>

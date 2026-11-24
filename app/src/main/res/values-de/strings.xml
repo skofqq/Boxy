@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">Das Abo hat ein unbekanntes Format. Die bisherige Konfiguration bleibt.</string>
     <string name="settings_module">Modul</string>
     <string name="settings_module_sub">Kern, Netzwerkmodus und IPv6</string>
+    <string name="settings_block_webrtc">WebRTC blockieren</string>
+    <string name="settings_block_webrtc_sub">STUN am Proxy vorbei wird unterbunden: Websites sehen nur die Proxy-Adresse</string>
+    <string name="settings_block_webrtc_old">Benötigt Modul v1.12.1 oder neuer</string>
     <string name="module_core_missing">Nicht installiert</string>
     <string name="module_core_missing_toast">Dieser Kern ist nicht installiert. Lade ihn unter Werkzeuge → Update → Kern.</string>
     <string name="module_applying">Wird angewendet, Dienst startet neu…</string>
@@ -1448,6 +1451,8 @@
     <string name="leak_hint_redirect">Der Modus redirect fängt nur TCP ab, daher läuft WebRTC über UDP am Proxy vorbei. Wähle tproxy, tun, mixed oder enhance.</string>
     <string name="leak_hint_udp">WebRTC läuft über UDP am Proxy vorbei. Prüfe, ob der Knoten UDP unterstützt und keine Regel UDP an DIRECT schickt.</string>
     <string name="leak_hint_ipv6">IPv6 ist im Modul aus, das Netz bietet es aber an, daher umgehen diese Verbindungen den Proxy. Schalte IPv6 im Modul ein oder am Telefon aus.</string>
+    <string name="leak_hint_webrtc_block">Schalte „WebRTC blockieren“ in den Einstellungen ein: Das Modul unterbindet dann STUN am Proxy vorbei.</string>
+    <string name="leak_hint_webrtc_other">WebRTC zeigt eine ausländische Adresse, die nicht der Proxy-Ausgang ist. Wahrscheinlich ein anderer Knoten: Die Regeln leiten IP-Prüfung und STUN-Server über verschiedene Gruppen.</string>
     <string name="node_sort_config">Wie in der Konfig</string>
     <string name="node_sort_delay">Nach Latenz</string>
     <string name="node_sort_name">Nach Name</string>

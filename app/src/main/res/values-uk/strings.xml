@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">Підписка має невідомий формат. Залишено попередню конфігурацію.</string>
     <string name="settings_module">Модуль</string>
     <string name="settings_module_sub">Ядро, режим мережі та IPv6</string>
+    <string name="settings_block_webrtc">Блокувати WebRTC</string>
+    <string name="settings_block_webrtc_sub">STUN повз проксі відсікається: сайти бачать лише адресу проксі</string>
+    <string name="settings_block_webrtc_old">Потрібен модуль v1.12.1 або новіший</string>
     <string name="module_core_missing">Не встановлено</string>
     <string name="module_core_missing_toast">Це ядро не встановлено. Завантажте його в «Утиліти → Оновлення → Ядро».</string>
     <string name="module_applying">Застосовую й перезапускаю сервіс…</string>
@@ -1460,6 +1463,8 @@
     <string name="leak_hint_redirect">Режим redirect перехоплює лише TCP, тому WebRTC через UDP іде повз проксі. Виберіть tproxy, tun, mixed або enhance.</string>
     <string name="leak_hint_udp">WebRTC іде повз проксі через UDP. Перевірте, що вузол підтримує UDP і правила не надсилають UDP у DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 у модулі вимкнено, а мережа його надає, тому такі з’єднання йдуть повз проксі. Увімкніть IPv6 у модулі або вимкніть його на телефоні.</string>
+    <string name="leak_hint_webrtc_block">Увімкніть «Блокувати WebRTC» у налаштуваннях: модуль відсікатиме STUN повз проксі.</string>
+    <string name="leak_hint_webrtc_other">WebRTC показує іноземну адресу, відмінну від виходу проксі. Найімовірніше, це інший вузол: правила відправляють перевірку IP і STUN-сервер через різні групи.</string>
     <string name="node_sort_config">Як у конфігу</string>
     <string name="node_sort_delay">За пінгом</string>
     <string name="node_sort_name">За ім\'ям</string>

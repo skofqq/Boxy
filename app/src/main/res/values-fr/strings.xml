@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">L’abonnement a un format inconnu. L’ancienne configuration est conservée.</string>
     <string name="settings_module">Module</string>
     <string name="settings_module_sub">Cœur, mode réseau et IPv6</string>
+    <string name="settings_block_webrtc">Bloquer WebRTC</string>
+    <string name="settings_block_webrtc_sub">Le STUN qui contourne le proxy est coupé : les sites ne voient que son adresse</string>
+    <string name="settings_block_webrtc_old">Nécessite le module v1.12.1 ou plus récent</string>
     <string name="module_core_missing">Non installé</string>
     <string name="module_core_missing_toast">Ce cœur n’est pas installé. Téléchargez-le dans Outils → Mise à jour → Cœur.</string>
     <string name="module_applying">Application et redémarrage du service…</string>
@@ -1448,6 +1451,8 @@
     <string name="leak_hint_redirect">Le mode redirect n’intercepte que TCP : WebRTC en UDP contourne le proxy. Choisissez tproxy, tun, mixed ou enhance.</string>
     <string name="leak_hint_udp">WebRTC contourne le proxy en UDP. Vérifiez que le nœud prend en charge UDP et qu’aucune règle n’envoie UDP vers DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 est désactivé dans le module alors que le réseau le fournit : ces connexions contournent le proxy. Activez IPv6 dans le module ou désactivez-le sur le téléphone.</string>
+    <string name="leak_hint_webrtc_block">Activez « Bloquer WebRTC » dans les réglages : le module coupera le STUN qui contourne le proxy.</string>
+    <string name="leak_hint_webrtc_other">WebRTC affiche une adresse étrangère différente de la sortie du proxy. C’est sans doute un autre nœud : les règles font passer la vérification d’IP et le serveur STUN par des groupes différents.</string>
     <string name="node_sort_config">Comme dans la config</string>
     <string name="node_sort_delay">Par latence</string>
     <string name="node_sort_name">Par nom</string>

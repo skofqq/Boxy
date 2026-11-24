@@ -694,6 +694,9 @@
     <string name="notify_subs_failed_format">The subscription has an unknown format. The previous config is kept.</string>
     <string name="settings_module">Module</string>
     <string name="settings_module_sub">Core, network mode and IPv6</string>
+    <string name="settings_block_webrtc">Block WebRTC</string>
+    <string name="settings_block_webrtc_sub">STUN past the proxy is cut off: sites see only the proxy\'s address</string>
+    <string name="settings_block_webrtc_old">Needs module v1.12.1 or newer</string>
     <string name="module_core_missing">Not installed</string>
     <string name="module_core_missing_toast">This core is not installed. Download it in Tools → Update → Core.</string>
     <string name="module_applying">Applying and restarting the service…</string>
@@ -1471,6 +1474,8 @@
     <string name="leak_hint_redirect">Redirect mode intercepts only TCP, so WebRTC over UDP goes past the proxy. Pick tproxy, tun, mixed or enhance.</string>
     <string name="leak_hint_udp">WebRTC goes past the proxy over UDP. Check that the node supports UDP and that no rule sends UDP to DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 is off in the module while the network offers it, so those connections skip the proxy. Turn IPv6 on in the module or off on the phone.</string>
+    <string name="leak_hint_webrtc_block">Turn on “Block WebRTC” in Settings: the module then cuts off STUN that goes past the proxy.</string>
+    <string name="leak_hint_webrtc_other">WebRTC shows a foreign address that is not the proxy\'s exit. Most likely it is another node: the rules send the IP check and the STUN server through different groups.</string>
     <string name="node_sort_config">As in config</string>
     <string name="node_sort_delay">By delay</string>
     <string name="node_sort_name">By name</string>

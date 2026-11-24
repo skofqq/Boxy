@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">L’abbonamento ha un formato sconosciuto. Resta la configurazione precedente.</string>
     <string name="settings_module">Modulo</string>
     <string name="settings_module_sub">Core, modalità di rete e IPv6</string>
+    <string name="settings_block_webrtc">Blocca WebRTC</string>
+    <string name="settings_block_webrtc_sub">Lo STUN che aggira il proxy viene bloccato: i siti vedono solo il suo indirizzo</string>
+    <string name="settings_block_webrtc_old">Richiede il modulo v1.12.1 o successivo</string>
     <string name="module_core_missing">Non installato</string>
     <string name="module_core_missing_toast">Questo core non è installato. Scaricalo in Strumenti → Aggiorna → Core.</string>
     <string name="module_applying">Applico e riavvio il servizio…</string>
@@ -1448,6 +1451,8 @@
     <string name="leak_hint_redirect">La modalità redirect intercetta solo TCP, quindi WebRTC su UDP aggira il proxy. Scegli tproxy, tun, mixed o enhance.</string>
     <string name="leak_hint_udp">WebRTC aggira il proxy via UDP. Verifica che il nodo supporti UDP e che nessuna regola mandi UDP a DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 è spento nel modulo ma la rete lo offre, quindi queste connessioni aggirano il proxy. Attiva IPv6 nel modulo o disattivalo sul telefono.</string>
+    <string name="leak_hint_webrtc_block">Attiva «Blocca WebRTC» nelle impostazioni: il modulo bloccherà lo STUN che aggira il proxy.</string>
+    <string name="leak_hint_webrtc_other">WebRTC mostra un indirizzo estero diverso dall’uscita del proxy. Probabilmente è un altro nodo: le regole instradano il controllo IP e il server STUN su gruppi diversi.</string>
     <string name="node_sort_config">Come nella config</string>
     <string name="node_sort_delay">Per latenza</string>
     <string name="node_sort_name">Per nome</string>

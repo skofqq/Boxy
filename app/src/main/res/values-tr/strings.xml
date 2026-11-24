@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">Aboneliğin biçimi bilinmiyor. Önceki yapılandırma korundu.</string>
     <string name="settings_module">Modül</string>
     <string name="settings_module_sub">Çekirdek, ağ modu ve IPv6</string>
+    <string name="settings_block_webrtc">WebRTC\'yi engelle</string>
+    <string name="settings_block_webrtc_sub">Proxy\'yi atlayan STUN kesilir: siteler yalnızca proxy adresini görür</string>
+    <string name="settings_block_webrtc_old">Modül v1.12.1 veya daha yenisi gerekir</string>
     <string name="module_core_missing">Yüklü değil</string>
     <string name="module_core_missing_toast">Bu çekirdek yüklü değil. Araçlar → Güncelleme → Çekirdek bölümünden indirin.</string>
     <string name="module_applying">Uygulanıyor, hizmet yeniden başlatılıyor…</string>
@@ -1448,6 +1451,8 @@
     <string name="leak_hint_redirect">Redirect modu yalnızca TCP’yi yakalar, bu yüzden UDP üzerinden WebRTC proxy’yi atlar. tproxy, tun, mixed veya enhance seçin.</string>
     <string name="leak_hint_udp">WebRTC UDP üzerinden proxy’yi atlıyor. Düğümün UDP desteklediğini ve hiçbir kuralın UDP’yi DIRECT’e göndermediğini denetleyin.</string>
     <string name="leak_hint_ipv6">Modülde IPv6 kapalı ama ağ sunuyor, bu bağlantılar proxy’yi atlıyor. Modülde IPv6’yı açın veya telefonda kapatın.</string>
+    <string name="leak_hint_webrtc_block">Ayarlar\'da “WebRTC\'yi engelle” seçeneğini açın: modül proxy\'yi atlayan STUN\'u keser.</string>
+    <string name="leak_hint_webrtc_other">WebRTC, proxy çıkışından farklı bir yabancı adres gösteriyor. Büyük olasılıkla başka bir düğüm: kurallar IP kontrolünü ve STUN sunucusunu farklı gruplardan geçiriyor.</string>
     <string name="node_sort_config">Yapılandırmadaki gibi</string>
     <string name="node_sort_delay">Gecikmeye göre</string>
     <string name="node_sort_name">Ada göre</string>

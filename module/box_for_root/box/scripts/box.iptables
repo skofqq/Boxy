@@ -32,6 +32,9 @@ quic="${quic:-enable}"
 clash_dns_forward="enable"
 # settings.ini: dns_hijack=false leaves port 53 to the system or another module (AdGuard Home)
 dns_hijack="${dns_hijack:-true}"
+# settings.ini: block_webrtc=true drops STUN / TURN over UDP that leaves the phone past the core (see webrtc_rules).
+block_webrtc="${block_webrtc:-false}"
+webrtc_ports="3478,3479,5349,5350,19302:19309"
 fake_ip_range=""
 
 # ex: 7.1.1
@@ -120,6 +123,7 @@ ipt_batched() {
 
 start_tproxy() { ipt_batched start_tproxy_rules; }
 start_redirect() { ipt_batched start_redirect_rules; }
+start_webrtc() { ipt_batched webrtc_rules; }
 
 case "${bin_name}" in
   "clash")
@@ -657,6 +661,88 @@ fi
   fi
 }
 
+# WebRTC leak guard (block_webrtc=true), for the family in ${iptables}. Browsers learn the public address from STUN
+# answers over UDP; when such a packet goes out past the core, the site sees the real address. That happens
+# when UDP is not proxied (redirect mode, IPv6 while the module has it off) and when the core's own rules send
+# STUN DIRECT. Packets the core takes over leave through lo (TProxy) or the TUN device and are not touched, so
+# WebRTC keeps working through the proxy. Apps left out of the proxy (package.list.cfg / gid.list.cfg) are
+# direct anyway and keep their calls; local networks are not touched either. REJECT, not DROP: a dropped
+# packet fails sendmsg() with EPERM, and a core may retry that in a busy loop.
+webrtc_rules() {
+  ${iptables} -N BOX_WEBRTC
+  ${iptables} -F BOX_WEBRTC
+  # Taken over by the core: marked for TProxy (still shows the real interface here), or sent to lo / the TUN.
+  ${iptables} -A BOX_WEBRTC -m mark --mark "${fwmark}" -j RETURN
+  ${iptables} -A BOX_WEBRTC -o lo -j RETURN
+  [ -n "${tun_device}" ] && ${iptables} -A BOX_WEBRTC -o "${tun_device}" -j RETURN
+  for ignore in ${ignore_out_list[@]} ; do
+    ${iptables} -A BOX_WEBRTC -o "${ignore}" -j RETURN
+  done
+  if [ "${iptables}" = "$IPV" ]; then
+    for subnet in ${intranet[@]} ; do
+      ${iptables} -A BOX_WEBRTC -d ${subnet} -j RETURN
+    done
+  else
+    for subnet6 in ${intranet6[@]} ; do
+      ${iptables} -A BOX_WEBRTC -d ${subnet6} -j RETURN
+    done
+  fi
+
+  case "${proxy_mode}" in
+    whitelist|white)
+      if [ -z "$(cat "${uid_list[@]}" 2>/dev/null)" ] ; then
+        ${iptables} -A BOX_WEBRTC -j REJECT
+      else
+        while read -r appid; do
+          ${iptables} -A BOX_WEBRTC -m owner --uid-owner "${appid}" -j REJECT
+        done < "${uid_list[@]}"
+        for appid in 0 1052; do
+          ${iptables} -A BOX_WEBRTC -m owner --uid-owner "${appid}" -j REJECT
+        done
+        for gid in ${gid_list[@]} "${box_group}"; do
+          ${iptables} -A BOX_WEBRTC -m owner --gid-owner "${gid}" -j REJECT
+        done
+      fi
+      ;;
+    *)
+      if [ -n "$(cat "${uid_list[@]}" 2>/dev/null)" ] ; then
+        while read -r appid; do
+          ${iptables} -A BOX_WEBRTC -m owner --uid-owner "${appid}" -j RETURN
+        done < "${uid_list[@]}"
+      fi
+      for gid in ${gid_list[@]} ; do
+        ${iptables} -A BOX_WEBRTC -m owner --gid-owner "${gid}" -j RETURN
+      done
+      ${iptables} -A BOX_WEBRTC -j REJECT
+      ;;
+  esac
+
+  ${iptables} -I OUTPUT -p udp -m multiport --dports "${webrtc_ports}" -j BOX_WEBRTC
+}
+
+stop_webrtc() {
+  ${iptables} -D OUTPUT -p udp -m multiport --dports "${webrtc_ports}" -j BOX_WEBRTC
+  ${iptables} -F BOX_WEBRTC
+  ${iptables} -X BOX_WEBRTC
+}
+
+# Adds the WebRTC guard for both families when block_webrtc=true; logs once.
+apply_webrtc() {
+  [ "${block_webrtc}" = "true" ] || return 0
+  local fam ok=1
+  # The TUN branch does not build the app list for itself.
+  [[ "${network_mode}" == @(redirect|mixed|tproxy|enhance) ]] || find_packages_uid
+  for fam in "$IPV" "$IP6V"; do
+    iptables="${fam}"
+    start_webrtc || { ok=0; stop_webrtc >/dev/null 2>&1; }
+  done
+  if [ "${ok}" = "1" ]; then
+    log Info "WebRTC: STUN past the core is blocked."
+  else
+    log Error "WebRTC: blocking rules failed."
+  fi
+}
+
 tproxy_routes_del() {
   if [ "${iptables}" = "$IPV" ]; then
     ip rule del fwmark "${fwmark}" table "${table}" pref "${pref}"
@@ -745,14 +831,14 @@ fast_cleanup() {
   case "${IPV}" in *-w*) wait="-w 100" ;; esac
   ${save} 2>/dev/null | busybox awk -v tp="${tproxy_port}" -v rp="${redir_port}" -v v6="${v6}" '
     BEGIN {
-      n = split("BOX_EXTERNAL BOX_LOCAL DIVERT CLASH_DNS_EXTERNAL CLASH_DNS_LOCAL LOCAL_IP_V4 LOCAL_IP_V6", c, " ")
+      n = split("BOX_EXTERNAL BOX_LOCAL BOX_WEBRTC DIVERT CLASH_DNS_EXTERNAL CLASH_DNS_LOCAL LOCAL_IP_V4 LOCAL_IP_V6", c, " ")
       for (i = 1; i <= n; i++) ours[c[i]] = 1
     }
     /^\*/ { t = substr($0, 2); tables[++nt] = t; next }
     /^:/ { name = substr($1, 2); if (name in ours) chains[t] = chains[t] " " name; next }
     /^-A / {
       if ($2 in ours) next
-      if ($0 ~ /-j (BOX_EXTERNAL|BOX_LOCAL|DIVERT|CLASH_DNS_EXTERNAL|CLASH_DNS_LOCAL|LOCAL_IP_V4|LOCAL_IP_V6)( |$)/ ||
+      if ($0 ~ /-j (BOX_EXTERNAL|BOX_LOCAL|BOX_WEBRTC|DIVERT|CLASH_DNS_EXTERNAL|CLASH_DNS_LOCAL|LOCAL_IP_V4|LOCAL_IP_V6)( |$)/ ||
           ($2 == "OUTPUT" && $0 ~ ("--dport (" tp "|" rp ") .*-j REJECT")) ||
           ($2 == "OUTPUT" && $0 ~ /-p udp/ && $0 ~ /--dport (443|80) / && $0 ~ /-j REJECT/) ||
           (v6 == 1 && $2 == "OUTPUT" && $0 ~ /-p udp/ && $0 ~ /--dport 53 -j DROP/) ||
@@ -789,6 +875,7 @@ cleanup_iptables() {
     iptables="${iptables}" && {
       stop_redirect
       stop_tproxy
+      stop_webrtc
       forward -D
     } >/dev/null 2>&1
 
@@ -932,6 +1019,7 @@ if [[ "${network_mode}" == @(redirect|mixed|tproxy|enhance) ]]; then
           exit 1
         ;;
       esac
+      apply_webrtc
       [ $1 = "renew" ] && log Debug "restart iptables transparent proxy rules done."
       bin_alive && log Info "${bin_name} connected."
       ;;
@@ -1000,6 +1088,7 @@ else
         disable_ipv6
         log Warning "Disable IPv6."
       fi
+      apply_webrtc
       [ $1 = "renew" ] && log Info "Restart iptables tun rules done."
       bin_alive && log Info "${bin_name} connected."
       ;;

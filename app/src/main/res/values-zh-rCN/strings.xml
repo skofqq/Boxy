@@ -641,6 +641,9 @@
     <string name="notify_subs_failed_format">订阅格式未知，已保留原配置。</string>
     <string name="settings_module">模块</string>
     <string name="settings_module_sub">内核、网络模式和 IPv6</string>
+    <string name="settings_block_webrtc">阻止 WebRTC</string>
+    <string name="settings_block_webrtc_sub">拦截绕过代理的 STUN：网站只能看到代理地址</string>
+    <string name="settings_block_webrtc_old">需要模块 v1.12.1 或更高版本</string>
     <string name="module_core_missing">未安装</string>
     <string name="module_core_missing_toast">该内核未安装。请在“工具 → 更新 → 内核”中下载。</string>
     <string name="module_applying">正在应用并重启服务…</string>
@@ -1442,6 +1445,8 @@
     <string name="leak_hint_redirect">redirect 模式只拦截 TCP，因此通过 UDP 的 WebRTC 会绕过代理。请选择 tproxy、tun、mixed 或 enhance。</string>
     <string name="leak_hint_udp">WebRTC 通过 UDP 绕过了代理。请确认节点支持 UDP，且没有规则把 UDP 发往 DIRECT。</string>
     <string name="leak_hint_ipv6">模块中 IPv6 已关闭，但网络提供 IPv6，这些连接会绕过代理。请在模块中开启 IPv6，或在手机上关闭它。</string>
+    <string name="leak_hint_webrtc_block">在设置中打开“阻止 WebRTC”：模块会拦截绕过代理的 STUN。</string>
+    <string name="leak_hint_webrtc_other">WebRTC 显示的是与代理出口不同的境外地址，很可能是另一个节点：规则把 IP 检测和 STUN 服务器分到了不同的分组。</string>
     <string name="node_sort_config">按配置顺序</string>
     <string name="node_sort_delay">按延迟</string>
     <string name="node_sort_name">按名称</string>

@@ -38,12 +38,18 @@ data class LeakResult(
     val networkMode: String? = null,
     /** IPv6 is switched off in the module. */
     val moduleIpv6Off: Boolean = false,
+    /** The module can block WebRTC past the core, but block_webrtc is off. */
+    val webRtcBlockOff: Boolean = false,
 ) {
     /** Likely causes of the leaks found, as string resources. */
     val hints: List<Int>
         get() = buildList {
             if (webRtcVerdict == LeakVerdict.LEAK) {
                 add(if (networkMode == "redirect") com.skofqq.boxy.R.string.leak_hint_redirect else com.skofqq.boxy.R.string.leak_hint_udp)
+                if (webRtcBlockOff) add(com.skofqq.boxy.R.string.leak_hint_webrtc_block)
+            } else if (webRtcVerdict == LeakVerdict.WARN) {
+                add(com.skofqq.boxy.R.string.leak_hint_webrtc_other)
+                if (webRtcBlockOff) add(com.skofqq.boxy.R.string.leak_hint_webrtc_block)
             }
             if (ipv6Verdict == LeakVerdict.LEAK && moduleIpv6Off) add(com.skofqq.boxy.R.string.leak_hint_ipv6)
         }
@@ -70,6 +76,7 @@ object LeakCheck {
     suspend fun run(context: Context): LeakResult = coroutineScope {
         val state = async { runCatching { BoxModule.state() }.getOrNull() }
         val excluded = async { BoxModule.packageExcluded(context.packageName) }
+        val rtcBlock = async { runCatching { BoxModule.blockWebrtc() }.getOrNull() }
         val direct = async { BoxModule.directAddresses() }
         val ipv4 = async { Net.geoIp(false) }
         val ipv6 = async { Net.geoIp(true) }
@@ -109,8 +116,11 @@ object LeakCheck {
         }
         val rtcVerdict = when {
             !judged -> LeakVerdict.UNKNOWN
-            // Any address other than the proxy's exit means WebRTC found a way around it.
-            rtc.any { g -> isReal(g) || listOfNotNull(v4, v6).none { it.ip == g.ip || (it.asn != null && it.asn == g.asn) } } -> LeakVerdict.LEAK
+            // The phone's own addresses, or anything from its own country, are a leak. A foreign address other than
+            // the exit is most likely another node of the proxy (rule groups may send the IP check and the STUN
+            // server through different nodes): worth a look, not an alarm.
+            rtc.any { g -> isReal(g) || g.countryCode == null || g.countryCode in homeCountries } -> LeakVerdict.LEAK
+            rtc.any { g -> listOfNotNull(v4, v6).none { it.ip == g.ip || (it.asn != null && it.asn == g.asn) } } -> LeakVerdict.WARN
             else -> LeakVerdict.OK
         }
         LeakResult(
@@ -126,6 +136,7 @@ object LeakCheck {
             webRtcVerdict = rtcVerdict,
             networkMode = state.await()?.mode,
             moduleIpv6Off = state.await()?.ipv6 == false,
+            webRtcBlockOff = rtcBlock.await() == false,
         ).also { last = it }
     }
 

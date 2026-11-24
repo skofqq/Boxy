@@ -1,5 +1,15 @@
 # Box for Root (Boxy edition)
 
+## v1.12.1
+
+New:
+- `block_webrtc=true` in settings.ini blocks WebRTC leaks: STUN / TURN over UDP (ports 3478, 3479, 5349, 5350,
+  19302–19309) that would leave past the core is rejected, for IPv4 and IPv6, in every network mode. That covers UDP
+  that is not proxied (redirect mode, IPv6 while `ipv6=false`) and STUN the core's own rules send DIRECT. Packets the
+  core takes over (TProxy mark, lo, the TUN device) pass, so WebRTC keeps working through the proxy; apps left out of
+  the proxy and local networks are not touched. Static iptables rules (chain `BOX_WEBRTC`), no background work;
+  `box.iptables renew` applies a change without restarting the core. Off by default, Boxy 2.2.3 has a switch for it.
+
 ## v1.12.0
 
 New:

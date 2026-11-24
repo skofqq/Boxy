@@ -686,6 +686,9 @@
     <string name="notify_subs_failed_format">У подписки неизвестный формат. Оставлена прежняя конфигурация.</string>
     <string name="settings_module">Модуль</string>
     <string name="settings_module_sub">Ядро, режим сети и IPv6</string>
+    <string name="settings_block_webrtc">Блокировать WebRTC</string>
+    <string name="settings_block_webrtc_sub">STUN мимо прокси отсекается: сайты видят только адрес прокси</string>
+    <string name="settings_block_webrtc_old">Нужен модуль v1.12.1 или новее</string>
     <string name="module_core_missing">Не установлено</string>
     <string name="module_core_missing_toast">Это ядро не установлено. Скачайте его в «Утилиты → Обновление → Ядро».</string>
     <string name="module_applying">Применяю и перезапускаю сервис…</string>
@@ -1475,6 +1478,8 @@
     <string name="leak_hint_redirect">Режим redirect перехватывает только TCP, поэтому WebRTC по UDP идёт мимо прокси. Выберите tproxy, tun, mixed или enhance.</string>
     <string name="leak_hint_udp">WebRTC идёт мимо прокси по UDP. Проверьте, что узел поддерживает UDP и правила не отправляют UDP в DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 в модуле выключен, а сеть его даёт, поэтому такие соединения идут мимо прокси. Включите IPv6 в модуле или отключите его на телефоне.</string>
+    <string name="leak_hint_webrtc_block">Включите «Блокировать WebRTC» в настройках: модуль будет отсекать STUN мимо прокси.</string>
+    <string name="leak_hint_webrtc_other">WebRTC показывает иностранный адрес, отличный от выхода прокси. Скорее всего, это другой узел: правила отправляют проверку IP и STUN-сервер через разные группы.</string>
     <string name="node_sort_config">Как в конфиге</string>
     <string name="node_sort_delay">По пингу</string>
     <string name="node_sort_name">По имени</string>

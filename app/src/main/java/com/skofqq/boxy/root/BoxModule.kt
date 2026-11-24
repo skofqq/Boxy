@@ -362,6 +362,24 @@ object BoxModule {
         ok
     }
 
+    /**
+     * block_webrtc in settings.ini (module v1.12.1+): STUN over UDP that would leave past the core is rejected.
+     * null when the installed module's box.iptables does not know it yet.
+     */
+    suspend fun blockWebrtc(): Boolean? = withContext(Dispatchers.IO) {
+        val kv = parseKv(
+            sh("grep -q block_webrtc $SCRIPTS/box.iptables 2>/dev/null && echo supported=1; grep -m1 '^block_webrtc=' $SETTINGS 2>/dev/null"),
+        )
+        if (kv["supported"] != "1") null else unquote(kv["block_webrtc"]) == "true"
+    }
+
+    /** Saves block_webrtc and re-applies the rules when the service runs (no core restart). */
+    suspend fun setBlockWebrtc(enabled: Boolean): Boolean = withContext(Dispatchers.IO) {
+        val ok = writeSettingRaw("block_webrtc", enabled.toString())
+        if (ok) Shell.cmd("[ -f $PID_FILE ] && $SCRIPTS/box.iptables renew >/dev/null 2>&1").exec()
+        ok
+    }
+
     suspend fun dnscrypt(): DnsCryptState = withContext(Dispatchers.IO) {
         val out = sh(
             "grep -E '^(dnscrypt|dnscrypt_port)=' $SETTINGS 2>/dev/null; " +

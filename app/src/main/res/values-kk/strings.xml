@@ -670,6 +670,9 @@
     <string name="notify_subs_failed_format">Жазылым пішімі белгісіз. Алдыңғы конфигурация қалдырылды.</string>
     <string name="settings_module">Модуль</string>
     <string name="settings_module_sub">Ядро, желі режимі және IPv6</string>
+    <string name="settings_block_webrtc">WebRTC бұғаттау</string>
+    <string name="settings_block_webrtc_sub">Проксиді айналып өтетін STUN кесіледі: сайттар тек прокси мекенжайын көреді</string>
+    <string name="settings_block_webrtc_old">v1.12.1 не жаңарақ модуль қажет</string>
     <string name="module_core_missing">Орнатылмаған</string>
     <string name="module_core_missing_toast">Бұл ядро орнатылмаған. Оны «Утилиталар → Жаңарту → Ядро» бөлімінде жүктеңіз.</string>
     <string name="module_applying">Қолданып, қызметті қайта іске қосудамын…</string>
@@ -1448,6 +1451,8 @@
     <string name="leak_hint_redirect">Redirect режимі тек TCP-ны ұстайды, сондықтан UDP арқылы WebRTC проксиді айналып өтеді. tproxy, tun, mixed немесе enhance таңдаңыз.</string>
     <string name="leak_hint_udp">WebRTC UDP арқылы проксиді айналып өтеді. Түйіннің UDP қолдайтынын және ережелер UDP-ны DIRECT-ке жібермейтінін тексеріңіз.</string>
     <string name="leak_hint_ipv6">Модульде IPv6 өшірулі, ал желі оны береді, сондықтан мұндай қосылымдар проксиді айналып өтеді. Модульде IPv6 қосыңыз немесе телефонда өшіріңіз.</string>
+    <string name="leak_hint_webrtc_block">Баптауларда «WebRTC бұғаттау» қосыңыз: модуль проксиді айналып өтетін STUN-ды кеседі.</string>
+    <string name="leak_hint_webrtc_other">WebRTC прокси шығысынан өзгеше шетелдік мекенжайды көрсетеді. Бұл басқа түйін болуы мүмкін: ережелер IP тексеруін және STUN серверін әртүрлі топтар арқылы жібереді.</string>
     <string name="node_sort_config">Конфигтегідей</string>
     <string name="node_sort_delay">Пинг бойынша</string>
     <string name="node_sort_name">Аты бойынша</string>
