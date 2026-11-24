@@ -727,6 +727,10 @@
     <string name="core_update_running">Скачиваю и проверяю ядро…</string>
     <string name="core_update_done">%1$s обновлено до %2$s.</string>
     <string name="core_update_failed">Не удалось обновить ядро.</string>
+    <string name="core_update_up_to_date">Установлена последняя версия.</string>
+    <string name="core_update_install">Установить</string>
+    <string name="core_update_reinstall">Переустановить</string>
+    <string name="core_update_close">Закрыть</string>
     <string name="tools_net_dns">Сеть и DNS</string>
     <string name="tools_net_dns_sub">Правила Wi‑Fi, перехват DNS и DNSCrypt</string>
     <string name="tools_row_wifi">Правила Wi‑Fi</string>

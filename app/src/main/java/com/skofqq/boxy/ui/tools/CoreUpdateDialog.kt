@@ -110,9 +110,12 @@ fun CoreUpdateDialog(update: CoreUpdate, onLater: () -> Unit, onClose: () -> Uni
         },
         text = {
             Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                VersionsRow(update.installed, update.latest)
+                VersionsRow(update.installed.ifEmpty { "—" }, update.latest)
                 when (phase) {
-                    Phase.OFFER -> Changelog(update, expanded) { expanded = !expanded }
+                    Phase.OFFER -> Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                        if (update.upToDate) Result(stringResource(R.string.core_update_up_to_date), Boxy.colors.text2, Boxy.colors.surface2)
+                        Changelog(update, expanded) { expanded = !expanded }
+                    }
                     Phase.RUNNING -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         if (percent >= 0f) {
                             androidx.compose.material3.LinearWavyProgressIndicator(progress = { percent }, modifier = Modifier.fillMaxWidth(), color = Boxy.colors.accent)
@@ -142,8 +145,18 @@ fun CoreUpdateDialog(update: CoreUpdate, onLater: () -> Unit, onClose: () -> Uni
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (phase) {
                     Phase.OFFER -> {
-                        DialogButton(stringResource(R.string.core_update_action), Boxy.colors.accent, Color.White) { runUpdate() }
-                        DialogButton(stringResource(R.string.core_update_later), Boxy.colors.surface2, Boxy.colors.text, onLater)
+                        val action = when {
+                            update.installed.isEmpty() -> R.string.core_update_install
+                            update.upToDate -> R.string.core_update_reinstall
+                            else -> R.string.core_update_action
+                        }
+                        DialogButton(stringResource(action), Boxy.colors.accent, Color.White) { runUpdate() }
+                        DialogButton(
+                            stringResource(if (update.upToDate) R.string.core_update_close else R.string.core_update_later),
+                            Boxy.colors.surface2,
+                            Boxy.colors.text,
+                            if (update.upToDate) onClose else onLater,
+                        )
                     }
                     Phase.RUNNING -> Unit
                     Phase.FAILED -> {
@@ -163,6 +176,49 @@ fun CoreUpdateDialog(update: CoreUpdate, onLater: () -> Unit, onClose: () -> Uni
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                 }
+            }
+        },
+        containerColor = Boxy.colors.card,
+    )
+}
+
+/**
+ * The same window for a core picked on the Update page: loads its latest release first, then offers to update,
+ * install (missing core) or reinstall (already the latest).
+ */
+@Composable
+fun CoreReleaseDialog(title: String, binName: String, xclash: String?, onClose: () -> Unit) {
+    var update by remember { mutableStateOf<CoreUpdate?>(null) }
+    var failed by remember { mutableStateOf(false) }
+    var attempt by remember { mutableStateOf(0) }
+    androidx.compose.runtime.LaunchedEffect(attempt) {
+        failed = false
+        update = runCatching { com.skofqq.boxy.net.Updates.coreRelease(binName, xclash) }.getOrNull()
+        failed = update == null
+    }
+    update?.let {
+        CoreUpdateDialog(it, onLater = onClose, onClose = onClose)
+        return
+    }
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+    GlassAlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(title) },
+        text = {
+            if (failed) {
+                Result(stringResource(R.string.about_check_failed), Tints.red.fg, Tints.red.bg)
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    androidx.compose.material3.LoadingIndicator(Modifier.size(40.dp), color = Boxy.colors.accent)
+                    Spacer(Modifier.width(12.dp))
+                    Text(stringResource(R.string.about_checking), color = Boxy.colors.text2)
+                }
+            }
+        },
+        confirmButton = {
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (failed) DialogButton(stringResource(R.string.action_retry), Boxy.colors.accent, Color.White) { attempt++ }
+                DialogButton(stringResource(R.string.core_update_close), Boxy.colors.surface2, Boxy.colors.text, onClose)
             }
         },
         containerColor = Boxy.colors.card,

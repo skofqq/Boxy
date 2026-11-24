@@ -711,6 +711,10 @@
     <string name="core_update_running">Çekirdek indiriliyor ve denetleniyor…</string>
     <string name="core_update_done">%1$s, %2$s sürümüne güncellendi.</string>
     <string name="core_update_failed">Çekirdek güncellenemedi.</string>
+    <string name="core_update_up_to_date">En son sürüm yüklü.</string>
+    <string name="core_update_install">Yükle</string>
+    <string name="core_update_reinstall">Yeniden yükle</string>
+    <string name="core_update_close">Kapat</string>
     <string name="tools_net_dns">Ağ ve DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi kuralları, DNS yönlendirme ve DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi kuralları</string>

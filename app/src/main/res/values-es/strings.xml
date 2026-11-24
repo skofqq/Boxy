@@ -711,6 +711,10 @@
     <string name="core_update_running">Descargando y comprobando el núcleo…</string>
     <string name="core_update_done">%1$s actualizado a %2$s.</string>
     <string name="core_update_failed">No se pudo actualizar el núcleo.</string>
+    <string name="core_update_up_to_date">Está instalada la última versión.</string>
+    <string name="core_update_install">Instalar</string>
+    <string name="core_update_reinstall">Reinstalar</string>
+    <string name="core_update_close">Cerrar</string>
     <string name="tools_net_dns">Red y DNS</string>
     <string name="tools_net_dns_sub">Reglas Wi‑Fi, intercepción DNS y DNSCrypt</string>
     <string name="tools_row_wifi">Reglas Wi‑Fi</string>

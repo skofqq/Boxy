@@ -711,6 +711,10 @@
     <string name="core_update_running">コアをダウンロードして確認中…</string>
     <string name="core_update_done">%1$s を %2$s に更新しました。</string>
     <string name="core_update_failed">コアを更新できませんでした。</string>
+    <string name="core_update_up_to_date">最新バージョンがインストールされています。</string>
+    <string name="core_update_install">インストール</string>
+    <string name="core_update_reinstall">再インストール</string>
+    <string name="core_update_close">閉じる</string>
     <string name="tools_net_dns">ネットワークと DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi ルール、DNS ハイジャック、DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi ルール</string>

@@ -77,6 +77,8 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     var smartSupported by remember { mutableStateOf(false) }
     // A newer stable release of the active core, shown on the core row.
     var coreUpdate by remember { mutableStateOf<com.skofqq.boxy.net.CoreUpdate?>(null) }
+    // A core picked in the sheet: the same window as the launch offer (versions, changelog, update).
+    var coreDialog by remember { mutableStateOf<CoreTarget?>(null) }
     var taskTitle by remember { mutableStateOf<String?>(null) }
     val taskLines = remember { mutableStateListOf<String>() }
     var taskDone by remember { mutableStateOf(false) }
@@ -143,7 +145,12 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
                     Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(18.dp)).background(Boxy.colors.card)
                         .clickable {
                             coreSheet = false
-                            scope.launch { launchTask(t.title, BoxModule.toolCommand("upkernel", t.binName, t.xclash)) }
+                            // Mihomo Smart has no stable GitHub release to compare with: plain update as before.
+                            if (t.xclash == "smart") {
+                                scope.launch { launchTask(t.title, BoxModule.toolCommand("upkernel", t.binName, t.xclash)) }
+                            } else {
+                                coreDialog = t
+                            }
                         }
                         .padding(horizontal = 18.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -155,6 +162,13 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
                     Icon(BoxyIcons.SystemUpdate, null, tint = Boxy.colors.text)
                 }
             }
+        }
+    }
+
+    coreDialog?.let { t ->
+        CoreReleaseDialog(t.title, t.binName, t.xclash) {
+            coreDialog = null
+            scope.launch { coreUpdate = runCatching { com.skofqq.boxy.net.Updates.coreUpdate() }.getOrNull() }
         }
     }
 

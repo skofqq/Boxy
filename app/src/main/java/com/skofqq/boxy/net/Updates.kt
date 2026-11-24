@@ -37,7 +37,10 @@ data class CoreUpdate(
     val notes: String = "",
     val pageUrl: String? = null,
     val date: String = "",
-)
+) {
+    /** The installed build is the latest release (an unknown or missing build is not). */
+    val upToDate: Boolean get() = installed.isNotEmpty() && !Updates.isNewer(latest, installed)
+}
 
 /** Update checks: the app's GitHub releases, the module's own updateJson and the active core. */
 object Updates {
@@ -168,7 +171,6 @@ object Updates {
      */
     suspend fun coreUpdate(): CoreUpdate? = withContext(Dispatchers.IO) {
         val bin = BoxModule.unquote(BoxModule.readSetting("bin_name"))?.takeIf { it.isNotBlank() } ?: return@withContext null
-        val (title, repo) = CORE_REPOS[bin] ?: return@withContext null
         val xclash = if (bin == "clash") {
             val option = BoxModule.unquote(BoxModule.readSetting("xclash_option"))
             if (!option.isNullOrBlank() && option != "mihomo") return@withContext null
@@ -176,21 +178,31 @@ object Updates {
         } else {
             null
         }
-        val b = "${BoxModule.BOX_DIR}/bin/$bin"
+        coreRelease(bin, xclash)?.takeIf { it.installed.isNotEmpty() && !it.upToDate }
+    }
+
+    /**
+     * Latest stable release of a core next to the installed build ([CoreUpdate.installed] is empty when the core is
+     * missing or an alpha build). For Mihomo the build in bin/xclash is read, so the one not selected is seen too.
+     * Null for cores we do not follow (Mihomo Smart) or when GitHub did not answer.
+     */
+    suspend fun coreRelease(bin: String, xclash: String?): CoreUpdate? = withContext(Dispatchers.IO) {
+        val (title, repo) = CORE_REPOS[bin] ?: return@withContext null
+        if (bin == "clash" && xclash != "mihomo") return@withContext null
+        val b = if (bin == "clash") "${BoxModule.BOX_DIR}/bin/xclash/mihomo" else "${BoxModule.BOX_DIR}/bin/$bin"
         val (_, out) = BoxModule.exec(
             when (bin) {
-                "clash" -> "\"$b\" -v | head -n1"
+                // Older modules keep Mihomo as bin/clash itself, without the xclash folder.
+                "clash" -> "b=\"$b\"; [ -x \"${'$'}b\" ] || b=${BoxModule.BOX_DIR}/bin/clash; \"${'$'}b\" -v | head -n1"
                 "hysteria" -> "\"$b\" version | grep -i '^version' | head -n1"
                 else -> "\"$b\" version | head -n1"
             },
         )
         val raw = out.joinToString(" ")
-        if ("alpha" in raw.lowercase()) return@withContext null
-        val installed = parseVersion(raw) ?: return@withContext null
+        val installed = if ("alpha" in raw.lowercase()) "" else parseVersion(raw).orEmpty()
         val body = get("https://api.github.com/repos/$repo/releases/latest") ?: return@withContext null
         val j = runCatching { JSONObject(body) }.getOrNull() ?: return@withContext null
         val latest = parseVersion(j.optString("tag_name")) ?: return@withContext null
-        if (!isNewer(latest, installed)) return@withContext null
         CoreUpdate(
             binName = bin,
             xclash = xclash,
