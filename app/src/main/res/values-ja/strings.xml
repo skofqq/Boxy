@@ -695,6 +695,9 @@
     <string name="notify_update_app_text">バージョン %1$s。タップして設定を開きます。</string>
     <string name="notify_update_module_title">モジュールのアップデートがあります</string>
     <string name="notify_update_module_text">Box for Root %1$s。タップして設定を開きます。</string>
+    <string name="notify_update_core_title">コア %1$s のアップデートがあります</string>
+    <string name="notify_update_core_text">インストール済み %1$s、最新 %2$s。タップして更新を開きます。</string>
+    <string name="update_core_available">%1$s %2$s が利用可能(インストール済み %3$s)</string>
     <string name="tools_net_dns">ネットワークと DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi ルール、DNS ハイジャック、DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi ルール</string>

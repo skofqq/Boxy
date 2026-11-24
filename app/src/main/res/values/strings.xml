@@ -719,6 +719,9 @@
     <string name="notify_update_app_text">Version %1$s. Tap to open Settings.</string>
     <string name="notify_update_module_title">Module update available</string>
     <string name="notify_update_module_text">Box for Root %1$s. Tap to open Settings.</string>
+    <string name="notify_update_core_title">%1$s update available</string>
+    <string name="notify_update_core_text">Installed %1$s, latest %2$s. Tap to open Update.</string>
+    <string name="update_core_available">%1$s %2$s is available (installed %3$s)</string>
     <string name="tools_net_dns">Network and DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi rules, DNS hijack and DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi rules</string>

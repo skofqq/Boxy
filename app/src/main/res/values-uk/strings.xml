@@ -695,6 +695,9 @@
     <string name="notify_update_app_text">Версія %1$s. Натисніть, щоб відкрити Налаштування.</string>
     <string name="notify_update_module_title">Доступне оновлення модуля</string>
     <string name="notify_update_module_text">Box for Root %1$s. Натисніть, щоб відкрити Налаштування.</string>
+    <string name="notify_update_core_title">Доступне оновлення ядра %1$s</string>
+    <string name="notify_update_core_text">Встановлено %1$s, вийшла %2$s. Натисніть, щоб відкрити Оновлення.</string>
+    <string name="update_core_available">Доступна %1$s %2$s (встановлено %3$s)</string>
     <string name="tools_net_dns">Мережа і DNS</string>
     <string name="tools_net_dns_sub">Правила Wi‑Fi, перехоплення DNS і DNSCrypt</string>
     <string name="tools_row_wifi">Правила Wi‑Fi</string>

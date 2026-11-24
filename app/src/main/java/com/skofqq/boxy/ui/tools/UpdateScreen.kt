@@ -75,6 +75,8 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
     var geoLabel by remember { mutableStateOf("MetaCubeX") }
     var core by remember { mutableStateOf<String?>(null) }
     var smartSupported by remember { mutableStateOf(false) }
+    // A newer stable release of the active core, shown on the core row.
+    var coreUpdate by remember { mutableStateOf<com.skofqq.boxy.net.CoreUpdate?>(null) }
     var taskTitle by remember { mutableStateOf<String?>(null) }
     val taskLines = remember { mutableStateListOf<String>() }
     var taskDone by remember { mutableStateOf(false) }
@@ -84,6 +86,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
         smartSupported = BoxModule.exec("grep -q 'smart' ${BoxModule.SCRIPTS}/box.tool").first
         CoreTools.geoSources().let { (p, e) -> geoLabel = geoSourcesLabel(p, e) }
         core = BoxModule.unquote(BoxModule.readSetting("bin_name"))
+        coreUpdate = runCatching { com.skofqq.boxy.net.Updates.coreUpdate() }.getOrNull()
     }
 
     val keptOld = stringResource(R.string.update_core_kept_old)
@@ -102,6 +105,7 @@ fun UpdateScreen(contentPadding: PaddingValues, onBack: () -> Unit) {
             }
             taskOk = ok
             taskDone = true
+            coreUpdate = runCatching { com.skofqq.boxy.net.Updates.coreUpdate() }.getOrNull()
         }
     }
 
@@ -116,7 +120,12 @@ SubPageHeader(stringResource(R.string.tools_update), stringResource(R.string.too
             SectionCard(null) {
                 com.skofqq.boxy.ui.components.NoticeCard(stringResource(R.string.update_tip_title), stringResource(R.string.update_tip_body))
                 Spacer(Modifier.height(6.dp))
-                UpdateRow(BoxyIcons.Storage, stringResource(R.string.update_target_core), stringResource(R.string.update_core_sub)) { coreSheet = true }
+                UpdateRow(
+                    BoxyIcons.Storage,
+                    stringResource(R.string.update_target_core),
+                    coreUpdate?.let { stringResource(R.string.update_core_available, it.title, it.latest, it.installed) }
+                        ?: stringResource(R.string.update_core_sub),
+                ) { coreSheet = true }
                 // Hysteria has no subscriptions in the module (its profiles come from links).
                 if (core != "hysteria") UpdateRow(BoxyIcons.Link, subsTitle, stringResource(R.string.update_subscription_sub)) {
                     launchTask(subsTitle, "${BoxModule.SCRIPTS}/box.tool subs")

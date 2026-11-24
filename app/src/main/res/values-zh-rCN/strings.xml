@@ -666,6 +666,9 @@
     <string name="notify_update_app_text">版本 %1$s。点按打开设置。</string>
     <string name="notify_update_module_title">模块有可用更新</string>
     <string name="notify_update_module_text">Box for Root %1$s。点按打开设置。</string>
+    <string name="notify_update_core_title">内核 %1$s 有可用更新</string>
+    <string name="notify_update_core_text">已安装 %1$s,最新 %2$s。点按打开更新。</string>
+    <string name="update_core_available">%1$s %2$s 可用(已安装 %3$s)</string>
     <string name="tools_net_dns">网络和 DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi 规则、DNS 劫持和 DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi 规则</string>

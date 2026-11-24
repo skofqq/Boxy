@@ -25,7 +25,10 @@ data class ModuleUpdate(
     val changelogUrl: String?,
 )
 
-/** Update checks: the app's GitHub releases and the module's own updateJson. */
+/** A newer stable release of the core the module runs now ([title] is how the app names it). */
+data class CoreUpdate(val binName: String, val title: String, val installed: String, val latest: String)
+
+/** Update checks: the app's GitHub releases, the module's own updateJson and the active core. */
 object Updates {
     const val REPO = "skofqq/Boxy"
 
@@ -131,5 +134,47 @@ object Updates {
             )
             (if (u.versionCode > current) u else null) to current
         }.getOrNull()
+    }
+
+    /** GitHub repositories of the stable cores; Mihomo Smart and alpha builds are left out. */
+    private val CORE_REPOS = mapOf(
+        "clash" to ("Mihomo" to "MetaCubeX/mihomo"),
+        "sing-box" to ("Sing-box" to "SagerNet/sing-box"),
+        "xray" to ("Xray" to "XTLS/Xray-core"),
+        "v2fly" to ("V2Ray" to "v2fly/v2ray-core"),
+        "hysteria" to ("Hysteria" to "apernet/hysteria"),
+    )
+
+    private val VERSION = Regex("""\bv?(\d+\.\d+(?:\.\d+)?)\b""")
+
+    /** First dotted version in a core's `version` output or a release tag ("app/v2.6.2" for Hysteria). */
+    fun parseVersion(text: String?): String? = text?.let { VERSION.find(it)?.groupValues?.get(1) }
+
+    /**
+     * Checks the core selected in settings.ini (bin_name) against its latest stable GitHub release.
+     * Returns null when it is up to date, the check failed, or the core is not one we follow
+     * (Mihomo Smart, an alpha build).
+     */
+    suspend fun coreUpdate(): CoreUpdate? = withContext(Dispatchers.IO) {
+        val bin = BoxModule.unquote(BoxModule.readSetting("bin_name"))?.takeIf { it.isNotBlank() } ?: return@withContext null
+        val (title, repo) = CORE_REPOS[bin] ?: return@withContext null
+        if (bin == "clash") {
+            val option = BoxModule.unquote(BoxModule.readSetting("xclash_option"))
+            if (!option.isNullOrBlank() && option != "mihomo") return@withContext null
+        }
+        val b = "${BoxModule.BOX_DIR}/bin/$bin"
+        val (_, out) = BoxModule.exec(
+            when (bin) {
+                "clash" -> "\"$b\" -v | head -n1"
+                "hysteria" -> "\"$b\" version | grep -i '^version' | head -n1"
+                else -> "\"$b\" version | head -n1"
+            },
+        )
+        val raw = out.joinToString(" ")
+        if ("alpha" in raw.lowercase()) return@withContext null
+        val installed = parseVersion(raw) ?: return@withContext null
+        val body = get("https://api.github.com/repos/$repo/releases/latest") ?: return@withContext null
+        val latest = runCatching { parseVersion(JSONObject(body).optString("tag_name")) }.getOrNull() ?: return@withContext null
+        if (isNewer(latest, installed)) CoreUpdate(bin, title, installed, latest) else null
     }
 }

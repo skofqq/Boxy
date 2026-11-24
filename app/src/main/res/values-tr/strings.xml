@@ -695,6 +695,9 @@
     <string name="notify_update_app_text">Sürüm %1$s. Ayarlar\'ı açmak için dokunun.</string>
     <string name="notify_update_module_title">Modül güncellemesi var</string>
     <string name="notify_update_module_text">Box for Root %1$s. Ayarlar\'ı açmak için dokunun.</string>
+    <string name="notify_update_core_title">%1$s çekirdek güncellemesi var</string>
+    <string name="notify_update_core_text">Yüklü %1$s, yeni %2$s. Güncelleme\'yi açmak için dokunun.</string>
+    <string name="update_core_available">%1$s %2$s mevcut (yüklü %3$s)</string>
     <string name="tools_net_dns">Ağ ve DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi kuralları, DNS yönlendirme ve DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi kuralları</string>

@@ -29,8 +29,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
- * Background check for new versions of the app (GitHub releases) and the module (its updateJson),
- * as often as Settings → Automatic update check says. A found version is announced once.
+ * Background check for new versions of the app (GitHub releases), the module (its updateJson) and the
+ * core the module runs (its stable GitHub release), as often as Settings → Automatic update check says.
+ * A found version is announced once.
  */
 class UpdateCheckJob : JobService() {
     private var job: Job? = null
@@ -59,6 +60,7 @@ class UpdateCheckJob : JobService() {
         const val CHANNEL_ID = "updates"
         private const val APP_NOTIFICATION_ID = 3
         private const val MODULE_NOTIFICATION_ID = 4
+        private const val CORE_NOTIFICATION_ID = 5
         private const val SEEN = "update_check"
 
         /** Schedules (or cancels) the periodic check for the interval in the preferences. */
@@ -86,20 +88,39 @@ class UpdateCheckJob : JobService() {
             Updates.appReleases()?.firstOrNull { !it.prerelease && it.apkUrl != null }?.version
                 ?.takeIf { Updates.isNewer(it, current) && it != seen.getString("app", null) }
                 ?.let { version ->
-                    if (notify(context, APP_NOTIFICATION_ID, R.string.notify_update_app_title, R.string.notify_update_app_text, version)) {
+                    if (notify(context, APP_NOTIFICATION_ID, MainActivity.EXTRA_OPEN_SETTINGS) {
+                            it.getString(R.string.notify_update_app_title) to it.getString(R.string.notify_update_app_text, version)
+                        }
+                    ) {
                         seen.edit().putString("app", version).apply()
                     }
                 }
             runCatching { Updates.moduleUpdate()?.first }.getOrNull()
                 ?.takeIf { it.versionCode != seen.getLong("module", 0) }
                 ?.let { u ->
-                    if (notify(context, MODULE_NOTIFICATION_ID, R.string.notify_update_module_title, R.string.notify_update_module_text, u.version)) {
+                    if (notify(context, MODULE_NOTIFICATION_ID, MainActivity.EXTRA_OPEN_SETTINGS) {
+                            it.getString(R.string.notify_update_module_title) to it.getString(R.string.notify_update_module_text, u.version)
+                        }
+                    ) {
                         seen.edit().putLong("module", u.versionCode).apply()
+                    }
+                }
+            // The active core: a version is announced once per core, so switching cores can announce again.
+            runCatching { Updates.coreUpdate() }.getOrNull()
+                ?.takeIf { it.latest != seen.getString("core_${it.binName}", null) }
+                ?.let { u ->
+                    if (notify(context, CORE_NOTIFICATION_ID, MainActivity.EXTRA_OPEN_UPDATE) {
+                            it.getString(R.string.notify_update_core_title, u.title) to
+                                it.getString(R.string.notify_update_core_text, u.installed, u.latest)
+                        }
+                    ) {
+                        seen.edit().putString("core_${u.binName}", u.latest).apply()
                     }
                 }
         }
 
-        private fun notify(context: Context, id: Int, title: Int, text: Int, version: String): Boolean {
+        /** Posts one update notice; [texts] gives its title and text in the app's language. */
+        private fun notify(context: Context, id: Int, openExtra: String, texts: (Context) -> Pair<String, String>): Boolean {
             if (Build.VERSION.SDK_INT >= 33 &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
             ) {
@@ -112,13 +133,15 @@ class UpdateCheckJob : JobService() {
                 id,
                 Intent(ctx, MainActivity::class.java)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    .putExtra(MainActivity.EXTRA_OPEN_SETTINGS, true),
+                    .putExtra(openExtra, true),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
+            val (title, text) = texts(ctx)
             val n = NotificationCompat.Builder(ctx, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_tile)
-                .setContentTitle(ctx.getString(title))
-                .setContentText(ctx.getString(text, version))
+                .setContentTitle(title)
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentIntent(open)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)

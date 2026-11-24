@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Pages asked for by an intent: the panel (long press on the Quick Settings tile, setting on)
-     * or Settings (an update notification).
+     * Settings (an app or module update notification) or the Update page (a core update notification).
      */
     private fun tileLongPress(intent: android.content.Intent?) {
         if (intent?.getBooleanExtra(TileLongPressActivity.EXTRA_OPEN_PANEL, false) == true) {
@@ -116,10 +116,16 @@ class MainActivity : ComponentActivity() {
             intent.removeExtra(EXTRA_OPEN_SETTINGS)
             PanelBus.settings = true
         }
+        if (intent?.getBooleanExtra(EXTRA_OPEN_UPDATE, false) == true) {
+            intent.removeExtra(EXTRA_OPEN_UPDATE)
+            com.skofqq.boxy.ui.tools.ToolsNav.request = com.skofqq.boxy.ui.tools.ROUTE_UPDATE
+            com.skofqq.boxy.ui.tools.ToolsNav.showTools = true
+        }
     }
 
     companion object {
         const val EXTRA_OPEN_SETTINGS = "com.skofqq.boxy.extra.OPEN_SETTINGS"
+        const val EXTRA_OPEN_UPDATE = "com.skofqq.boxy.extra.OPEN_UPDATE"
         /** How long the launch screen may hold the first frame so the logo animation can play out. */
         private const val SPLASH_MS = 400L
     }
@@ -263,7 +269,9 @@ private fun MainScreen(prefs: Prefs, openPanel: Boolean, checkUpdate: Boolean) {
             // A page opened over the tabs (the panel) closes, so the Tools page is seen.
             subPage = null
             val i = tabs.indexOf(Tab.TOOLS)
-            if (i >= 0) pager.animateScrollToPage(i)
+            // Not in this effect: resetting showTools restarts it, which cancelled the scroll on a cold start
+            // (opened from the core update notification).
+            if (i >= 0) scope.launch { pager.animateScrollToPage(i) }
         }
     }
     LaunchedEffect(com.skofqq.boxy.ui.components.AppsNav.open) {

@@ -695,6 +695,9 @@
     <string name="notify_update_app_text">Versión %1$s. Toca para abrir Ajustes.</string>
     <string name="notify_update_module_title">Actualización del módulo disponible</string>
     <string name="notify_update_module_text">Box for Root %1$s. Toca para abrir Ajustes.</string>
+    <string name="notify_update_core_title">Actualización del núcleo %1$s disponible</string>
+    <string name="notify_update_core_text">Instalada %1$s, nueva %2$s. Toca para abrir Actualizar.</string>
+    <string name="update_core_available">%1$s %2$s disponible (instalada %3$s)</string>
     <string name="tools_net_dns">Red y DNS</string>
     <string name="tools_net_dns_sub">Reglas Wi‑Fi, intercepción DNS y DNSCrypt</string>
     <string name="tools_row_wifi">Reglas Wi‑Fi</string>

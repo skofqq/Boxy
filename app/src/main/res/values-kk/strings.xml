@@ -695,6 +695,9 @@
     <string name="notify_update_app_text">Нұсқа %1$s. Баптауларды ашу үшін түртіңіз.</string>
     <string name="notify_update_module_title">Модуль жаңартуы бар</string>
     <string name="notify_update_module_text">Box for Root %1$s. Баптауларды ашу үшін түртіңіз.</string>
+    <string name="notify_update_core_title">%1$s ядросының жаңартуы бар</string>
+    <string name="notify_update_core_text">Орнатылған %1$s, жаңасы %2$s. Жаңартуды ашу үшін түртіңіз.</string>
+    <string name="update_core_available">%1$s %2$s қолжетімді (орнатылған %3$s)</string>
     <string name="tools_net_dns">Желі және DNS</string>
     <string name="tools_net_dns_sub">Wi‑Fi ережелері, DNS ұстау және DNSCrypt</string>
     <string name="tools_row_wifi">Wi‑Fi ережелері</string>
