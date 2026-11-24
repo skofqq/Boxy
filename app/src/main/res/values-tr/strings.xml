@@ -1451,7 +1451,7 @@
     <string name="leak_hint_redirect">Redirect modu yalnızca TCP’yi yakalar, bu yüzden UDP üzerinden WebRTC proxy’yi atlar. tproxy, tun, mixed veya enhance seçin.</string>
     <string name="leak_hint_udp">WebRTC UDP üzerinden proxy’yi atlıyor. Düğümün UDP desteklediğini ve hiçbir kuralın UDP’yi DIRECT’e göndermediğini denetleyin.</string>
     <string name="leak_hint_ipv6">Modülde IPv6 kapalı ama ağ sunuyor, bu bağlantılar proxy’yi atlıyor. Modülde IPv6’yı açın veya telefonda kapatın.</string>
-    <string name="leak_hint_webrtc_block">Ayarlar\'da “WebRTC\'yi engelle” seçeneğini açın: modül proxy\'yi atlayan STUN\'u keser.</string>
+    <string name="leak_hint_webrtc_block">Yapılandırma → Ağ ve DNS bölümünde “WebRTC\'yi engelle”yi açın: modül proxy\'yi atlayan STUN\'u keser.</string>
     <string name="leak_hint_webrtc_other">WebRTC, proxy çıkışından farklı bir yabancı adres gösteriyor. Büyük olasılıkla başka bir düğüm: kurallar IP kontrolünü ve STUN sunucusunu farklı gruplardan geçiriyor.</string>
     <string name="node_sort_config">Yapılandırmadaki gibi</string>
     <string name="node_sort_delay">Gecikmeye göre</string>

@@ -130,9 +130,6 @@ private fun SettingsMain(contentPadding: PaddingValues, prefs: Prefs, push: (Str
     var settingSheet by remember { mutableStateOf<com.skofqq.boxy.ui.components.ModuleSetting?>(null) }
     var applying by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { moduleSetup = runCatching { BoxModule.moduleSetup() }.getOrNull() }
-    var blockWebrtc by remember { mutableStateOf<Boolean?>(null) }
-    var webrtcBusy by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { blockWebrtc = runCatching { BoxModule.blockWebrtc() }.getOrNull() }
     val restarting = stringResource(R.string.module_applying)
     val applyFailed = stringResource(R.string.module_apply_failed)
     fun applyModule(settings: List<Pair<String, String>>) {
@@ -200,22 +197,9 @@ PageHeader(stringResource(R.string.settings_title), stringResource(R.string.sett
                     BoxyIcons.IpAddress,
                     stringResource(R.string.sheet_ipv6_title),
                     m?.ipv6?.let { stringResource(if (it) R.string.common_on else R.string.common_off) } ?: dash,
+                    showDivider = false,
                 ) {
                     if (!applying) settingSheet = com.skofqq.boxy.ui.components.ModuleSetting.IPV6
-                }
-                SwitchRow(
-                    BoxyIcons.Block,
-                    stringResource(R.string.settings_block_webrtc),
-                    stringResource(if (blockWebrtc == null && moduleInstalled) R.string.settings_block_webrtc_old else R.string.settings_block_webrtc_sub),
-                    blockWebrtc == true,
-                    enabled = blockWebrtc != null && !webrtcBusy,
-                    showDivider = false,
-                ) { on ->
-                    webrtcBusy = true
-                    scope.launch {
-                        if (BoxModule.setBlockWebrtc(on)) blockWebrtc = on
-                        webrtcBusy = false
-                    }
                 }
             }
         }

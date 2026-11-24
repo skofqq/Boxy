@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skofqq.boxy.R
+import kotlinx.coroutines.launch
 import com.skofqq.boxy.ui.components.PinnedLazyPage
 import com.skofqq.boxy.data.NavExtra
 import com.skofqq.boxy.root.BoxModule
@@ -130,6 +131,14 @@ object ToolsNav {
 private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPage: (NavExtra) -> Unit, push: (String) -> Unit) {
     var importChooser by remember { mutableStateOf(false) }
     var leakCheck by remember { mutableStateOf(false) }
+    var blockWebrtc by remember { mutableStateOf<Boolean?>(null) }
+    var webrtcBusy by remember { mutableStateOf(false) }
+    var moduleInstalled by remember { mutableStateOf(true) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        blockWebrtc = runCatching { BoxModule.blockWebrtc() }.getOrNull()
+        moduleInstalled = runCatching { BoxModule.state().moduleVersion }.getOrNull() != null
+    }
     if (leakCheck) LeakCheckSheet { leakCheck = false }
     var tlsPing by remember { mutableStateOf(false) }
     if (tlsPing) TlsPingSheet { tlsPing = false }
@@ -181,6 +190,19 @@ private fun ToolsHub(contentPadding: PaddingValues, navExtra: NavExtra, onOpenPa
             SectionCard(stringResource(R.string.tools_net_dns), stringResource(R.string.tools_net_dns_sub)) {
                 SettingsRow(BoxyIcons.Wifi, stringResource(R.string.tools_row_wifi), stringResource(R.string.tools_network_sub)) { push(ROUTE_NETWORK) }
                 SettingsRow(BoxyIcons.Shield, stringResource(R.string.tools_dns), stringResource(R.string.tools_dns_row_sub)) { push(ROUTE_DNS) }
+                com.skofqq.boxy.ui.components.SwitchRow(
+                    BoxyIcons.Block,
+                    stringResource(R.string.settings_block_webrtc),
+                    stringResource(if (blockWebrtc == null && moduleInstalled) R.string.settings_block_webrtc_old else R.string.settings_block_webrtc_sub),
+                    blockWebrtc == true,
+                    enabled = blockWebrtc != null && !webrtcBusy,
+                ) { on ->
+                    webrtcBusy = true
+                    scope.launch {
+                        if (BoxModule.setBlockWebrtc(on)) blockWebrtc = on
+                        webrtcBusy = false
+                    }
+                }
                 SettingsRow(BoxyIcons.Language, stringResource(R.string.leak_title), stringResource(R.string.leak_row_sub), showDivider = false) { leakCheck = true }
             }
         }

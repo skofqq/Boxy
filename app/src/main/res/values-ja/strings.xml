@@ -1445,7 +1445,7 @@
     <string name="leak_hint_redirect">redirect モードは TCP だけを捕捉するため、UDP の WebRTC はプロキシを通りません。tproxy、tun、mixed、enhance のいずれかを選んでください。</string>
     <string name="leak_hint_udp">WebRTC が UDP でプロキシを迂回しています。ノードが UDP に対応し、UDP を DIRECT に送るルールがないか確認してください。</string>
     <string name="leak_hint_ipv6">モジュールで IPv6 がオフですが、ネットワークは IPv6 を提供しているため、その接続はプロキシを通りません。モジュールで IPv6 をオンにするか、端末でオフにしてください。</string>
-    <string name="leak_hint_webrtc_block">設定で「WebRTC をブロック」をオンにすると、プロキシを通らない STUN をモジュールが遮断します。</string>
+    <string name="leak_hint_webrtc_block">構成 → ネットワークと DNS で「WebRTC をブロック」をオンにすると、プロキシを通らない STUN をモジュールが遮断します。</string>
     <string name="leak_hint_webrtc_other">WebRTC にプロキシの出口とは別の海外アドレスが表示されています。おそらく別のノードです。ルールが IP チェックと STUN サーバーを別のグループに振り分けています。</string>
     <string name="node_sort_config">設定どおり</string>
     <string name="node_sort_delay">遅延順</string>

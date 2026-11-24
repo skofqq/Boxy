@@ -1463,7 +1463,7 @@
     <string name="leak_hint_redirect">Режим redirect перехоплює лише TCP, тому WebRTC через UDP іде повз проксі. Виберіть tproxy, tun, mixed або enhance.</string>
     <string name="leak_hint_udp">WebRTC іде повз проксі через UDP. Перевірте, що вузол підтримує UDP і правила не надсилають UDP у DIRECT.</string>
     <string name="leak_hint_ipv6">IPv6 у модулі вимкнено, а мережа його надає, тому такі з’єднання йдуть повз проксі. Увімкніть IPv6 у модулі або вимкніть його на телефоні.</string>
-    <string name="leak_hint_webrtc_block">Увімкніть «Блокувати WebRTC» у налаштуваннях: модуль відсікатиме STUN повз проксі.</string>
+    <string name="leak_hint_webrtc_block">Увімкніть «Блокувати WebRTC» у Конфігурації → Мережа і DNS: модуль відсікатиме STUN повз проксі.</string>
     <string name="leak_hint_webrtc_other">WebRTC показує іноземну адресу, відмінну від виходу проксі. Найімовірніше, це інший вузол: правила відправляють перевірку IP і STUN-сервер через різні групи.</string>
     <string name="node_sort_config">Як у конфігу</string>
     <string name="node_sort_delay">За пінгом</string>
